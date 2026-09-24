@@ -6,24 +6,62 @@
     "requested_frames": 30,
     "dart_before": {
       "description_builds": 1,
-      "encoded_snapshots": 1,
-      "encoded_bytes": 372986,
+      "encoded_snapshots": 0,
+      "encoded_bytes": 0,
       "ffi_callbacks": 3,
       "ui_callbacks": 0,
       "diagnostic_callbacks": 1,
       "description_build": {
         "samples": 1,
-        "p50_us": 636,
-        "p95_us": 636,
-        "p99_us": 636
+        "p50_us": 5,
+        "p95_us": 5,
+        "p99_us": 5
       },
       "encode": {
-        "samples": 1,
-        "p50_us": 4175,
-        "p95_us": 4175,
-        "p99_us": 4175
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "publish_to_applied": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "initial": {
+        "bytes": 373068,
+        "encode_us": 5255
+      },
+      "data_messages": 0,
+      "data_bytes": 0,
+      "data_records_checked": 0,
+      "data_cells_written": 0,
+      "data_encode": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "data_publish_to_applied": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_data_parse": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_data_apply": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_snapshot_apply": {
         "samples": 0,
         "p50_us": 0,
         "p95_us": 0,
@@ -32,24 +70,62 @@
     },
     "dart_after": {
       "description_builds": 1,
-      "encoded_snapshots": 1,
-      "encoded_bytes": 372986,
+      "encoded_snapshots": 0,
+      "encoded_bytes": 0,
       "ffi_callbacks": 4,
       "ui_callbacks": 0,
       "diagnostic_callbacks": 2,
       "description_build": {
         "samples": 1,
-        "p50_us": 636,
-        "p95_us": 636,
-        "p99_us": 636
+        "p50_us": 5,
+        "p95_us": 5,
+        "p99_us": 5
       },
       "encode": {
-        "samples": 1,
-        "p50_us": 4175,
-        "p95_us": 4175,
-        "p99_us": 4175
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "publish_to_applied": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "initial": {
+        "bytes": 373068,
+        "encode_us": 5255
+      },
+      "data_messages": 0,
+      "data_bytes": 0,
+      "data_records_checked": 0,
+      "data_cells_written": 0,
+      "data_encode": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "data_publish_to_applied": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_data_parse": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_data_apply": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_snapshot_apply": {
         "samples": 0,
         "p50_us": 0,
         "p95_us": 0,
@@ -77,6 +153,8 @@
             "end": 9
           },
           "row_count": 10000,
+          "dataset": "quote-data",
+          "dataset_revision": 1,
           "scroll_y": 0.0
         }
       },
@@ -88,19 +166,21 @@
       "native": {
         "materializations": 2,
         "rows_constructed": 22,
-        "cells_constructed": 76
+        "cells_constructed": 76,
+        "data_records_checked": 0,
+        "data_cells_written": 0
       },
       "draw": {
         "samples": 2,
-        "p50_us": 1869.823,
-        "p95_us": 9068.543,
-        "p99_us": 9068.543
+        "p50_us": 2877.439,
+        "p95_us": 7180.287,
+        "p99_us": 7180.287
       },
       "dirty_to_present_submit": {
         "samples": 1,
-        "p50_us": 11403.263,
-        "p95_us": 11403.263,
-        "p99_us": 11403.263
+        "p50_us": 20037.631,
+        "p95_us": 20037.631,
+        "p99_us": 20037.631
       },
       "present_interval": {
         "samples": 0,
@@ -136,6 +216,8 @@
             "end": 9
           },
           "row_count": 10000,
+          "dataset": "quote-data",
+          "dataset_revision": 1,
           "scroll_y": 0.0
         }
       },
@@ -147,25 +229,27 @@
       "native": {
         "materializations": 32,
         "rows_constructed": 352,
-        "cells_constructed": 1216
+        "cells_constructed": 1216,
+        "data_records_checked": 0,
+        "data_cells_written": 0
       },
       "draw": {
         "samples": 32,
-        "p50_us": 1700.863,
-        "p95_us": 2461.695,
-        "p99_us": 9068.543
+        "p50_us": 1570.815,
+        "p95_us": 2877.439,
+        "p99_us": 7180.287
       },
       "dirty_to_present_submit": {
         "samples": 31,
-        "p50_us": 2010.111,
-        "p95_us": 5599.231,
-        "p99_us": 11403.263
+        "p50_us": 1985.535,
+        "p95_us": 15220.735,
+        "p99_us": 20037.631
       },
       "present_interval": {
         "samples": 29,
-        "p50_us": 16654.335,
-        "p95_us": 17432.575,
-        "p99_us": 17563.647
+        "p50_us": 16637.951,
+        "p95_us": 17842.175,
+        "p99_us": 18235.391
       },
       "input_to_frame": {
         "samples": 0,
@@ -177,28 +261,66 @@
   },
   "dart": {
     "description_builds": 4,
-    "encoded_snapshots": 4,
-    "encoded_bytes": 1491946,
-    "ffi_callbacks": 8,
+    "encoded_snapshots": 3,
+    "encoded_bytes": 1287,
+    "ffi_callbacks": 11,
     "ui_callbacks": 0,
     "diagnostic_callbacks": 3,
     "description_build": {
       "samples": 4,
-      "p50_us": 1411,
-      "p95_us": 1501,
-      "p99_us": 1501
+      "p50_us": 2,
+      "p95_us": 5,
+      "p99_us": 5
     },
     "encode": {
-      "samples": 4,
-      "p50_us": 4617,
-      "p95_us": 4807,
-      "p99_us": 4807
+      "samples": 3,
+      "p50_us": 12,
+      "p95_us": 13,
+      "p99_us": 13
     },
     "publish_to_applied": {
       "samples": 3,
-      "p50_us": 9667,
-      "p95_us": 10433,
-      "p99_us": 10433
+      "p50_us": 115,
+      "p95_us": 134,
+      "p99_us": 134
+    },
+    "initial": {
+      "bytes": 373068,
+      "encode_us": 5255
+    },
+    "data_messages": 3,
+    "data_bytes": 440,
+    "data_records_checked": 3,
+    "data_cells_written": 3,
+    "data_encode": {
+      "samples": 3,
+      "p50_us": 14,
+      "p95_us": 14,
+      "p99_us": 14
+    },
+    "data_publish_to_applied": {
+      "samples": 3,
+      "p50_us": 278,
+      "p95_us": 297,
+      "p99_us": 297
+    },
+    "native_data_parse": {
+      "samples": 3,
+      "p50_us": 19,
+      "p95_us": 53,
+      "p99_us": 53
+    },
+    "native_data_apply": {
+      "samples": 3,
+      "p50_us": 7,
+      "p95_us": 24,
+      "p99_us": 24
+    },
+    "native_snapshot_apply": {
+      "samples": 3,
+      "p50_us": 4,
+      "p95_us": 24,
+      "p99_us": 24
     }
   },
   "native": {
@@ -222,6 +344,8 @@
           "end": 9
         },
         "row_count": 10000,
+        "dataset": "quote-data",
+        "dataset_revision": 4,
         "scroll_y": 0.0
       }
     },
@@ -233,25 +357,27 @@
     "native": {
       "materializations": 35,
       "rows_constructed": 385,
-      "cells_constructed": 1330
+      "cells_constructed": 1330,
+      "data_records_checked": 3,
+      "data_cells_written": 3
     },
     "draw": {
       "samples": 35,
-      "p50_us": 1730.559,
-      "p95_us": 2461.695,
-      "p99_us": 9068.543
+      "p50_us": 1604.607,
+      "p95_us": 2877.439,
+      "p99_us": 7180.287
     },
     "dirty_to_present_submit": {
       "samples": 34,
-      "p50_us": 2052.095,
-      "p95_us": 8183.807,
-      "p99_us": 11403.263
+      "p50_us": 2009.087,
+      "p95_us": 17874.943,
+      "p99_us": 20037.631
     },
     "present_interval": {
       "samples": 30,
-      "p50_us": 16654.335,
-      "p95_us": 17563.647,
-      "p99_us": 33423.359
+      "p50_us": 16637.951,
+      "p95_us": 18235.391,
+      "p99_us": 33341.439
     },
     "input_to_frame": {
       "samples": 0,
@@ -261,7 +387,7 @@
     }
   },
   "process": {
-    "rss_bytes": 97075200,
-    "peak_rss_bytes": 99172352
+    "rss_bytes": 89612288,
+    "peak_rss_bytes": 92487680
   }
 }

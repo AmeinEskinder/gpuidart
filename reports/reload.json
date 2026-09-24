@@ -1,8 +1,8 @@
 {
   "source_changed": "DemoApplication.heading",
-  "same_process_id": 12172,
-  "same_isolate_id": "isolates/7434966846360631",
-  "reload_and_reassemble_us": 87434,
+  "same_process_id": 10256,
+  "same_isolate_id": "isolates/2252097960729799",
+  "reload_and_reassemble_us": 82459,
   "invalid_source_rejected": true,
   "before": {
     "state": {
@@ -26,6 +26,8 @@
             "end": 2009
           },
           "row_count": 10000,
+          "dataset": "quote-data",
+          "dataset_revision": 2,
           "scroll_y": -64000.0
         }
       },
@@ -35,27 +37,29 @@
         "greeting": "Hello, Reload preserves this text"
       },
       "native": {
-        "materializations": 19,
-        "rows_constructed": 209,
-        "cells_constructed": 722
+        "materializations": 18,
+        "rows_constructed": 198,
+        "cells_constructed": 684,
+        "data_records_checked": 1,
+        "data_cells_written": 1
       },
       "draw": {
-        "samples": 19,
-        "p50_us": 1952.767,
-        "p95_us": 8536.063,
-        "p99_us": 8536.063
+        "samples": 18,
+        "p50_us": 2211.839,
+        "p95_us": 8626.175,
+        "p99_us": 8626.175
       },
       "dirty_to_present_submit": {
-        "samples": 18,
-        "p50_us": 2422.783,
-        "p95_us": 20299.775,
-        "p99_us": 20299.775
+        "samples": 17,
+        "p50_us": 2654.207,
+        "p95_us": 18677.759,
+        "p99_us": 18677.759
       },
       "present_interval": {
-        "samples": 16,
-        "p50_us": 16424.959,
-        "p95_us": 17776.639,
-        "p99_us": 17776.639
+        "samples": 15,
+        "p50_us": 16539.647,
+        "p95_us": 17612.799,
+        "p99_us": 17612.799
       },
       "input_to_frame": {
         "samples": 0,
@@ -66,32 +70,78 @@
     },
     "dart": {
       "description_builds": 2,
-      "encoded_snapshots": 2,
-      "encoded_bytes": 745993,
-      "ffi_callbacks": 5,
+      "encoded_snapshots": 1,
+      "encoded_bytes": 450,
+      "ffi_callbacks": 6,
       "ui_callbacks": 0,
       "diagnostic_callbacks": 2,
       "description_build": {
         "samples": 2,
-        "p50_us": 18321,
-        "p95_us": 18321,
-        "p99_us": 18321
+        "p50_us": 755,
+        "p95_us": 755,
+        "p99_us": 755
       },
       "encode": {
-        "samples": 2,
-        "p50_us": 26224,
-        "p95_us": 26224,
-        "p99_us": 26224
+        "samples": 1,
+        "p50_us": 72,
+        "p95_us": 72,
+        "p99_us": 72
       },
       "publish_to_applied": {
         "samples": 1,
-        "p50_us": 19018,
-        "p95_us": 19018,
-        "p99_us": 19018
+        "p50_us": 919,
+        "p95_us": 919,
+        "p99_us": 919
+      },
+      "initial": {
+        "bytes": 373068,
+        "encode_us": 28208
+      },
+      "data_messages": 1,
+      "data_bytes": 150,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 155,
+        "p95_us": 155,
+        "p99_us": 155
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 2931,
+        "p95_us": 2931,
+        "p99_us": 2931
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 59,
+        "p95_us": 59,
+        "p99_us": 59
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 17,
+        "p95_us": 17,
+        "p99_us": 17
+      },
+      "native_snapshot_apply": {
+        "samples": 1,
+        "p50_us": 25,
+        "p95_us": 25,
+        "p99_us": 25
       }
     },
     "count": 7,
-    "name": "Reload preserves this text"
+    "name": "Reload preserves this text",
+    "dataset": {
+      "revision": 2,
+      "value": "987.65",
+      "native": {
+        "value": "987.65",
+        "revision": 2
+      }
+    }
   },
   "after": {
     "state": {
@@ -115,6 +165,8 @@
             "end": 2009
           },
           "row_count": 10000,
+          "dataset": "quote-data",
+          "dataset_revision": 2,
           "scroll_y": -64000.0
         }
       },
@@ -124,27 +176,29 @@
         "greeting": "Hello, Reload preserves this text"
       },
       "native": {
-        "materializations": 23,
-        "rows_constructed": 253,
-        "cells_constructed": 874
+        "materializations": 22,
+        "rows_constructed": 242,
+        "cells_constructed": 836,
+        "data_records_checked": 1,
+        "data_cells_written": 1
       },
       "draw": {
-        "samples": 23,
-        "p50_us": 1943.551,
-        "p95_us": 4243.455,
-        "p99_us": 8536.063
+        "samples": 22,
+        "p50_us": 2211.839,
+        "p95_us": 3586.047,
+        "p99_us": 8626.175
       },
       "dirty_to_present_submit": {
-        "samples": 22,
-        "p50_us": 2416.639,
-        "p95_us": 13983.743,
-        "p99_us": 20299.775
+        "samples": 21,
+        "p50_us": 2654.207,
+        "p95_us": 14802.943,
+        "p99_us": 18677.759
       },
       "present_interval": {
         "samples": 19,
-        "p50_us": 16515.071,
-        "p95_us": 17776.639,
-        "p99_us": 17776.639
+        "p50_us": 16588.799,
+        "p95_us": 17612.799,
+        "p99_us": 17612.799
       },
       "input_to_frame": {
         "samples": 0,
@@ -155,31 +209,77 @@
     },
     "dart": {
       "description_builds": 3,
-      "encoded_snapshots": 3,
-      "encoded_bytes": 1118986,
-      "ffi_callbacks": 7,
+      "encoded_snapshots": 2,
+      "encoded_bytes": 886,
+      "ffi_callbacks": 9,
       "ui_callbacks": 0,
-      "diagnostic_callbacks": 3,
+      "diagnostic_callbacks": 4,
       "description_build": {
         "samples": 3,
-        "p50_us": 10726,
-        "p95_us": 18321,
-        "p99_us": 18321
+        "p50_us": 503,
+        "p95_us": 755,
+        "p99_us": 755
       },
       "encode": {
-        "samples": 3,
-        "p50_us": 13874,
-        "p95_us": 26224,
-        "p99_us": 26224
+        "samples": 2,
+        "p50_us": 490,
+        "p95_us": 490,
+        "p99_us": 490
       },
       "publish_to_applied": {
         "samples": 2,
-        "p50_us": 20627,
-        "p95_us": 20627,
-        "p99_us": 20627
+        "p50_us": 1586,
+        "p95_us": 1586,
+        "p99_us": 1586
+      },
+      "initial": {
+        "bytes": 373068,
+        "encode_us": 28208
+      },
+      "data_messages": 1,
+      "data_bytes": 150,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 155,
+        "p95_us": 155,
+        "p99_us": 155
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 2931,
+        "p95_us": 2931,
+        "p99_us": 2931
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 59,
+        "p95_us": 59,
+        "p99_us": 59
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 17,
+        "p95_us": 17,
+        "p99_us": 17
+      },
+      "native_snapshot_apply": {
+        "samples": 2,
+        "p50_us": 25,
+        "p95_us": 25,
+        "p99_us": 25
       }
     },
     "count": 7,
-    "name": "Reload preserves this text"
+    "name": "Reload preserves this text",
+    "dataset": {
+      "revision": 2,
+      "value": "987.65",
+      "native": {
+        "value": "987.65",
+        "revision": 2
+      }
+    }
   }
 }

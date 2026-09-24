@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:gpuidart/gpuidart.dart';
 
 import 'app.dart';
+import 'measure_data.dart';
 
 Future<void> main(List<String> args) async {
   final rowArgument = args.where((arg) => arg.startsWith('--rows='));
@@ -14,7 +15,7 @@ Future<void> main(List<String> args) async {
         ? 10000
         : int.parse(rowArgument.single.substring(7)),
   );
-  final host = await GpuiHost.openView(app.build);
+  final host = await GpuiHost.openView(app.build, datasets: [app.quotes]);
   Future<void> handle(GpuiEvent event) async {
     if (event.type == 'click' && event.id == 'increment') {
       app.count++;
@@ -46,12 +47,22 @@ Future<void> main(List<String> args) async {
           'dart': host.metrics.read(),
           'count': app.count,
           'name': app.name,
+          'dataset': {
+            'revision': app.quotes.revision,
+            'value': app.quotes.cell(2000, 2),
+            'native': await host.diagnose('cell', {
+              'dataset': app.quotes.id,
+              'row': 2000,
+              'column': 2,
+            }),
+          },
         }),
       );
     });
     registerExtension('ext.gpuidart.prepare', (_, _) async {
       app.count = 7;
       app.name = 'Reload preserves this text';
+      await host.editDataset(app.quotes, [const CellEdit(2000, 2, '987.65')]);
       await host.rebuild();
       final state = await host.diagnose('prepare', {
         'input': 'name',
@@ -70,7 +81,10 @@ Future<void> main(List<String> args) async {
   }
 
   try {
-    if (args.contains('--self-test') || args.contains('--measure')) {
+    if (args.contains('--measure-data')) {
+      stdout.writeln(jsonEncode(await measureData(host, app)));
+      await host.close();
+    } else if (args.contains('--self-test') || args.contains('--measure')) {
       await Future<void>.delayed(const Duration(milliseconds: 250));
       final before = await host.diagnose('inspect');
       final dartBefore = host.metrics.read();
@@ -100,7 +114,9 @@ Future<void> main(List<String> args) async {
       final updates = args.contains('--measure') ? 120 : 3;
       for (var i = 0; i < updates; i++) {
         app.count++;
-        app.rows[0][2] = '${100 + i / 100}';
+        await host.editDataset(app.quotes, [
+          CellEdit(0, 2, '${100 + i / 100}'),
+        ]);
         await host.rebuild();
         await Future<void>.delayed(const Duration(milliseconds: 16));
       }
@@ -113,7 +129,7 @@ Future<void> main(List<String> args) async {
           'mode': const bool.fromEnvironment('gpuidart.packaged')
               ? 'aot'
               : 'jit',
-          'rows': app.rows.length,
+          'rows': app.quotes.rowCount,
           'updates': updates,
           'unchanged_repaints': {
             'requested_frames': 30,

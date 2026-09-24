@@ -1,0 +1,566 @@
+{
+  "measured_at_utc": "2026-09-24T23:29:15.864993Z",
+  "cases": [
+    {
+      "mode": "aot",
+      "records": 100,
+      "initial": {
+        "bytes": 3714,
+        "encode_us": 234
+      },
+      "phases": [
+        {
+          "operation": "cell",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 18088,
+          "min_bytes_per_operation": 149,
+          "max_bytes_per_operation": 153,
+          "description_builds": 0,
+          "native_records_checked": 120,
+          "native_cells_written": 120,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 8,
+            "p95_us": 13,
+            "p99_us": 22
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 6,
+            "p95_us": 11,
+            "p99_us": 16
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 2,
+            "p95_us": 5,
+            "p99_us": 6
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 90,
+            "p95_us": 130,
+            "p99_us": 160
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 129
+        },
+        {
+          "operation": "row",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 19560,
+          "min_bytes_per_operation": 163,
+          "max_bytes_per_operation": 163,
+          "description_builds": 0,
+          "native_records_checked": 120,
+          "native_cells_written": 360,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 6,
+            "p95_us": 12,
+            "p99_us": 14
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 5,
+            "p95_us": 10,
+            "p99_us": 11
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 2,
+            "p95_us": 5,
+            "p99_us": 9
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 78,
+            "p95_us": 117,
+            "p99_us": 150
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 257
+        },
+        {
+          "operation": "batch10",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 74520,
+          "min_bytes_per_operation": 621,
+          "max_bytes_per_operation": 621,
+          "description_builds": 0,
+          "native_records_checked": 1200,
+          "native_cells_written": 1200,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 21,
+            "p95_us": 32,
+            "p99_us": 206
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 16,
+            "p95_us": 23,
+            "p99_us": 29
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 6,
+            "p99_us": 8
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 117,
+            "p95_us": 166,
+            "p99_us": 323
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 385
+        },
+        {
+          "operation": "counter",
+          "iterations": 120,
+          "snapshot_bytes": 51778,
+          "dataset_bytes": 0,
+          "min_bytes_per_operation": 430,
+          "max_bytes_per_operation": 433,
+          "description_builds": 120,
+          "native_records_checked": 0,
+          "native_cells_written": 0,
+          "description_build": {
+            "samples": 120,
+            "p50_us": 1,
+            "p95_us": 2,
+            "p99_us": 3
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 16,
+            "p95_us": 26,
+            "p99_us": 29
+          },
+          "native_parse": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 5,
+            "p95_us": 9,
+            "p99_us": 12
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 117,
+            "p95_us": 197,
+            "p99_us": 263
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 385
+        }
+      ],
+      "process": {
+        "rss_bytes": 85200896,
+        "peak_rss_bytes": 85827584
+      },
+      "scope": "Sequential awaited transactions after eight warmups per phase. Timings end at application acknowledgement plus Dart commit, not presentation. Rendering is allowed to coalesce updates."
+    },
+    {
+      "mode": "aot",
+      "records": 10000,
+      "initial": {
+        "bytes": 373068,
+        "encode_us": 9085
+      },
+      "phases": [
+        {
+          "operation": "cell",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 18088,
+          "min_bytes_per_operation": 149,
+          "max_bytes_per_operation": 153,
+          "description_builds": 0,
+          "native_records_checked": 120,
+          "native_cells_written": 120,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 7,
+            "p95_us": 14,
+            "p99_us": 49
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 6,
+            "p95_us": 10,
+            "p99_us": 18
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 2,
+            "p95_us": 5,
+            "p99_us": 8
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 82,
+            "p95_us": 123,
+            "p99_us": 231
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 129
+        },
+        {
+          "operation": "row",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 19560,
+          "min_bytes_per_operation": 163,
+          "max_bytes_per_operation": 163,
+          "description_builds": 0,
+          "native_records_checked": 120,
+          "native_cells_written": 360,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 8,
+            "p95_us": 15,
+            "p99_us": 20
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 6,
+            "p95_us": 10,
+            "p99_us": 14
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 5,
+            "p99_us": 8
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 86,
+            "p95_us": 133,
+            "p99_us": 188
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 257
+        },
+        {
+          "operation": "batch10",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 74520,
+          "min_bytes_per_operation": 621,
+          "max_bytes_per_operation": 621,
+          "description_builds": 0,
+          "native_records_checked": 1200,
+          "native_cells_written": 1200,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 26,
+            "p95_us": 43,
+            "p99_us": 73
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 17,
+            "p95_us": 26,
+            "p99_us": 36
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 7,
+            "p99_us": 11
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 139,
+            "p95_us": 228,
+            "p99_us": 338
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 385
+        },
+        {
+          "operation": "counter",
+          "iterations": 120,
+          "snapshot_bytes": 51778,
+          "dataset_bytes": 0,
+          "min_bytes_per_operation": 430,
+          "max_bytes_per_operation": 433,
+          "description_builds": 120,
+          "native_records_checked": 0,
+          "native_cells_written": 0,
+          "description_build": {
+            "samples": 120,
+            "p50_us": 0,
+            "p95_us": 2,
+            "p99_us": 3
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 22
+          },
+          "native_parse": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 7,
+            "p99_us": 13
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 91,
+            "p95_us": 134,
+            "p99_us": 218
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 385
+        }
+      ],
+      "process": {
+        "rss_bytes": 96403456,
+        "peak_rss_bytes": 96403456
+      },
+      "scope": "Sequential awaited transactions after eight warmups per phase. Timings end at application acknowledgement plus Dart commit, not presentation. Rendering is allowed to coalesce updates."
+    },
+    {
+      "mode": "aot",
+      "records": 100000,
+      "initial": {
+        "bytes": 3877396,
+        "encode_us": 95509
+      },
+      "phases": [
+        {
+          "operation": "cell",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 18088,
+          "min_bytes_per_operation": 149,
+          "max_bytes_per_operation": 153,
+          "description_builds": 0,
+          "native_records_checked": 120,
+          "native_cells_written": 120,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 9,
+            "p95_us": 16,
+            "p99_us": 77
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 7,
+            "p95_us": 11,
+            "p99_us": 13
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 5,
+            "p99_us": 7
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 103,
+            "p95_us": 195,
+            "p99_us": 401
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 129
+        },
+        {
+          "operation": "row",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 19560,
+          "min_bytes_per_operation": 163,
+          "max_bytes_per_operation": 163,
+          "description_builds": 0,
+          "native_records_checked": 120,
+          "native_cells_written": 360,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 6,
+            "p95_us": 14,
+            "p99_us": 16
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 5,
+            "p95_us": 10,
+            "p99_us": 16
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 2,
+            "p95_us": 5,
+            "p99_us": 8
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 71,
+            "p95_us": 147,
+            "p99_us": 192
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 257
+        },
+        {
+          "operation": "batch10",
+          "iterations": 120,
+          "snapshot_bytes": 0,
+          "dataset_bytes": 74520,
+          "min_bytes_per_operation": 621,
+          "max_bytes_per_operation": 621,
+          "description_builds": 0,
+          "native_records_checked": 1200,
+          "native_cells_written": 1200,
+          "description_build": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 21,
+            "p95_us": 32,
+            "p99_us": 211
+          },
+          "native_parse": {
+            "samples": 120,
+            "p50_us": 14,
+            "p95_us": 19,
+            "p99_us": 25
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 6,
+            "p99_us": 11
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 111,
+            "p95_us": 196,
+            "p99_us": 2901
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 385
+        },
+        {
+          "operation": "counter",
+          "iterations": 120,
+          "snapshot_bytes": 51778,
+          "dataset_bytes": 0,
+          "min_bytes_per_operation": 430,
+          "max_bytes_per_operation": 433,
+          "description_builds": 120,
+          "native_records_checked": 0,
+          "native_cells_written": 0,
+          "description_build": {
+            "samples": 120,
+            "p50_us": 1,
+            "p95_us": 2,
+            "p99_us": 5
+          },
+          "encode": {
+            "samples": 120,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 35
+          },
+          "native_parse": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_apply": {
+            "samples": 120,
+            "p50_us": 3,
+            "p95_us": 6,
+            "p99_us": 9
+          },
+          "dart_operation_to_applied": {
+            "samples": 120,
+            "p50_us": 89,
+            "p95_us": 138,
+            "p99_us": 194
+          },
+          "table_entity": 4294967300,
+          "dataset_revision": 385
+        }
+      ],
+      "process": {
+        "rss_bytes": 158871552,
+        "peak_rss_bytes": 173051904
+      },
+      "scope": "Sequential awaited transactions after eight warmups per phase. Timings end at application acknowledgement plus Dart commit, not presentation. Rendering is allowed to coalesce updates."
+    }
+  ]
+}

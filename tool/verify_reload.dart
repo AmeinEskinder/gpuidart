@@ -13,6 +13,8 @@ Future<void> main() async {
   final app = await File('example/app.dart').copy('${fixture.path}/app.dart');
   final entry = await File('example/main.dart')
       .copy('${fixture.path}/main.dart');
+  await File('example/measure_data.dart')
+      .copy('${fixture.path}/measure_data.dart');
   final session = await DevSession.start(entry: entry.absolute.path);
   try {
     await session.call('prepare');
@@ -20,6 +22,12 @@ Future<void> main() async {
     final before = await session.call('inspect');
     final inputBefore = before['state']['inputs']['name'] as Map;
     require(before['count'] == 7, 'Application state was not prepared');
+    require(
+      before['dataset']['value'] == '987.65' &&
+          before['dataset']['native']['value'] == '987.65' &&
+          before['dataset']['revision'] == 2,
+      'Edited dataset state was not prepared on both sides',
+    );
     require(
       before['name'] == 'Reload preserves this text',
       'Dart text state was not prepared',
@@ -52,13 +60,22 @@ Future<void> main() async {
       after['state']['labels']['title'] == newHeading,
       'Native description did not receive new code output',
     );
-    for (final field in ['count', 'name']) {
-      require(before[field] == after[field], 'Dart state changed: $field');
+    for (final field in ['count', 'name', 'dataset']) {
+      require(
+        jsonEncode(before[field]) == jsonEncode(after[field]),
+        'Dart state changed: $field',
+      );
     }
     for (final field in ['inputs', 'tables']) {
       require(
         jsonEncode(before['state'][field]) == jsonEncode(after['state'][field]),
         'Native state changed: $field',
+      );
+    }
+    for (final field in ['data_messages', 'data_bytes']) {
+      require(
+        before['dart'][field] == after['dart'][field],
+        'Code reload republished dataset records',
       );
     }
     await app.writeAsString('$source\nthis is deliberately invalid Dart;\n');

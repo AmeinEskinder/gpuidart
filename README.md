@@ -4,6 +4,8 @@ An experimental Windows desktop host using Dart application code and GPUI Kit's 
 
 The first spike supports text, buttons, native text inputs and virtualized tables. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
+Table datasets upload once. View snapshots reference them by ID; cell and row edits transfer only changed data. See [the dataset API](docs/datasets.md) and [100,000-record acceptance measurements](reports/data-publication.md).
+
 This implements a small direct adapter over GPUI Kit. It does not replace Shell's QuickJS engine. See [the integration decision](docs/integration.md) for the source findings and next experiments.
 
 ## Run
@@ -69,7 +71,7 @@ dart run tool/verify_reload.dart
 dart run tool/summarize.dart
 ```
 
-`reports/environment.json` describes the machine used for the checked-in run; refresh it when measuring elsewhere. Native histograms include startup, forced repaints and updates together. The 120-update workload changes one visible price and a counter through whole-view snapshots. It has not yet been compared with matched GPUI Shell or GPUIX workloads.
+`reports/environment.json` describes the machine used for the recorded run; refresh it when measuring elsewhere. Native histograms include startup, forced repaints and updates together. The 120-update workload now changes one visible price through a dataset edit and a counter through a view snapshot. Run `dart run tool/measure_data.dart` for separate cell, row, ten-cell and counter measurements at up to 100,000 records. Matched Shell/GPUIX comparisons remain outstanding.
 
 ## Verify
 
@@ -107,7 +109,7 @@ Node IDs must be nonempty and unique throughout one description. An input or tab
 
 - Windows only, one application host with one window. The dedicated UI isolate is a Windows experiment; macOS needs a different launch/thread arrangement.
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
-- Descriptions use UTF-8 JSON and copy table data on every publication. Rendering is virtualized; total data storage and publication work still grow with row count.
+- Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks, sorting and stable row identity are not implemented. Table selection follows row indices.
 - The adapter uses a fixed column layout and component theme. It is not a complete GPUI style binding.
 

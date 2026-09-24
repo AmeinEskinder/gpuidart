@@ -9,6 +9,8 @@ import 'package:ffi/ffi.dart';
 import 'nodes.dart';
 import 'metrics.dart';
 
+part 'dataset.dart';
+
 typedef _EventNative = Void Function(Pointer<Uint8>, Size);
 typedef _CreateNative = Pointer<Void> Function(
   Pointer<Uint8>,
@@ -35,6 +37,9 @@ final class _Bindings {
   );
   late final publish = library.lookupFunction<_PublishNative, _PublishDart>(
     'gd_publish',
+  );
+  late final dataset = library.lookupFunction<_PublishNative, _PublishDart>(
+    'gd_dataset',
   );
   late final diagnostic = library.lookupFunction<_PublishNative, _PublishDart>(
     'gd_diagnostic',
@@ -73,6 +78,9 @@ final class GpuiHost {
   final _pending = <int, Completer<void>>{};
   final _publishTimers = <int, Stopwatch>{};
   final _diagnostics = <int, Completer<Map<String, dynamic>>>{};
+  final _datasets = <String, TableDataset>{};
+  final _dataPending = <int, Completer<void>>{};
+  final _dataTimers = <int, Stopwatch>{};
   final metrics = HostMetrics();
   UiNode Function()? _builder;
   int _request = 0;
@@ -88,11 +96,12 @@ final class GpuiHost {
   static Future<GpuiHost> openView(
     UiNode Function() builder, {
     String? libraryPath,
+    List<TableDataset> datasets = const [],
   }) async {
     final timer = Stopwatch()..start();
     final root = builder();
     final elapsed = timer.elapsedMicroseconds;
-    final host = await open(root, libraryPath: libraryPath);
+    final host = await open(root, libraryPath: libraryPath, datasets: datasets);
     host._builder = builder;
     host.metrics.descriptionBuilds = 1;
     HostMetrics.sample(host.metrics.buildMicroseconds, elapsed);
@@ -110,7 +119,11 @@ final class GpuiHost {
     return publish(root);
   }
 
-  static Future<GpuiHost> open(UiNode root, {String? libraryPath}) async {
+  static Future<GpuiHost> open(
+    UiNode root, {
+    String? libraryPath,
+    List<TableDataset> datasets = const [],
+  }) async {
     if (!Platform.isWindows) {
       throw UnsupportedError(
         'The initial native host currently supports Windows.',
@@ -128,9 +141,23 @@ final class GpuiHost {
               : 'target/debug/gpuidart.dll'),
     ).absolute.path;
     final host = GpuiHost._(_Bindings(path));
+    for (final dataset in datasets) {
+      if (dataset._owner != null ||
+          dataset._busy ||
+          host._datasets.containsKey(dataset.id)) {
+        throw ArgumentError(
+          'Dataset is already registered or its ID is duplicated',
+        );
+      }
+      host._datasets[dataset.id] = dataset;
+    }
     host._callback = NativeCallable<_EventNative>.listener(host._receive);
-    host._handle = host._withSnapshot(
-      root,
+    host._handle = host._withMessage(
+      {
+        'snapshot': {'revision': 1, 'root': root.toJson()},
+        'datasets': datasets.map((dataset) => dataset._upload()).toList(),
+      },
+      'initial',
       (bytes, length) =>
           host._bindings.create(bytes, length, host._callback.nativeFunction),
     );
@@ -140,6 +167,10 @@ final class GpuiHost {
       throw ArgumentError(
         'Invalid initial UI description. Check IDs and table row widths.',
       );
+    }
+    for (final dataset in datasets) {
+      dataset._owner = host;
+      dataset._revision = 1;
     }
     final result = ReceivePort();
     final nativeDone = result.first;
@@ -152,6 +183,9 @@ final class GpuiHost {
         debugName: 'gpui-native-loop',
       );
     } catch (_) {
+      for (final dataset in datasets) {
+        dataset._owner = null;
+      }
       result.close();
       host._bindings.destroy(host._handle);
       host._callback.close();
@@ -165,17 +199,17 @@ final class GpuiHost {
     return host;
   }
 
-  T _withSnapshot<T>(UiNode root, T Function(Pointer<Uint8>, int) action) {
+  T _withMessage<T>(
+    Map<String, Object> message,
+    String kind,
+    T Function(Pointer<Uint8>, int) action,
+  ) {
     final timer = Stopwatch()..start();
-    final data = utf8.encode(
-      jsonEncode({'revision': _revision, 'root': root.toJson()}),
-    );
+    final data = utf8.encode(jsonEncode(message));
     final bytes = calloc<Uint8>(data.length);
     try {
       bytes.asTypedList(data.length).setAll(0, data);
-      metrics.encodedSnapshots++;
-      metrics.encodedBytes += data.length;
-      HostMetrics.sample(metrics.encodeMicroseconds, timer.elapsedMicroseconds);
+      metrics.recordEncoding(kind, data.length, timer.elapsedMicroseconds);
       return action(bytes, data.length);
     } finally {
       calloc.free(bytes);
@@ -190,8 +224,9 @@ final class GpuiHost {
     _pending[revision] = accepted;
     _publishTimers[revision] = Stopwatch()..start();
     try {
-      final status = _withSnapshot(
-        root,
+      final status = _withMessage(
+        {'revision': revision, 'root': root.toJson()},
+        'snapshot',
         (bytes, length) => _bindings.publish(_handle, bytes, length),
       );
       if (status != 0) {
@@ -204,6 +239,54 @@ final class GpuiHost {
     }
     return accepted.future;
   }
+
+  Future<void> registerDataset(TableDataset dataset) => _transact(
+    dataset,
+    {'op': 'replace', 'data': dataset._data()},
+    () {},
+    create: true,
+  );
+
+  Future<void> editDataset(TableDataset dataset, List<TableEdit> edits) {
+    final batch = List<TableEdit>.of(edits);
+    if (batch.isEmpty) {
+      throw ArgumentError('Dataset edit batch must be nonempty');
+    }
+    for (final edit in batch) {
+      edit._validate(dataset);
+    }
+    return _transact(
+      dataset,
+      {'op': 'edit', 'edits': batch.map((edit) => edit._toJson()).toList()},
+      () {
+        for (final edit in batch) {
+          edit._apply(dataset);
+        }
+      },
+    );
+  }
+
+  Future<void> replaceDataset(
+    TableDataset dataset, {
+    required List<String> columns,
+    required List<List<String>> rows,
+  }) {
+    final replacement = TableDataset(dataset.id, columns: columns, rows: rows);
+    return _transact(
+      dataset,
+      {'op': 'replace', 'data': replacement._data()},
+      () {
+        dataset._columns = replacement._columns;
+        dataset._rows = replacement._rows;
+      },
+    );
+  }
+
+  Future<void> releaseDataset(TableDataset dataset) =>
+      _transact(dataset, {'op': 'release'}, () {
+        dataset._owner = null;
+        _datasets.remove(dataset.id);
+      });
 
   Future<void> close() {
     if (!_closing && !_closed.isCompleted) {
@@ -252,11 +335,46 @@ final class GpuiHost {
           final timer = _publishTimers.remove(event.revision);
           if (timer != null) {
             HostMetrics.sample(
+              metrics.nativeSnapshotApplyMicroseconds,
+              event.data['native_apply_us'] as int,
+            );
+            HostMetrics.sample(
               metrics.applyMicroseconds,
               timer.elapsedMicroseconds,
             );
           }
           _pending.remove(event.revision)?.complete();
+        case 'rejected':
+          _publishTimers.remove(event.revision);
+          _pending
+              .remove(event.revision)
+              ?.completeError(StateError(event.data['message'] as String));
+        case 'dataset_applied':
+          final timer = _dataTimers.remove(event.data['request']);
+          if (timer != null) {
+            HostMetrics.sample(
+              metrics.dataApplyMicroseconds,
+              timer.elapsedMicroseconds,
+            );
+          }
+          HostMetrics.sample(
+            metrics.nativeDataParseMicroseconds,
+            event.data['parse_us'] as int,
+          );
+          HostMetrics.sample(
+            metrics.nativeDataApplyMicroseconds,
+            event.data['apply_us'] as int,
+          );
+          metrics.dataRecordsChecked +=
+              event.data['work']['records_checked'] as int;
+          metrics.dataCellsWritten +=
+              event.data['work']['cells_written'] as int;
+          _dataPending.remove(event.data['request'])?.complete();
+        case 'dataset_rejected':
+          _dataTimers.remove(event.data['request']);
+          _dataPending
+              .remove(event.data['request'])
+              ?.completeError(StateError(event.data['message'] as String));
         case 'diagnostic':
           _diagnostics
               .remove(event.data['request'])
@@ -300,6 +418,17 @@ final class GpuiHost {
       }
       _pending.clear();
       _publishTimers.clear();
+      for (final pending in _dataPending.values) {
+        pending.completeError(
+          StateError('Host closed during dataset transaction'),
+        );
+      }
+      _dataPending.clear();
+      _dataTimers.clear();
+      for (final dataset in _datasets.values) {
+        dataset._owner = null;
+      }
+      _datasets.clear();
       for (final pending in _diagnostics.values) {
         pending.completeError(
           StateError('Host closed during diagnostic request'),

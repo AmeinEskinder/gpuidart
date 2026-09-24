@@ -40,6 +40,8 @@ Every accepted description has an increasing revision. Native button events carr
 
 Rust validates the whole description before queueing it. The UI thread rejects stale revisions, replaces the description and reconciles retained input/table entities by node ID and kind. Table rows are data, and native code constructs visible cells during layout.
 
+Dataset records now live outside the view description. Initial creation uploads each dataset once. Later snapshots carry dataset IDs, while revisioned data messages edit cells, replace rows, replace datasets or release unused datasets. Rust validates the full edit batch before mutating its shared data. The Dart dataset commits after native acknowledgement. See [the transaction contract](datasets.md) and [publication measurements](../reports/data-publication.md).
+
 Event buffers belong to Rust until Dart receives and frees them. Shutdown waits for both the last native `closed` event and the return of the blocking native call before releasing the host and callback. No GPUI pointer is exposed to Dart.
 
 The DLL embeds a Common Controls v6 manifest as resource 2. Without it, loading from `dart run` failed with Windows error 127 because GPUI imports `TaskDialogIndirect`. A Rust test executable's activation context had masked that failure; the live Dart test caught it. Embedding the dependency in the DLL fixed loading without changing the Dart SDK or machine settings.
@@ -48,7 +50,7 @@ This tests an FFI-hosted Dart application, not a Dart engine inside Shell. JSON 
 
 ## Current milestone
 
-The current host now has a portable Dart AOT executable plus DLLs, measured redraw construction/allocation counts, and actual Dart JIT code reload. See [the measurement record](../reports/summary.md) for the results and limits.
+The host has a portable Dart AOT executable plus DLLs, redraw construction/allocation counters, sparse table publication and actual Dart JIT code reload. The dataset acceptance test compares 100, 10,000 and 100,000 records and keeps cell, row, batch and counter operations separate. See [the measurement record](../reports/summary.md) for results and limits.
 
 The packaged application uses the same blocking native UI isolate arrangement as development. A live VM-service reload succeeded while that native call remained active. This establishes the tested Windows arrangement; it does not establish a Rust executable embedding Dart or a portable thread arrangement for other operating systems.
 

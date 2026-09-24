@@ -42,22 +42,14 @@ final class UiInput extends UiNode {
   };
 }
 
-/// Rows are copied to Rust. GPUI materializes only the visible table cells.
+/// References a dataset registered with this host. Snapshots contain no records.
 final class UiTable extends UiNode {
-  UiTable(
-    super.id, {
-    required List<String> columns,
-    required List<List<String>> rows,
-  }) : columns = List.unmodifiable(columns),
-       rows = List.unmodifiable(
-         rows.map((row) => List<String>.unmodifiable(row)),
-       );
-  final List<String> columns;
-  final List<List<String>> rows;
+  const UiTable(super.id, {required this.dataset});
+  final String dataset;
   @override
   Map<String, Object> toJson() => {
     'kind': 'table',
     'id': id,
-    'data': {'columns': columns, 'rows': rows},
+    'dataset': dataset,
   };
 }

@@ -44,17 +44,19 @@ Generated from the adjacent JSON reports by `dart run tool/summarize.dart`.
 
 ## Local AOT sample
 
-${measurement['rows']} records; ${measurement['updates']} sequential updates, each changing a counter and one visible price, awaiting native application and then delaying 16 ms. This is not a fixed-rate load test. Native histograms cover startup, forced repaints and updates together.
+${measurement['rows']} records; ${measurement['updates']} iterations, each awaiting one cell transaction and one counter snapshot, then delaying 16 ms. This is not a fixed-rate load test. Native histograms cover startup, forced repaints and updates together. Separate publication scaling results are in [data-publication.md](data-publication.md).
 
 | Metric | p50 | p95 | p99 |
 | --- | ---: | ---: | ---: |
 ''');
   for (final entry in <String, dynamic>{
-    'Dart description build (includes immutable row copies)':
-        dart['description_build'],
+    'Dart description build': dart['description_build'],
     'Dart JSON encode, allocate and copy': dart['encode'],
     'Publish to applied acknowledgement (includes encoding)':
         dart['publish_to_applied'],
+    'Dataset JSON encode, allocate and copy': dart['data_encode'],
+    'Dataset publish to applied acknowledgement':
+        dart['data_publish_to_applied'],
     'Native draw': native['draw'],
     'Native dirty to presentation submission':
         native['dirty_to_present_submit'],
@@ -67,7 +69,7 @@ ${measurement['rows']} records; ${measurement['updates']} sequential updates, ea
   report.write('''
 RSS after the workload: **${mib(measurement['process']['rss_bytes'])} MiB**; process peak: **${mib(measurement['process']['peak_rss_bytes'])} MiB**. These include the Dart runtime and native renderer.
 
-The description and encoding samples include the first build. Native application acknowledgement and presentation submission are separate timestamps; neither measures the moment pixels become visible. No controlled OS input-to-present measurement has been made. Any input samples in the raw report are incidental window events.
+Description samples include the first build. Initial dataset encoding is reported separately in the raw JSON. Snapshot encoding contains no table records. Native application acknowledgement and presentation submission are separate timestamps; neither measures the moment pixels become visible. No controlled OS input-to-present measurement has been made. Any input samples in the raw report are incidental window events. The earlier full-data results remain in [baseline-snapshots/summary.md](baseline-snapshots/summary.md).
 
 ## Unchanged repaint probe
 
@@ -94,11 +96,11 @@ Ten warmed redraws per case, a fixed 860 × 650 window and a 320 px table. The a
   }
   report.writeln();
   report.write('''
-Rendering work stayed proportional to the viewport. Total data storage and snapshot copying still grow with record count.
+Rendering work stayed proportional to the viewport. Total storage and initial upload still grow with record count. Ordinary snapshots reference existing data, and record edits transfer only changed values.
 
 ## Actual Dart code reload
 
-`DemoApplication.heading` changed in the same live process and isolate. The VM accepted the new source and the rebuilt native description contained the new heading. Counter, Dart text state, input entity/text/focus/selection and table entity/scroll offset remained equal. Reload plus reassembly to the applied acknowledgement took **${ms(reload['reload_and_reassemble_us'])} ms** in this single development run. Invalid source was rejected and the previous code remained active.
+`DemoApplication.heading` changed in the same live process and isolate. The VM accepted the new source and the rebuilt native description contained the new heading. Counter, Dart text state, edited dataset value/revision, input entity/text/focus/selection and table entity/scroll offset remained equal. Reload plus reassembly to the applied acknowledgement took **${ms(reload['reload_and_reassemble_us'])} ms** in this single development run. Invalid source was rejected and the previous code remained active.
 
 The fixture seeds state through a development extension. Separate headless tests type Unicode, select by keyboard, navigate rows, dispatch wheel input, resize the window and verify retained state. The reload result establishes a component method edit; it does not establish arbitrary structural changes or AOT reload.
 
@@ -107,8 +109,8 @@ The fixture seeds state through a development extension. Separate headless tests
 - ${environment['os']['Caption']} ${environment['os']['BuildNumber']}; ${environment['cpu'][0]['Name']}.
 - ${environment['dart']}; GPUI Kit `21622a70efd25219d26aa459164878c4da9e39f8`, GPUI 0.3.6, Rust 1.98.1, native release build with profiler enabled.
 - Installed GPUs: ${(environment['gpu'] as List).map((gpu) => gpu['Name']).join(', ')}. The report does not identify which adapter rendered the window.
-- Four native tests, one live Dart integration test and Dart analysis passed during this milestone.
-- Human visual inspection is pending: the desktop automation connection was unavailable.
+- Seven native tests, one live Dart integration test and Dart analysis passed during this milestone.
+- Human visual inspection, including IME composition, is pending: the desktop automation connection failed after retry and reset. Windows Sandbox is not installed on this machine.
 - GPUI Shell/QuickJS and GPUIX/Solid comparisons, controlled input latency and clean-machine installation verification remain outstanding. These local measurements establish no ranking against those runtimes.
 ''');
   File('reports/summary.md').writeAsStringSync(report.toString());

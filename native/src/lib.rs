@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod allocations;
+mod datasets;
 mod diagnostics;
 mod protocol;
 mod ui;
@@ -10,6 +11,7 @@ use std::{
     slice,
     sync::atomic::{AtomicBool, Ordering},
     sync::{Arc, Mutex},
+    time::Instant,
 };
 
 #[derive(Clone)]
@@ -23,6 +25,7 @@ impl Events {
 
 pub(crate) enum Command {
     Publish(Snapshot),
+    Dataset(datasets::Update, u64),
     Diagnostic(diagnostics::Request),
     Close,
 }
@@ -44,7 +47,7 @@ pub unsafe extern "C" fn gd_diagnostic(host: *const Host, bytes: *const u8, len:
 }
 
 pub struct Host {
-    initial: Mutex<Option<Snapshot>>,
+    initial: Mutex<Option<datasets::Initial>>,
     sender: Sender<Command>,
     receiver: Receiver<Command>,
     events: Events,
@@ -65,7 +68,7 @@ pub unsafe extern "C" fn gd_create(
     if bytes.is_null() || len > MAX_MESSAGE_BYTES {
         return std::ptr::null_mut();
     }
-    let Ok(initial) = Snapshot::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
+    let Ok(initial) = datasets::Initial::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
         return std::ptr::null_mut();
     };
     let events = Events(Arc::new(move |event| {
@@ -123,6 +126,26 @@ pub unsafe extern "C" fn gd_publish(host: *const Host, bytes: *const u8, len: us
             Err(_) => -3,
         },
         Err(_) => -2,
+    }
+}
+
+/// Copies a revisioned dataset transaction. Application/rejection is asynchronous.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_dataset(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
+        return -1;
+    }
+    let timer = Instant::now();
+    let Ok(update) = datasets::Update::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
+        return -2;
+    };
+    let parse_us = timer.elapsed().as_micros() as u64;
+    match unsafe { &*host }
+        .sender
+        .try_send(Command::Dataset(update, parse_us))
+    {
+        Ok(()) => 0,
+        Err(_) => -3,
     }
 }
 

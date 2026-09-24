@@ -1,7 +1,8 @@
+use crate::datasets::{self, Change, Initial, SharedDataset, Store, Update};
 use crate::diagnostics::Counters;
 use crate::{
     Command, Events,
-    protocol::{Event, Node, Snapshot, TableData},
+    protocol::{Event, Node, Snapshot},
 };
 use async_channel::Receiver;
 use gpui_kit::base::ScrollbarHandle;
@@ -17,19 +18,24 @@ use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
     sync::Arc,
+    time::Instant,
 };
 
-struct Rows(Arc<TableData>, Rc<Counters>);
+struct Rows(SharedDataset, Rc<Counters>);
 
 impl TableDelegate for Rows {
     fn columns_count(&self, _: &App) -> usize {
-        self.0.columns.len()
+        self.0.borrow().data.columns.len()
     }
     fn rows_count(&self, _: &App) -> usize {
-        self.0.rows.len()
+        self.0.borrow().data.rows.len()
     }
     fn column(&self, index: usize, _: &App) -> Column {
-        Column::new(format!("column-{index}"), self.0.columns[index].clone()).width(px(200.))
+        Column::new(
+            format!("column-{index}"),
+            self.0.borrow().data.columns[index].clone(),
+        )
+        .width(px(200.))
     }
     fn render_td(
         &mut self,
@@ -39,7 +45,7 @@ impl TableDelegate for Rows {
         _: &mut Context<TableState<Self>>,
     ) -> impl IntoElement {
         self.1.cells.set(self.1.cells.get() + 1);
-        div().child(self.0.rows[row][col].clone())
+        div().child(self.0.borrow().data.rows[row][col].clone())
     }
     fn render_tr(
         &mut self,
@@ -63,6 +69,7 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     tables: HashMap<String, Entity<TableState<Rows>>>,
+    datasets: Store,
     counters: Rc<Counters>,
 }
 
@@ -99,7 +106,9 @@ impl DartView {
                     json!({
                         "entity": entity.entity_id().as_u64(),
                         "visible_rows": table.visible_range().rows(),
-                        "row_count": table.delegate().0.rows.len(),
+                        "row_count": table.delegate().0.borrow().data.rows.len(),
+                        "dataset": table.delegate().0.borrow().id,
+                        "dataset_revision": table.delegate().0.borrow().revision,
                         "scroll_y": f32::from(offset.y),
                     }),
                 )
@@ -149,7 +158,7 @@ impl DartView {
             || selection.end > text.len()
             || !text.is_char_boundary(selection.start)
             || !text.is_char_boundary(selection.end)
-            || row >= table.read(cx).delegate().0.rows.len()
+            || row >= table.read(cx).delegate().0.borrow().data.rows.len()
         {
             return Err("Invalid selection or row".into());
         }
@@ -163,14 +172,10 @@ impl DartView {
         Ok(())
     }
 
-    fn new(
-        snapshot: Snapshot,
-        events: Events,
-        window: &mut Window,
-        cx: &mut Context<Self>,
-    ) -> Self {
+    fn new(initial: Initial, events: Events, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let mut view = Self {
-            snapshot,
+            snapshot: initial.snapshot,
+            datasets: Store::new(initial.datasets),
             events,
             inputs: HashMap::new(),
             tables: HashMap::new(),
@@ -181,9 +186,20 @@ impl DartView {
     }
 
     fn publish(&mut self, snapshot: Snapshot, window: &mut Window, cx: &mut Context<Self>) {
+        let timer = Instant::now();
         if snapshot.revision <= self.snapshot.revision {
-            self.events.emit(Event::Error {
+            self.events.emit(Event::Rejected {
+                revision: snapshot.revision,
                 message: "Revision must increase".into(),
+            });
+            return;
+        }
+        if let Err(message) =
+            datasets::validate_references(&snapshot, |id| self.datasets.entries.contains_key(id))
+        {
+            self.events.emit(Event::Rejected {
+                revision: snapshot.revision,
+                message,
             });
             return;
         }
@@ -191,8 +207,81 @@ impl DartView {
         self.reconcile(window, cx);
         self.events.emit(Event::Applied {
             revision: self.snapshot.revision,
+            native_apply_us: timer.elapsed().as_micros() as u64,
         });
         cx.notify();
+    }
+
+    pub(crate) fn cell(&self, dataset: &str, row: usize, column: usize) -> Value {
+        let Some(data) = self.datasets.entries.get(dataset) else {
+            return json!({"error":"Unknown dataset"});
+        };
+        let data = data.borrow();
+        match data.data.rows.get(row).and_then(|row| row.get(column)) {
+            Some(value) => json!({"value":value, "revision":data.revision}),
+            None => json!({"error":"Invalid cell"}),
+        }
+    }
+
+    fn update_dataset(&mut self, update: Update, parse_us: u64, cx: &mut Context<Self>) {
+        let timer = Instant::now();
+        let request = update.request;
+        let id = update.id.clone();
+        let revision = update.revision;
+        let replace = matches!(&update.change, Change::Replace { .. });
+        if matches!(&update.change, Change::Release) {
+            let mut referenced = false;
+            self.snapshot.root.visit(&mut |node| {
+                if let Node::Table { dataset, .. } = node {
+                    referenced |= dataset == &id;
+                }
+            });
+            if referenced {
+                self.events.emit(Event::DatasetRejected {
+                    request,
+                    message: "Remove dataset references from the view before releasing it".into(),
+                });
+                return;
+            }
+        }
+        match self.datasets.apply(update) {
+            Ok(work) => {
+                for table in self.tables.values() {
+                    if table.read(cx).delegate().0.borrow().id == id {
+                        table.update(cx, |table, cx| {
+                            if replace {
+                                table.clear_selection(cx);
+                                table
+                                    .vertical_scroll_handle
+                                    .set_offset(point(px(0.), px(0.)));
+                                table
+                                    .horizontal_scroll_handle
+                                    .set_offset(point(px(0.), px(0.)));
+                                table.refresh(cx);
+                            }
+                            cx.notify();
+                        });
+                    }
+                }
+                self.counters
+                    .data_records_checked
+                    .set(self.counters.data_records_checked.get() + work.records_checked as u64);
+                self.counters
+                    .data_cells_written
+                    .set(self.counters.data_cells_written.get() + work.cells_written as u64);
+                self.events.emit(Event::DatasetApplied {
+                    request,
+                    id,
+                    revision,
+                    parse_us,
+                    apply_us: timer.elapsed().as_micros() as u64,
+                    work,
+                });
+            }
+            Err(message) => self
+                .events
+                .emit(Event::DatasetRejected { request, message }),
+        }
     }
 
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) {
@@ -232,12 +321,20 @@ impl DartView {
                     );
                 }
             }
-            Node::Table { id, data } => {
+            Node::Table { id, dataset } => {
+                let data = self.datasets.entries[dataset].clone();
                 table_ids.insert(id.clone());
                 if let Some(table) = self.tables.get(id) {
                     table.update(cx, |table, cx| {
-                        if table.delegate().0 != *data {
+                        if !Rc::ptr_eq(&table.delegate().0, &data) {
                             table.delegate_mut().0 = data.clone();
+                            table.clear_selection(cx);
+                            table
+                                .vertical_scroll_handle
+                                .set_offset(point(px(0.), px(0.)));
+                            table
+                                .horizontal_scroll_handle
+                                .set_offset(point(px(0.), px(0.)));
                             table.refresh(cx);
                             cx.notify();
                         }
@@ -313,7 +410,7 @@ impl Render for DartView {
 }
 
 pub(crate) fn run(
-    initial: Snapshot,
+    initial: Initial,
     receiver: Receiver<Command>,
     events: Events,
 ) -> Result<(), String> {
@@ -355,6 +452,7 @@ pub(crate) fn run(
             events.emit(Event::Ready);
             events.emit(Event::Applied {
                 revision: view.read(cx).snapshot.revision,
+                native_apply_us: 0,
             });
             cx.spawn(async move |cx| {
                 while let Ok(command) = receiver.recv().await {
@@ -370,6 +468,18 @@ pub(crate) fn run(
                             }
                         }
                         Command::Close => break,
+                        Command::Dataset(update, parse_us) => {
+                            if handle
+                                .update(cx, |_, _, cx| {
+                                    view.update(cx, |view, cx| {
+                                        view.update_dataset(update, parse_us, cx)
+                                    })
+                                })
+                                .is_err()
+                            {
+                                break;
+                            }
+                        }
                         Command::Diagnostic(request) => {
                             if handle
                                 .update(cx, |_, window, cx| {

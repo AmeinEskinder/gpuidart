@@ -1,6 +1,7 @@
 use super::DartView;
 use crate::{
     Events,
+    datasets::{Change, Initial, Update, Upload},
     protocol::{Event, Node, Snapshot, TableData},
 };
 use gpui_kit::gpui;
@@ -12,10 +13,6 @@ use gpui_kit::{
 use std::sync::{Arc, Mutex};
 
 fn description(revision: u64) -> Snapshot {
-    description_with_rows(revision, 10_000)
-}
-
-fn description_with_rows(revision: u64, count: usize) -> Snapshot {
     Snapshot {
         revision,
         root: Node::Column {
@@ -35,15 +32,30 @@ fn description_with_rows(revision: u64, count: usize) -> Snapshot {
                 },
                 Node::Table {
                     id: "table".into(),
-                    data: Arc::new(TableData {
-                        columns: vec!["ID".into(), "Value".into()],
-                        rows: (0..count)
-                            .map(|i| vec![i.to_string(), format!("Row {i}")])
-                            .collect(),
-                    }),
+                    dataset: "records".into(),
                 },
             ],
         },
+    }
+}
+
+fn table_data(count: usize) -> TableData {
+    TableData {
+        columns: vec!["ID".into(), "Value".into()],
+        rows: (0..count)
+            .map(|i| vec![i.to_string(), format!("Row {i}")])
+            .collect(),
+    }
+}
+
+fn initial(count: usize) -> Initial {
+    Initial {
+        snapshot: description(1),
+        datasets: vec![Upload {
+            id: "records".into(),
+            revision: 1,
+            data: table_data(count),
+        }],
     }
 }
 
@@ -61,14 +73,7 @@ fn construction_and_allocations_scale_with_viewport(cx: &mut TestAppContext) {
             },
             cx,
             |window, cx| {
-                cx.new(|cx| {
-                    DartView::new(
-                        description_with_rows(1, 100),
-                        Events(Arc::new(|_| {})),
-                        window,
-                        cx,
-                    )
-                })
+                cx.new(|cx| DartView::new(initial(100), Events(Arc::new(|_| {})), window, cx))
             },
         )
         .unwrap()
@@ -76,7 +81,10 @@ fn construction_and_allocations_scale_with_viewport(cx: &mut TestAppContext) {
     let mut samples = Vec::new();
     for (i, row_count) in [100, 10_000, 100_000].into_iter().enumerate() {
         cx.update_window(handle, |_, window, cx| {
-            view.update(cx, |view, cx| view.publish(description_with_rows(i as u64 + 2, row_count), window, cx));
+            view.update(cx, |view, cx| {
+                view.update_dataset(Update {request:1, id:"records".into(), base_revision: i as u64 + 1, revision: i as u64 + 2, change: Change::Replace { data: table_data(row_count) }}, 0, cx);
+                view.publish(description(i as u64 + 2), window, cx);
+            });
             for _ in 0..5 { window.render_frame(cx); }
             let counters = view.read(cx).counters.clone();
             let rows_before = counters.rows.get();
@@ -129,7 +137,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
                 ..Default::default()
             },
             cx,
-            |window, cx| cx.new(|cx| DartView::new(description(1), sink, window, cx)),
+            |window, cx| cx.new(|cx| DartView::new(initial(10_000), sink, window, cx)),
         )
         .unwrap()
     });
@@ -141,6 +149,31 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
         window.input("Dart 🦀", cx);
         assert_eq!(window.find("name").value(), Some("Dart 🦀"));
         window.press("shift-left", cx);
+        assert_eq!(
+            view.read(cx).inputs["name"].state.read(cx).selected_range(),
+            5..9
+        );
+        view.update(cx, |view, cx| {
+            view.update_dataset(
+                Update {
+                    request: 1,
+                    id: "records".into(),
+                    base_revision: 1,
+                    revision: 2,
+                    change: Change::Edit {
+                        edits: vec![crate::datasets::Edit::Cell {
+                            row: 4,
+                            column: 1,
+                            value: "edited".into(),
+                        }],
+                    },
+                },
+                0,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        assert_eq!(view.read(cx).cell("records", 4, 1)["value"], "edited");
         assert_eq!(
             view.read(cx).inputs["name"].state.read(cx).selected_range(),
             5..9

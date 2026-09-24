@@ -1,4 +1,4 @@
-use std::{collections::HashSet, sync::Arc};
+use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
@@ -18,10 +18,10 @@ pub enum Node {
     Text { id: String, text: String },
     Button { id: String, label: String },
     Input { id: String, placeholder: String },
-    Table { id: String, data: Arc<TableData> },
+    Table { id: String, dataset: String },
 }
 
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TableData {
     pub columns: Vec<String>,
@@ -55,7 +55,12 @@ impl Snapshot {
             return Err("Snapshot exceeds 16 MiB".into());
         }
         let snapshot: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
-        if snapshot.revision == 0 {
+        snapshot.validate()?;
+        Ok(snapshot)
+    }
+
+    pub fn validate(&self) -> Result<(), String> {
+        if self.revision == 0 {
             return Err("Revision must be positive".into());
         }
         let mut ids = HashSet::new();
@@ -72,23 +77,14 @@ impl Snapshot {
                         validate(child, depth + 1, ids)?;
                     }
                 }
-                Node::Table { data, .. } => {
-                    if data.columns.is_empty()
-                        || data.columns.len() > 64
-                        || data.rows.len() > 100_000
-                    {
-                        return Err("Table requires 1..64 columns and at most 100000 rows".into());
-                    }
-                    if data.rows.iter().any(|row| row.len() != data.columns.len()) {
-                        return Err("Table row width does not match its columns".into());
-                    }
+                Node::Table { dataset, .. } if dataset.is_empty() => {
+                    return Err("Table dataset ID must be nonempty".into());
                 }
                 _ => {}
             }
             Ok(())
         }
-        validate(&snapshot.root, 0, &mut ids)?;
-        Ok(snapshot)
+        validate(&self.root, 0, &mut ids)
     }
 }
 
@@ -102,6 +98,23 @@ pub enum Event {
     Ready,
     Applied {
         revision: u64,
+        native_apply_us: u64,
+    },
+    Rejected {
+        revision: u64,
+        message: String,
+    },
+    DatasetApplied {
+        request: u64,
+        id: String,
+        revision: u64,
+        parse_us: u64,
+        apply_us: u64,
+        work: crate::datasets::Work,
+    },
+    DatasetRejected {
+        request: u64,
+        message: String,
     },
     Click {
         revision: u64,
@@ -129,8 +142,8 @@ mod tests {
     }
 
     #[test]
-    fn rejects_ragged_table_before_native_rendering() {
-        let bytes = br#"{"revision":1,"root":{"kind":"table","id":"table","data":{"columns":["A","B"],"rows":[["x"]]}}}"#;
-        assert!(Snapshot::parse(bytes).unwrap_err().contains("row width"));
+    fn rejects_inline_table_records() {
+        let bytes = br#"{"revision":1,"root":{"kind":"table","id":"table","dataset":"quotes","data":{"columns":["A"],"rows":[["x"]]}}}"#;
+        assert!(Snapshot::parse(bytes).is_err());
     }
 }

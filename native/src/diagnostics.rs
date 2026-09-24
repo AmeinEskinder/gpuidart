@@ -9,17 +9,25 @@ pub(crate) struct Counters {
     pub materializations: Cell<u64>,
     pub rows: Cell<u64>,
     pub cells: Cell<u64>,
+    pub data_records_checked: Cell<u64>,
+    pub data_cells_written: Cell<u64>,
 }
 
 impl Counters {
     pub fn read(&self) -> Value {
-        json!({"materializations": self.materializations.get(), "rows_constructed": self.rows.get(), "cells_constructed": self.cells.get()})
+        json!({"materializations": self.materializations.get(), "rows_constructed": self.rows.get(), "cells_constructed": self.cells.get(), "data_records_checked": self.data_records_checked.get(), "data_cells_written": self.data_cells_written.get()})
     }
 }
 
 #[derive(Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub(crate) enum Request {
+    Cell {
+        request: u64,
+        dataset: String,
+        row: usize,
+        column: usize,
+    },
     Inspect {
         request: u64,
     },
@@ -46,6 +54,15 @@ pub(crate) fn handle(
     cx: &mut App,
 ) {
     match request {
+        Request::Cell {
+            request,
+            dataset,
+            row,
+            column,
+        } => events.emit(Event::Diagnostic {
+            request,
+            data: view.read(cx).cell(&dataset, row, column),
+        }),
         Request::Inspect { request } => reply(request, view, events, window, cx),
         Request::Repaint { request, frames } if frames <= 600 => {
             let target = view.read(cx).materialization_count() + u64::from(frames);
