@@ -1,0 +1,77 @@
+# Integration decision
+
+Source inspected on 2026-09-25 at GPUI Kit commit `21622a70efd25219d26aa459164878c4da9e39f8`.
+
+## Reuse findings
+
+| Part | Source finding | Decision for this spike |
+| --- | --- | --- |
+| Base and Component | Kit exposes native controls and retained input/table entities. | Use Kit directly for the four initial controls. |
+| Shell engine | `ShellRuntime` and view handles re-export QuickJS types. | Treat Dart as a port that needs a new contract. |
+| Shell snapshot | Its constructor is crate-private and stores a weak `ShellRuntime` for callback lifetime management. | Do not assume an external Dart package can construct one. |
+| Shell materializer | Public `materialize` takes `Rc<ShellRuntime>` and `RenderSnapshot`. | Reusing it requires changing the host/runtime boundary. |
+| Styled catalog | `gpui-component-shell` registers styled components through a frozen registry. | This is an existing catalog adapter to study during a Shell port. |
+| Repaint path | Shell caches snapshots and can reuse GPUI subtrees. Virtual lists and dock chrome have frame-path callbacks. | Measure view renders, frame callbacks and materialization separately. |
+
+The earlier statement that styled components are not automatically included in Shell remains true, but the pinned source already contains an explicit adapter for them. It is no longer necessary to assume every Shell component binding must be authored from scratch.
+
+Source links:
+
+- [Engine boundary](https://github.com/longbridge/gpui-kit/blob/21622a70efd25219d26aa459164878c4da9e39f8/crates/shell/src/engine/mod.rs)
+- [Snapshot ownership](https://github.com/longbridge/gpui-kit/blob/21622a70efd25219d26aa459164878c4da9e39f8/crates/shell/src/snapshot.rs)
+- [Materializer](https://github.com/longbridge/gpui-kit/blob/21622a70efd25219d26aa459164878c4da9e39f8/crates/shell/src/materialize.rs)
+- [Styled component registry](https://github.com/longbridge/gpui-kit/blob/21622a70efd25219d26aa459164878c4da9e39f8/crates/component-shell/src/lib.rs)
+
+## Implemented boundary
+
+```mermaid
+flowchart LR
+    Dart["Dart application isolate\nstate, Futures, JSON descriptions"]
+    Queue["Bounded native command queue"]
+    UI["Dedicated isolate in blocking native call\nGPUI window and retained controls"]
+    Dart -->|"FFI: validate and copy"| Queue
+    Queue -->|"wake foreground task"| UI
+    UI -->|"NativeCallable.listener events"| Dart
+```
+
+GPUI runs on the thread that enters `gd_run`. The Dart worker isolate stays in that native call until the window closes. The application isolate continues processing its normal event loop. Commands wake a GPUI foreground task through an asynchronous channel; there is no frame polling or Dart render callback.
+
+Every accepted description has an increasing revision. Native button events carry the revision that installed the callback. Input events carry the live description revision. The typed Dart API exposes both IDs and revisions, so applications can decide whether an event belongs to their current state.
+
+Rust validates the whole description before queueing it. The UI thread rejects stale revisions, replaces the description and reconciles retained input/table entities by node ID and kind. Table rows are data, and native code constructs visible cells during layout.
+
+Event buffers belong to Rust until Dart receives and frees them. Shutdown waits for both the last native `closed` event and the return of the blocking native call before releasing the host and callback. No GPUI pointer is exposed to Dart.
+
+The DLL embeds a Common Controls v6 manifest as resource 2. Without it, loading from `dart run` failed with Windows error 127 because GPUI imports `TaskDialogIndirect`. A Rust test executable's activation context had masked that failure; the live Dart test caught it. Embedding the dependency in the DLL fixed loading without changing the Dart SDK or machine settings.
+
+This tests an FFI-hosted Dart application, not a Dart engine inside Shell. JSON encoding, queue handoff and data copying are measurable additional costs. The architecture must not inherit QuickJS's per-call timing claims.
+
+## Next experiments
+
+1. Define a runtime-independent host interface for retained entities, event dispatch, callback retirement and scheduling. Use the direct adapter and a small Shell engine implementation to expose what the interface actually needs.
+2. Connect Dart signals to view invalidation. Preserve whole-view snapshots as the comparison baseline.
+3. Add node mutations in a separate experiment with stable IDs and atomic commits. Keep snapshot publication and callback retirement explicit.
+
+## Benchmark plan
+
+Use the same native components, machine, window dimensions, visible rows and release settings for each implementation.
+
+| Workload | Record |
+| --- | --- |
+| Unchanged repaint | Frame time, native materialization count, all language callbacks |
+| One visible cell changes | Description/patch time, encoded bytes, queue delay, presentation latency |
+| Offscreen row changes | Work done despite unchanged visible content |
+| Scroll a large table | Visible rows, language callbacks during layout, frame time |
+| Insert/remove/reorder | Structural update cost and retained identity correctness |
+| Close during async work | Callbacks after disposal, retained resources |
+
+Compare QuickJS/Shell snapshots, Dart snapshots and Dart node mutations first. Add GPUIX/Solid as the external comparison. Separate Dart JIT and AOT results. Record p50/p95/p99 latency, allocations, memory, and display frame budget. The `applied` acknowledgement is not a presentation timestamp.
+
+No comparative performance results have been produced by this spike.
+
+## Verification record
+
+- Rust protocol tests reject duplicate IDs and ragged table data.
+- A GPUI test clicks the button, types Unicode text, replaces the description, verifies input entity identity/text/focus, checks the 10,000-row table's visible range, forces ten native repaints with no events, rejects a stale revision and removes retained controls.
+- The Dart integration test opens the real Windows host, publishes from a timer, rejects an invalid table, applies the next valid description, closes, and verifies publication after close fails.
+- The example opened a native window. Visual inspection was unavailable because the computer-use helper could not connect to its native pipe.
