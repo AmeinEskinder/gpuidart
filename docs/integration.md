@@ -46,11 +46,22 @@ The DLL embeds a Common Controls v6 manifest as resource 2. Without it, loading 
 
 This tests an FFI-hosted Dart application, not a Dart engine inside Shell. JSON encoding, queue handoff and data copying are measurable additional costs. The architecture must not inherit QuickJS's per-call timing claims.
 
+## Current milestone
+
+The current host now has a portable Dart AOT executable plus DLLs, measured redraw construction/allocation counts, and actual Dart JIT code reload. See [the measurement record](../reports/summary.md) for the results and limits.
+
+The packaged application uses the same blocking native UI isolate arrangement as development. A live VM-service reload succeeded while that native call remained active. This establishes the tested Windows arrangement; it does not establish a Rust executable embedding Dart or a portable thread arrangement for other operating systems.
+
+`tool/dev.dart` watches source changes and invokes [`reloadSources`](https://api.flutter.dev/flutter/vm_service/VmService/reloadSources.html), then calls a registered application extension to rebuild the view. The reload test changes a method body while preserving the existing application object and native entities. A snapshot replacement alone would not pass the test because the output must reflect changed source code.
+
+The AOT package is built with [`dart compile exe`](https://dart.dev/tools/dart-compile#exe). Native assets are embedded in the GPUI DLL. DLL lookup uses the executable's directory, so the working directory can be unrelated to the package. The native DLL retains its Common Controls v6 manifest.
+
 ## Next experiments
 
-1. Define a runtime-independent host interface for retained entities, event dispatch, callback retirement and scheduling. Use the direct adapter and a small Shell engine implementation to expose what the interface actually needs.
-2. Connect Dart signals to view invalidation. Preserve whole-view snapshots as the comparison baseline.
-3. Add node mutations in a separate experiment with stable IDs and atomic commits. Keep snapshot publication and callback retirement explicit.
+1. Complete human visual inspection and clean-machine package verification. Measure controlled OS input-to-presentation latency.
+2. Run matched release workloads against GPUI Shell/QuickJS and GPUIX/Solid. Keep unchanged repaints and invalidated views separate.
+3. If frequent updates make full descriptions expensive, introduce independently invalidated child views and compare them with the current whole-view baseline.
+4. Evaluate targeted mutations or a Shell engine port after measuring their expected benefit. A port must demonstrate concrete reuse of description, materialization or component infrastructure.
 
 ## Benchmark plan
 
@@ -65,13 +76,16 @@ Use the same native components, machine, window dimensions, visible rows and rel
 | Insert/remove/reorder | Structural update cost and retained identity correctness |
 | Close during async work | Callbacks after disposal, retained resources |
 
-Compare QuickJS/Shell snapshots, Dart snapshots and Dart node mutations first. Add GPUIX/Solid as the external comparison. Separate Dart JIT and AOT results. Record p50/p95/p99 latency, allocations, memory, and display frame budget. The `applied` acknowledgement is not a presentation timestamp.
+Compare QuickJS/Shell snapshots, Dart snapshots and GPUIX/Solid before changing the update architecture. Pin each repository and preserve equivalent components, table data, viewport, update cadence and presentation behavior. If equivalent widgets are unavailable, report that difference alongside runtime results. Separate Dart JIT and AOT results. Record p50/p95/p99 latency, allocations, memory, and display frame budget. The `applied` acknowledgement is not a presentation timestamp.
 
-No comparative performance results have been produced by this spike.
+The checked-in AOT sample measures only this host. It does not establish a performance ranking against Shell or GPUIX. Source counters instrument the registered Dart builder and callbacks; they cannot establish that the Dart runtime executes no code during repaints.
 
 ## Verification record
 
 - Rust protocol tests reject duplicate IDs and ragged table data.
-- A GPUI test clicks the button, types Unicode text, replaces the description, verifies input entity identity/text/focus, checks the 10,000-row table's visible range, forces ten native repaints with no events, rejects a stale revision and removes retained controls.
+- A GPUI test clicks the button, types Unicode text, extends selection by keyboard, replaces the description, verifies input entity identity/text/focus/selection, scrolls the 10,000-row table by wheel, navigates by keyboard, resizes, forces ten native repaints with no events, rejects a stale revision and removes retained controls.
+- A scoped Rust allocator and delegate counters measure ten warmed redraws at 100, 10,000 and 100,000 records. Rendering work stays proportional to the viewport; data creation and publication are outside that allocation scope.
 - The Dart integration test opens the real Windows host, publishes from a timer, rejects an invalid table, applies the next valid description, closes, and verifies publication after close fails.
-- The example opened a native window. Visual inspection was unavailable because the computer-use helper could not connect to its native pipe.
+- An extracted AOT package starts with a Windows-only PATH outside the repository. The verifier checks package hashes and loaded module paths, including Common Controls v6 and the bundled CRT. The SDK remains installed on the test machine.
+- The live JIT reload test changes component source and checks preserved Dart state, native entities, text, focus, selection and scroll offset. Invalid source leaves the previous code running. Preparation uses a development extension; it is separate from the headless typing tests.
+- Visual inspection remains unavailable because the computer-use helper could not connect to its native pipe after recovery attempts.

@@ -1,8 +1,10 @@
+use crate::diagnostics::Counters;
 use crate::{
     Command, Events,
     protocol::{Event, Node, Snapshot, TableData},
 };
 use async_channel::Receiver;
+use gpui_kit::base::ScrollbarHandle;
 use gpui_kit::component::{
     ActiveTheme, StyledExt,
     button::{Button, ButtonVariants},
@@ -10,12 +12,14 @@ use gpui_kit::component::{
     table::{Column, DataTable, TableDelegate, TableState},
 };
 use gpui_kit::*;
+use serde_json::{Value, json};
 use std::{
     collections::{HashMap, HashSet},
+    rc::Rc,
     sync::Arc,
 };
 
-struct Rows(Arc<TableData>);
+struct Rows(Arc<TableData>, Rc<Counters>);
 
 impl TableDelegate for Rows {
     fn columns_count(&self, _: &App) -> usize {
@@ -34,7 +38,17 @@ impl TableDelegate for Rows {
         _: &mut Window,
         _: &mut Context<TableState<Self>>,
     ) -> impl IntoElement {
+        self.1.cells.set(self.1.cells.get() + 1);
         div().child(self.0.rows[row][col].clone())
+    }
+    fn render_tr(
+        &mut self,
+        row: usize,
+        _: &mut Window,
+        _: &mut Context<TableState<Self>>,
+    ) -> Stateful<Div> {
+        self.1.rows.set(self.1.rows.get() + 1);
+        div().id(("row", row))
     }
 }
 
@@ -49,9 +63,106 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     tables: HashMap<String, Entity<TableState<Rows>>>,
+    counters: Rc<Counters>,
 }
 
 impl DartView {
+    pub(crate) fn materialization_count(&self) -> u64 {
+        self.counters.materializations.get()
+    }
+
+    pub(crate) fn inspect(&self, window: &Window, cx: &App) -> Value {
+        let inputs = self
+            .inputs
+            .iter()
+            .map(|(id, input)| {
+                let state = input.state.read(cx);
+                (
+                    id.clone(),
+                    json!({
+                        "entity": input.state.entity_id().as_u64(),
+                        "text": state.value().to_string(),
+                        "selection": state.selected_range(),
+                        "focused": state.focus_handle(cx).is_focused(window),
+                    }),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>();
+        let tables = self
+            .tables
+            .iter()
+            .map(|(id, entity)| {
+                let table = entity.read(cx);
+                let offset = table.vertical_scroll_handle.offset();
+                (
+                    id.clone(),
+                    json!({
+                        "entity": entity.entity_id().as_u64(),
+                        "visible_rows": table.visible_range().rows(),
+                        "row_count": table.delegate().0.rows.len(),
+                        "scroll_y": f32::from(offset.y),
+                    }),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>();
+        let mut labels = serde_json::Map::new();
+        self.snapshot.root.visit(&mut |node| {
+            if let Node::Text { id, text } = node {
+                labels.insert(id.clone(), json!(text));
+            }
+        });
+        macro_rules! histogram {
+            ($hist:expr) => {{
+                let histogram = $hist;
+                json!({
+                    "samples": histogram.len(),
+                    "p50_us": histogram.value_at_quantile(0.50) as f64 / 1000.0,
+                    "p95_us": histogram.value_at_quantile(0.95) as f64 / 1000.0,
+                    "p99_us": histogram.value_at_quantile(0.99) as f64 / 1000.0,
+                })
+            }};
+        }
+        let frames = window.frame_duration_snapshot();
+        let input = window.input_latency_snapshot();
+        json!({"revision": self.snapshot.revision, "inputs": inputs, "tables": tables, "labels": labels,
+            "native": self.counters.read(),
+            "draw": histogram!(frames.draw_duration_histogram),
+            "dirty_to_present_submit": histogram!(frames.dirty_to_present_histogram),
+            "present_interval": histogram!(frames.present_interval_histogram),
+            "input_to_frame": histogram!(input.latency_histogram),
+        })
+    }
+
+    pub(crate) fn prepare(
+        &mut self,
+        input: &str,
+        text: &str,
+        selection: std::ops::Range<usize>,
+        table: &str,
+        row: usize,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Result<(), String> {
+        let input = self.inputs.get(input).ok_or("Unknown input")?;
+        let table = self.tables.get(table).ok_or("Unknown table")?;
+        if selection.start > selection.end
+            || selection.end > text.len()
+            || !text.is_char_boundary(selection.start)
+            || !text.is_char_boundary(selection.end)
+            || row >= table.read(cx).delegate().0.rows.len()
+        {
+            return Err("Invalid selection or row".into());
+        }
+        input.state.update(cx, |input, cx| {
+            input.set_value(text.to_owned(), window, cx);
+            input.set_selected_range(selection, cx);
+            input.focus(window, cx);
+        });
+        table.update(cx, |table, cx| table.scroll_to_row(row, cx));
+        cx.notify();
+        Ok(())
+    }
+
     fn new(
         snapshot: Snapshot,
         events: Events,
@@ -63,6 +174,7 @@ impl DartView {
             events,
             inputs: HashMap::new(),
             tables: HashMap::new(),
+            counters: Rc::new(Counters::default()),
         };
         view.reconcile(window, cx);
         view
@@ -131,7 +243,9 @@ impl DartView {
                         }
                     });
                 } else {
-                    let table = cx.new(|cx| TableState::new(Rows(data.clone()), window, cx));
+                    let table = cx.new(|cx| {
+                        TableState::new(Rows(data.clone(), self.counters.clone()), window, cx)
+                    });
                     self.tables.insert(id.clone(), table);
                 }
             }
@@ -185,6 +299,9 @@ mod tests;
 
 impl Render for DartView {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        self.counters
+            .materializations
+            .set(self.counters.materializations.get() + 1);
         div()
             .id("gpuidart")
             .size_full()
@@ -253,6 +370,16 @@ pub(crate) fn run(
                             }
                         }
                         Command::Close => break,
+                        Command::Diagnostic(request) => {
+                            if handle
+                                .update(cx, |_, window, cx| {
+                                    crate::diagnostics::handle(request, &view, &events, window, cx)
+                                })
+                                .is_err()
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
                 let _ = cx.update(|cx| cx.quit());

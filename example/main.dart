@@ -1,53 +1,140 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:gpuidart/gpuidart.dart';
 
-Future<void> main() async {
-  var count = 0;
-  var name = '';
-  var status = 'Waiting for an asynchronous update...';
-  final rows = List.generate(
-    10000,
-    (i) => ['$i', 'Instrument $i', '${100 + i / 100}'],
-  );
-  UiNode build() => UiColumn('main', [
-    const UiText('title', 'Dart application · GPUI Kit controls'),
-    UiText('count', 'Count: $count'),
-    const UiButton('increment', 'Increment'),
-    const UiInput('name', placeholder: 'Type here; state survives updates'),
-    UiText('greeting', name.isEmpty ? 'Enter a name' : 'Hello, $name'),
-    UiText('status', status),
-    UiTable('quotes', columns: ['ID', 'Instrument', 'Price'], rows: rows),
-  ]);
+import 'app.dart';
 
-  final host = await GpuiHost.open(build());
+Future<void> main(List<String> args) async {
+  final rowArgument = args.where((arg) => arg.startsWith('--rows='));
+  final app = DemoApplication(
+    rowCount: rowArgument.isEmpty
+        ? 10000
+        : int.parse(rowArgument.single.substring(7)),
+  );
+  final host = await GpuiHost.openView(app.build);
   Future<void> handle(GpuiEvent event) async {
     if (event.type == 'click' && event.id == 'increment') {
-      count++;
-      await host.publish(build());
+      app.count++;
+      await host.rebuild();
     } else if (event.type == 'input' && event.id == 'name') {
-      name = event.value!;
-      await host.publish(build());
+      app.name = event.value!;
+      await host.rebuild();
     } else if (event.type == 'error') {
-      print(event);
+      stderr.writeln(event);
     }
   }
 
   final subscription = host.events.listen((event) {
-    unawaited(handle(event).catchError((Object error) => print(error)));
+    unawaited(
+      handle(event).catchError((Object error) => stderr.writeln(error)),
+    );
   });
-  final timer = Timer(const Duration(seconds: 2), () async {
-    status = 'Dart Future/Timer completed while GPUI was running';
-    try {
-      await host.publish(build());
-    } on StateError {
-      /* Window closed. */
-    }
-  });
+  if (!const bool.fromEnvironment('dart.vm.product')) {
+    registerExtension('ext.gpuidart.reassemble', (_, _) async {
+      await host.rebuild();
+      return ServiceExtensionResponse.result(
+        jsonEncode({'heading': app.heading, 'count': app.count}),
+      );
+    });
+    registerExtension('ext.gpuidart.inspect', (_, _) async {
+      return ServiceExtensionResponse.result(
+        jsonEncode({
+          'state': await host.diagnose('inspect'),
+          'dart': host.metrics.read(),
+          'count': app.count,
+          'name': app.name,
+        }),
+      );
+    });
+    registerExtension('ext.gpuidart.prepare', (_, _) async {
+      app.count = 7;
+      app.name = 'Reload preserves this text';
+      await host.rebuild();
+      final state = await host.diagnose('prepare', {
+        'input': 'name',
+        'text': 'Reload preserves this text',
+        'start': 7,
+        'end': 16,
+        'table': 'quotes',
+        'row': 2000,
+      });
+      return ServiceExtensionResponse.result(jsonEncode(state));
+    });
+    registerExtension('ext.gpuidart.close', (_, _) async {
+      unawaited(host.close());
+      return ServiceExtensionResponse.result('{}');
+    });
+  }
+
   try {
+    if (args.contains('--self-test') || args.contains('--measure')) {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      final before = await host.diagnose('inspect');
+      final dartBefore = host.metrics.read();
+      final after = await host.diagnose('repaint', {'frames': 30});
+      final dartAfter = host.metrics.read();
+      for (final field in [
+        'description_builds',
+        'ui_callbacks',
+        'encoded_snapshots',
+      ]) {
+        if (dartBefore[field] != dartAfter[field]) {
+          throw StateError('Unchanged repaint executed Dart UI work: $field');
+        }
+      }
+      if ((dartAfter['ffi_callbacks'] as int) -
+              (dartBefore['ffi_callbacks'] as int) !=
+          1) {
+        throw StateError('Expected only the diagnostic completion callback');
+      }
+      if ((after['native']['materializations'] as int) -
+              (before['native']['materializations'] as int) <
+          30) {
+        throw StateError(
+          'Repaint probe did not complete 30 native view builds',
+        );
+      }
+      final updates = args.contains('--measure') ? 120 : 3;
+      for (var i = 0; i < updates; i++) {
+        app.count++;
+        app.rows[0][2] = '${100 + i / 100}';
+        await host.rebuild();
+        await Future<void>.delayed(const Duration(milliseconds: 16));
+      }
+      final state = await host.diagnose('inspect');
+      if (state['labels']['count'] != 'Count: $updates') {
+        throw StateError('Snapshot updates did not reach the native view');
+      }
+      stdout.writeln(
+        jsonEncode({
+          'mode': const bool.fromEnvironment('gpuidart.packaged')
+              ? 'aot'
+              : 'jit',
+          'rows': app.rows.length,
+          'updates': updates,
+          'unchanged_repaints': {
+            'requested_frames': 30,
+            'dart_before': dartBefore,
+            'dart_after': dartAfter,
+            'native_before': before,
+            'native_after': after,
+          },
+          'dart': host.metrics.read(),
+          'native': state,
+          'process': {
+            'rss_bytes': ProcessInfo.currentRss,
+            'peak_rss_bytes': ProcessInfo.maxRss,
+          },
+        }),
+      );
+      await host.close();
+    }
     await host.done;
   } finally {
-    timer.cancel();
+    await host.close();
     await subscription.cancel();
   }
 }

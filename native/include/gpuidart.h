@@ -20,6 +20,9 @@ int32_t gd_run(const GdHost *host);
 /* 0 = queued, -1 = invalid pointer/size, -2 = invalid description,
    -3 = queue closed or full. The applied event acknowledges native application. */
 int32_t gd_publish(const GdHost *host, const uint8_t *bytes, size_t len);
+/* Explicit diagnostics only: inspect counters/state, request native repaints,
+   or prepare native interaction state for reload verification. */
+int32_t gd_diagnostic(const GdHost *host, const uint8_t *bytes, size_t len);
 void gd_close(const GdHost *host);
 
 /* Wait for gd_run to return and the closed callback before destroying the host

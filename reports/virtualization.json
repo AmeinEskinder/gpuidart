@@ -1,0 +1,33 @@
+{
+  "scope": "headless GPUI UI thread, ten warmed redraws; excludes data construction, snapshot publication and GPU allocations",
+  "window": {
+    "width": 860,
+    "height": 650
+  },
+  "samples": [
+    {
+      "data_rows": 100,
+      "frames": 10,
+      "rows_constructed": 110,
+      "cells_constructed": 290,
+      "allocation_calls": 20051,
+      "allocated_bytes": 8366426
+    },
+    {
+      "data_rows": 10000,
+      "frames": 10,
+      "rows_constructed": 110,
+      "cells_constructed": 290,
+      "allocation_calls": 20050,
+      "allocated_bytes": 8366170
+    },
+    {
+      "data_rows": 100000,
+      "frames": 10,
+      "rows_constructed": 110,
+      "cells_constructed": 290,
+      "allocation_calls": 20050,
+      "allocated_bytes": 8366170
+    }
+  ]
+}

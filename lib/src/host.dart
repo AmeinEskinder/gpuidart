@@ -7,6 +7,7 @@ import 'dart:isolate';
 import 'package:ffi/ffi.dart';
 
 import 'nodes.dart';
+import 'metrics.dart';
 
 typedef _EventNative = Void Function(Pointer<Uint8>, Size);
 typedef _CreateNative = Pointer<Void> Function(
@@ -34,6 +35,9 @@ final class _Bindings {
   );
   late final publish = library.lookupFunction<_PublishNative, _PublishDart>(
     'gd_publish',
+  );
+  late final diagnostic = library.lookupFunction<_PublishNative, _PublishDart>(
+    'gd_diagnostic',
   );
   late final close = library.lookupFunction<_HostNative, _HostDart>('gd_close');
   late final destroy = library.lookupFunction<_HostNative, _HostDart>(
@@ -67,6 +71,11 @@ final class GpuiHost {
   final _ready = Completer<void>();
   final _closed = Completer<void>();
   final _pending = <int, Completer<void>>{};
+  final _publishTimers = <int, Stopwatch>{};
+  final _diagnostics = <int, Completer<Map<String, dynamic>>>{};
+  final metrics = HostMetrics();
+  UiNode Function()? _builder;
+  int _request = 0;
   late final NativeCallable<_EventNative> _callback;
   late final Pointer<Void> _handle;
   late final Future<void> done;
@@ -75,16 +84,48 @@ final class GpuiHost {
 
   Stream<GpuiEvent> get events => _events.stream;
 
+  /// Tracks every execution of the application's description builder.
+  static Future<GpuiHost> openView(
+    UiNode Function() builder, {
+    String? libraryPath,
+  }) async {
+    final timer = Stopwatch()..start();
+    final root = builder();
+    final elapsed = timer.elapsedMicroseconds;
+    final host = await open(root, libraryPath: libraryPath);
+    host._builder = builder;
+    host.metrics.descriptionBuilds = 1;
+    HostMetrics.sample(host.metrics.buildMicroseconds, elapsed);
+    return host;
+  }
+
+  Future<void> rebuild() {
+    if (_closing || _closed.isCompleted) throw StateError('Host is closing');
+    final builder = _builder;
+    if (builder == null) throw StateError('Use openView to register a builder');
+    final timer = Stopwatch()..start();
+    metrics.descriptionBuilds++;
+    final root = builder();
+    HostMetrics.sample(metrics.buildMicroseconds, timer.elapsedMicroseconds);
+    return publish(root);
+  }
+
   static Future<GpuiHost> open(UiNode root, {String? libraryPath}) async {
     if (!Platform.isWindows) {
       throw UnsupportedError(
         'The initial native host currently supports Windows.',
       );
     }
+    final sibling = File.fromUri(
+      File(Platform.resolvedExecutable).parent.uri.resolve('gpuidart.dll'),
+    );
     final path = File(
       libraryPath ??
           Platform.environment['GPUIDART_LIBRARY'] ??
-          'target/debug/gpuidart.dll',
+          (const bool.fromEnvironment('gpuidart.packaged') ||
+                  sibling.existsSync()
+              ? sibling.path
+              : 'target/debug/gpuidart.dll'),
     ).absolute.path;
     final host = GpuiHost._(_Bindings(path));
     host._callback = NativeCallable<_EventNative>.listener(host._receive);
@@ -125,12 +166,16 @@ final class GpuiHost {
   }
 
   T _withSnapshot<T>(UiNode root, T Function(Pointer<Uint8>, int) action) {
+    final timer = Stopwatch()..start();
     final data = utf8.encode(
       jsonEncode({'revision': _revision, 'root': root.toJson()}),
     );
     final bytes = calloc<Uint8>(data.length);
     try {
       bytes.asTypedList(data.length).setAll(0, data);
+      metrics.encodedSnapshots++;
+      metrics.encodedBytes += data.length;
+      HostMetrics.sample(metrics.encodeMicroseconds, timer.elapsedMicroseconds);
       return action(bytes, data.length);
     } finally {
       calloc.free(bytes);
@@ -143,6 +188,7 @@ final class GpuiHost {
     final revision = ++_revision;
     final accepted = Completer<void>();
     _pending[revision] = accepted;
+    _publishTimers[revision] = Stopwatch()..start();
     try {
       final status = _withSnapshot(
         root,
@@ -153,6 +199,7 @@ final class GpuiHost {
       }
     } catch (_) {
       _pending.remove(revision);
+      _publishTimers.remove(revision);
       rethrow;
     }
     return accepted.future;
@@ -166,17 +213,54 @@ final class GpuiHost {
     return done;
   }
 
+  /// Opt-in native inspection and test control; no commands run during repaint.
+  Future<Map<String, dynamic>> diagnose(
+    String op, [
+    Map<String, Object> arguments = const {},
+  ]) {
+    if (_closing || _closed.isCompleted) throw StateError('Host is closing');
+    final request = ++_request;
+    final completion = Completer<Map<String, dynamic>>();
+    final data = utf8.encode(
+      jsonEncode({...arguments, 'op': op, 'request': request}),
+    );
+    final bytes = calloc<Uint8>(data.length);
+    try {
+      bytes.asTypedList(data.length).setAll(0, data);
+      final status = _bindings.diagnostic(_handle, bytes, data.length);
+      if (status != 0) throw StateError('Diagnostic request failed: $status');
+      _diagnostics[request] = completion;
+    } finally {
+      calloc.free(bytes);
+    }
+    return completion.future;
+  }
+
   void _receive(Pointer<Uint8> bytes, int length) {
     try {
       final event = GpuiEvent._(
         jsonDecode(utf8.decode(bytes.asTypedList(length)))
             as Map<String, dynamic>,
       );
+      metrics.ffiCallbacks++;
+      if (event.type == 'click' || event.type == 'input') metrics.uiCallbacks++;
+      if (event.type == 'diagnostic') metrics.diagnosticCallbacks++;
       switch (event.type) {
         case 'ready':
           if (!_ready.isCompleted) _ready.complete();
         case 'applied':
+          final timer = _publishTimers.remove(event.revision);
+          if (timer != null) {
+            HostMetrics.sample(
+              metrics.applyMicroseconds,
+              timer.elapsedMicroseconds,
+            );
+          }
           _pending.remove(event.revision)?.complete();
+        case 'diagnostic':
+          _diagnostics
+              .remove(event.data['request'])
+              ?.complete(event.data['data'] as Map<String, dynamic>);
         case 'closed':
           _closing = true;
           if (!_closed.isCompleted) _closed.complete();
@@ -215,6 +299,13 @@ final class GpuiHost {
         );
       }
       _pending.clear();
+      _publishTimers.clear();
+      for (final pending in _diagnostics.values) {
+        pending.completeError(
+          StateError('Host closed during diagnostic request'),
+        );
+      }
+      _diagnostics.clear();
       result.close();
       _bindings.destroy(_handle);
       _callback.close();

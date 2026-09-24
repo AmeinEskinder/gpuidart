@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod allocations;
+mod diagnostics;
 mod protocol;
 mod ui;
 
@@ -20,7 +23,24 @@ impl Events {
 
 pub(crate) enum Command {
     Publish(Snapshot),
+    Diagnostic(diagnostics::Request),
     Close,
+}
+
+/// Queues an opt-in diagnostic request. Input is copied before returning.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_diagnostic(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    if host.is_null() || bytes.is_null() || len > 4096 {
+        return -1;
+    }
+    let host = unsafe { &*host };
+    let Ok(request) = serde_json::from_slice(unsafe { slice::from_raw_parts(bytes, len) }) else {
+        return -2;
+    };
+    match host.sender.try_send(Command::Diagnostic(request)) {
+        Ok(()) => 0,
+        Err(_) => -3,
+    }
 }
 
 pub struct Host {
