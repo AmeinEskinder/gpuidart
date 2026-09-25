@@ -1,22 +1,83 @@
 param(
     [switch]$Sandbox,
     [switch]$Japanese,
+    [switch]$CheckOnly,
     [string]$ReportPath = (Join-Path $PSScriptRoot '../../build/windows-prerequisites.json')
 )
 $ErrorActionPreference = 'Stop'
 if (!$Sandbox -and !$Japanese) { throw 'Specify -Sandbox, -Japanese, or both. No settings have changed.' }
 $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
-if (!$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if (!$CheckOnly -and !$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     throw 'Open PowerShell as Administrator and run this script. It does not elevate itself or restart Windows.'
 }
-$report = [ordered]@{ started_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $false; steps = @() }
+function Get-ReleaseSetupEnvironment {
+    $restartReasons = @()
+    foreach ($key in @(
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending',
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired'
+    )) {
+        if (Test-Path -LiteralPath $key) { $restartReasons += $key }
+    }
+    $network = [ordered]@{ cost = 'Unknown'; roaming = $false; over_data_limit = $false }
+    try {
+        [Windows.Networking.Connectivity.NetworkInformation,Windows,ContentType=WindowsRuntime] | Out-Null
+        $connection = [Windows.Networking.Connectivity.NetworkInformation]::GetInternetConnectionProfile()
+        if ($connection) {
+            $cost = $connection.GetConnectionCost()
+            $network.cost = [string]$cost.NetworkCostType
+            $network.roaming = $cost.Roaming
+            $network.over_data_limit = $cost.OverDataLimit
+        } else { $network.cost = 'Disconnected' }
+    } catch { $network['inspection_error'] = $_.Exception.Message }
+    [pscustomobject]@{ restart_pending = $restartReasons.Count -gt 0; restart_reasons = $restartReasons; network = $network }
+}
+
+function Assert-DownloadAvailable($environment) {
+    if ($environment.network.cost -ne 'Unrestricted' -or $environment.network.roaming -or $environment.network.over_data_limit) {
+        throw "Windows download is blocked by this setup check: network cost is $($environment.network.cost). Use an unmetered connection, or turn off Metered connection if you accept the data usage. No network settings were changed."
+    }
+}
+
+$environmentBefore = Get-ReleaseSetupEnvironment
+$report = [ordered]@{
+    started_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $false; steps = @()
+    mode = 'install'; environment_before = $environmentBefore
+    restart_needed = $environmentBefore.restart_pending
+}
+if ($CheckOnly -and !$PSBoundParameters.ContainsKey('ReportPath')) {
+    $ReportPath = Join-Path $PSScriptRoot '../../build/windows-prerequisites.inspection.json'
+}
 $ReportPath = [IO.Path]::GetFullPath($ReportPath)
 New-Item -ItemType Directory -Path (Split-Path $ReportPath -Parent) -Force | Out-Null
-$report | ConvertTo-Json | Set-Content -LiteralPath $ReportPath -Encoding UTF8
+if (Test-Path -LiteralPath $ReportPath) {
+    $previousPath = $ReportPath + '.' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff') + '-' + [guid]::NewGuid().ToString('N').Substring(0,8) + '.json'
+    Copy-Item -LiteralPath $ReportPath -Destination $previousPath
+    $report['previous_report'] = $previousPath
+}
+$report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
+if ($CheckOnly) {
+    $report.mode = 'inspection'
+    $report.passed = $null
+    $report['blockers'] = @()
+    if ($environmentBefore.restart_pending) { $report.blockers += 'Restart Windows to complete pending servicing before installation.' }
+    if ($Japanese) {
+        try { Assert-DownloadAvailable $environmentBefore } catch { $report.blockers += $_.Exception.Message }
+    }
+    $report['finished_at_utc'] = [DateTime]::UtcNow.ToString('o')
+    $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
+    $report.blockers | ForEach-Object { Write-Output $_ }
+    Write-Output "Inspection only; no installation attempted. Saved $ReportPath"
+    return
+}
+$japaneseCapabilities = @('Language.Basic~~~ja-JP~0.0.1.0','Language.Fonts.Jpan~~~und-JPAN~0.0.1.0')
 foreach ($step in @('Sandbox','Japanese')) {
     if (($step -eq 'Sandbox' -and !$Sandbox) -or ($step -eq 'Japanese' -and !$Japanese)) { continue }
     $result = [ordered]@{ name = $step; passed = $false }
     try {
+        $environment = Get-ReleaseSetupEnvironment
+        if ($environment.restart_pending -or $report.restart_needed) {
+            throw 'Windows has pending servicing. Save your work, restart Windows, then rerun this command. No installation was attempted for this step.'
+        }
         if ($step -eq 'Sandbox') {
             $feature = Get-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM
             $result['previous_state'] = [string]$feature.State
@@ -29,23 +90,63 @@ foreach ($step in @('Sandbox','Japanese')) {
                 $result['restart_needed'] = [bool]$enabled.RestartNeeded
             }
             $result['state'] = [string](Get-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM).State
+            if ($result.state -notin @('Enabled','EnablePending')) { throw "Sandbox feature state is $($result.state)." }
         } else {
-            $language = Get-InstalledLanguage -Language ja-JP
-            if (!$language -or [string]$language.LanguageFeatures -notmatch 'BasicTyping') {
-                Install-Language -Language ja-JP | Out-Null
+            $result['capabilities_before'] = @($japaneseCapabilities | ForEach-Object {
+                Get-WindowsCapability -Online -Name $_ | Select-Object Name,@{n='State';e={[string]$_.State}}
+            })
+            $result['restart_needed'] = $false
+            foreach ($capability in $result.capabilities_before) {
+                if ($capability.State -eq 'Installed') { continue }
+                if ($capability.State -eq 'InstallPending') {
+                    $result.restart_needed = $true
+                    throw 'Japanese capability installation is pending a Windows restart.'
+                }
+                Assert-DownloadAvailable (Get-ReleaseSetupEnvironment)
+                Write-Output "Installing $($capability.Name). Windows Update may take several minutes."
+                $installed = Add-WindowsCapability -Online -Name $capability.Name
+                if ($installed.RestartNeeded) {
+                    $result.restart_needed = $true
+                    break
+                }
             }
-            $language = Get-InstalledLanguage -Language ja-JP
-            if (!$language -or [string]$language.LanguageFeatures -notmatch 'BasicTyping') { throw 'Japanese BasicTyping is not installed.' }
-            $result['installed'] = $language | Select-Object LanguageId,LanguagePacks,LanguageFeatures
-            $result['next_step'] = 'Sign in again if required, then add Japanese to the original user language list. Windows display language is unchanged.'
+            $result['capabilities_after'] = @($japaneseCapabilities | ForEach-Object {
+                Get-WindowsCapability -Online -Name $_ | Select-Object Name,@{n='State';e={[string]$_.State}}
+            })
+            if (@($result.capabilities_after | Where-Object State -ne 'Installed').Count -ne 0) {
+                throw 'Japanese typing or fonts are not installed yet. See capability states in the report.'
+            }
+            $result['next_step'] = 'Add Japanese to the original user language list. Windows display language is unchanged.'
         }
         $result.passed = $true
-    } catch { $result['error'] = $_.Exception.Message }
+    } catch {
+        $result['error'] = $_.Exception.Message
+        if ($step -eq 'Japanese' -and $result.Contains('capabilities_before')) {
+            try {
+                $result['capabilities_after'] = @($japaneseCapabilities | ForEach-Object {
+                    Get-WindowsCapability -Online -Name $_ | Select-Object Name,@{n='State';e={[string]$_.State}}
+                })
+            } catch { $result['inspection_error'] = $_.Exception.Message }
+        }
+        if ($result.error -match '800f0908|-2146498296') {
+            $result['next_step'] = 'Windows refused a metered-network download. Use an unmetered connection before retrying.'
+        }
+        Write-Warning "$step failed: $($result.error)"
+    }
+    if ($result['restart_needed']) { $report.restart_needed = $true }
+    if ($result.passed) { Write-Output "$step installation checked." }
     $report.steps += $result
     $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
 }
-$report.passed = @($report.steps | Where-Object { !$_.passed }).Count -eq 0
+$report['environment_after'] = Get-ReleaseSetupEnvironment
+$report.restart_needed = $report.restart_needed -or $report.environment_after.restart_pending
+$report.passed = @($report.steps | Where-Object { !$_.passed }).Count -eq 0 -and !$report.restart_needed
 $report['finished_at_utc'] = [DateTime]::UtcNow.ToString('o')
 $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
 Write-Output "Saved $ReportPath. No restart was initiated."
-if (!$report.passed) { throw 'One or more prerequisites failed. Read the report before retrying.' }
+if ($report.restart_needed) { Write-Warning 'A Windows restart is required. Save your work before restarting.' }
+if (!$report.passed) {
+    $failures = @($report.steps | Where-Object { !$_.passed } | ForEach-Object { "$($_.name): $($_.error)" })
+    if ($report.restart_needed) { $failures += 'Restart Windows before the next attempt.' }
+    throw ($failures -join [Environment]::NewLine)
+}

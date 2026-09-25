@@ -1,0 +1,32 @@
+﻿{
+    "tested_at_utc":  "2026-09-25T16:38:10.2308443Z",
+    "passed":  true,
+    "scope":  "Read-only setup inspection and report preservation; no Windows installation or release-gate pass",
+    "inspection":  {
+                       "started_at_utc":  "2026-09-25T16:38:09.9475998Z",
+                       "passed":  null,
+                       "steps":  [
+
+                                 ],
+                       "mode":  "inspection",
+                       "environment_before":  {
+                                                  "restart_pending":  true,
+                                                  "restart_reasons":  [
+                                                                          "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending",
+                                                                          "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\RebootRequired"
+                                                                      ],
+                                                  "network":  {
+                                                                  "cost":  "Fixed",
+                                                                  "roaming":  false,
+                                                                  "over_data_limit":  false
+                                                              }
+                                              },
+                       "restart_needed":  true,
+                       "previous_report":  "D:\\Dev\\gpuidart\\.cache\\prerequisite-check-d3defbccf0db480ab673e789a84dd040\\inspection.json.20260925-163809-962-4cc67a66.json",
+                       "blockers":  [
+                                        "Restart Windows to complete pending servicing before installation.",
+                                        "Windows download is blocked by this setup check: network cost is Fixed. Use an unmetered connection, or turn off Metered connection if you accept the data usage. No network settings were changed."
+                                    ],
+                       "finished_at_utc":  "2026-09-25T16:38:10.0800313Z"
+                   }
+}

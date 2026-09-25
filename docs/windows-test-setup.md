@@ -21,18 +21,38 @@ PowerShell** in the repository:
 ./tool/windows/enable_release_checks.ps1 -Sandbox -Japanese
 ```
 
-This enables the Windows Sandbox optional feature and installs Japanese language
-components through Windows Update. It preserves the display language, records
-each operation in `build/windows-prerequisites.json`, and never initiates a
-restart. Complete a required Windows restart at a convenient time. Installation
-errors are saved; neither a failed installation nor a pending restart counts as
+This enables the Windows Sandbox optional feature and installs Japanese basic
+typing and fonts through Windows Update. It preserves the display language,
+records each operation in `build/windows-prerequisites.json`, and never initiates
+a restart. Earlier reports are archived before each attempt. Complete a required
+Windows restart at a convenient time. Installation errors and partial capability
+states are saved; neither a failed installation nor a pending restart counts as
 completed setup. Use just one switch to prepare only that check.
+
+To inspect restart and network requirements without administrator rights or
+installing anything:
+
+```powershell
+./tool/windows/enable_release_checks.ps1 -Sandbox -Japanese -CheckOnly
+```
+
+This writes `build/windows-prerequisites.inspection.json`. An inspection does not
+verify installed components and cannot produce an installation pass.
+
+The installer stops before new servicing if Windows has a pending restart, even
+when the Sandbox feature already says `Enabled`. Save your work and restart
+Windows before rerunning the command. If the connection is metered, Windows can
+refuse language downloads with `0x800F0908`, `CBS_E_METERED_NETWORK`. Connect to
+an unmetered network, or turn off **Metered connection** for the current network
+in Settings if you accept the data usage. The script never changes network cost
+settings or repeatedly retries a blocked download.
 
 These steps follow Microsoft's [Sandbox installation](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-install),
 [Sandbox configuration](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file)
-and [language installation](https://learn.microsoft.com/en-us/powershell/module/languagepackmanagement/install-language)
-instructions. Feature installation needs administrator rights. Adding a language
-may require signing in again.
+and [capability installation](https://learn.microsoft.com/en-us/powershell/module/dism/add-windowscapability)
+instructions. The [Japanese IME guide](https://learn.microsoft.com/en-us/globalization/input/japanese-ime)
+explains that Japanese input can be added while preserving the display language.
+The PowerShell installation commands need administrator rights.
 
 After installation, add Japanese for the original signed-in user in a normal
 PowerShell, preserving existing languages and their order:

@@ -1,0 +1,42 @@
+$ErrorActionPreference = 'Stop'
+$projectRoot = Split-Path $PSScriptRoot -Parent
+$setup = Join-Path $PSScriptRoot 'windows/enable_release_checks.ps1'
+$directory = Join-Path $projectRoot ('.cache/prerequisite-check-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $directory | Out-Null
+$reportPath = Join-Path $directory 'inspection.json'
+'{"passed":false,"error":"preserve the earlier installation failure"}' | Set-Content -LiteralPath $reportPath -Encoding UTF8
+$previousHash = (Get-FileHash -LiteralPath $reportPath).Hash
+$installedBefore = (Get-FileHash -LiteralPath (Join-Path $projectRoot 'build/windows-prerequisites.json') -ErrorAction SilentlyContinue).Hash
+& powershell.exe -NoProfile -File $setup -Sandbox -Japanese -CheckOnly -ReportPath $reportPath
+if ($LASTEXITCODE -ne 0) { throw 'Read-only prerequisite inspection failed.' }
+$report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
+if ($report.mode -ne 'inspection' -or $null -ne $report.passed -or @($report.steps).Count -ne 0) {
+    throw 'Inspection must not claim an installation pass or run installation steps.'
+}
+if ((Get-FileHash -LiteralPath $report.previous_report).Hash -ne $previousHash) {
+    throw 'The previous failure report was not preserved byte-for-byte.'
+}
+$pending = (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending') -or
+    (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired')
+if ($report.restart_needed -ne $pending -or ($pending -and !($report.blockers -match 'Restart Windows'))) {
+    throw 'Pending Windows servicing was not reported as requiring restart.'
+}
+[Windows.Networking.Connectivity.NetworkInformation,Windows,ContentType=WindowsRuntime] | Out-Null
+$connection = [Windows.Networking.Connectivity.NetworkInformation]::GetInternetConnectionProfile()
+if ($connection) {
+    $cost = $connection.GetConnectionCost()
+    if (($cost.NetworkCostType -in @('Fixed','Variable') -or $cost.Roaming -or $cost.OverDataLimit) -and !($report.blockers -match 'network cost')) {
+        throw 'Metered network was not reported before installation.'
+    }
+}
+$installedAfter = (Get-FileHash -LiteralPath (Join-Path $projectRoot 'build/windows-prerequisites.json') -ErrorAction SilentlyContinue).Hash
+if ($installedBefore -ne $installedAfter) { throw 'Inspection changed the installation report.' }
+$result = [ordered]@{
+    tested_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $true
+    scope = 'Read-only setup inspection and report preservation; no Windows installation or release-gate pass'
+    inspection = $report
+}
+$destination = Join-Path $projectRoot 'reports/mvp/prerequisites/inspection-check.json'
+New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
+$result | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $destination -Encoding UTF8
+Write-Output 'PASS: pending-restart/network inspection, preserved failure report, no installation result claimed.'
