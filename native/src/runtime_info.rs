@@ -112,3 +112,25 @@ pub unsafe extern "C" fn gd_runtime_read(length: *mut usize) -> *mut u8 {
         Box::into_raw(bytes).cast()
     })
 }
+
+#[cfg(all(test, unix))]
+mod tests {
+    #[test]
+    fn runtime_probe_reports_current_process_loaded_images_and_memory() {
+        let value = super::read();
+        assert_eq!(value["pid"], std::process::id());
+        assert!(
+            value["loaded_images"]
+                .as_array()
+                .is_some_and(|images| !images.is_empty())
+        );
+        assert!(
+            value["memory_bytes"]
+                .as_object()
+                .is_some_and(|memory| !memory.is_empty())
+        );
+        assert!(value["cpu_user_us"].as_i64().is_some_and(|time| time >= 0));
+        assert!(value.get("loaded_images_error").is_none());
+        assert!(value.get("memory_error").is_none());
+    }
+}

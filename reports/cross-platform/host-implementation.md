@@ -150,3 +150,11 @@ the new runtime probe: Darwin's `timeval.tv_usec` is 32-bit, while the seconds
 field is 64-bit. Conversion to 64-bit before arithmetic fixes this target type
 difference. The window job was skipped, so that attempt supplies no evidence
 about the revised child lifecycle. Its compile log is retained separately.
+
+At `7d05024`, the revised child-failure/reaping tests passed on macOS, and Linux
+passed its full jobs. The macOS live host then exposed Darwin's inheritance of
+`O_NONBLOCK` on accepted sockets, producing `Resource temporarily unavailable`
+before reading a reply. Linux does not inherit that flag. The accept boundary
+now explicitly selects blocking mode; a real-socket regression waits for a
+delayed frame. This second window failure is retained in
+`macos-socket-mode-failure.log`. It is separate from the fixed child-reaping bug.

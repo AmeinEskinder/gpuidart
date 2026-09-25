@@ -51,6 +51,12 @@ impl Endpoint {
     fn path(&self) -> PathBuf {
         self.directory.join("ui.sock")
     }
+    fn accept(&self) -> io::Result<UnixStream> {
+        let (socket, _) = self.listener.accept()?;
+        // Darwin inherits the listener's O_NONBLOCK flag; Linux does not.
+        socket.set_nonblocking(false)?;
+        Ok(socket)
+    }
 }
 impl Drop for Endpoint {
     fn drop(&mut self) {
@@ -158,8 +164,8 @@ pub unsafe extern "C" fn gd_run_companion(host: *const Host) -> i32 {
                 .ok_or("Companion was not prepared")?;
             let started = Instant::now();
             let socket = loop {
-                match endpoint.listener.accept() {
-                    Ok((socket, _)) => break socket,
+                match endpoint.accept() {
+                    Ok(socket) => break socket,
                     Err(error) if error.kind() == io::ErrorKind::WouldBlock => {}
                     Err(error) => return Err(error.to_string()),
                 }
@@ -396,5 +402,25 @@ mod tests {
         assert!(endpoint.path().exists());
         drop(endpoint);
         assert!(!directory.exists());
+    }
+
+    #[test]
+    fn accepted_transport_waits_for_a_delayed_frame() {
+        let endpoint = Endpoint::new().unwrap();
+        let path = endpoint.path();
+        let (connected, ready) = std::sync::mpsc::channel();
+        let peer = std::thread::spawn(move || {
+            let mut socket = UnixStream::connect(path).unwrap();
+            connected.send(()).unwrap();
+            std::thread::sleep(Duration::from_millis(50));
+            write_frame(&mut socket, &Command::Close).unwrap();
+        });
+        ready.recv().unwrap();
+        let mut socket = endpoint.accept().unwrap();
+        assert!(matches!(
+            read_frame::<Command>(&mut socket).unwrap(),
+            Command::Close
+        ));
+        peer.join().unwrap();
     }
 }

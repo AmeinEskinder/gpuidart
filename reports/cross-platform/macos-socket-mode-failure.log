@@ -1,0 +1,47 @@
+﻿window	Real-window lifecycle, 100k JIT/AOT traces and code reload	﻿2026-09-25T21:20:18.7979930Z ##[group]Run set -o pipefail
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.7980300Z [36;1mset -o pipefail[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.7980580Z [36;1mdart test --tags live-window 2>&1 | tee build/macos-window/tests.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.7981160Z [36;1mdart run tool/capture_publication_trace.dart build/macos-window/jit-trace.json 2>&1 | tee build/macos-window/jit.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.7981830Z [36;1mbuild/macos-window/capture build/macos-window/aot-trace.json 2>&1 | tee build/macos-window/aot.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.7982510Z [36;1mdart run tool/verify_watchlist_reload.dart --report=build/macos-window/reload.json --trace --prepare-delay-ms=0 2>&1 | tee build/macos-window/reload.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8144160Z shell: /bin/bash -e {0}
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8144520Z env:
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8144730Z   CARGO_INCREMENTAL: 0
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8145010Z   CARGO_BUILD_JOBS: 2
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8145240Z   RUST_BACKTRACE: 1
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8145510Z   DART_HOME: /Users/runner/hostedtoolcache/dart/3.13.4/arm64
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8146010Z   PUB_CACHE: /Users/runner/.pub-cache
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:18.8146270Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:23.9080350Z 
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:25.8873320Z ##[group]✅ Passing tests
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:25.8874310Z ✅ test/companion_lifecycle_test.dart: companion exit startup settles and reaps the owned child
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:30.7683170Z ✅ test/companion_lifecycle_test.dart: companion hung startup settles and reaps the owned child
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.1150030Z ✅ test/native_host_test.dart: an incompatible native library fails before host creation
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2263380Z GPUI companion: Companion header: failed to fill whole buffer
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2564850Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2566190Z ##[group]❌ test/native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2566890Z Bad state: Companion header: Resource temporarily unavailable (os error 35)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2576080Z package:gpuidart/src/host.dart 638:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2577130Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.2577690Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.3156730Z GPUI companion: Companion header: failed to fill whole buffer
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.3195230Z ##[group]❌ test/native_host_test.dart: failed initial descriptions release resources for another host (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.3196440Z Bad state: Companion header: Resource temporarily unavailable (os error 35)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.3197170Z package:gpuidart/src/host.dart 638:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.3198000Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.3198650Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.5544800Z GPUI companion: Companion header: failed to fill whole buffer
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.5846980Z ##[group]❌ test/native_trace_test.dart: real requests correlate across the bridge without recording UI values (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.5948030Z Bad state: Companion header: Resource temporarily unavailable (os error 35)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6050510Z package:gpuidart/src/host.dart 638:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6151980Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6252560Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6353740Z GPUI companion: Companion header: failed to fill whole buffer
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6410850Z ##[group]❌ test/native_trace_test.dart: overflow is explicit and does not prevent updates or shutdown (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6411960Z Bad state: Companion header: Resource temporarily unavailable (os error 35)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6414500Z package:gpuidart/src/host.dart 638:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6415910Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:31.6417130Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:32.2168310Z 
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:32.2238400Z ##[error]3 tests passed, 4 failed.
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T21:20:32.2581090Z ##[error]Process completed with exit code 1.
