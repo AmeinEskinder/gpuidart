@@ -1,0 +1,35 @@
+﻿{
+    "started_at_utc":  "2026-09-25T18:13:08.1503152Z",
+    "source_commit":  "023eef424cf1eb948ded933e8134d42b3bb09eab",
+    "local_acceptance_passed":  false,
+    "release_status":  "candidate_pending_external_checks",
+    "external_checks":  {
+                            "clean_windows_launch":  "pending",
+                            "human_ime":  "pending",
+                            "mixed_monitor_dpi":  "pending"
+                        },
+    "checks":  [
+                   {
+                       "name":  "native-and-dart",
+                       "exit_code":  0,
+                       "elapsed_ms":  20221
+                   },
+                   {
+                       "name":  "watchlist-ui",
+                       "exit_code":  0,
+                       "elapsed_ms":  12452
+                   },
+                   {
+                       "name":  "watchlist-stability",
+                       "exit_code":  0,
+                       "elapsed_ms":  33710
+                   },
+                   {
+                       "name":  "code-reload",
+                       "exit_code":  255,
+                       "elapsed_ms":  3389
+                   }
+               ],
+    "error":  "code-reload failed. See reports/mvp/code-reload.stderr.log and stdout.log",
+    "finished_at_utc":  "2026-09-25T18:14:19.4663814Z"
+}

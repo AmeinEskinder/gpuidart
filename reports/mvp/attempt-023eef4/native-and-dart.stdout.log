@@ -1,0 +1,50 @@
+﻿
+running 10 tests
+test protocol::tests::rejects_inline_table_records ... ok
+test protocol::tests::rejects_ambiguous_retained_identity ... ok
+test datasets::tests::initial_upload_rejects_bad_data_and_missing_references ... ok
+test datasets::tests::invalid_batch_and_stale_revision_preserve_all_records ... ok
+test ffi_tests::ffi_rejects_bad_messages_bounds_queues_and_reports_unwind ... ok
+test ui::tests::missing_retained_state_returns_an_error ... ok
+test datasets::tests::one_cell_decode_and_apply_allocations_are_independent_of_dataset_size ... ok
+test ui::tests::narrow_windows_wrap_actions_and_scroll_to_footer ... ok
+test ui::tests::native_events_retained_input_and_virtualized_table ... ok
+test ui::tests::construction_and_allocations_scale_with_viewport ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Formatted 14 files (0 changed) in 0.04 seconds.
+Analyzing gpuidart...
+No issues found!
+00:00 +0: loading test\dev_session_test.dart
+00:00 +0: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +1: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +2: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +3: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +4: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +5: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +6: test\dev_session_test.dart: service discovery waits through empty and partial JSON writes
+00:00 +7: test\host_fault_test.dart: missing ready acknowledgement closes and releases startup
+00:00 +8: test\host_fault_test.dart: missing ready acknowledgement closes and releases startup
+00:00 +9: test\host_fault_test.dart: missing ready acknowledgement closes and releases startup
+00:00 +10: test\native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it
+00:00 +11: test\native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it
+00:01 +12: test\host_fault_test.dart: drop_snapshot reports a deadline and stops further transactions
+00:01 +13: test\native_host_test.dart: failed initial descriptions release resources for another host
+00:01 +14: test\host_fault_test.dart: drop_dataset reports a deadline and stops further transactions
+00:01 +15: test\host_fault_test.dart: drop_diagnostic reports a deadline and stops further transactions
+00:02 +16: test\host_fault_test.dart: mismatched dataset acknowledgement never commits Dart state
+00:02 +17: test\host_fault_test.dart: native failure after ready preserves the error while draining closed
+00:02 +18: test\host_fault_test.dart: caught panic during snapshot submission closes the host
+00:02 +19: test\host_fault_test.dart: caught panic during dataset submission closes the host
+00:02 +20: test\host_fault_test.dart: caught panic during diagnostic submission closes the host
+00:02 +21: test\host_fault_test.dart: runner exit without closed has a bounded failure
+00:02 +22: test\host_fault_test.dart: shutdown deadline retains memory until the native loop returns
+00:03 +23: test\host_fault_test.dart: (tearDownAll)
+00:03 +23: All tests passed!
+

@@ -14,12 +14,15 @@ Future<void> main() async {
     if (!condition) throw StateError(message);
   }
 
+  final report = <String, Object?>{'passed': false};
+
   try {
     final applicationPid = (await session.service.getVM()).pid;
     require(applicationPid != null, 'Application PID was not reported');
     await session.call('prepare');
     await Future<void>.delayed(const Duration(milliseconds: 300));
     final before = await session.call('inspect');
+    report['before'] = before;
     require(
       before['query'] == 'ALP' && before['ticks'] == 1,
       'Watchlist application state was not prepared',
@@ -42,6 +45,7 @@ Future<void> main() async {
     );
     await session.reload();
     final after = await session.call('inspect');
+    report['after'] = after;
     require(
       (await session.service.getVM()).pid == applicationPid,
       'Application process changed during reload',
@@ -86,6 +90,7 @@ Future<void> main() async {
       );
       await session.reload();
       final recovered = await session.call('inspect');
+      report['latest_recovery'] = recovered;
       require(
         recovered['state']['labels']['title'] == heading,
         'Reload did not recover after invalid source',
@@ -112,14 +117,30 @@ Future<void> main() async {
         'Repeated reload republished data',
       );
     }
-    await Directory('reports/sdk').create(recursive: true);
-    await File('reports/sdk/reload.json').writeAsString(
-      '${const JsonEncoder.withIndent('  ').convert({'same_application_process_id': applicationPid, 'launcher_process_id': session.process.pid, 'same_isolate_id': session.isolateId, 'changed_code_executed': true, 'invalid_source_rejected': rejected, 'successful_reloads': 11, 'recovered_after_invalid_source': true, 'before': before, 'after': after})}\n',
-    );
+    report.addAll({
+      'passed': true,
+      'same_application_process_id': applicationPid,
+      'launcher_process_id': session.process.pid,
+      'same_isolate_id': session.isolateId,
+      'changed_code_executed': true,
+      'invalid_source_rejected': rejected,
+      'successful_reloads': 11,
+      'recovered_after_invalid_source': true,
+    });
     stdout.writeln(
       'PASS: watchlist code reload preserved application state, input text/focus/selection, table identity and scroll without republishing data.',
     );
+  } catch (error) {
+    report['error'] = '$error';
+    rethrow;
   } finally {
-    await session.close();
+    try {
+      await Directory('reports/sdk').create(recursive: true);
+      await File('reports/sdk/reload.json').writeAsString(
+        '${const JsonEncoder.withIndent('  ').convert(report)}\n',
+      );
+    } finally {
+      await session.close();
+    }
   }
 }
