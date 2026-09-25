@@ -23,9 +23,11 @@ Clean-machine launch and human IME composition require separate evidence under [
 - Milestone 2: host boundary and lifecycle hardened. Seven native tests, three Dart/native tests and Dart analysis passed. See [lifecycle evidence](../reports/sdk/lifecycle.md).
 - Milestone 3: bounded launcher startup, process cleanup, named packaging, strict verification and source/build identity completed. See [development and packaging evidence](../reports/sdk/development-packaging.md).
 - Milestone 4: all nine local acceptance checks passed from committed source `8e6940c`, including the follow-up startup-race and package-identity fixes. See [the release-candidate record](../reports/mvp/README.md).
+- Review follow-up: native panic containment, fallible retained lookups, Dart event validation, request/shutdown deadlines, fault-injection tests and pinned Windows CI were committed. All nine local checks passed again from `5c9a292`, including ten native and 23 Dart tests. The first hosted CI run and the project license choice remain pending.
+- Reload observation: one table-state comparison failed during the first hardening acceptance run. Eight targeted follow-ups and the full rerun passed unchanged assertions. The cause remains unlocalized; [the saved observation](../reports/mvp/attempt-023eef4/README.md) is not discarded.
 - External release gates: clean Windows environment and human IME results are not available yet.
 
-The local MVP implementation and verification are complete. The stable-release goal remains open until those two external gates have evidence. Testing movement between monitors with different DPI remains additional pending coverage.
+The latest local acceptance run passed. The stable-release goal remains open pending external evidence and resolution of the reload observation. Testing movement between monitors with different DPI remains additional pending coverage.
 
 ## Reproduce local release acceptance
 

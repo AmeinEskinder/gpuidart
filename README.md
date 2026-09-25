@@ -2,7 +2,7 @@
 
 An experimental Windows desktop SDK using Dart application code and GPUI Kit's Rust controls. Start with the [SDK guide](docs/sdk.md) and the [Market watch example](example/watchlist/main.dart).
 
-The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. Its [Windows ZIP](build/WatchlistMvp-windows-x64.zip) is built from committed source. Clean-machine launch and human IME verification remain required before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
+The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. Its [Windows ZIP](build/WatchlistMvp-windows-x64.zip) is built from committed source. Clean-machine launch, human IME verification and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
 The SDK supports row/column layouts, text, buttons, native text inputs and virtualized tables, plus initial window options and table-selection events. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
