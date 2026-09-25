@@ -35,7 +35,11 @@ viewport. Callback addresses remain live until the native runner returns.
 Render callbacks do not establish physical presentation. VM-service startup is
 captured, but service discovery, reload and application-state preservation need
 separate probes. Button/input controls are available for input testing; the
-initial automated run does not inject input or claim human/IME verification.
+initial automated run did not inject input. Linux runs with
+`GPUIDART_PROBE_INPUT=1` now require both exact probe text and a button click.
+`xdotool` drives the isolated X11 display. This does not claim human/IME
+verification. The runner also requires a pre-quit resize checkpoint; macOS's
+process-terminating quit path is recorded separately from a returned FFI call.
 
 ## Probe development failures
 
@@ -50,3 +54,6 @@ initial automated run does not inject input or claim human/IME verification.
 - The probe now uses the existing Windows DPI setup before loading the DLL;
   the first successful FFI run reported scale 1.0 while the native executable
   reported 1.25 on this desktop.
+- The DPI change initially used a relative import from `lib/`, which failed
+  hosted analysis. It now uses the package import. This was introduced after
+  the earlier local analysis check and is retained in the CI evidence.

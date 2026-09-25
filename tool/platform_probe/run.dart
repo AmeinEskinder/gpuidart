@@ -12,6 +12,7 @@ Future<void> main(List<String> args) async {
     String executable,
     List<String> arguments, {
     Duration timeout = const Duration(seconds: 40),
+    bool driveInput = false,
   }) async {
     final watch = Stopwatch()..start();
     final stdoutFile = File('${output.path}/$name.stdout.log').openWrite();
@@ -19,8 +20,17 @@ Future<void> main(List<String> args) async {
     var timedOut = false;
     int? status;
     Object? error;
+    String? inputError;
     try {
       final process = await Process.start(executable, arguments);
+      final driver = driveInput
+          ? injectInput().then<void>(
+              (_) {},
+              onError: (Object error) {
+                inputError = error.toString();
+              },
+            )
+          : Future<void>.value();
       final out = stdoutFile.addStream(process.stdout);
       final err = stderrFile.addStream(process.stderr);
       status = await process.exitCode.timeout(
@@ -41,11 +51,38 @@ Future<void> main(List<String> args) async {
         },
       );
       await Future.wait([out, err]);
+      await driver;
     } catch (exception) {
       error = exception.toString();
     } finally {
       await stdoutFile.close();
       await stderrFile.close();
+    }
+    final events = <Map<String, dynamic>>[];
+    for (final line in File(
+      '${output.path}/$name.stdout.log',
+    ).readAsLinesSync()) {
+      if (!line.startsWith('{')) continue;
+      try {
+        if (jsonDecode(line) case final Map<String, dynamic> event) {
+          events.add(event);
+        }
+      } on FormatException {
+        // A dependency can also write plain text to stdout.
+      }
+    }
+    if (name.startsWith('rust-') || name == 'dart-jit' || name == 'dart-aot') {
+      final beforeQuit = events
+          .where((event) => event['stage'] == 'before_quit')
+          .firstOrNull;
+      if (beforeQuit == null ||
+          beforeQuit['detail']['resized_render'] != true) {
+        error ??= 'No checkpoint proving resized rendering before quit';
+      }
+      if (!Platform.isMacOS &&
+          !events.any((event) => event['stage'] == 'run_return')) {
+        error ??= 'Native loop did not report returning';
+      }
     }
     final result = <String, Object?>{
       'name': name,
@@ -55,6 +92,7 @@ Future<void> main(List<String> args) async {
       'timeout': timedOut,
       'error': error,
       'elapsed_ms': watch.elapsedMilliseconds,
+      'input_driver_error': inputError,
     };
     results.add(result);
     File('${output.path}/results.json').writeAsStringSync(
@@ -98,13 +136,17 @@ Future<void> main(List<String> args) async {
         ? 'libgpuidart_platform_probe.dylib'
         : 'libgpuidart_platform_probe.so'}',
   ).absolute.path;
-  final nativeMain = await run('rust-main', native, []);
-  final nativeWorker = await run('rust-worker', native, ['--worker']);
+  final driveInput =
+      Platform.isLinux && Platform.environment['GPUIDART_PROBE_INPUT'] == '1';
+  final nativeMain = await run('rust-main', native, [], driveInput: driveInput);
+  final nativeWorker = await run('rust-worker', native, [
+    '--worker',
+  ], driveInput: driveInput);
   final jit = await run('dart-jit', Platform.resolvedExecutable, [
     '--enable-vm-service=0',
     'tool/platform_probe/probe.dart',
     library,
-  ]);
+  ], driveInput: driveInput);
   final aotPath = '${output.path}/probe$suffix';
   final compile = await run('aot-compile', Platform.resolvedExecutable, [
     'compile',
@@ -114,11 +156,14 @@ Future<void> main(List<String> args) async {
     aotPath,
   ], timeout: const Duration(minutes: 2));
   final aot = compile['exit_code'] == 0
-      ? await run('dart-aot', aotPath, [library])
+      ? await run('dart-aot', aotPath, [library], driveInput: driveInput)
       : null;
 
   bool successful(Map<String, Object?>? result) =>
-      result?['exit_code'] == 0 && result?['timeout'] == false;
+      result?['exit_code'] == 0 &&
+      result?['timeout'] == false &&
+      result?['input_driver_error'] == null &&
+      result?['error'] == null;
   // macOS worker rejection is retained as an unsupported launcher result.
   // It is never counted as a successful window, callback or reload check.
   final passed = [
@@ -130,4 +175,51 @@ Future<void> main(List<String> args) async {
   ].every(successful);
   stdout.writeln('All launch strategies passed: $passed. See ${output.path}');
   if (!passed) exitCode = 1;
+}
+
+Future<void> injectInput() async {
+  Future<String> xdotool(List<String> arguments) async {
+    final process = await Process.start('xdotool', arguments);
+    final output = utf8.decodeStream(process.stdout);
+    final errors = utf8.decodeStream(process.stderr);
+    final status = await process.exitCode.timeout(
+      const Duration(seconds: 8),
+      onTimeout: () {
+        process.kill(ProcessSignal.sigkill);
+        throw TimeoutException('xdotool $arguments');
+      },
+    );
+    final text = await output;
+    final error = await errors;
+    if (status != 0) throw StateError('xdotool exited $status: $error');
+    return text.trim();
+  }
+
+  final window = (await xdotool([
+    'search',
+    '--sync',
+    '--onlyvisible',
+    '--name',
+    '^GPUI-Dart platform probe\$',
+  ])).split('\n').single;
+  // A newly mapped window can precede its first layout/draw.
+  await Future<void>.delayed(const Duration(milliseconds: 300));
+  await xdotool([
+    'windowactivate',
+    '--sync',
+    window,
+    'mousemove',
+    '--window',
+    window,
+    '80',
+    '60',
+    'click',
+    '1',
+    'type',
+    '--clearmodifiers',
+    '--delay',
+    '30',
+    'gpui-probe',
+  ]);
+  await xdotool(['mousemove', '--window', window, '80', '105', 'click', '1']);
 }

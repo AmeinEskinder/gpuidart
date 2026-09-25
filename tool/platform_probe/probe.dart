@@ -4,7 +4,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 
-import '../../lib/src/windows.dart';
+import 'package:gpuidart/src/windows.dart';
 
 typedef Callback = Void Function(Uint32);
 

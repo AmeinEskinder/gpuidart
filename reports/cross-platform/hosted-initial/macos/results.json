@@ -1,0 +1,114 @@
+{
+  "created_at": "2026-09-25T19:50:18.731473Z",
+  "os": "macos",
+  "os_version": "Version 15.7.9 (Build 24G830)",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"macos_arm64\"",
+  "display": null,
+  "wayland_display": null,
+  "results": [
+    {
+      "name": "source",
+      "executable": "git",
+      "arguments": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 59
+    },
+    {
+      "name": "rust",
+      "executable": "rustc",
+      "arguments": [
+        "-vV"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 91
+    },
+    {
+      "name": "hardware",
+      "executable": "system_profiler",
+      "arguments": [
+        "SPHardwareDataType",
+        "SPDisplaysDataType"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 595
+    },
+    {
+      "name": "os",
+      "executable": "sw_vers",
+      "arguments": [],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 15
+    },
+    {
+      "name": "rust-main",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+      "arguments": [],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 12525
+    },
+    {
+      "name": "rust-worker",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+      "arguments": [
+        "--worker"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 75
+    },
+    {
+      "name": "dart-jit",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "--enable-vm-service=0",
+        "tool/platform_probe/probe.dart",
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/libgpuidart_platform_probe.dylib"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 840
+    },
+    {
+      "name": "aot-compile",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "compile",
+        "exe",
+        "tool/platform_probe/probe.dart",
+        "-o",
+        "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/probe"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 1736
+    },
+    {
+      "name": "dart-aot",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/probe",
+      "arguments": [
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/libgpuidart_platform_probe.dylib"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 36
+    }
+  ],
+  "limits": "Probe only. No IME, clean-machine or presentation claim."
+}

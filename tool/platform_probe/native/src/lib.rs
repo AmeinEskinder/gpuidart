@@ -1,7 +1,7 @@
 use gpui_kit::component::StyledExt;
 use gpui_kit::component::{
     button::Button,
-    input::{Input, InputState},
+    input::{Input, InputEvent, InputState},
 };
 use gpui_kit::*;
 use std::sync::{
@@ -71,6 +71,8 @@ struct Probe {
     renders: Arc<AtomicU32>,
     clicks: Arc<AtomicU32>,
     resized: Arc<AtomicU32>,
+    _input_subscription: Subscription,
+    last_size: Option<Size<Pixels>>,
 }
 
 impl Render for Probe {
@@ -79,12 +81,13 @@ impl Render for Probe {
         if window.viewport_size() == size(px(720.), px(420.)) {
             self.resized.store(1, Ordering::Release);
         }
-        if count <= 3 {
+        if count <= 3 || self.last_size != Some(window.viewport_size()) {
             report(
                 "render",
                 serde_json::json!({"count": count, "size": format!("{:?}", window.viewport_size()), "scale": window.scale_factor()}),
             );
         }
+        self.last_size = Some(window.viewport_size());
         let clicks = self.clicks.clone();
         div()
             .v_flex()
@@ -134,6 +137,12 @@ fn run(callback: Option<Callback>) -> i32 {
     let result_clicks = clicks.clone();
     let resized = Arc::new(AtomicU32::new(0));
     let result_resized = resized.clone();
+    let input_matches = Arc::new(AtomicU32::new(0));
+    let result_input_matches = input_matches.clone();
+    let quit_renders = renders.clone();
+    let quit_clicks = clicks.clone();
+    let quit_resized = resized.clone();
+    let quit_input_matches = input_matches.clone();
     let opened = Arc::new(AtomicU32::new(0));
     let result_opened = opened.clone();
     gpui_kit::application().run(move |cx| {
@@ -149,11 +158,26 @@ fn run(callback: Option<Callback>) -> i32 {
         };
         let window = gpui_kit::open_window(options, cx, |window, cx| {
             let input = cx.new(|cx| InputState::new(window, cx).placeholder("Type here"));
-            cx.new(|_| Probe {
-                input,
-                renders,
-                clicks,
-                resized,
+            cx.new(|cx| {
+                let subscription =
+                    cx.subscribe_in(&input, window, move |_, input, event, _, cx| {
+                        if matches!(event, InputEvent::Change) {
+                            let matches = input.read(cx).value().as_ref() == "gpui-probe";
+                            input_matches.store(u32::from(matches), Ordering::Release);
+                            report(
+                                "input_changed",
+                                serde_json::json!({"matches_probe_text": matches}),
+                            );
+                        }
+                    });
+                Probe {
+                    input,
+                    renders,
+                    clicks,
+                    resized,
+                    _input_subscription: subscription,
+                    last_size: None,
+                }
             })
         });
         let window = match window {
@@ -190,6 +214,15 @@ fn run(callback: Option<Callback>) -> i32 {
                     }
                 }
             }
+            report(
+                "before_quit",
+                serde_json::json!({
+                    "renders": quit_renders.load(Ordering::Acquire),
+                    "clicks": quit_clicks.load(Ordering::Acquire),
+                    "resized_render": quit_resized.load(Ordering::Acquire) == 1,
+                    "input_matches": quit_input_matches.load(Ordering::Acquire) == 1,
+                }),
+            );
             let _ = cx.update(|cx| cx.quit());
         })
         .detach();
@@ -197,11 +230,14 @@ fn run(callback: Option<Callback>) -> i32 {
     let renders = result_renders.load(Ordering::Acquire);
     report(
         "run_return",
-        serde_json::json!({"renders": renders, "clicks": result_clicks.load(Ordering::Acquire), "resized_render": result_resized.load(Ordering::Acquire) == 1}),
+        serde_json::json!({"renders": renders, "clicks": result_clicks.load(Ordering::Acquire), "resized_render": result_resized.load(Ordering::Acquire) == 1, "input_matches": result_input_matches.load(Ordering::Acquire) == 1}),
     );
     if result_opened.load(Ordering::Acquire) == 1
         && renders >= 2
         && result_resized.load(Ordering::Acquire) == 1
+        && (std::env::var("GPUIDART_PROBE_INPUT").as_deref() != Ok("1")
+            || (result_input_matches.load(Ordering::Acquire) == 1
+                && result_clicks.load(Ordering::Acquire) >= 1))
     {
         0
     } else {

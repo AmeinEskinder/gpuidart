@@ -73,3 +73,41 @@ base revision; the probe code was uncommitted during these checks.
 Windows preservation checks passed: 12 native tests, 27 Dart tests including the
 five live-window cases, Cargo formatting and Dart analysis. These checks do not
 complete any macOS/Linux acceptance item.
+
+## First hosted probe, source `ac7aed4`
+
+[Run 36181630595](https://github.com/AmeinEskinder/gpuidart/actions/runs/36181630595)
+built the pinned dependency on both targets. Raw logs are retained under
+`hosted-initial/`; [run metadata](run-36181630595.json) records the source and jobs.
+
+| Check | Ubuntu 24.04 x64, X11 | macOS 15 ARM64 |
+| --- | --- | --- |
+| Pinned probe builds | Pass | Pass |
+| Rust process-main-thread window | Render, resized render and loop return | Render observed; process exits on quit before loop return |
+| Rust worker window | Pass | Rejected by main-thread guard |
+| Dart JIT / AOT worker window | Both pass, callbacks and active Dart timer | Both rejected, application and runner report non-main OS thread |
+| Input / IME | Untested in this run | Untested |
+| Renderer scope | llvmpipe CPU Vulkan, Mesa 25.2.8, Xvfb, scale 1 | Apple virtual machine; renderer identity not established, scale 1 |
+
+The initial runner classified the macOS Rust process's zero exit code as
+successful. Inspection found no `run_return` or final `exit` event. The pinned
+`gpui-pre-macos` `platform.rs:557` schedules `NSApplication terminate:` on quit.
+This is a lifecycle constraint, not evidence that the FFI call returned. The
+revised probe requires a checkpoint proving resize before quit and keeps loop
+return separate. macOS resized rendering is unverified in the initial capture.
+
+The current Dart-hosted dedicated-isolate arrangement is therefore unsuitable
+for this macOS backend. Moving the Dart application to a different isolate does
+not make its FFI call run on the OS main thread. No production port is selected.
+The next isolated candidate is a native companion executable whose main thread
+owns AppKit, with Dart retaining its application process and SDK. Its process
+transport, bounded cleanup, JIT/AOT and actual reload must be proven before
+adoption. A same-process Dart VM embedder remains an alternative requiring its
+own bootstrap/runtime-distribution proof and a returning GPUI shutdown path.
+
+The parallel Windows job [36181630592](https://github.com/AmeinEskinder/gpuidart/actions/runs/36181630592)
+failed analysis on a relative import introduced by the final probe DPI change.
+The earlier analysis result preceded that import; the 12 native and 27 Dart
+behavioral results remain valid. The import is corrected to `package:` and
+analysis is rerun before the next commit. The failure metadata is retained in
+`reports/ci/run-36181630592.json`.

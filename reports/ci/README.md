@@ -19,3 +19,9 @@ native and 22 headless Dart tests.
 These jobs run `./tool/check.ps1 -Headless` with pinned toolchains and dependencies.
 They do not verify GPU interaction, code reload, AOT packaging, clean-machine
 launch or IME composition.
+
+The later probe commit `ac7aed4` failed [run 36181630592](https://github.com/AmeinEskinder/gpuidart/actions/runs/36181630592)
+at Dart analysis because its Windows DPI helper used a relative `lib/` import.
+The 12 native tests passed before that failure; Dart tests were not reached.
+[Failure metadata](run-36181630592.json) is retained. The latest verified hosted
+Windows source remains `e8a176a` until a corrected run succeeds.
