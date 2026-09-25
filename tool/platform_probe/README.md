@@ -20,6 +20,13 @@ exit codes, timeout, tool versions and environment observations. The runner
 returns failure if any launcher fails. In particular, macOS worker rejection
 is an unsupported launch strategy, never a successful window check.
 
+The companion candidate now runs in JIT and AOT, plus actual method reload,
+invalid-source rejection and recovery through the existing development launcher.
+Its small stdin protocol is probe-only. macOS worker rejection is an expected
+negative capability check; the native-main and companion checks must pass for
+the macOS job to succeed. A zero process exit without its required checkpoints
+does not pass.
+
 The probe reports native thread IDs and platform main-thread predicates. Windows
 does not have a main-thread predicate in this probe and reports `-1`; compare its
 executable entry and UI thread IDs directly. macOS uses `pthread_main_np`, Linux

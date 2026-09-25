@@ -111,3 +111,38 @@ The earlier analysis result preceded that import; the 12 native and 27 Dart
 behavioral results remain valid. The import is corrected to `package:` and
 analysis is rerun before the next commit. The failure metadata is retained in
 `reports/ci/run-36181630592.json`.
+
+## Input and shutdown checkpoints, source `8afcece`
+
+[Run 36182706923](https://github.com/AmeinEskinder/gpuidart/actions/runs/36182706923)
+confirmed exact synthetic input text and one button click in all four Linux
+launch variants. Each also rendered at 720 by 420, returned from the native
+loop and exited normally. The software renderer and display scope are unchanged.
+The macOS native executable also recorded the resized viewport and pre-quit
+checkpoint, then terminated its process. Worker launch rejection is unchanged.
+See [Linux records](hosted-input/linux/results.json) and
+[macOS records](hosted-input/macos/results.json).
+
+Windows hosted checks recovered in [36182707028](https://github.com/AmeinEskinder/gpuidart/actions/runs/36182707028).
+The corrected import passed analysis, 12 native tests and 22 headless Dart tests.
+
+## Companion candidate
+
+`companion.dart` starts the native probe executable with `--stdio`. The child's
+process main thread owns GPUI. A bounded 64-command channel carries the probe's
+small label/close commands from its stdin reader to the UI loop; EOF requests
+quit. The parent Dart process receives native records, keeps its timer running,
+registers the existing development extension names, and waits for child exit.
+This is an isolated transport feasibility test, not a production protocol or
+Dart embedding implementation. It does not change the SDK's JSON protocol.
+
+The candidate passed on Windows in JIT and AOT, including actual source reload,
+invalid-source rejection and recovery through `DevSession`. The native PID,
+input entity and synthetic input text were retained across the method change.
+See [Windows candidate results](companion-windows/results.json) and
+[reload evidence](companion-windows/reload.json). These results are pre-commit
+checks based on `8afcece`; macOS/Linux candidate runs are still pending.
+
+The next hosted runner treats macOS's rejected worker calls as explicit negative
+capability checks. Only successful native-main and companion JIT/AOT/reload
+checks can satisfy the macOS job. No rejected worker call counts as UI support.

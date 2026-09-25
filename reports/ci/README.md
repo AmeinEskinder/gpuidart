@@ -25,3 +25,7 @@ at Dart analysis because its Windows DPI helper used a relative `lib/` import.
 The 12 native tests passed before that failure; Dart tests were not reached.
 [Failure metadata](run-36181630592.json) is retained. The latest verified hosted
 Windows source remains `e8a176a` until a corrected run succeeds.
+
+The corrected source `8afcece` passed [36182707028](https://github.com/AmeinEskinder/gpuidart/actions/runs/36182707028),
+including 12 native tests, 22 headless Dart tests and analysis. This is the latest
+verified hosted Windows source. [Run metadata](run-36182707028.json) is retained.

@@ -55,6 +55,12 @@ jobs:
         run: |
           mkdir -p build/platform-probe
           cargo build --locked -p gpuidart-platform-probe 2>&1 | tee build/platform-probe/build.log
+          cp target/debug/gpuidart-platform-window build/platform-probe/
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            cp target/debug/libgpuidart_platform_probe.dylib build/platform-probe/
+          else
+            cp target/debug/libgpuidart_platform_probe.so build/platform-probe/
+          fi
       - name: Probe macOS native main thread and Dart JIT/AOT workers
         if: runner.os == 'macOS'
         run: dart run tool/platform_probe/run.dart

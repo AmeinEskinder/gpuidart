@@ -1,0 +1,148 @@
+{
+  "created_at": "2026-09-25T19:58:01.445641Z",
+  "os": "linux",
+  "os_version": "Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
+  "display": ":99",
+  "wayland_display": null,
+  "results": [
+    {
+      "name": "source",
+      "executable": "git",
+      "arguments": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 51,
+      "input_driver_error": null
+    },
+    {
+      "name": "rust",
+      "executable": "rustc",
+      "arguments": [
+        "-vV"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 35,
+      "input_driver_error": null
+    },
+    {
+      "name": "os",
+      "executable": "uname",
+      "arguments": [
+        "-a"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 5,
+      "input_driver_error": null
+    },
+    {
+      "name": "vulkan",
+      "executable": "vulkaninfo",
+      "arguments": [
+        "--summary"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 176,
+      "input_driver_error": null
+    },
+    {
+      "name": "display",
+      "executable": "xrandr",
+      "arguments": [
+        "--verbose"
+      ],
+      "exit_code": null,
+      "timeout": false,
+      "error": "ProcessException: No such file or directory\n  Command: xrandr --verbose",
+      "elapsed_ms": 7,
+      "input_driver_error": null
+    },
+    {
+      "name": "libc",
+      "executable": "ldd",
+      "arguments": [
+        "--version"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 6,
+      "input_driver_error": null
+    },
+    {
+      "name": "rust-main",
+      "executable": "/home/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+      "arguments": [],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 7002,
+      "input_driver_error": null
+    },
+    {
+      "name": "rust-worker",
+      "executable": "/home/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+      "arguments": [
+        "--worker"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 6089,
+      "input_driver_error": null
+    },
+    {
+      "name": "dart-jit",
+      "executable": "/opt/hostedtoolcache/dart/3.13.4/x64/bin/dart",
+      "arguments": [
+        "--enable-vm-service=0",
+        "tool/platform_probe/probe.dart",
+        "/home/runner/work/gpuidart/gpuidart/target/debug/libgpuidart_platform_probe.so"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 6608,
+      "input_driver_error": null
+    },
+    {
+      "name": "aot-compile",
+      "executable": "/opt/hostedtoolcache/dart/3.13.4/x64/bin/dart",
+      "arguments": [
+        "compile",
+        "exe",
+        "tool/platform_probe/probe.dart",
+        "-o",
+        "/home/runner/work/gpuidart/gpuidart/build/platform-probe/probe"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 1360,
+      "input_driver_error": null
+    },
+    {
+      "name": "dart-aot",
+      "executable": "/home/runner/work/gpuidart/gpuidart/build/platform-probe/probe",
+      "arguments": [
+        "/home/runner/work/gpuidart/gpuidart/target/debug/libgpuidart_platform_probe.so"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 6085,
+      "input_driver_error": null
+    }
+  ],
+  "limits": "Probe only. No IME, clean-machine or presentation claim."
+}

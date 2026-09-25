@@ -13,6 +13,7 @@ Future<void> main(List<String> args) async {
     List<String> arguments, {
     Duration timeout = const Duration(seconds: 40),
     bool driveInput = false,
+    bool companion = false,
   }) async {
     final watch = Stopwatch()..start();
     final stdoutFile = File('${output.path}/$name.stdout.log').openWrite();
@@ -22,7 +23,11 @@ Future<void> main(List<String> args) async {
     Object? error;
     String? inputError;
     try {
-      final process = await Process.start(executable, arguments);
+      final process = await Process.start(
+        executable,
+        arguments,
+        environment: companion ? {'GPUIDART_PROBE_INPUT': '0'} : null,
+      );
       final driver = driveInput
           ? injectInput().then<void>(
               (_) {},
@@ -71,7 +76,18 @@ Future<void> main(List<String> args) async {
         // A dependency can also write plain text to stdout.
       }
     }
-    if (name.startsWith('rust-') || name == 'dart-jit' || name == 'dart-aot') {
+    final rejectedThread =
+        Platform.isMacOS &&
+        status == 1 &&
+        events.any(
+          (event) =>
+              event['stage'] == 'rejected_non_main_thread' &&
+              event['main_thread'] == 0,
+        );
+    if (!rejectedThread &&
+        (name.startsWith('rust-') ||
+            name == 'dart-jit' ||
+            name == 'dart-aot')) {
       final beforeQuit = events
           .where((event) => event['stage'] == 'before_quit')
           .firstOrNull;
@@ -93,6 +109,7 @@ Future<void> main(List<String> args) async {
       'error': error,
       'elapsed_ms': watch.elapsedMilliseconds,
       'input_driver_error': inputError,
+      'unsupported_non_main_thread': rejectedThread,
     };
     results.add(result);
     File('${output.path}/results.json').writeAsStringSync(
@@ -159,21 +176,62 @@ Future<void> main(List<String> args) async {
       ? await run('dart-aot', aotPath, [library], driveInput: driveInput)
       : null;
 
+  final companionJit = await run('companion-jit', Platform.resolvedExecutable, [
+    'tool/platform_probe/companion.dart',
+    native,
+  ], companion: true);
+  final companionAotPath = '${output.path}/companion$suffix';
+  final companionCompile = await run(
+    'companion-compile',
+    Platform.resolvedExecutable,
+    [
+      'compile',
+      'exe',
+      'tool/platform_probe/companion.dart',
+      '-o',
+      companionAotPath,
+    ],
+    timeout: const Duration(minutes: 2),
+  );
+  final companionAot = companionCompile['exit_code'] == 0
+      ? await run('companion-aot', companionAotPath, [native], companion: true)
+      : null;
+  final reload = await run(
+    'companion-reload',
+    Platform.resolvedExecutable,
+    ['tool/platform_probe/reload.dart', native, '${output.path}/reload.json'],
+    companion: true,
+    timeout: const Duration(seconds: 45),
+  );
+
   bool successful(Map<String, Object?>? result) =>
       result?['exit_code'] == 0 &&
       result?['timeout'] == false &&
       result?['input_driver_error'] == null &&
       result?['error'] == null;
-  // macOS worker rejection is retained as an unsupported launcher result.
-  // It is never counted as a successful window, callback or reload check.
-  final passed = [
-    nativeMain,
-    nativeWorker,
-    jit,
-    compile,
-    aot,
-  ].every(successful);
-  stdout.writeln('All launch strategies passed: $passed. See ${output.path}');
+  // macOS worker rejection is an explicit negative capability check. Only the
+  // companion candidate can satisfy its successful Dart launch/reload checks.
+  final passed =
+      [
+        nativeMain,
+        if (!Platform.isMacOS) nativeWorker,
+        if (!Platform.isMacOS) jit,
+        compile,
+        if (!Platform.isMacOS) aot,
+        companionJit,
+        companionCompile,
+        companionAot,
+        reload,
+      ].every(successful) &&
+      (!Platform.isMacOS ||
+          [nativeWorker, jit, aot].every(
+            (result) =>
+                result?['unsupported_non_main_thread'] == true &&
+                result?['timeout'] == false,
+          ));
+  stdout.writeln(
+    'Applicable launch checks passed: $passed. See ${output.path}',
+  );
   if (!passed) exitCode = 1;
 }
 

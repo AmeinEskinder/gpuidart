@@ -4,6 +4,8 @@ use gpui_kit::component::{
     input::{Input, InputEvent, InputState},
 };
 use gpui_kit::*;
+use std::io::{BufRead, Read};
+use std::sync::mpsc::{Receiver, sync_channel};
 use std::sync::{
     Arc,
     atomic::{AtomicU32, Ordering},
@@ -67,6 +69,7 @@ pub fn report(stage: &str, detail: serde_json::Value) {
 type Callback = extern "C" fn(u32);
 
 struct Probe {
+    label: String,
     input: Entity<InputState>,
     renders: Arc<AtomicU32>,
     clicks: Arc<AtomicU32>,
@@ -94,7 +97,7 @@ impl Render for Probe {
             .gap_2()
             .p_4()
             .size_full()
-            .child("GPUI-Dart platform probe")
+            .child(self.label.clone())
             .child(Input::new(&self.input))
             .child(
                 Button::new("probe-button")
@@ -115,7 +118,7 @@ pub extern "C" fn gdp_signal(value: u32) {
 /// Isolated feasibility ABI. Callback must remain live until this call returns.
 #[unsafe(no_mangle)]
 pub extern "C" fn gdp_run(callback: Option<Callback>) -> i32 {
-    match std::panic::catch_unwind(|| run(callback)) {
+    match std::panic::catch_unwind(|| run(callback, None)) {
         Ok(status) => status,
         Err(_) => {
             report("panic", serde_json::Value::Null);
@@ -124,7 +127,53 @@ pub extern "C" fn gdp_run(callback: Option<Callback>) -> i32 {
     }
 }
 
-fn run(callback: Option<Callback>) -> i32 {
+enum ProbeCommand {
+    Label(String),
+    Close,
+}
+
+/// Separate-process candidate. This protocol is only for the feasibility probe.
+pub fn run_companion() -> i32 {
+    let (sender, receiver) = sync_channel(64);
+    std::thread::spawn(move || {
+        let stdin = std::io::stdin();
+        let mut input = stdin.lock();
+        loop {
+            let mut line = Vec::new();
+            let read = input.by_ref().take(4097).read_until(b'\n', &mut line);
+            if !matches!(read, Ok(1..=4096)) {
+                let _ = sender.send(ProbeCommand::Close);
+                break;
+            }
+            let value = serde_json::from_slice::<serde_json::Value>(&line);
+            let command = match value {
+                Ok(value) if value["op"] == "close" => ProbeCommand::Close,
+                Ok(value) if value["op"] == "label" => {
+                    match value["value"].as_str().filter(|value| value.len() <= 128) {
+                        Some(value) => ProbeCommand::Label(value.to_owned()),
+                        None => {
+                            let _ = sender.send(ProbeCommand::Close);
+                            break;
+                        }
+                    }
+                }
+                _ => {
+                    let _ = sender.send(ProbeCommand::Close);
+                    break;
+                }
+            };
+            if sender.send(command).is_err() {
+                break;
+            }
+        }
+    });
+    extern "C" fn ready(value: u32) {
+        report("native_callback", serde_json::json!({"value": value}));
+    }
+    run(Some(ready), Some(receiver))
+}
+
+fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> i32 {
     report("run_enter", serde_json::Value::Null);
     if cfg!(target_os = "macos") && gdp_is_main_thread() != 1 {
         report("rejected_non_main_thread", serde_json::Value::Null);
@@ -145,6 +194,7 @@ fn run(callback: Option<Callback>) -> i32 {
     let quit_input_matches = input_matches.clone();
     let opened = Arc::new(AtomicU32::new(0));
     let result_opened = opened.clone();
+    let companion = commands.is_some();
     gpui_kit::application().run(move |cx| {
         report("app_callback", serde_json::Value::Null);
         gpui_kit::init(cx);
@@ -157,7 +207,13 @@ fn run(callback: Option<Callback>) -> i32 {
             ..Default::default()
         };
         let window = gpui_kit::open_window(options, cx, |window, cx| {
-            let input = cx.new(|cx| InputState::new(window, cx).placeholder("Type here"));
+            let input = cx.new(|cx| {
+                let mut input = InputState::new(window, cx).placeholder("Type here");
+                if companion {
+                    input.set_value("retained probe state", window, cx);
+                }
+                input
+            });
             cx.new(|cx| {
                 let subscription =
                     cx.subscribe_in(&input, window, move |_, input, event, _, cx| {
@@ -171,6 +227,7 @@ fn run(callback: Option<Callback>) -> i32 {
                         }
                     });
                 Probe {
+                    label: "GPUI-Dart platform probe".into(),
                     input,
                     renders,
                     clicks,
@@ -180,8 +237,8 @@ fn run(callback: Option<Callback>) -> i32 {
                 }
             })
         });
-        let window = match window {
-            Ok((window, _view)) => window,
+        let (window, view) = match window {
+            Ok(window) => window,
             Err(error) => {
                 report(
                     "open_failed",
@@ -197,7 +254,8 @@ fn run(callback: Option<Callback>) -> i32 {
         }
         cx.activate(true);
         cx.spawn(async move |cx| {
-            for step in 0..500 {
+            let steps = if commands.is_some() { 3000 } else { 500 };
+            for step in 0..steps {
                 cx.background_executor()
                     .timer(Duration::from_millis(10))
                     .await;
@@ -211,6 +269,34 @@ fn run(callback: Option<Callback>) -> i32 {
                     report("signal_received", serde_json::json!({"value": signal}));
                     if let Some(callback) = callback {
                         callback(signal);
+                    }
+                }
+                if let Some(commands) = &commands {
+                    let mut closing = false;
+                    for command in commands.try_iter().take(64) {
+                        match command {
+                            ProbeCommand::Close => {
+                                closing = true;
+                                break;
+                            }
+                            ProbeCommand::Label(label) => {
+                                let _ = view.update(cx, |view, cx| {
+                                    view.label = label;
+                                    report(
+                                        "label_applied",
+                                        serde_json::json!({
+                                            "label": view.label,
+                                            "input_entity": format!("{:?}", view.input.entity_id()),
+                                            "input_value": view.input.read(cx).value().to_string(),
+                                        }),
+                                    );
+                                    cx.notify();
+                                });
+                            }
+                        }
+                    }
+                    if closing {
+                        break;
                     }
                 }
             }
