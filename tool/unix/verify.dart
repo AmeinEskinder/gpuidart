@@ -10,14 +10,17 @@ Future<void> main(List<String> args) async {
   final root = File(Platform.resolvedExecutable).parent;
   var reportFile = File('${root.path}/verification.json');
   var environmentKind = 'development_machine';
+  var runtimeOnly = false;
   for (final arg in args) {
     if (arg.startsWith('--report=')) {
       reportFile = File(arg.substring(9)).absolute;
     } else if (arg.startsWith('--environment=')) {
       environmentKind = arg.substring(14);
+    } else if (arg == '--runtime-only') {
+      runtimeOnly = true;
     } else {
       throw ArgumentError(
-        'Usage: ./verify [--report=FILE] [--environment=development_machine|clean_vm|clean_machine|clean_container]',
+        'Usage: ./verify [--runtime-only] [--report=FILE] [--environment=development_machine|clean_vm|clean_machine|clean_container]',
       );
     }
   }
@@ -35,6 +38,7 @@ Future<void> main(List<String> args) async {
     'environment_declared_by_operator': environmentKind,
     'package_path': root.path,
     'os': Platform.operatingSystemVersion,
+    'runtime_only': runtimeOnly,
   };
   Future<void> save() async {
     await reportFile.parent.create(recursive: true);
@@ -91,6 +95,26 @@ Future<void> main(List<String> args) async {
       helper,
       File(Platform.resolvedExecutable),
     ]) {
+      final relative = file.absolute.path.substring(
+        '${root.absolute.path}/'.length,
+      );
+      final inspection =
+          (manifest['build_dependency_inspection'] as Map?)?[relative];
+      if (runtimeOnly) {
+        if (inspection is! Map ||
+            inspection['output'] is! String ||
+            (inspection['output'] as String).isEmpty ||
+            (inspection['output'] as String).contains('not found')) {
+          throw StateError(
+            'Missing or failed build-time dependency inspection: $relative',
+          );
+        }
+        dependencies[file.path] = {
+          'scope': 'Recorded at build time; inspection tool not executed on this machine',
+          ...inspection,
+        };
+        continue;
+      }
       final result = await Process.run(
         Platform.isMacOS ? '/usr/bin/otool' : '/usr/bin/ldd',
         [if (Platform.isMacOS) '-L', file.path],

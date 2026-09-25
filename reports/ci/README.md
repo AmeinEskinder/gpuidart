@@ -35,3 +35,9 @@ The cross-platform implementation passed Windows checks at `6467d6c` in
 12 native tests, 22 headless Dart tests and analysis. This supersedes the older
 latest-source statements above. The five Windows live-window cases still need
 the local desktop command. [Run metadata](run-36191291231.json) is retained.
+
+Latest verified Windows source: `f56bea1`,
+[run 36192759714](https://github.com/AmeinEskinder/gpuidart/actions/runs/36192759714).
+The same 12 native/22 headless Dart checks passed. Local reload additionally
+checks native process identity; Unix native-window results are recorded under
+cross-platform acceptance.

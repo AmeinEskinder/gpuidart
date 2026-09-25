@@ -148,11 +148,29 @@ Future<void> main(List<String> args) async {
   );
   await File('docs/unix-release-checks.md')
       .copy('${stage.path}/RELEASE-CHECKS.md');
+  final dependencyInspection = <String, Object>{};
+  for (final path in [
+    binary,
+    '${payload.path}/${nativeLibraryName('gpuidart')}',
+    '${payload.path}/gpuidart-launcher',
+    '${stage.path}/verify',
+  ]) {
+    final relative = File(path).absolute.path
+        .substring('${stage.absolute.path}/'.length);
+    dependencyInspection[relative] = {
+      'tool': Platform.isMacOS ? 'otool -L' : 'ldd',
+      'output': await command(
+        Platform.isMacOS ? '/usr/bin/otool' : '/usr/bin/ldd',
+        [if (Platform.isMacOS) '-L', path],
+      ),
+    };
+  }
   await File('${stage.path}/README.txt')
       .writeAsString('''GPUI-Dart $target evaluation package
 Run ${Platform.isMacOS ? '$name.app/Contents/MacOS/$name or open $name.app' : './$name'}.
 Keep the complete package together. No Dart/Rust SDK is needed to run it.
 Run ./verify --report=verification.json to check hashes, dependencies, loaded libraries and the application's self-test.
+On a machine without developer inspection tools, use ./verify --runtime-only --report=verification.json; this uses the retained build-time dependency inspection and still checks actual loaded images.
 See RELEASE-CHECKS.md for OS prerequisites and human checks.
 ${Platform.isMacOS ? 'This app has an ad-hoc signature. Developer ID distribution and notarization are unverified.' : 'Requires Ubuntu 24.04 x64, X11 and the documented system runtime libraries.'}
 The project owner has not selected a project license. This is a private evaluation artifact.
@@ -186,6 +204,7 @@ The project owner has not selected a project license. This is a private evaluati
     'target': target,
     'native_abi': 1,
     'companion_extension': 2,
+    'build_dependency_inspection': dependencyInspection,
     'executable': File(binary).absolute.path.substring(prefix.length),
     'library':
         '${Platform.isMacOS ? '$name.app/Contents/MacOS/' : ''}${nativeLibraryName('gpuidart')}',

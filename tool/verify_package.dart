@@ -6,9 +6,11 @@ import 'package:crypto/crypto.dart';
 import 'src/commands.dart';
 
 Future<void> main(List<String> args) async {
+  final runtimeOnly = args.contains('--runtime-only');
+  args = args.where((arg) => arg != '--runtime-only').toList();
   if (args.isEmpty || args.length > 3) {
     throw ArgumentError(
-      'Usage: verify_package.dart ARCHIVE [REPORT] [ENVIRONMENT]',
+      'Usage: verify_package.dart ARCHIVE [REPORT] [ENVIRONMENT] [--runtime-only]',
     );
   }
   final archive = File(args[0]).absolute;
@@ -16,6 +18,9 @@ Future<void> main(List<String> args) async {
     args.length > 1 ? args[1] : 'build/package-verification.json',
   ).absolute;
   if (Platform.isWindows) {
+    if (runtimeOnly) {
+      throw UnsupportedError('--runtime-only is a Unix verifier option');
+    }
     stdout.writeln(
       await command('powershell.exe', [
         '-NoProfile',
@@ -41,6 +46,7 @@ Future<void> main(List<String> args) async {
   }
   await command('tar', ['-xzf', archive.path, '-C', directory.path]);
   final result = await Process.run('${directory.path}/verify', [
+    if (runtimeOnly) '--runtime-only',
     '--report=${report.path}',
     '--environment=${args.length > 2 ? args[2] : 'development_machine'}',
   ]);

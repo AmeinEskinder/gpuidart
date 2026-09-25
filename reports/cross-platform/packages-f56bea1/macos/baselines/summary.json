@@ -1,0 +1,74 @@
+{
+  "source": "f56bea1099a5410ad6ffec4aa7179b445ce45f7b",
+  "os": "Version 15.7.9 (Build 24G830)",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"macos_arm64\"",
+  "runs": [
+    {
+      "mode": "jit",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 815929.9583333334,
+        "records_constructed": 860694.9166666666,
+        "host_ready": 2064214.4166666667,
+        "verified_draw_ack": 2220292.2916666665
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 53247.166666666664,
+        "records_constructed": 79557.08333333333,
+        "host_ready": 442290.8333333333,
+        "verified_draw_ack": 583207.2916666666
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 29717.041666666668,
+        "records_constructed": 57335.791666666664,
+        "host_ready": 361970.2083333333,
+        "verified_draw_ack": 507801.7916666667
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 673399.25,
+        "records_constructed": 715913.25,
+        "host_ready": 1097017.0833333333,
+        "verified_draw_ack": 1225777.2083333333
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 526675.8333333334,
+        "records_constructed": 567734.8333333334,
+        "host_ready": 862441.25,
+        "verified_draw_ack": 1004286.0
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 30369.458333333332,
+        "records_constructed": 50382.833333333336,
+        "host_ready": 359838.375,
+        "verified_draw_ack": 504733.2916666667
+      }
+    }
+  ],
+  "scope": "Three instrumented repetitions per mode on one runner. Shared OS-clock stage boundaries. No input-to-present or cross-platform hardware-normalized comparison."
+}

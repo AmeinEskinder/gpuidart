@@ -2,6 +2,10 @@
 
 This is a development work order, not evidence that any platform support exists or has been measured. The Windows host remains the reference implementation and must stay green throughout. The snapshot/dataset wire protocol is OS-agnostic and does not change. Source: `e8a176a`.
 
+Implementation progress and per-target acceptance are tracked separately in
+[cross-platform status](../reports/cross-platform/status.md). The inventory below
+describes the starting revision.
+
 ## Objective
 
 Run the existing Dart API and snapshot/dataset protocol on macOS and Linux. Extend packaging, tooling and CI with equivalent behavioral verification for each declared target. Keep one public SDK. Record supported OS versions, CPU architectures and Linux display backends explicitly; success on one target does not establish support for every variant.

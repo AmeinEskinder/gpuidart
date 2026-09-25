@@ -1,0 +1,68 @@
+[
+    {
+        "Id": "sha256:67b0cf00148bdb24bf6e2f6ee82b9659e1c4aa063d09b9ebc99db4a89daa3a12",
+        "RepoTags": [
+            "gpuidart-runtime-check:latest"
+        ],
+        "RepoDigests": [],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-09-25T21:42:19.15245441Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LIBGL_ALWAYS_SOFTWARE=1"
+            ],
+            "Cmd": [
+                "sh",
+                "-c",
+                "xvfb-run -a -s '-screen 0 1280x800x24' sh -c 'openbox >/evidence/openbox.log 2>&1 & /evaluation/extracted/verify --environment=clean_container --report=/evidence/verification.json'"
+            ],
+            "ArgsEscaped": true,
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "/evaluation",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "org.opencontainers.image.version": "24.04"
+            }
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 661950860,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/dcacx1k6ow19576qrgo7n7q7q/diff:/var/lib/docker/overlay2/pzwbokx3hk7okte45l7qfcya4/diff:/var/lib/docker/overlay2/2ish8kd0zsgsgtmon5oyiak7l/diff:/var/lib/docker/overlay2/b08b4ee28aee8bc4b38f862dd16ffcd73e5b0045aa53b5d7f65c415fb8648345/diff",
+                "MergedDir": "/var/lib/docker/overlay2/6pfjwks6bpjt014d50uxvxn8h/merged",
+                "UpperDir": "/var/lib/docker/overlay2/6pfjwks6bpjt014d50uxvxn8h/diff",
+                "WorkDir": "/var/lib/docker/overlay2/6pfjwks6bpjt014d50uxvxn8h/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:65e5d715ea720349e6475f91651a0956279fc295a45fd73aa04f1cec046281a1",
+                "sha256:81585fb1179255bfcfba81e4b8c4ef3cb1529003822427e5621f83565aa03ab0",
+                "sha256:8472f4d60b7479193f41ba7cf82df0f4d1461bb04500c24479388c86699e34d7",
+                "sha256:88f1b88f5e8c1a05c658f740ec7072243473afeaf309f10334539be2eefedad9",
+                "sha256:55ff28bfad6c0b533909420a554133fbeb544e264072677ecf6779910d93c569"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-09-25T21:42:21.197408756Z"
+        }
+    }
+]

@@ -1,0 +1,12 @@
+> cargo build --locked -p gpuidart -p gpuidart-launcher --release
+> /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart pub get --enforce-lockfile
+> /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart compile exe --define=gpuidart.packaged=true example/watchlist/main.dart -o build/Watchlist-linux-x64-OERHFW/Watchlist
+> chmod 755 build/Watchlist-linux-x64-OERHFW/Watchlist build/Watchlist-linux-x64-OERHFW/gpuidart-launcher
+> /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart compile exe tool/unix/verify.dart -o build/Watchlist-linux-x64-OERHFW/verify
+> cargo metadata --locked --offline --filter-platform x86_64-unknown-linux-gnu --format-version 1
+> git ls-files --cached --others --exclude-standard -- lib native launcher example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock rust-toolchain.toml
+> git rev-parse HEAD
+> git status --porcelain
+> rustc --version
+> tar -czf /home/runner/work/gpuidart/gpuidart/build/Watchlist-linux-x64.tar.gz -C build/Watchlist-linux-x64-OERHFW .
+{"package":"/home/runner/work/gpuidart/gpuidart/build/Watchlist-linux-x64.tar.gz","sha256":"f804fbcec3e4f71bbb5321051a34ae01169c3696f942ba1ac762aa16b3131d97","staging_directory":"/home/runner/work/gpuidart/gpuidart/build/Watchlist-linux-x64-OERHFW"}

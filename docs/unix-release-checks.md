@@ -62,9 +62,13 @@ Dart FFI callbacks require.
 1. Provision a separate machine or VM without Dart, Flutter, Rust or build tools.
    Record image, OS version, architecture and installed runtime packages.
 2. Copy the archive, record its SHA-256 and extract it outside a source checkout.
-3. Run `./verify --environment=clean_vm --report=verification.json`. Use
+3. Run `./verify --runtime-only --environment=clean_vm --report=verification.json`. Use
    `clean_machine` for a physical machine. These values record an operator's
    declaration; they do not certify how the environment was provisioned.
+   `--runtime-only` uses the package's recorded build-time `otool`/`ldd`
+   inspection, verifies file hashes and inspects actual loaded images. It does
+   not run the inspection tool again; macOS `otool` belongs to the developer
+   toolchain. Default verification reruns that tool when available.
 4. Retain the report even if it fails. Record missing dependencies before
    installing them, then retain the later attempt separately.
 5. Launch the application normally, including Finder on macOS. Search for

@@ -24,6 +24,12 @@ Source links:
 
 ## Implemented boundary
 
+The diagram below describes the direct FFI path used on Windows and Linux X11.
+macOS uses a native companion on the process main thread, proven by the
+[cross-platform probes and lifecycle checks](../reports/cross-platform/host-implementation.md).
+Dart owns child creation/reaping; the native bridge transfers the same commands
+and events through a private, bounded Unix socket. It is not a Dart VM embedding.
+
 ```mermaid
 flowchart LR
     Dart["Dart application isolate\nstate, Futures, JSON descriptions"]
@@ -52,7 +58,7 @@ This tests an FFI-hosted Dart application, not a Dart engine inside Shell. JSON 
 
 The host has a portable Dart AOT executable plus DLLs, redraw construction/allocation counters, sparse table publication and actual Dart JIT code reload. The dataset acceptance test compares 100, 10,000 and 100,000 records and keeps cell, row, batch and counter operations separate. See [the measurement record](../reports/summary.md) for results and limits.
 
-The packaged application uses the same blocking native UI isolate arrangement as development. A live VM-service reload succeeded while that native call remained active. This establishes the tested Windows arrangement; it does not establish a Rust executable embedding Dart or a portable thread arrangement for other operating systems.
+Development and AOT use each platform's same native launch strategy. A live VM-service reload succeeds while the blocking native call remains active on Windows/Linux, and while the companion remains alive on macOS. Application and native control state survive changed Dart code. These are separate platform results; none establishes a Rust executable embedding Dart.
 
 `tool/dev.dart` watches source changes and invokes [`reloadSources`](https://api.flutter.dev/flutter/vm_service/VmService/reloadSources.html), then calls a registered application extension to rebuild the view. The reload test changes a method body while preserving the existing application object and native entities. A snapshot replacement alone would not pass the test because the output must reflect changed source code.
 

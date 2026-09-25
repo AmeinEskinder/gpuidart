@@ -1,0 +1,101 @@
+{
+  "recorded_at_utc": "2026-09-25T21:41:43.408071Z",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"macos_arm64\"",
+  "display_environment": {
+    "DISPLAY": null,
+    "WAYLAND_DISPLAY": null,
+    "XDG_SESSION_TYPE": null,
+    "XDG_CURRENT_DESKTOP": null,
+    "GDK_SCALE": null,
+    "GDK_DPI_SCALE": null,
+    "LIBGL_ALWAYS_SOFTWARE": "1"
+  },
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "f56bea1099a5410ad6ffec4aa7179b445ce45f7b\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uname",
+        "-a"
+      ],
+      "exit_code": 0,
+      "stdout": "Darwin sjc20-bb660-2397abe9-6e5d-4475-8816-1afc1a71d1bc-3E944BC56516.local 24.6.0 Darwin Kernel Version 24.6.0: Tue Jul 21 20:51:34 PDT 2026; root:xnu-11417.140.69.711.44~1/RELEASE_ARM64_VMAPPLE arm64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sw_vers"
+      ],
+      "exit_code": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t15.7.9\nBuildVersion:\t\t24G830\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "exit_code": 0,
+      "stdout": "Xcode 16.4\nBuild version 16F6\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "xcrun",
+        "--find",
+        "metal"
+      ],
+      "exit_code": 0,
+      "stdout": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/metal\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sysctl",
+        "hw.model",
+        "hw.machine",
+        "hw.physicalcpu",
+        "hw.memsize"
+      ],
+      "exit_code": 0,
+      "stdout": "hw.model: VirtualMac2,1\nhw.machine: arm64\nhw.physicalcpu: 3\nhw.memsize: 7516192768\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "swift",
+        "tool/platform_probe/metal.swift"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"default_device\" : \"Apple Paravirtual device\",\n  \"devices\" : [\n    {\n      \"low_power\" : false,\n      \"name\" : \"Apple Paravirtual device\",\n      \"registry_id\" : \"4294967706\",\n      \"unified_memory\" : true\n    }\n  ],\n  \"scope\" : \"Metal device enumeration on this runner; no physical GPU or presentation claim\"\n}\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "Runner/device enumeration. Does not establish physical GPU presentation or human interaction."
+}

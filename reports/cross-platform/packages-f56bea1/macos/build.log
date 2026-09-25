@@ -1,0 +1,17 @@
+> cargo build --locked -p gpuidart -p gpuidart-launcher --release
+> /Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart pub get --enforce-lockfile
+> /Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart compile exe --define=gpuidart.packaged=true example/watchlist/main.dart -o build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app/Contents/MacOS/Watchlist
+> chmod 755 build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app/Contents/MacOS/Watchlist build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app/Contents/MacOS/gpuidart-launcher
+> /Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart compile exe tool/unix/verify.dart -o build/Watchlist-macos-arm64-pXSZ5u/verify
+> codesign --force --sign - build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app/Contents/MacOS/libgpuidart.dylib
+> codesign --force --sign - build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app/Contents/MacOS/gpuidart-launcher
+> codesign --force --sign - build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app/Contents/MacOS/Watchlist
+> codesign --force --sign - build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app
+> codesign --verify --deep --strict build/Watchlist-macos-arm64-pXSZ5u/Watchlist.app
+> cargo metadata --locked --offline --filter-platform aarch64-apple-darwin --format-version 1
+> git ls-files --cached --others --exclude-standard -- lib native launcher example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock rust-toolchain.toml
+> git rev-parse HEAD
+> git status --porcelain
+> rustc --version
+> tar -czf /Users/runner/work/gpuidart/gpuidart/build/Watchlist-macos-arm64.tar.gz -C build/Watchlist-macos-arm64-pXSZ5u .
+{"package":"/Users/runner/work/gpuidart/gpuidart/build/Watchlist-macos-arm64.tar.gz","sha256":"c5cc5bf993bd98607dc4a08c01bef204809300c249dadf674a3419d3e0fdfc5a","staging_directory":"/Users/runner/work/gpuidart/gpuidart/build/Watchlist-macos-arm64-pXSZ5u"}

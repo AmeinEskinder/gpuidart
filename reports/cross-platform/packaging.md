@@ -59,3 +59,82 @@ The metadata query now specifies the package's Rust target with
 `--filter-platform`. This preserves offline, locked dependency resolution and
 limits the inventory to that target. Extraction/runtime verification still
 requires a successful follow-up job.
+
+## Verified evaluation packages at `f56bea1`
+
+[Run 36192771602](https://github.com/AmeinEskinder/gpuidart/actions/runs/36192771602)
+passed on both targets. [Raw records](packages-f56bea1/) include environment
+enumeration, file/source hashes, static dependencies, actual loaded images,
+native scale/geometry, three JIT and three AOT baseline runs per target, and the
+Linux runtime-only container's package inventory and image identity.
+
+| Artifact | Archive bytes | Installed payload bytes | Extracted launch |
+| --- | ---: | ---: | --- |
+| macOS 15 ARM64 | 13,526,086 | 37,059,100 | Passed; separate UI PID on main thread, strict ad-hoc signature check |
+| Ubuntu 24.04 x64/X11 | 23,635,153 | 72,261,874 | Passed on hosted image and fresh runtime-only container |
+
+Installed sizes include the verifier, manifest and documentation; system
+runtime prerequisites are excluded. Archives were downloaded and their hashes
+matched the verification records. They are local evaluation artifacts under
+`build/unix-evaluation-packages/`, not a public release. Their SHA-256 values are:
+
+- macOS: `c5cc5bf993bd98607dc4a08c01bef204809300c249dadf674a3419d3e0fdfc5a`
+- Linux: `f804fbcec3e4f71bbb5321051a34ae01169c3696f942ba1ac762aa16b3131d97`
+
+The Linux container contains no Dart, Rust or Cargo executable. Its self-test
+loaded only the packaged SDK library and documented system libraries. This
+establishes runtime closure for that Ubuntu container, using software Vulkan;
+it does not establish a physical desktop or another distribution. The macOS
+runner still contains developer tools. Both checks ran at scale 1. macOS
+reported a 960 by 653 logical viewport on its small virtual display; Linux
+reported 960 by 720. Neither result proves Retina/fractional scaling.
+
+### Startup and memory baseline
+
+The fixture constructs 100,000 two-column records, opens the same view, requests
+two repaints and samples memory after two idle seconds. Native code is a release
+build; tracing is enabled. Values below are medians of three runs, with the
+observed min–max in parentheses. Startup columns are cumulative milliseconds
+from the driver's launch timestamp; do not add their medians together.
+
+| Host / mode | Dart main | Records constructed | Host ready | Requested draw acknowledged |
+| --- | ---: | ---: | ---: | ---: |
+| macOS JIT | 673.4 (526.7–815.9) | 715.9 (567.7–860.7) | 1,097.0 (862.4–2,064.2) | 1,225.8 (1,004.3–2,220.3) |
+| macOS AOT | 30.4 (29.7–53.2) | 57.3 (50.4–79.6) | 362.0 (359.8–442.3) | 507.8 (504.7–583.2) |
+| Linux JIT | 492.2 (492.0–497.0) | 546.3 (541.3–549.9) | 804.0 (800.8–809.2) | 886.6 (885.2–1,260.7) |
+| Linux AOT | 7.4 (7.4–7.9) | 35.6 (34.8–36.0) | 231.2 (228.7–231.7) | 328.2 (325.6–329.7) |
+
+The launch interval includes the owned-session helper and, for JIT, the Dart
+command's startup. It does not isolate VM boot. Host readiness is not first
+useful display; requested-draw acknowledgement is not presentation. First-run
+effects remain in these samples. The Mac VM and Linux software renderer are
+different environments, so these numbers do not rank platform performance.
+
+Memory below is MiB after the idle interval. Linux application/UI share one PID
+and are listed once. The macOS processes are separate; resident sizes may include
+shared pages and are not summed as unique memory.
+
+| Host / mode / process | Resident size or RSS | Physical footprint (Mac) / PSS (Linux) |
+| --- | ---: | ---: |
+| macOS JIT application | 248.33 (248.16–250.77) | 177.67 (177.47–180.69) |
+| macOS JIT UI | 71.27 (70.56–71.50) | 48.31 (48.02–48.39) |
+| macOS AOT application | 71.91 (71.91–71.98) | 40.66 (40.66–40.72) |
+| macOS AOT UI | 71.25 (71.17–71.38) | 48.71 (48.03–48.72) |
+| Linux JIT shared process | 404.42 (404.37–417.95) | 353.03 (352.67–366.27) |
+| Linux AOT shared process | 233.92 (233.31–234.23) | 211.52 (211.02–211.79) |
+
+Each raw baseline records the metric source, per-process counters and loaded
+images. The table uses `after_idle.by_pid` and deduplicates PID roles. These
+are initial instrumentation baselines, with different OS memory definitions,
+not evidence about Dart versus other language runtimes.
+
+### Standalone verifier without developer tools
+
+The first macOS package verifier calls `otool`. That tool comes from the Apple
+developer toolchain, so it is unsuitable as a prerequisite for a clean Mac.
+The next package revision retains build-time dependency inspection in the
+manifest and adds explicit `--runtime-only` verification. That mode still
+checks file hashes, signatures, actual loaded images and application behavior;
+it labels static inspection as recorded at build time. Default mode reruns the
+inspection tools. A hosted check with an invalid `DEVELOPER_DIR` is being added
+to prove that this mode does not invoke `otool`. It is not a clean-Mac claim.

@@ -1,0 +1,1697 @@
+{
+  "mode": "jit",
+  "repetition": 1,
+  "driver_launch_ticks": 541628595857,
+  "passed": true,
+  "exit_code": 0,
+  "stderr": "",
+  "application": {
+    "passed": true,
+    "mode": "jit",
+    "clock": "Linux CLOCK_MONOTONIC",
+    "frequency": 1000000000,
+    "stages": {
+      "dart_main": 542120585254,
+      "records_constructed": 542169853478,
+      "host_ready": 542437798030,
+      "verified_draw_ack": 542889292160
+    },
+    "idle_start": 542905246491,
+    "idle_end": 544907299460,
+    "before_idle": {
+      "roles": {
+        "application": 5780,
+        "ui": 5780
+      },
+      "by_pid": {
+        "5780": {
+          "pid": 5780,
+          "os": "linux",
+          "arch": "x86_64",
+          "cpu_user_us": 1723368,
+          "cpu_system_us": 226812,
+          "loaded_images": [
+            "/home/runner/work/gpuidart/gpuidart/target/release/libgpuidart.so",
+            "/opt/hostedtoolcache/dart/3.13.4/x64/bin/dartvm",
+            "/opt/hostedtoolcache/dart/3.13.4/x64/bin/snapshots/kernel-service.dart.snapshot",
+            "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+            "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0",
+            "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1",
+            "/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so",
+            "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0",
+            "/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0",
+            "/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1",
+            "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+            "/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0",
+            "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0",
+            "/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0",
+            "/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72",
+            "/usr/lib/x86_64-linux-gnu/libelf-0.190.so",
+            "/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1",
+            "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+            "/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so",
+            "/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+            "/usr/lib/x86_64-linux-gnu/libicudata.so.74.2",
+            "/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2",
+            "/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5",
+            "/usr/lib/x86_64-linux-gnu/libm.so.6",
+            "/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0",
+            "/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1",
+            "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+            "/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0",
+            "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+            "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4",
+            "/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_intel.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so",
+            "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0",
+            "/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14",
+            "/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+            "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5"
+          ],
+          "loaded_images_source": "/proc/self/maps executable file mappings",
+          "memory_bytes": {
+            "Rss": 438136832,
+            "Pss": 383954944,
+            "Pss_Dirty": 283623424,
+            "Pss_Anon": 245432320,
+            "Pss_File": 126857216,
+            "Pss_Shmem": 11665408,
+            "Shared_Clean": 103411712,
+            "Shared_Dirty": 24576,
+            "Private_Clean": 51089408,
+            "Private_Dirty": 283611136,
+            "Referenced": 438136832,
+            "Anonymous": 245432320,
+            "KSM": 0,
+            "LazyFree": 0,
+            "AnonHugePages": 10485760,
+            "ShmemPmdMapped": 0,
+            "FilePmdMapped": 0,
+            "Shared_Hugetlb": 0,
+            "Private_Hugetlb": 0,
+            "Swap": 0,
+            "SwapPss": 0,
+            "Locked": 0
+          },
+          "memory_source": "/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them",
+          "main_thread": false
+        }
+      }
+    },
+    "after_idle": {
+      "roles": {
+        "application": 5780,
+        "ui": 5780
+      },
+      "by_pid": {
+        "5780": {
+          "pid": 5780,
+          "os": "linux",
+          "arch": "x86_64",
+          "cpu_user_us": 1732164,
+          "cpu_system_us": 239619,
+          "loaded_images": [
+            "/home/runner/work/gpuidart/gpuidart/target/release/libgpuidart.so",
+            "/opt/hostedtoolcache/dart/3.13.4/x64/bin/dartvm",
+            "/opt/hostedtoolcache/dart/3.13.4/x64/bin/snapshots/kernel-service.dart.snapshot",
+            "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+            "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0",
+            "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1",
+            "/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so",
+            "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0",
+            "/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0",
+            "/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1",
+            "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+            "/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0",
+            "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0",
+            "/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0",
+            "/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72",
+            "/usr/lib/x86_64-linux-gnu/libelf-0.190.so",
+            "/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1",
+            "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+            "/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so",
+            "/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+            "/usr/lib/x86_64-linux-gnu/libicudata.so.74.2",
+            "/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2",
+            "/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5",
+            "/usr/lib/x86_64-linux-gnu/libm.so.6",
+            "/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0",
+            "/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1",
+            "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+            "/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0",
+            "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+            "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4",
+            "/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_intel.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+            "/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so",
+            "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0",
+            "/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0",
+            "/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14",
+            "/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0",
+            "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+            "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5"
+          ],
+          "loaded_images_source": "/proc/self/maps executable file mappings",
+          "memory_bytes": {
+            "Rss": 438247424,
+            "Pss": 384065536,
+            "Pss_Dirty": 283734016,
+            "Pss_Anon": 245542912,
+            "Pss_File": 126857216,
+            "Pss_Shmem": 11665408,
+            "Shared_Clean": 103411712,
+            "Shared_Dirty": 24576,
+            "Private_Clean": 51089408,
+            "Private_Dirty": 283721728,
+            "Referenced": 438247424,
+            "Anonymous": 245542912,
+            "KSM": 0,
+            "LazyFree": 0,
+            "AnonHugePages": 10485760,
+            "ShmemPmdMapped": 0,
+            "FilePmdMapped": 0,
+            "Shared_Hugetlb": 0,
+            "Private_Hugetlb": 0,
+            "Swap": 0,
+            "SwapPss": 0,
+            "Locked": 0
+          },
+          "memory_source": "/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them",
+          "main_thread": false
+        }
+      }
+    },
+    "window": {
+      "width": 860.0,
+      "height": 650.0,
+      "scale_factor": 1.0,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 4,
+      "rows_constructed": 44,
+      "cells_constructed": 116,
+      "data_records_checked": 0,
+      "data_cells_written": 0
+    },
+    "trace": {
+      "schema": 1,
+      "metadata": {
+        "clock": "Linux CLOCK_MONOTONIC",
+        "origin_ticks": 542120767756,
+        "frequency": 1000000000,
+        "clock_epoch": "System boot, excluding suspended time",
+        "suspend_behavior": "Excludes system suspend; frequency may be adjusted by the OS",
+        "resolution_ticks": 1,
+        "ordering_uncertainty": "Not independently calibrated; do not infer ordering from sub-resolution timestamp differences",
+        "process_id": 5780,
+        "native_process_ids": [
+          5780
+        ],
+        "remote_complete": true,
+        "capacity_per_side": 512,
+        "dart_dropped": 0,
+        "native_dropped": 0,
+        "native_read_failed": false,
+        "finalized": true,
+        "capture_complete": true,
+        "scope": "Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch covers synchronous handling; deferred diagnostic replies occur later. Tracing adds overhead."
+      },
+      "records": [
+        {
+          "name": "dart.build",
+          "operation": "initial",
+          "request": 1,
+          "start": 542170932070,
+          "end": 542171343050,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.request",
+          "operation": "initial",
+          "request": 1,
+          "start": 542176181518,
+          "end": 542176181518,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.library",
+          "operation": "initial",
+          "request": 1,
+          "start": 542185258780,
+          "end": 542187725984,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.describe",
+          "operation": "initial",
+          "request": 1,
+          "start": 542189327305,
+          "end": 542189978866,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.encode",
+          "operation": "initial",
+          "request": 1,
+          "start": 542190954595,
+          "end": 542239303268,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 2178131
+        },
+        {
+          "name": "dart.ffi",
+          "operation": "initial",
+          "request": 1,
+          "start": 542239316242,
+          "end": 542267903870,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 2178131
+        },
+        {
+          "name": "native.run",
+          "operation": "initial",
+          "request": 1,
+          "start": 542278930726,
+          "end": 542278930726,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.window_opened",
+          "operation": "initial",
+          "request": 1,
+          "start": 542421672225,
+          "end": 542421672225,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.emit",
+          "operation": "initial",
+          "request": 1,
+          "start": 542421676393,
+          "end": 542421676393,
+          "thread": 5793,
+          "process": 5780,
+          "bytes": 16
+        },
+        {
+          "name": "native.emit",
+          "operation": "snapshot",
+          "request": 1,
+          "start": 542421699496,
+          "end": 542421699496,
+          "thread": 5793,
+          "process": 5780,
+          "bytes": 51
+        },
+        {
+          "name": "dart.receive",
+          "operation": "initial",
+          "request": 1,
+          "start": 542423922876,
+          "end": 542423922876,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 16
+        },
+        {
+          "name": "dart.decode",
+          "operation": "initial",
+          "request": 1,
+          "start": 542423922876,
+          "end": 542434658085,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.ack",
+          "operation": "initial",
+          "request": 1,
+          "start": 542435676143,
+          "end": 542435676143,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.request",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542438320399,
+          "end": 542438320399,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.encode",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542439621177,
+          "end": 542439739989,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 39
+        },
+        {
+          "name": "dart.ffi",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542439744588,
+          "end": 542440689369,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 39,
+          "status": 0
+        },
+        {
+          "name": "native.parse",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542440670744,
+          "end": 542440677577,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 39
+        },
+        {
+          "name": "native.enqueue_attempt",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542440678719,
+          "end": 542440678719,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "native.submit_return",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542440680592,
+          "end": 542440680592,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.receive",
+          "operation": "snapshot",
+          "request": 1,
+          "start": 542440876720,
+          "end": 542440876720,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 51
+        },
+        {
+          "name": "dart.decode",
+          "operation": "snapshot",
+          "request": 1,
+          "start": 542440876720,
+          "end": 542442661575,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.ack",
+          "operation": "snapshot",
+          "request": 1,
+          "start": 542442809773,
+          "end": 542442809773,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0,
+          "native_apply_us": 0
+        },
+        {
+          "name": "native.dequeue",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542828416956,
+          "end": 542828416956,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.dispatch",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542828419971,
+          "end": 542828425943,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.emit",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542887970508,
+          "end": 542887970508,
+          "thread": 5793,
+          "process": 5780,
+          "bytes": 836
+        },
+        {
+          "name": "dart.receive",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542888045624,
+          "end": 542888045624,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 836
+        },
+        {
+          "name": "dart.decode",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542888045624,
+          "end": 542889086996,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.ack",
+          "operation": "diagnostic",
+          "request": 1,
+          "start": 542889219254,
+          "end": 542889219254,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.request",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889476616,
+          "end": 542889476616,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.encode",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889793991,
+          "end": 542889852020,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 28
+        },
+        {
+          "name": "dart.ffi",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889854344,
+          "end": 542889879130,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 28,
+          "status": 0
+        },
+        {
+          "name": "native.parse",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889857580,
+          "end": 542889863040,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 28
+        },
+        {
+          "name": "native.enqueue_attempt",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889863942,
+          "end": 542889863942,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "native.submit_return",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889877467,
+          "end": 542889877467,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "native.dequeue",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889894825,
+          "end": 542889894825,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.dispatch",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542889895687,
+          "end": 542896377745,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.emit",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542896360813,
+          "end": 542896360813,
+          "thread": 5793,
+          "process": 5780,
+          "bytes": 3614
+        },
+        {
+          "name": "dart.decode",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542896410231,
+          "end": 542897673779,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.receive",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542896410231,
+          "end": 542896410231,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 3614
+        },
+        {
+          "name": "dart.ack",
+          "operation": "diagnostic",
+          "request": 2,
+          "start": 542897700138,
+          "end": 542897700138,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.request",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907319116,
+          "end": 544907319116,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.encode",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907355765,
+          "end": 544907416750,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 28
+        },
+        {
+          "name": "dart.ffi",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907418463,
+          "end": 544907446155,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 28,
+          "status": 0
+        },
+        {
+          "name": "native.parse",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907422390,
+          "end": 544907428762,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 28
+        },
+        {
+          "name": "native.enqueue_attempt",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907430115,
+          "end": 544907430115,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "native.submit_return",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907444552,
+          "end": 544907444552,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "native.dequeue",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907488650,
+          "end": 544907488650,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.dispatch",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544907489822,
+          "end": 544914025170,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.emit",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544913997077,
+          "end": 544913997077,
+          "thread": 5793,
+          "process": 5780,
+          "bytes": 3614
+        },
+        {
+          "name": "dart.decode",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544914083283,
+          "end": 544914525292,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.receive",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544914083283,
+          "end": 544914083283,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 3614
+        },
+        {
+          "name": "dart.ack",
+          "operation": "diagnostic",
+          "request": 3,
+          "start": 544914556300,
+          "end": 544914556300,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.close",
+          "operation": "close",
+          "request": 0,
+          "start": 544921266475,
+          "end": 544921266475,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "native.close",
+          "operation": "close",
+          "request": 0,
+          "start": 544921549696,
+          "end": 544921549696,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "native.dequeue",
+          "operation": "close",
+          "request": 0,
+          "start": 544921576672,
+          "end": 544921576672,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.dispatch",
+          "operation": "close",
+          "request": 0,
+          "start": 544921577584,
+          "end": 544921577955,
+          "thread": 5793,
+          "process": 5780
+        },
+        {
+          "name": "native.emit",
+          "operation": "close",
+          "request": 0,
+          "start": 544926884049,
+          "end": 544926884049,
+          "thread": 5793,
+          "process": 5780,
+          "bytes": 17
+        },
+        {
+          "name": "dart.decode",
+          "operation": "close",
+          "request": 0,
+          "start": 544926941501,
+          "end": 544927098776,
+          "thread": 5792,
+          "process": 5780
+        },
+        {
+          "name": "dart.receive",
+          "operation": "close",
+          "request": 0,
+          "start": 544926941501,
+          "end": 544926941501,
+          "thread": 5792,
+          "process": 5780,
+          "bytes": 17
+        },
+        {
+          "name": "dart.ack",
+          "operation": "close",
+          "request": 0,
+          "start": 544927144932,
+          "end": 544927144932,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        },
+        {
+          "name": "dart.runner_result",
+          "operation": "close",
+          "request": 0,
+          "start": 544932457940,
+          "end": 544932457940,
+          "thread": 5792,
+          "process": 5780,
+          "status": 0
+        }
+      ],
+      "traceEvents": [
+        {
+          "name": "dart.build",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 50164.314,
+          "dur": 410.98,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.request",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 55413.762,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1
+          }
+        },
+        {
+          "name": "dart.library",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 64491.024000000005,
+          "dur": 2467.204,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.describe",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 68559.549,
+          "dur": 651.561,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1
+          }
+        },
+        {
+          "name": "dart.encode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 70186.839,
+          "dur": 48348.673,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "bytes": 2178131
+          }
+        },
+        {
+          "name": "dart.ffi",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 118548.486,
+          "dur": 28587.628,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "bytes": 2178131
+          }
+        },
+        {
+          "name": "native.run",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 158162.97,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "initial",
+            "request": 1
+          }
+        },
+        {
+          "name": "native.window_opened",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 300904.469,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "initial",
+            "request": 1
+          }
+        },
+        {
+          "name": "native.emit",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 300908.637,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "bytes": 16
+          }
+        },
+        {
+          "name": "native.emit",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 300931.74,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "snapshot",
+            "request": 1,
+            "bytes": 51
+          }
+        },
+        {
+          "name": "dart.receive",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 303155.12,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "bytes": 16
+          }
+        },
+        {
+          "name": "dart.decode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 303155.12,
+          "dur": 10735.209,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1
+          }
+        },
+        {
+          "name": "dart.ack",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 314908.387,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "initial",
+            "request": 1,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.request",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 317552.643,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1
+          }
+        },
+        {
+          "name": "dart.encode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 318853.42100000003,
+          "dur": 118.812,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "bytes": 39
+          }
+        },
+        {
+          "name": "dart.ffi",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 318976.832,
+          "dur": 944.7810000000001,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "bytes": 39,
+            "status": 0
+          }
+        },
+        {
+          "name": "native.parse",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 319902.988,
+          "dur": 6.833,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "bytes": 39
+          }
+        },
+        {
+          "name": "native.enqueue_attempt",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 319910.963,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1
+          }
+        },
+        {
+          "name": "native.submit_return",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 319912.836,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.receive",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 320108.964,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "snapshot",
+            "request": 1,
+            "bytes": 51
+          }
+        },
+        {
+          "name": "dart.decode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 320108.964,
+          "dur": 1784.855,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "snapshot",
+            "request": 1
+          }
+        },
+        {
+          "name": "dart.ack",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 322042.017,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "snapshot",
+            "request": 1,
+            "status": 0,
+            "native_apply_us": 0
+          }
+        },
+        {
+          "name": "native.dequeue",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 707649.2000000001,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1
+          }
+        },
+        {
+          "name": "native.dispatch",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 707652.215,
+          "dur": 5.972,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1
+          }
+        },
+        {
+          "name": "native.emit",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 767202.752,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "bytes": 836
+          }
+        },
+        {
+          "name": "dart.receive",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 767277.868,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "bytes": 836
+          }
+        },
+        {
+          "name": "dart.decode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 767277.868,
+          "dur": 1041.372,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1
+          }
+        },
+        {
+          "name": "dart.ack",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 768451.498,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 1,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.request",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 768708.86,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2
+          }
+        },
+        {
+          "name": "dart.encode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 769026.235,
+          "dur": 58.029,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "bytes": 28
+          }
+        },
+        {
+          "name": "dart.ffi",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 769086.588,
+          "dur": 24.786,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "bytes": 28,
+            "status": 0
+          }
+        },
+        {
+          "name": "native.parse",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 769089.824,
+          "dur": 5.46,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "bytes": 28
+          }
+        },
+        {
+          "name": "native.enqueue_attempt",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 769096.186,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2
+          }
+        },
+        {
+          "name": "native.submit_return",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 769109.711,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "status": 0
+          }
+        },
+        {
+          "name": "native.dequeue",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 769127.069,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2
+          }
+        },
+        {
+          "name": "native.dispatch",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 769127.931,
+          "dur": 6482.058,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2
+          }
+        },
+        {
+          "name": "native.emit",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 775593.057,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "bytes": 3614
+          }
+        },
+        {
+          "name": "dart.decode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 775642.475,
+          "dur": 1263.548,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2
+          }
+        },
+        {
+          "name": "dart.receive",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 775642.475,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "bytes": 3614
+          }
+        },
+        {
+          "name": "dart.ack",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 776932.382,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 2,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.request",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2786551.36,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3
+          }
+        },
+        {
+          "name": "dart.encode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2786588.009,
+          "dur": 60.985,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "bytes": 28
+          }
+        },
+        {
+          "name": "dart.ffi",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2786650.707,
+          "dur": 27.692,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "bytes": 28,
+            "status": 0
+          }
+        },
+        {
+          "name": "native.parse",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2786654.634,
+          "dur": 6.372,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "bytes": 28
+          }
+        },
+        {
+          "name": "native.enqueue_attempt",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2786662.359,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3
+          }
+        },
+        {
+          "name": "native.submit_return",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2786676.796,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "status": 0
+          }
+        },
+        {
+          "name": "native.dequeue",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2786720.894,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3
+          }
+        },
+        {
+          "name": "native.dispatch",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2786722.066,
+          "dur": 6535.348,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3
+          }
+        },
+        {
+          "name": "native.emit",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2793229.321,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "bytes": 3614
+          }
+        },
+        {
+          "name": "dart.decode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2793315.5270000002,
+          "dur": 442.009,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3
+          }
+        },
+        {
+          "name": "dart.receive",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2793315.5270000002,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "bytes": 3614
+          }
+        },
+        {
+          "name": "dart.ack",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2793788.544,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "diagnostic",
+            "request": 3,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.close",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2800498.719,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "close",
+            "request": 0
+          }
+        },
+        {
+          "name": "native.close",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2800781.94,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "close",
+            "request": 0
+          }
+        },
+        {
+          "name": "native.dequeue",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2800808.916,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "close",
+            "request": 0
+          }
+        },
+        {
+          "name": "native.dispatch",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2800809.828,
+          "dur": 0.371,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "close",
+            "request": 0
+          }
+        },
+        {
+          "name": "native.emit",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2806116.293,
+          "pid": 5780,
+          "tid": 5793,
+          "args": {
+            "operation": "close",
+            "request": 0,
+            "bytes": 17
+          }
+        },
+        {
+          "name": "dart.decode",
+          "cat": "gpuidart",
+          "ph": "X",
+          "ts": 2806173.745,
+          "dur": 157.275,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "close",
+            "request": 0
+          }
+        },
+        {
+          "name": "dart.receive",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2806173.745,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "close",
+            "request": 0,
+            "bytes": 17
+          }
+        },
+        {
+          "name": "dart.ack",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2806377.176,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "close",
+            "request": 0,
+            "status": 0
+          }
+        },
+        {
+          "name": "dart.runner_result",
+          "cat": "gpuidart",
+          "ph": "i",
+          "s": "t",
+          "ts": 2811690.184,
+          "pid": 5780,
+          "tid": 5792,
+          "args": {
+            "operation": "close",
+            "request": 0,
+            "status": 0
+          }
+        }
+      ],
+      "displayTimeUnit": "ms"
+    },
+    "scope": "Instrumented release-native 100k startup/idle fixture. Draw acknowledgement follows an explicit repaint request; it is not first useful display or presentation. CPU sampling includes diagnostic overhead. Process RSS values must not be summed as unique memory."
+  },
+  "from_driver_launch_us": {
+    "dart_main": 491989.397,
+    "records_constructed": 541257.621,
+    "host_ready": 809202.173,
+    "verified_draw_ack": 1260696.303
+  }
+}

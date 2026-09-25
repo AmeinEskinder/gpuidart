@@ -1,8 +1,8 @@
-# Windows SDK preview
+# Desktop SDK preview
 
-GPUI-Dart 0.1 is a Windows x64 SDK preview. DPI setup requires Windows 10 version 1803 or later, using Microsoft's [process DPI-context API](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiawarenesscontextforprocess); this build was tested on Windows 11. The supported application model is one host and one window per process, immutable UI descriptions, and retained native controls and datasets. The JSON wire format and diagnostic commands are internal. Build the Dart package and native DLL from the same revision.
+GPUI-Dart 0.1 is a desktop SDK preview with Windows x64, macOS 15 ARM64 and Ubuntu 24.04 x64/X11 implementations. See the [acceptance matrix](../reports/cross-platform/status.md) for verified environments and remaining gates. Windows DPI setup requires Windows 10 version 1803 or later, using Microsoft's [process DPI-context API](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiawarenesscontextforprocess); the local reference was tested on Windows 11. The application model is one host and one window, immutable UI descriptions, and retained native controls and datasets. The JSON wire format and diagnostic commands are internal. Build the Dart package, native library and launcher from the same revision.
 
-The Dart host checks native ABI/protocol version 1 before creating a host. Older DLLs without a version export, and DLLs with a different version, fail with a rebuild instruction. The native library rejects a second active host, including callers from another Dart isolate. Await successful completion of the previous host's done Future before opening another one. A shutdown timeout requires process recovery if the native runner remains stuck.
+The Dart host checks native ABI/protocol version 1 before creating a host. Libraries without a matching version fail with a rebuild instruction. macOS additionally requires companion lifecycle extension version 2 and the matching `gpuidart-launcher`. The native library rejects a second active host, including callers from another Dart isolate. Await successful completion of the previous host's done Future before opening another one. A shutdown timeout requires process recovery if the native runner remains stuck.
 
 ## Run the representative screen
 
@@ -12,6 +12,8 @@ From the repository root:
 ./tool/build.ps1
 dart run tool/dev.dart
 ```
+
+On macOS/Linux, use `dart run tool/build.dart` in place of the PowerShell build command. Linux currently requires X11; see [Unix prerequisites and packaging](unix-release-checks.md). The application API and development entry point are the same on all three targets.
 
 The default entry point is [Market watch](../example/watchlist/main.dart). It contains 1,000 fictitious instruments, search, row selection, a shortlist and sample price updates. Search replaces the displayed dataset deliberately; updating a price or shortlist entry sends one cell edit. There is no live feed or trading connection. Application data is in memory and resets when the process exits.
 
@@ -27,6 +29,8 @@ dart run tool/dev.dart path/to/main.dart --your-app-argument
 Run the launcher from the project root. It watches the entry point's directory recursively and the package's lib directory. It reports compilation/reload errors and keeps the previous running code on a rejected reload. Rust changes and Dart changes that the VM cannot reload require a restart. Close the application window to stop the launcher.
 
 Startup waits at most 30 seconds for reload registration. Failed startup cleans up the launched process tree, including Dart's VM child process. Ctrl+C requests application shutdown. Reload service calls also have a timeout, so an unavailable application does not leave the launcher waiting indefinitely.
+
+Windows and Linux execute GPUI inside the blocking native runner isolate. macOS starts an owned native companion because AppKit needs the process main thread and its normal quit terminates that process. Dart creates and reaps the child; close waits for transport completion and child exit before disposing callbacks. The companion uses a private Unix socket with bounded frames and queues. It adds process/transport cost; Windows measurements do not quantify that cost.
 
 ## Application lifecycle
 
@@ -86,6 +90,8 @@ Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size. Datasets h
 Native acknowledgements have a 30-second deadline; shutdown reporting has a 10-second deadline. Configure these with `requestTimeout` and `shutdownTimeout` when opening the host. Missing acknowledgements, malformed events and caught native panics close the host and settle pending requests. See [failure handling and its limits](failures.md).
 
 ## Package an AOT application
+
+The following commands describe the Windows package. For macOS/Linux use `dart run tool/package.dart --name=MyApp --entry=path/to/main.dart`, then `dart run tool/verify_package.dart ARCHIVE REPORT.json`. Their [release guide](unix-release-checks.md) describes the bundle, standalone verifier, runtime prerequisites and signing limits.
 
 ```powershell
 ./tool/package.ps1

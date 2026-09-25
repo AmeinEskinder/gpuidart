@@ -182,3 +182,9 @@ to remain unchanged across reload and recovery. This supplements application
 PID, retained entities, input/selection/scroll and publication checks. The new
 assertion passed locally on Windows with no preparation delay; Unix acceptance
 of this stronger assertion is pending the next hosted run.
+
+The stronger assertion passed at `f56bea1` in macOS run `36192759632` and Linux
+run `36192759651`. Their `native-pid-reload-macos/` and
+`native-pid-reload-linux/` records retain the unchanged native PID alongside the
+application state and trace. Both full SDK workflows passed; Windows headless
+checks passed in `36192759714` at the same source.

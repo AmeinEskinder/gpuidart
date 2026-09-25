@@ -1,6 +1,14 @@
 # GPUI-Dart
 
-An experimental Windows desktop SDK using Dart application code and GPUI Kit's Rust controls. Start with the [SDK guide](docs/sdk.md) and the [Market watch example](example/watchlist/main.dart).
+An experimental desktop SDK using Dart application code and GPUI Kit's Rust controls. Start with the [SDK guide](docs/sdk.md) and the [Market watch example](example/watchlist/main.dart).
+
+| Target | Verified scope |
+| --- | --- |
+| Windows x64 | Reference host, local desktop checks and AOT packaging |
+| macOS 15 ARM64 | Hosted native-window lifecycle, JIT/AOT 100k workload and code reload; GPUI runs in a native main-thread companion |
+| Ubuntu 24.04 x64, X11 | Hosted Xvfb/Mesa window lifecycle, JIT/AOT 100k workload and code reload |
+
+See [cross-platform acceptance](reports/cross-platform/status.md) for source revisions, package results and remaining gates. Native Wayland, Intel Macs, other Linux distributions and older macOS versions are unverified.
 
 The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. Its [Windows ZIP](build/WatchlistMvp-windows-x64.zip) is built from committed source. Clean-machine launch, human IME verification and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
@@ -41,6 +49,19 @@ dart run example/watchlist/main.dart
 The output is [build/gpuidart-windows-x64.zip](build/gpuidart-windows-x64.zip). Extract it and run `gpuidart.exe`; keep its DLLs beside it. The executable includes Dart's AOT runtime. The ZIP includes the native GPUI library and release Visual C++ runtime. On a machine without the project-local CRT archive, supply `-CrtDirectory` pointing to the Microsoft x64 redistributable folder.
 
 Verification extracts the ZIP outside the repository, changes to an unrelated working directory, restricts PATH to Windows directories and runs the watchlist's self-test. It checks loaded module paths, including Common Controls v6 and the sibling CRT, and the actual window's PerMonitorV2 awareness. The executable embeds a DPI manifest. A clean machine without an SDK has not yet been tested. The ZIP includes a standalone verifier and [manual release checks](docs/windows-release-checks.md).
+
+## macOS and Linux
+
+Use Dart 3.13.4 and the pinned Rust toolchain. The macOS build was verified with Xcode 16.4 and its Metal tools; Linux needs the build dependencies listed in [its workflow](.github/workflows/linux.yml). On Linux, select X11 with `DISPLAY` set and `WAYLAND_DISPLAY`/`ZED_HEADLESS` unset.
+
+```sh
+dart run tool/build.dart
+dart run tool/dev.dart
+dart run tool/check.dart
+dart run tool/package.dart --name=Watchlist
+```
+
+The package command emits `build/Watchlist-macos-arm64.tar.gz` or `build/Watchlist-linux-x64.tar.gz`. Run `dart run tool/verify_package.dart ARCHIVE REPORT.json` to extract and verify it. See [Unix release checks](docs/unix-release-checks.md) for runtime libraries, macOS signing limits and human input/display checks. macOS bundles currently use ad-hoc signatures; public distribution and clean-Mac launch remain unverified.
 
 ## Development code reload
 
@@ -88,7 +109,7 @@ The native tests render GPUI controls and exercise pointer/keyboard input, Unico
 
 `cargo test` and `cargo build` produce different native artifacts. The check script builds the normal DLL before running Dart.
 
-The check script also builds a test DLL that injects protocol and shutdown failures. See [failure handling](docs/failures.md) for deadlines, panic-containment limits and regression coverage. [GitHub Actions configuration](docs/ci.md) runs the headless checks; its first hosted run is pending publication of this repository.
+The check script also builds a test library that injects protocol and shutdown failures. See [failure handling](docs/failures.md) for deadlines, panic-containment limits and regression coverage. [GitHub Actions](docs/ci.md) runs Windows headless checks and separate headless/window jobs on macOS and Linux. Hosted and human verification remain distinct.
 
 ## Example
 
@@ -118,7 +139,7 @@ The remaining clean-Windows launch and human IME checks have a [setup guide](doc
 
 The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 
-- Windows only, one application host with one window. The dedicated UI isolate is a Windows experiment; macOS needs a different launch/thread arrangement.
+- One application host with one window. Windows and Linux X11 use a blocking native runner isolate; macOS uses a native companion process whose main thread owns GPUI.
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks, sorting and stable row identity are not implemented. Table selection follows row indices.
