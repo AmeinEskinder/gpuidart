@@ -1,0 +1,104 @@
+﻿{
+    "source":  "b6a7ee095fbeb4f870dacb8a86785d568ea750e1",
+    "native_profile":  "debug",
+    "rows":  100000,
+    "dart_version":  "Dart SDK version: 3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"windows_x64\"",
+    "native_dll_sha256":  "098ace66d1aa22dd5eda84ab4f4ce370002a48df0aa69a3c038ddc3ee660c552",
+    "dart_aot_exe_sha256":  "1ec4f9aadfb47d837fc4c83de24b522a58fafc36162876e2357a8791cb785867",
+    "verification":  {
+                         "native_tests":  11,
+                         "dart_tests":  27,
+                         "dart_analyze":  "passed",
+                         "scope":  "Smoke and trace correlation, not a performance comparison or release acceptance."
+                     },
+    "captures":  [
+                     {
+                         "mode":  "jit",
+                         "file":  "jit.trace.json",
+                         "sha256":  "8c82678ee3de14acb473ab1dd4e0ce80a0aae3100fde4c49580b1e04b70c2ea3",
+                         "records":  848,
+                         "metadata":  {
+                                          "clock":  "Windows QueryPerformanceCounter",
+                                          "origin_qpc":  950568768871,
+                                          "frequency":  10000000,
+                                          "cross_thread_order_uncertainty_ticks":  1,
+                                          "process_id":  32360,
+                                          "capacity_per_side":  4096,
+                                          "dart_dropped":  0,
+                                          "native_dropped":  0,
+                                          "native_read_failed":  false,
+                                          "finalized":  true,
+                                          "capture_complete":  true,
+                                          "scope":  "Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch includes acknowledgement serialization/callback submission. Tracing adds overhead."
+                                      },
+                         "publication":  [
+                                             {
+                                                 "operation":  "dataset",
+                                                 "requests":  30,
+                                                 "acks":  30,
+                                                 "failed_acks":  0,
+                                                 "encoded_bytes":  4584
+                                             },
+                                             {
+                                                 "operation":  "snapshot",
+                                                 "requests":  30,
+                                                 "acks":  30,
+                                                 "failed_acks":  0,
+                                                 "encoded_bytes":  4993
+                                             },
+                                             {
+                                                 "operation":  "diagnostic",
+                                                 "requests":  1,
+                                                 "acks":  1,
+                                                 "failed_acks":  0,
+                                                 "encoded_bytes":  69
+                                             }
+                                         ],
+                         "stage_order_checks_passed":  true
+                     },
+                     {
+                         "mode":  "aot",
+                         "file":  "aot.trace.json",
+                         "sha256":  "0483bbb23cac9083b2eeae3515559d533541b43123dd0e7cc5ba08a7025854e7",
+                         "records":  848,
+                         "metadata":  {
+                                          "clock":  "Windows QueryPerformanceCounter",
+                                          "origin_qpc":  950598959962,
+                                          "frequency":  10000000,
+                                          "cross_thread_order_uncertainty_ticks":  1,
+                                          "process_id":  34548,
+                                          "capacity_per_side":  4096,
+                                          "dart_dropped":  0,
+                                          "native_dropped":  0,
+                                          "native_read_failed":  false,
+                                          "finalized":  true,
+                                          "capture_complete":  true,
+                                          "scope":  "Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch includes acknowledgement serialization/callback submission. Tracing adds overhead."
+                                      },
+                         "publication":  [
+                                             {
+                                                 "operation":  "dataset",
+                                                 "requests":  30,
+                                                 "acks":  30,
+                                                 "failed_acks":  0,
+                                                 "encoded_bytes":  4584
+                                             },
+                                             {
+                                                 "operation":  "snapshot",
+                                                 "requests":  30,
+                                                 "acks":  30,
+                                                 "failed_acks":  0,
+                                                 "encoded_bytes":  4993
+                                             },
+                                             {
+                                                 "operation":  "diagnostic",
+                                                 "requests":  1,
+                                                 "acks":  1,
+                                                 "failed_acks":  0,
+                                                 "encoded_bytes":  69
+                                             }
+                                         ],
+                         "stage_order_checks_passed":  true
+                     }
+                 ]
+}
