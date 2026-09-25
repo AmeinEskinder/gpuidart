@@ -17,7 +17,13 @@ try {
         checks=@()
     }
     $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $reportPath -Encoding UTF8
-    $dart = (Get-Command dart -CommandType Application).Source
+    $probe = Join-Path $projectRoot '.cache/mvp-dart-executable.dart'
+    New-Item -ItemType Directory -Path (Split-Path $probe -Parent) -Force | Out-Null
+    "import 'dart:io'; void main() => stdout.write(Platform.resolvedExecutable);" | Set-Content -LiteralPath $probe -Encoding UTF8
+    $dart = ((& dart $probe) -join '').Trim()
+    if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $dart -PathType Leaf)) {
+        throw 'Could not resolve the Dart executable behind the current launcher.'
+    }
     $powershell = Join-Path $PSHOME 'powershell.exe'
     $checks = @(
         @{name='native-and-dart'; executable=$powershell; arguments=@('-NoProfile','-File','tool/check.ps1')},
