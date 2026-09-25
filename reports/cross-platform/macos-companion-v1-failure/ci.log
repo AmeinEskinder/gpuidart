@@ -1,0 +1,41 @@
+﻿window	Real-window lifecycle, 100k JIT/AOT traces and code reload	﻿2026-09-25T20:59:19.1060100Z ##[group]Run set -o pipefail
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1061270Z [36;1mset -o pipefail[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1063600Z [36;1mdart test --tags live-window 2>&1 | tee build/macos-window/tests.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1064340Z [36;1mdart run tool/capture_publication_trace.dart build/macos-window/jit-trace.json 2>&1 | tee build/macos-window/jit.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1065700Z [36;1mbuild/macos-window/capture build/macos-window/aot-trace.json 2>&1 | tee build/macos-window/aot.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1069170Z [36;1mdart run tool/verify_watchlist_reload.dart --report=build/macos-window/reload.json --trace --prepare-delay-ms=0 2>&1 | tee build/macos-window/reload.log[0m
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1488760Z shell: /bin/bash -e {0}
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1489670Z env:
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1490240Z   CARGO_INCREMENTAL: 0
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1491210Z   CARGO_BUILD_JOBS: 2
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1492000Z   RUST_BACKTRACE: 1
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1492730Z   DART_HOME: /Users/runner/hostedtoolcache/dart/3.13.4/arm64
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1493910Z   PUB_CACHE: /Users/runner/.pub-cache
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:19.1494530Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:23.9627430Z 
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:25.0473450Z ##[group]✅ Passing tests
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:25.0474400Z ✅ test/native_host_test.dart: an incompatible native library fails before host creation
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.2593200Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.2608370Z ##[group]❌ test/native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.2614260Z Bad state: No child processes (os error 10)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.2615360Z package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.2618650Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.2622050Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.5492070Z ##[group]❌ test/native_host_test.dart: failed initial descriptions release resources for another host (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.5500560Z Bad state: No child processes (os error 10)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.5501380Z package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.5503650Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:27.5504500Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.2085230Z ##[group]❌ test/native_trace_test.dart: real requests correlate across the bridge without recording UI values (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.2087140Z Bad state: No child processes (os error 10)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.2087850Z package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.2092810Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.2102820Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.4525700Z ##[group]❌ test/native_trace_test.dart: overflow is explicit and does not prevent updates or shutdown (failed)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.4534580Z Bad state: No child processes (os error 10)
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.4535250Z package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.4536000Z package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.4536710Z ##[endgroup]
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.8892900Z 
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.8956650Z ##[error]1 test passed, 4 failed.
+window	Real-window lifecycle, 100k JIT/AOT traces and code reload	2026-09-25T20:59:28.9835720Z ##[error]Process completed with exit code 1.

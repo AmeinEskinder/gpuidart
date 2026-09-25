@@ -16,6 +16,7 @@ import 'native_event.dart';
 
 part 'dataset.dart';
 part 'tracing.dart';
+part 'companion.dart';
 
 typedef _EventNative = Void Function(Pointer<Uint8>, Size);
 typedef _CreateNative = Pointer<Void> Function(
@@ -155,6 +156,7 @@ final class GpuiHost {
   StackTrace? _failureStack;
   int _revision = 1;
   bool _closing = false;
+  _Companion? _companion;
 
   Stream<GpuiEvent> get events => _events.stream;
 
@@ -286,15 +288,17 @@ final class GpuiHost {
     final result = ReceivePort();
     final nativeDone = result.first;
     try {
+      host._companion = await _Companion.start(bindings, path, host._handle);
       await Isolate.spawn(
         _runNative,
-        (path, host._handle.address, result.sendPort),
+        (path, host._handle.address, result.sendPort, host._companion != null),
         onError: result.sendPort,
         onExit: result.sendPort,
         errorsAreFatal: true,
         debugName: 'gpui-native-loop',
       );
     } catch (_) {
+      await host._companion?.abortStartup();
       for (final dataset in datasets) {
         dataset._owner = null;
       }
@@ -457,6 +461,7 @@ final class GpuiHost {
       _closing = true;
       _trace?._point('dart.close', 'close', 0);
       _bindings.close(_handle);
+      _companion?.armDeadline();
     }
     _shutdownDeadline ??= Timer(shutdownTimeout, () {
       final error = TimeoutException(
@@ -646,6 +651,10 @@ final class GpuiHost {
   Future<void> _finish(Future<dynamic> nativeDone, ReceivePort result) async {
     try {
       final status = await nativeDone;
+      final companionStatus = await _companion?.finish();
+      if (companionStatus != null && companionStatus != 0) {
+        throw StateError('Native companion exited with code $companionStatus');
+      }
       _trace?._point(
         'dart.runner_result',
         'close',
@@ -695,36 +704,15 @@ final class GpuiHost {
   }
 }
 
-void _runNative((String, int, SendPort) args) {
+void _runNative((String, int, SendPort, bool) args) {
   try {
     final bindings = _Bindings(args.$1);
     final handle = Pointer<Void>.fromAddress(args.$2);
-    if (Platform.isMacOS ||
-        (Platform.isLinux &&
-            Platform.environment['GPUIDART_COMPANION'] == '1')) {
-      final version = bindings.library
-          .lookupFunction<Uint32 Function(), int Function()>(
-            'gd_companion_version',
-          )();
-      if (version != 1) {
-        throw StateError('Incompatible GPUI companion extension');
-      }
-      final run = bindings.library.lookupFunction<_PublishNative, _PublishDart>(
+    if (args.$4) {
+      final run = bindings.library.lookupFunction<_RunNative, _RunDart>(
         'gd_run_companion',
       );
-      final bytes = utf8.encode(
-        jsonEncode({
-          'launcher': resolveLauncher(libraryPath: args.$1),
-          'library': args.$1,
-        }),
-      );
-      final buffer = calloc<Uint8>(bytes.length);
-      try {
-        buffer.asTypedList(bytes.length).setAll(0, bytes);
-        args.$3.send(run(handle, buffer, bytes.length));
-      } finally {
-        calloc.free(buffer);
-      }
+      args.$3.send(run(handle));
     } else {
       args.$3.send(bindings.run(handle));
     }

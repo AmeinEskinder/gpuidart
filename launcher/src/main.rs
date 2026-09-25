@@ -19,20 +19,20 @@ fn run(args: Vec<OsString>) -> Result<u8, String> {
             let version: libloading::Symbol<unsafe extern "C" fn() -> u32> = library
                 .get(b"gd_companion_version")
                 .map_err(|e| e.to_string())?;
-            if version() != 1 {
+            if version() != 2 {
                 return Err("incompatible companion extension; rebuild the package".into());
             }
-            let fd = args[2]
-                .to_str()
-                .and_then(|s| s.parse::<i32>().ok())
-                .filter(|fd| *fd >= 3)
-                .ok_or("invalid companion descriptor")?;
-            let main: libloading::Symbol<unsafe extern "C" fn(i32) -> i32> = library
+            let path = args[2].to_str().ok_or("invalid companion socket path")?;
+            let main: libloading::Symbol<unsafe extern "C" fn(*const u8, usize) -> i32> = library
                 .get(b"gd_ui_process_main")
                 .map_err(|e| e.to_string())?;
-            Ok(if main(fd) == 0 { 0 } else { 1 })
+            Ok(if main(path.as_ptr(), path.len()) == 0 {
+                0
+            } else {
+                1
+            })
         },
-        _ => Err("expected --session PROGRAM [ARGS...] or --ui-host LIBRARY FD".into()),
+        _ => Err("expected --session PROGRAM [ARGS...] or --ui-host LIBRARY SOCKET".into()),
     }
 }
 

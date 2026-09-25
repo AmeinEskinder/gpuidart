@@ -41,11 +41,7 @@ pub extern "C" fn gd_abi_version() -> u32 {
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn gd_companion_version() -> u32 {
-    1
-}
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn gd_run_companion(host: *mut Host, _: *const u8, _: usize) -> i32 {
-    unsafe { gd_run(host) }
+    0
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_create(

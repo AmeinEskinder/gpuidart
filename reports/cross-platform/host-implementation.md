@@ -85,7 +85,7 @@ The macOS clock probe now
 identifies an Apple Paravirtual Metal device; this is a VM renderer, with no
 physical GPU or presentation claim. Raw probe logs are in `hosted-clock/`.
 
-## macOS companion implementation
+## Initial macOS companion implementation, superseded by version 2
 
 The production bridge now starts the native helper through lifecycle extension
 version 1. The helper loads the same SDK dylib and calls its UI entry on the
@@ -111,3 +111,36 @@ The added Unix frame, child failure, shutdown and trace-merge tests and full
 macOS SDK jobs are pending hosted execution. The helper is also selectable on
 Linux with the internal `GPUIDART_COMPANION=1` test switch. Linux's default remains
 the verified direct FFI runner. No new performance claim is made.
+
+## Child ownership correction
+
+Source `7ad3b02` passed Linux's headless and window jobs, but macOS passed only
+the headless job. Four real-window tests failed with `No child processes` when
+Rust attempted to reap the native child. See
+[36188527731](https://github.com/AmeinEskinder/gpuidart/actions/runs/36188527731)
+and the retained `macos-companion-v1-failure/` logs. The 100k and reload checks
+were not reached. This failure invalidates the first implementation's lifecycle
+acceptance, despite the isolated companion probe having passed.
+
+[Dart's macOS process implementation](https://dart.googlesource.com/sdk/+/refs/heads/main/runtime/bin/process_macos.cc)
+uses `wait` for any child, then looks up the child's registered Dart exit pipe.
+This source behavior explains the observed competing native waiter. Version 2
+makes Dart the sole owner of child creation, exit status and termination. Rust
+prepares a socket in a private mode-0700 directory, then runs bounded transport.
+The helper connects by path, so it does not depend on Dart inheriting arbitrary
+file descriptors. Host disposal waits for both transport return and Dart's
+reported child exit. A four-second Dart timer kills a stuck closing companion;
+the child has an independent four-second exit fallback after parent EOF.
+
+New live-library regression cases cover an early child exit and a child that
+never connects, including reaping. Native tests cover frame bounds and private
+socket cleanup. The previous Rust-spawn tests were removed with that launch
+path. Windows passed analysis, 12 native tests and 27 Dart tests after the fix;
+the revised Unix lifecycle still requires hosted verification.
+
+Runtime diagnostics now enumerate loaded images and per-process memory/CPU on
+Unix. Linux reports executable file mappings and `smaps_rollup` counters; macOS
+reports dyld images, resident size and physical footprint. These probes run only
+when requested and will support package verification and separate process
+baselines. They do not turn startup or publication timestamps into presentation
+measurements.

@@ -22,6 +22,9 @@ impl Counters {
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub(crate) enum Request {
+    Runtime {
+        request: u64,
+    },
     Cell {
         request: u64,
         dataset: String,
@@ -49,7 +52,8 @@ pub(crate) enum Request {
 impl Request {
     pub(crate) fn id(&self) -> u64 {
         match self {
-            Self::Cell { request, .. }
+            Self::Runtime { request }
+            | Self::Cell { request, .. }
             | Self::Inspect { request }
             | Self::Repaint { request, .. }
             | Self::Prepare { request, .. } => *request,
@@ -65,6 +69,10 @@ pub(crate) fn handle(
     cx: &mut App,
 ) {
     match request {
+        Request::Runtime { request } => events.emit(Event::Diagnostic {
+            request,
+            data: crate::runtime_info::read(),
+        }),
         Request::Cell {
             request,
             dataset,

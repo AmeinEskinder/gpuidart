@@ -12,11 +12,18 @@ class OwnedProcess {
 
   static Future<OwnedProcess> start(
     String executable,
-    List<String> arguments,
-  ) async => OwnedProcess._(
+    List<String> arguments, {
+    String? launcherPath,
+    String? workingDirectory,
+    Map<String, String>? environment,
+    bool includeParentEnvironment = true,
+  }) async => OwnedProcess._(
     await Process.start(
-      Platform.isWindows ? executable : resolveLauncher(),
+      Platform.isWindows ? executable : launcherPath ?? resolveLauncher(),
       Platform.isWindows ? arguments : ['--session', executable, ...arguments],
+      workingDirectory: workingDirectory,
+      environment: environment,
+      includeParentEnvironment: includeParentEnvironment,
     ),
   );
 

@@ -1,14 +1,11 @@
-//! Private Unix socket transport. The public JSON and ordinary FFI ABI stay unchanged.
+//! Private Unix socket transport. Dart owns child creation, exit status and reaping.
 use crate::{Command, Events, Host, boundary, datasets::Initial, protocol::Event, trace::Trace};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{
     io::{self, Read, Write},
     net::Shutdown,
-    os::{
-        fd::{AsRawFd, FromRawFd},
-        unix::{net::UnixStream, process::CommandExt},
-    },
-    process::{Command as ProcessCommand, Stdio},
+    os::unix::net::{UnixListener, UnixStream},
+    path::PathBuf,
     sync::{
         Arc, Mutex,
         atomic::{AtomicBool, Ordering},
@@ -16,13 +13,50 @@ use std::{
     time::{Duration, Instant},
 };
 
-// Serialization can add default window fields and the internal command envelope.
 const MAX_FRAME: usize = crate::protocol::MAX_MESSAGE_BYTES + 4096;
 
-#[derive(Deserialize)]
-struct Launch {
-    launcher: String,
-    library: String,
+pub(crate) struct Endpoint {
+    directory: PathBuf,
+    listener: UnixListener,
+}
+impl Endpoint {
+    fn new() -> Result<Self, String> {
+        let mut template = b"/tmp/gpuidart-XXXXXX\0".to_vec();
+        let path = unsafe { libc::mkdtemp(template.as_mut_ptr().cast()) };
+        if path.is_null() {
+            return Err(io::Error::last_os_error().to_string());
+        }
+        let directory = PathBuf::from(
+            unsafe { std::ffi::CStr::from_ptr(path) }
+                .to_string_lossy()
+                .into_owned(),
+        );
+        let listener = match UnixListener::bind(directory.join("ui.sock")) {
+            Ok(listener) => listener,
+            Err(error) => {
+                let _ = std::fs::remove_dir(&directory);
+                return Err(error.to_string());
+            }
+        };
+        let endpoint = Self {
+            directory,
+            listener,
+        };
+        endpoint
+            .listener
+            .set_nonblocking(true)
+            .map_err(|e| e.to_string())?;
+        Ok(endpoint)
+    }
+    fn path(&self) -> PathBuf {
+        self.directory.join("ui.sock")
+    }
+}
+impl Drop for Endpoint {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(self.path());
+        let _ = std::fs::remove_dir(&self.directory);
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -31,7 +65,6 @@ struct Start {
     initial: Initial,
     trace_limit: usize,
 }
-
 #[derive(Serialize, Deserialize)]
 enum Reply {
     Event(Event),
@@ -49,7 +82,6 @@ fn write_frame(writer: &mut impl Write, value: &impl Serialize) -> Result<(), St
         .and_then(|_| writer.flush())
         .map_err(|e| e.to_string())
 }
-
 fn read_frame<T: DeserializeOwned>(reader: &mut impl Read) -> Result<T, String> {
     let mut length = [0; 4];
     reader
@@ -68,88 +100,94 @@ fn read_frame<T: DeserializeOwned>(reader: &mut impl Read) -> Result<T, String> 
 
 #[unsafe(no_mangle)]
 pub extern "C" fn gd_companion_version() -> u32 {
-    1
+    2
 }
 
-/// Blocking companion runner. Paths are UTF-8 JSON, copied before launching.
-/// Keep host and its event callback alive until this function returns.
+/// Prepare once before starting the child. Free returned socket path with gd_free_event.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn gd_run_companion(host: *const Host, bytes: *const u8, len: usize) -> i32 {
-    boundary::call(-4, || {
-        if bytes.is_null() || len > 16 * 1024 {
-            return -1;
-        }
-        let Ok(launch) =
-            serde_json::from_slice::<Launch>(unsafe { std::slice::from_raw_parts(bytes, len) })
-        else {
-            return -2;
+pub unsafe extern "C" fn gd_companion_prepare(host: *const Host, length: *mut usize) -> *mut u8 {
+    if length.is_null() {
+        return std::ptr::null_mut();
+    }
+    unsafe {
+        *length = 0;
+    }
+    boundary::call(std::ptr::null_mut(), || {
+        let Some(host) = (unsafe { host.as_ref() }) else {
+            return std::ptr::null_mut();
         };
-        unsafe { crate::run_with(host, |host, initial| run(host, initial, launch)) }
+        let mut stored = host.companion.lock().unwrap_or_else(|e| e.into_inner());
+        if stored.is_some() || host.running.load(Ordering::Acquire) {
+            return std::ptr::null_mut();
+        }
+        let Ok(endpoint) = Endpoint::new() else {
+            return std::ptr::null_mut();
+        };
+        let bytes = endpoint
+            .path()
+            .to_string_lossy()
+            .as_bytes()
+            .to_vec()
+            .into_boxed_slice();
+        *stored = Some(endpoint);
+        unsafe {
+            *length = bytes.len();
+        }
+        Box::into_raw(bytes).cast()
     })
 }
 
-fn run(host: &Host, initial: Initial, launch: Launch) -> Result<(), String> {
-    let (mut socket, child_socket) = UnixStream::pair().map_err(|e| e.to_string())?;
-    let fd = child_socket.as_raw_fd();
-    let mut command = ProcessCommand::new(&launch.launcher);
-    command
-        .args(["--ui-host", &launch.library, &fd.to_string()])
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::inherit());
-    unsafe {
-        command.pre_exec(move || {
-            // Only async-signal-safe libc calls are allowed before exec.
-            if libc::fcntl(fd, libc::F_SETFD, 0) == -1 {
-                return Err(io::Error::last_os_error());
-            }
-            Ok(())
-        });
+/// Dart reports child exit before releasing the host, including startup failures.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_companion_exited(host: *const Host) {
+    if let Some(host) = unsafe { host.as_ref() } {
+        host.companion_exited.store(true, Ordering::Release);
     }
-    let mut child = command
-        .spawn()
-        .map_err(|e| format!("Start native companion: {e}"))?;
-    drop(child_socket);
-    let trace_limit = host.trace.begin_remote();
-    let abort = AtomicBool::new(false);
-    // Clones are created before worker startup; all paths below reap the child.
-    let writer_socket = socket.try_clone();
-    let watch_socket = socket.try_clone();
-    let (Ok(mut writer_socket), Ok(watch_socket)) = (writer_socket, watch_socket) else {
-        let _ = child.kill();
-        let _ = child.wait();
-        return Err("Clone companion socket".into());
-    };
-    std::thread::scope(|scope| {
-        let watch = scope.spawn(|| {
-            let mut closing = None;
-            loop {
-                match child.try_wait() {
-                    Ok(Some(status)) => return Ok(status),
-                    Err(error) => {
-                        let _ = child.kill();
-                        let _ = child.wait();
-                        let _ = watch_socket.shutdown(Shutdown::Both);
-                        return Err(error.to_string());
-                    }
-                    _ => {}
+}
+
+/// Blocking transport runner. Dart must also wait for its Process.exitCode before destroy.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_run_companion(host: *const Host) -> i32 {
+    boundary::call(-4, || unsafe {
+        crate::run_with(host, |host, initial| {
+            let endpoint = host
+                .companion
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .take()
+                .ok_or("Companion was not prepared")?;
+            let started = Instant::now();
+            let socket = loop {
+                match endpoint.listener.accept() {
+                    Ok((socket, _)) => break socket,
+                    Err(error) if error.kind() == io::ErrorKind::WouldBlock => {}
+                    Err(error) => return Err(error.to_string()),
                 }
-                if host.sender.is_closed() { closing.get_or_insert_with(Instant::now); }
-                if abort.load(Ordering::Acquire) || closing.is_some_and(|t: Instant| t.elapsed() >= Duration::from_secs(4)) {
-                    let _ = child.kill();
-                    let _ = child.wait();
-                    let _ = watch_socket.shutdown(Shutdown::Both);
-                    return Err("Native companion was terminated after transport failure or shutdown deadline".into());
+                if host.companion_exited.load(Ordering::Acquire)
+                    || host.sender.is_closed()
+                    || started.elapsed() > Duration::from_secs(30)
+                {
+                    return Err(
+                        "Native companion did not connect before exit or startup deadline".into(),
+                    );
                 }
                 std::thread::sleep(Duration::from_millis(10));
-            }
-        });
+            };
+            run(host, initial, socket)
+        })
+    })
+}
+
+fn run(host: &Host, initial: Initial, mut socket: UnixStream) -> Result<(), String> {
+    let trace_limit = host.trace.begin_remote();
+    let mut writer_socket = socket.try_clone().map_err(|e| e.to_string())?;
+    std::thread::scope(|scope| {
         let writer = scope.spawn(|| {
             let result = (|| {
                 write_frame(
                     &mut writer_socket,
                     &Start {
-                        version: 1,
+                        version: 2,
                         initial,
                         trace_limit,
                     },
@@ -170,9 +208,8 @@ fn run(host: &Host, initial: Initial, launch: Launch) -> Result<(), String> {
             })();
             let _ = writer_socket.shutdown(Shutdown::Write);
             if result.is_err() {
-                host.sender.close();
+                let _ = writer_socket.shutdown(Shutdown::Both);
             }
-            result
         });
         let mut remote_error = None;
         let result = loop {
@@ -189,33 +226,28 @@ fn run(host: &Host, initial: Initial, launch: Launch) -> Result<(), String> {
             }
         };
         host.sender.close();
-        if result.is_err() {
-            abort.store(true, Ordering::Release);
-        }
-        let status = watch.join().map_err(|_| "Companion monitor panicked")?;
-        let _written = writer.join().map_err(|_| "Companion writer panicked")?;
+        let _ = socket.shutdown(Shutdown::Both);
+        writer.join().map_err(|_| "Companion writer panicked")?;
         result?;
-        let status = status?;
-        if !status.success() {
-            return Err(format!("Native companion exited with {status}"));
-        }
         remote_error.map_or(Ok(()), Err)
     })
 }
 
-/// Consumes an inherited, connected socket. Called once by the native launcher
-/// on its process main thread; macOS AppKit can terminate this process on quit.
+/// Called by the native executable on its main thread. The path is copied before use.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn gd_ui_process_main(fd: i32) -> i32 {
+pub unsafe extern "C" fn gd_ui_process_main(bytes: *const u8, len: usize) -> i32 {
     boundary::call(-4, || {
-        if fd < 3 {
+        if bytes.is_null() || len > 1024 {
             return -1;
         }
-        let socket = unsafe { UnixStream::from_raw_fd(fd) };
-        if unsafe { libc::fcntl(fd, libc::F_SETFD, libc::FD_CLOEXEC) } == -1 {
+        let Ok(path) = std::str::from_utf8(unsafe { std::slice::from_raw_parts(bytes, len) })
+        else {
             return -1;
-        }
-        match child_main(socket) {
+        };
+        match UnixStream::connect(path)
+            .map_err(|e| e.to_string())
+            .and_then(child_main)
+        {
             Ok(()) => 0,
             Err(error) => {
                 eprintln!("GPUI companion: {error}");
@@ -224,14 +256,13 @@ pub unsafe extern "C" fn gd_ui_process_main(fd: i32) -> i32 {
         }
     })
 }
-
 fn child_main(mut socket: UnixStream) -> Result<(), String> {
     let Start {
         version,
         initial,
         trace_limit,
     } = read_frame(&mut socket)?;
-    if version != 1 {
+    if version != 2 {
         return Err("Incompatible companion transport".into());
     }
     let trace = Arc::new(Trace::default());
@@ -295,6 +326,11 @@ fn child_main(mut socket: UnixStream) -> Result<(), String> {
             let command = match read_frame::<Command>(&mut socket) {
                 Ok(command) => command,
                 Err(message) => {
+                    // Parent death must also terminate a wedged UI process.
+                    std::thread::spawn(|| {
+                        std::thread::sleep(Duration::from_secs(4));
+                        std::process::exit(70);
+                    });
                     reader_events.emit(Event::Error { message });
                     break;
                 }
@@ -331,33 +367,14 @@ fn child_main(mut socket: UnixStream) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::os::unix::fs::PermissionsExt;
-
-    fn initial() -> Initial {
-        Initial::parse(br#"{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}"#).unwrap()
-    }
-
-    fn host() -> Host {
-        let (sender, receiver) = async_channel::bounded(64);
-        Host {
-            initial: Mutex::new(None),
-            sender,
-            receiver,
-            events: Events(Arc::new(|_| {})),
-            running: AtomicBool::new(false),
-            trace: Arc::new(Trace::default()),
-            panic_on_run: AtomicBool::new(false),
-        }
-    }
-
     #[test]
-    fn frames_preserve_commands_and_reject_oversize_truncation_and_bad_json() {
+    fn frames_reject_oversize_truncation_and_bad_json() {
         let mut bytes = Vec::new();
-        write_frame(&mut bytes, &Command::Publish(initial().snapshot)).unwrap();
-        let Command::Publish(snapshot) = read_frame(&mut bytes.as_slice()).unwrap() else {
-            panic!("wrong command")
-        };
-        assert_eq!(snapshot.revision, 1);
+        write_frame(&mut bytes, &Command::Close).unwrap();
+        assert!(matches!(
+            read_frame::<Command>(&mut bytes.as_slice()).unwrap(),
+            Command::Close
+        ));
         for bytes in [
             vec![0, 0, 0, 0],
             ((MAX_FRAME + 1) as u32).to_le_bytes().to_vec(),
@@ -367,51 +384,17 @@ mod tests {
             assert!(read_frame::<Command>(&mut bytes.as_slice()).is_err());
         }
     }
-
     #[test]
-    fn companion_start_failure_early_exit_and_hung_close_are_bounded_and_reaped() {
-        assert!(
-            run(
-                &host(),
-                initial(),
-                Launch {
-                    launcher: "/gpuidart-missing-launcher".into(),
-                    library: "unused".into()
-                }
-            )
-            .unwrap_err()
-            .contains("Start native companion")
-        );
-        let directory =
-            std::env::temp_dir().join(format!("gpuidart-companion-test-{}", std::process::id()));
-        std::fs::create_dir(&directory).unwrap();
-        let script = directory.join("launcher");
-        let pid_path = directory.join("pid");
-        let launch = || Launch {
-            launcher: script.to_string_lossy().into(),
-            library: pid_path.to_string_lossy().into(),
-        };
-        std::fs::write(&script, "#!/bin/sh\nexit 7\n").unwrap();
-        std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o700)).unwrap();
-        let start = Instant::now();
-        assert!(run(&host(), initial(), launch()).is_err());
-        assert!(start.elapsed() < Duration::from_secs(2));
-        std::fs::write(&script, "#!/bin/sh\necho $$ > \"$2\"\nexec /bin/sleep 60\n").unwrap();
-        let host = host();
-        host.sender.close();
-        let start = Instant::now();
-        assert!(run(&host, initial(), launch()).is_err());
-        assert!(start.elapsed() < Duration::from_secs(6));
-        let pid = std::fs::read_to_string(&pid_path)
-            .unwrap()
-            .trim()
-            .parse::<i32>()
-            .unwrap();
+    fn endpoint_is_private_and_removed_when_ownership_ends() {
+        use std::os::unix::fs::PermissionsExt;
+        let endpoint = Endpoint::new().unwrap();
+        let directory = endpoint.directory.clone();
         assert_eq!(
-            unsafe { libc::kill(pid, 0) },
-            -1,
-            "companion must be reaped before returning"
+            std::fs::metadata(&directory).unwrap().permissions().mode() & 0o777,
+            0o700
         );
-        std::fs::remove_dir_all(directory).unwrap();
+        assert!(endpoint.path().exists());
+        drop(endpoint);
+        assert!(!directory.exists());
     }
 }

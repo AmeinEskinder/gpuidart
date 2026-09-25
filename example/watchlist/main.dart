@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:gpuidart/src/runtime_info.dart';
+
 import 'package:gpuidart/development.dart';
 import 'package:gpuidart/gpuidart.dart';
 import 'package:gpuidart/tracing.dart';
@@ -174,6 +176,11 @@ Future<void> main(List<String> args) async {
           'passed': true,
           'rows': app.dataset.rowCount,
           'native': state,
+          if (Platform.isLinux || Platform.isMacOS)
+            'runtime': {
+              'application': readRuntimeInfo(),
+              'ui': await host.diagnose('runtime'),
+            },
           'metrics': host.metrics.read(),
         }),
       );

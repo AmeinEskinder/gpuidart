@@ -10,6 +10,7 @@ mod diagnostics;
 #[path = "../../benchmarks/native/src/input_trace.rs"]
 mod input_trace;
 mod protocol;
+mod runtime_info;
 mod trace;
 mod ui;
 
@@ -111,6 +112,10 @@ pub struct Host {
     events: Events,
     running: AtomicBool,
     trace: Arc<trace::Trace>,
+    #[cfg(unix)]
+    companion: Mutex<Option<companion::Endpoint>>,
+    #[cfg(unix)]
+    companion_exited: AtomicBool,
     #[cfg(test)]
     panic_on_run: AtomicBool,
 }
@@ -168,6 +173,10 @@ unsafe fn create(bytes: *const u8, len: usize, callback: EventCallback) -> *mut 
         events,
         running: AtomicBool::new(false),
         trace,
+        #[cfg(unix)]
+        companion: Mutex::new(None),
+        #[cfg(unix)]
+        companion_exited: AtomicBool::new(false),
         #[cfg(test)]
         panic_on_run: AtomicBool::new(false),
     });

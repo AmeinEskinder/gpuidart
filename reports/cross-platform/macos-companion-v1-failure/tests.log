@@ -1,0 +1,26 @@
+
+::group::✅ Passing tests
+✅ test/native_host_test.dart: an incompatible native library fails before host creation
+::endgroup::
+::group::❌ test/native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it (failed)
+Bad state: No child processes (os error 10)
+package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+::endgroup::
+::group::❌ test/native_host_test.dart: failed initial descriptions release resources for another host (failed)
+Bad state: No child processes (os error 10)
+package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+::endgroup::
+::group::❌ test/native_trace_test.dart: real requests correlate across the bridge without recording UI values (failed)
+Bad state: No child processes (os error 10)
+package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+::endgroup::
+::group::❌ test/native_trace_test.dart: overflow is explicit and does not prevent updates or shutdown (failed)
+Bad state: No child processes (os error 10)
+package:gpuidart/src/host.dart 633:24  GpuiHost._receive
+package:gpuidart/src/host.dart         GpuiHost.open.<fn>
+::endgroup::
+
+::error::1 test passed, 4 failed.
