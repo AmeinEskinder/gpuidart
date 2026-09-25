@@ -32,7 +32,26 @@ typedef _RunNative = Int32 Function(Pointer<Void>);
 typedef _RunDart = int Function(Pointer<Void>);
 
 final class _Bindings {
-  _Bindings(String path) : library = DynamicLibrary.open(path);
+  _Bindings(String path) : library = DynamicLibrary.open(path) {
+    const expected = 1;
+    int version;
+    try {
+      version = library.lookupFunction<Uint32 Function(), int Function()>(
+        'gd_abi_version',
+      )();
+    } on ArgumentError {
+      throw StateError(
+        'Incompatible GPUI-Dart library at $path: missing ABI version. '
+        'Rebuild the native DLL with this SDK.',
+      );
+    }
+    if (version != expected) {
+      throw StateError(
+        'Incompatible GPUI-Dart library at $path: ABI $version, expected $expected. '
+        'Rebuild the native DLL with this SDK.',
+      );
+    }
+  }
   final DynamicLibrary library;
   late final create = library.lookupFunction<_CreateNative, _CreateDart>(
     'gd_create',
@@ -186,24 +205,29 @@ final class GpuiHost {
       }
       host._datasets[dataset.id] = dataset;
     }
+    final initial = <String, Object>{
+      'snapshot': {'revision': 1, 'root': root.toJson()},
+      'datasets': datasets.map((dataset) => dataset._upload()).toList(),
+      'window': windowDescription,
+    };
     host._callback = NativeCallable<_EventNative>.listener(host._receive);
-    host._handle = host._withMessage(
-      {
-        'snapshot': {'revision': 1, 'root': root.toJson()},
-        'datasets': datasets.map((dataset) => dataset._upload()).toList(),
-        'window': windowDescription,
-      },
-      'initial',
-      (bytes, length) =>
-          host._bindings.create(bytes, length, host._callback.nativeFunction),
-    );
-    if (host._handle == nullptr) {
+    try {
+      host._handle = host._withMessage(
+        initial,
+        'initial',
+        (bytes, length) =>
+            host._bindings.create(bytes, length, host._callback.nativeFunction),
+      );
+      if (host._handle == nullptr) {
+        throw ArgumentError(
+          'Native host creation rejected. Check node IDs and dataset schema; '
+          'only one GPUI host may be active in a process.',
+        );
+      }
+    } catch (_) {
       host._callback.close();
       await host._events.close();
-      throw ArgumentError(
-        'Invalid initial UI description or incompatible native DLL. '
-        'Check node IDs and dataset schema, and build the DLL from the same SDK revision.',
-      );
+      rethrow;
     }
     for (final dataset in datasets) {
       dataset._owner = host;
@@ -232,7 +256,12 @@ final class GpuiHost {
     host.done = host._finish(nativeDone, result);
     // Register a handler immediately; callers also receive the original future.
     unawaited(host.done.catchError((Object _) {}));
-    await host._ready.future;
+    try {
+      await host._ready.future;
+    } catch (_) {
+      await host.done.catchError((Object _) {});
+      rethrow;
+    }
     return host;
   }
 
@@ -479,7 +508,8 @@ final class GpuiHost {
       result.close();
       _bindings.destroy(_handle);
       _callback.close();
-      await _events.close();
+      // A paused event subscriber must not keep native shutdown pending.
+      unawaited(_events.close());
     }
   }
 }

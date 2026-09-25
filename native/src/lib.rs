@@ -59,6 +59,14 @@ pub struct Host {
 
 type EventCallback = extern "C" fn(*mut u8, usize);
 
+static HOST_ACTIVE: AtomicBool = AtomicBool::new(false);
+
+/// Version of the FFI functions and JSON protocol required by this library.
+#[unsafe(no_mangle)]
+pub extern "C" fn gd_abi_version() -> u32 {
+    1
+}
+
 /// `bytes` must remain readable for `len` bytes until this call returns.
 /// The callback receives an owned allocation, released with `gd_free_event`.
 /// Keep the callback alive until `gd_run` returns and `closed` is delivered.
@@ -74,6 +82,12 @@ pub unsafe extern "C" fn gd_create(
     let Ok(initial) = datasets::Initial::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
         return std::ptr::null_mut();
     };
+    if HOST_ACTIVE
+        .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+        .is_err()
+    {
+        return std::ptr::null_mut();
+    }
     let events = Events(Arc::new(move |event| {
         let bytes = serde_json::to_vec(&event)
             .expect("event serialization")
@@ -175,6 +189,7 @@ pub unsafe extern "C" fn gd_destroy(host: *mut Host) {
             "destroy while running"
         );
         drop(unsafe { Box::from_raw(host) });
+        HOST_ACTIVE.store(false, Ordering::Release);
     }
 }
 

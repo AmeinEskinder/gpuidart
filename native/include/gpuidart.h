@@ -12,6 +12,11 @@ typedef void (*GdEventCallback)(uint8_t *bytes, size_t len);
 
 /* Returns NULL for an invalid initial description. Input bytes are copied.
    Callback owns each delivered buffer and must call gd_free_event exactly once. */
+/* FFI and JSON protocol revision. Check before calling any host function. */
+uint32_t gd_abi_version(void);
+
+/* Returns NULL for an invalid description or when a host is already active.
+   gd_destroy releases the process-wide host reservation. */
 GdHost *gd_create(const uint8_t *bytes, size_t len, GdEventCallback callback);
 
 /* Blocks on the calling thread until the native application closes. Call once. */

@@ -2,6 +2,8 @@
 
 GPUI-Dart 0.1 is a Windows x64 SDK preview. DPI setup requires Windows 10 version 1803 or later, using Microsoft's [process DPI-context API](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiawarenesscontextforprocess); this build was tested on Windows 11. The supported application model is one host and one window per process, immutable UI descriptions, and retained native controls and datasets. The JSON wire format and diagnostic commands are internal. Build the Dart package and native DLL from the same revision.
 
+The Dart host checks native ABI/protocol version 1 before creating a host. Older DLLs without a version export, and DLLs with a different version, fail with a rebuild instruction. The native library rejects a second active host, including callers from another Dart isolate. Await the previous host's done Future before opening another one.
+
 ## Run the representative screen
 
 From the repository root:
@@ -70,7 +72,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | publish / rebuild | Completes after native application of a snapshot. This is not a presentation fence. |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. See [datasets](datasets.md). |
-| close / done | Close is idempotent; done completes after the native UI loop and callback teardown finish. |
+| close / done | Close is idempotent; done completes after the native UI loop and callback teardown finish. Pending publications settle with success or an error. A paused event subscriber does not delay done; it receives queued events and stream completion when resumed. |
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.
 

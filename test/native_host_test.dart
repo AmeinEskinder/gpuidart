@@ -2,11 +2,29 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:gpuidart/gpuidart.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('an incompatible DLL fails before host creation', () async {
+    await expectLater(
+      GpuiHost.open(
+        const UiText('text', 'Hello'),
+        libraryPath:
+            '${Platform.environment['SystemRoot']}/System32/kernel32.dll',
+      ),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          contains('Incompatible GPUI-Dart library'),
+        ),
+      ),
+    );
+  });
+
   test(
     'Dart timers publish to the real GPUI loop and shutdown releases it',
     () async {
@@ -25,6 +43,10 @@ void main() {
       final events = <GpuiEvent>[];
       final subscription = host.events.listen(events.add);
       try {
+        await expectLater(
+          GpuiHost.open(const UiText('second', 'Unsupported second host')),
+          throwsArgumentError,
+        );
         final firstUpdate = Completer<void>();
         Timer(const Duration(milliseconds: 100), () async {
           try {
@@ -83,6 +105,12 @@ void main() {
           containsAllInOrder([2, 4]),
         );
         expect(events.where((e) => e.type == 'error'), isEmpty);
+        final paused = host.events.listen((_) {})..pause();
+        try {
+          await host.close().timeout(const Duration(seconds: 3));
+        } finally {
+          await paused.cancel();
+        }
       } finally {
         await host.close().timeout(const Duration(seconds: 10));
         await subscription.cancel();
@@ -91,5 +119,59 @@ void main() {
       expect(() => host.publish(build('After close')), throwsStateError);
     },
     timeout: const Timeout(Duration(seconds: 45)),
+  );
+
+  test(
+    'failed initial descriptions release resources for another host',
+    () async {
+      final dataset = TableDataset(
+        'reusable',
+        columns: ['Value'],
+        rows: [
+          ['one'],
+        ],
+      );
+      await expectLater(
+        GpuiHost.open(
+          const UiTable('table', dataset: 'missing'),
+          datasets: [dataset],
+        ),
+        throwsArgumentError,
+      );
+      final host = await GpuiHost.open(
+        const UiTable('table', dataset: 'reusable'),
+        datasets: [dataset],
+      );
+      try {
+        final updates = <Future<bool>>[];
+        for (var i = 0; i < 256; i++) {
+          try {
+            updates.add(
+              host
+                  .publish(UiText('text', '$i'))
+                  .then((_) => true, onError: (Object _) => false),
+            );
+          } on StateError {
+            // Submission can reject when the bounded native queue is full.
+            updates.add(Future.value(false));
+          }
+        }
+        final edit = host
+            .editDataset(dataset, [const CellEdit(0, 0, 'two')])
+            .then((_) => true, onError: (Object _) => false);
+        await host.close().timeout(const Duration(seconds: 10));
+        final results = await Future.wait([...updates, edit])
+            .timeout(const Duration(seconds: 3));
+        expect(results.length, 257);
+        expect(results, contains(true));
+        await expectLater(
+          host.editDataset(dataset, [const CellEdit(0, 0, 'three')]),
+          throwsStateError,
+        );
+      } finally {
+        await host.close();
+      }
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
   );
 }
