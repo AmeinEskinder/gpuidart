@@ -292,7 +292,7 @@ impl DartView {
                 self.counters
                     .data_cells_written
                     .set(self.counters.data_cells_written.get() + work.cells_written as u64);
-                #[cfg(feature = "benchmark-trace")]
+                #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
                 crate::input_trace::record_sequence(
                     "update_applied",
                     None,
@@ -445,12 +445,12 @@ impl DartView {
                     .primary()
                     .label(label.clone())
                     .on_click(move |_, _, _| {
-                        #[cfg(feature = "benchmark-trace")]
+                        #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
                         crate::input_trace::record("native_click_handler", json!({"id": event_id}));
                         events.emit(Event::Click {
                             revision,
                             id: event_id.clone(),
-                            #[cfg(feature = "benchmark-trace")]
+                            #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
                             debug_input_sequence: crate::input_trace::sequence(),
                         });
                     })
@@ -507,7 +507,7 @@ impl Render for DartView {
             .text_color(cx.theme().foreground)
             .child(div().w_full().p_5().child(content))
             .vertical_scrollbar(&self.scroll);
-        #[cfg(feature = "benchmark-trace")]
+        #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
         let root = crate::input_trace::observe(root);
         root
     }
@@ -519,6 +519,17 @@ pub(crate) fn run(
     events: Events,
     trace: Arc<crate::trace::Trace>,
 ) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    if gpui::guess_compositor() != "X11" {
+        return Err("This host currently supports Linux X11. Set DISPLAY and launch with WAYLAND_DISPLAY and ZED_HEADLESS unset. Native Wayland is not verified.".into());
+    }
+    #[cfg(target_os = "macos")]
+    if unsafe { libc::pthread_main_np() } != 1 {
+        return Err(
+            "GPUI on macOS requires the process main thread; use the native companion launcher."
+                .into(),
+        );
+    }
     let initial_key = crate::trace::Key {
         operation: "initial",
         request: 1,

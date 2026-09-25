@@ -121,7 +121,7 @@ pub enum Event {
     Click {
         revision: u64,
         id: String,
-        #[cfg(feature = "benchmark-trace")]
+        #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
         debug_input_sequence: Option<u64>,
     },
     Input {

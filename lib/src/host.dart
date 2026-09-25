@@ -10,6 +10,8 @@ import 'nodes.dart';
 import 'metrics.dart';
 import 'window_options.dart';
 import 'windows.dart';
+import 'platform.dart';
+import 'trace_clock.dart';
 import 'native_event.dart';
 
 part 'dataset.dart';
@@ -113,7 +115,7 @@ final class TableSelection {
   final int? row;
 }
 
-/// Experimental Windows host. The Dart application isolate keeps its event loop.
+/// Experimental desktop host. The Dart application isolate keeps its event loop.
 /// A dedicated isolate blocks inside GPUI's native UI loop.
 final class GpuiHost {
   GpuiHost._(
@@ -209,9 +211,10 @@ final class GpuiHost {
     Duration shutdownTimeout = const Duration(seconds: 10),
     GpuiTrace? trace,
   }) async {
-    if (!Platform.isWindows) {
+    if (!Platform.isWindows && !Platform.isLinux) {
       throw UnsupportedError(
-        'The initial native host currently supports Windows.',
+        'This host currently supports Windows and Linux X11. '
+        'The macOS companion lifecycle is not installed yet.',
       );
     }
     if (requestTimeout <= Duration.zero || shutdownTimeout <= Duration.zero) {
@@ -220,18 +223,8 @@ final class GpuiHost {
     final windowDescription = window.toJson();
     trace?._claim();
     trace?._point('dart.request', 'initial', 1);
-    configureWindowsDpi();
-    final sibling = File.fromUri(
-      File(Platform.resolvedExecutable).parent.uri.resolve('gpuidart.dll'),
-    );
-    final path = File(
-      libraryPath ??
-          Platform.environment['GPUIDART_LIBRARY'] ??
-          (const bool.fromEnvironment('gpuidart.packaged') ||
-                  sibling.existsSync()
-              ? sibling.path
-              : 'target/debug/gpuidart.dll'),
-    ).absolute.path;
+    if (Platform.isWindows) configureWindowsDpi();
+    final path = resolveNativeLibrary(libraryPath);
     final bindings = trace == null
         ? _Bindings(path)
         : trace._measure('dart.library', 'initial', 1, () => _Bindings(path));

@@ -1,0 +1,102 @@
+name: Linux SDK checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-sdk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  headless:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - name: Install pinned-backend dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: linux-sdk-headless-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            linux-sdk-headless-
+            platform-probe-Linux-X64-
+      - name: Pin toolchain and dependencies
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+      - name: Native and headless Dart contracts
+        run: dart run tool/check.dart --headless
+
+  window:
+    needs: headless
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - name: Install X11 and Mesa software rendering
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers vulkan-tools xvfb openbox xdotool
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: linux-sdk-window-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            linux-sdk-window-
+            linux-sdk-headless-
+      - name: Build native host and AOT trace application
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+          cargo build --locked -p gpuidart
+          mkdir -p build/linux-window .cache
+          dart compile exe tool/capture_publication_trace.dart -o build/linux-window/capture
+          cp target/debug/libgpuidart.so build/linux-window/
+      - name: Real-window lifecycle, 100k JIT/AOT traces and code reload
+        run: |
+          xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'CHECKS'
+          unset WAYLAND_DISPLAY ZED_HEADLESS
+          openbox >build/linux-window/openbox.log 2>&1 &
+          vulkaninfo --summary >build/linux-window/vulkan.log 2>&1
+          dart test --tags live-window 2>&1 | tee build/linux-window/tests.log
+          dart run tool/capture_publication_trace.dart build/linux-window/jit-trace.json 2>&1 | tee build/linux-window/jit.log
+          build/linux-window/capture build/linux-window/aot-trace.json 2>&1 | tee build/linux-window/aot.log
+          dart run tool/verify_watchlist_reload.dart --report=build/linux-window/reload.json --trace --prepare-delay-ms=0 2>&1 | tee build/linux-window/reload.log
+          CHECKS
+      - name: Retain successful and failed window evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: linux-x11-window
+          path: build/linux-window/
+          retention-days: 14

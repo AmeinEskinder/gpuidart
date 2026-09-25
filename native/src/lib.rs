@@ -1,9 +1,10 @@
 #[cfg(test)]
 mod allocations;
 mod boundary;
+mod clock;
 mod datasets;
 mod diagnostics;
-#[cfg(feature = "benchmark-trace")]
+#[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
 #[path = "../../benchmarks/native/src/input_trace.rs"]
 mod input_trace;
 mod protocol;
@@ -58,7 +59,7 @@ impl Command {
     }
 }
 
-fn submit(host: &Host, command: Command, len: usize, started: Option<trace::Stamp>) -> i32 {
+fn submit(host: &Host, command: Command, len: usize, started: Option<clock::Stamp>) -> i32 {
     let key = command.trace_key();
     host.trace
         .complete("native.parse", key, started, Some(len), None);
@@ -174,7 +175,7 @@ unsafe fn create(bytes: *const u8, len: usize, callback: EventCallback) -> *mut 
     Box::into_raw(host)
 }
 
-/// Blocking Windows UI loop. Call exactly once, on a dedicated Dart isolate.
+/// Blocking Windows/Linux UI loop. Call exactly once, on a dedicated Dart isolate.
 /// `host` must remain live until the function returns.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_run(host: *const Host) -> i32 {
@@ -224,7 +225,7 @@ unsafe fn run(host: *const Host) -> i32 {
         }
         Err(message) => (Err(format!("Native UI panic: {message}")), -4),
     };
-    #[cfg(feature = "benchmark-trace")]
+    #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
     input_trace::save();
     host.sender.close();
     if let Err(message) = &result {

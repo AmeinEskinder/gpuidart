@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "os": "linux",
+  "before": {
+    "applied": {
+      "label": "probe-before",
+      "input_entity": "EntityId(1v1)",
+      "input_value": "retained probe state",
+      "native_pid": 5883
+    },
+    "dart_pid": 5863,
+    "ticks": 24
+  },
+  "reload": {
+    "label": "probe-after",
+    "input_entity": "EntityId(1v1)",
+    "input_value": "retained probe state",
+    "native_pid": 5883
+  },
+  "after": {
+    "applied": {
+      "label": "probe-after",
+      "input_entity": "EntityId(1v1)",
+      "input_value": "retained probe state",
+      "native_pid": 5883
+    },
+    "dart_pid": 5863,
+    "ticks": 26
+  },
+  "invalid_source_rejected": true,
+  "after_invalid": {
+    "applied": {
+      "label": "probe-after",
+      "input_entity": "EntityId(1v1)",
+      "input_value": "retained probe state",
+      "native_pid": 5883
+    },
+    "dart_pid": 5863,
+    "ticks": 27
+  },
+  "recovery": {
+    "label": "probe-after",
+    "input_entity": "EntityId(1v1)",
+    "input_value": "retained probe state",
+    "native_pid": 5883
+  },
+  "exit_code": 0
+}

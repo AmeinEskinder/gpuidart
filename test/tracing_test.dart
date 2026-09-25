@@ -1,8 +1,9 @@
-@TestOn('windows')
+@TestOn('windows || linux')
 library;
 
 import 'package:gpuidart/gpuidart.dart';
 import 'package:gpuidart/tracing.dart';
+import 'package:gpuidart/src/platform.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -35,7 +36,7 @@ void main() {
       final trace = GpuiTrace();
       Future<GpuiHost> open() => GpuiHost.open(
         const UiText('mode', 'normal'),
-        libraryPath: '.cache/fault_host.dll',
+        libraryPath: '.cache/${nativeLibraryName('fault_host')}',
         trace: trace,
       );
       await expectLater(

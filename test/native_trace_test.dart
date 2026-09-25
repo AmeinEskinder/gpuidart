@@ -1,8 +1,9 @@
-@TestOn('windows')
+@TestOn('windows || linux')
 @Tags(['live-window'])
 library;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gpuidart/gpuidart.dart';
 import 'package:gpuidart/tracing.dart';
@@ -88,7 +89,7 @@ void main() {
           final after = record(operation, request, stages[i]);
           expect(
             (after['start'] as int) - (before['start'] as int),
-            greaterThanOrEqualTo(-1),
+            greaterThanOrEqualTo(Platform.isWindows ? -1 : 0),
             reason: '${stages[i - 1]} -> ${stages[i]}',
           );
         }

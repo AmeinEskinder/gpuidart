@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: platform-probe-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   probe:
     strategy:
@@ -78,7 +82,21 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: platform-probe-${{ runner.os }}-${{ runner.arch }}
-          path: build/platform-probe/
+          path: |
+            build/platform-probe/*.json
+            build/platform-probe/*.log
+          retention-days: 14
+      - name: Retain runnable probe artifacts separately
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: platform-probe-binaries-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/platform-probe/gpuidart-platform-window
+            build/platform-probe/libgpuidart_platform_probe.dylib
+            build/platform-probe/libgpuidart_platform_probe.so
+            build/platform-probe/probe
+            build/platform-probe/companion
           retention-days: 14
       - name: Keep build cache even when a launch strategy fails
         if: always() && steps.cache.outputs.cache-hit != 'true'

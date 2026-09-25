@@ -1,4 +1,4 @@
-@TestOn('windows')
+@TestOn('windows || linux')
 library;
 
 import 'dart:async';
@@ -6,10 +6,11 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:gpuidart/gpuidart.dart';
+import 'package:gpuidart/src/platform.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final path = File('.cache/fault_host.dll').absolute.path;
+  final path = File('.cache/${nativeLibraryName('fault_host')}').absolute.path;
   late DynamicLibrary fixture;
   late int Function() allocated, freed, destroyed, earlyDestroy;
   setUpAll(() {

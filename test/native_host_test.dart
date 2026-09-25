@@ -1,4 +1,4 @@
-@TestOn('windows')
+@TestOn('windows || linux')
 @Tags(['live-window'])
 library;
 
@@ -9,12 +9,13 @@ import 'package:gpuidart/gpuidart.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('an incompatible DLL fails before host creation', () async {
+  test('an incompatible native library fails before host creation', () async {
     await expectLater(
       GpuiHost.open(
         const UiText('text', 'Hello'),
-        libraryPath:
-            '${Platform.environment['SystemRoot']}/System32/kernel32.dll',
+        libraryPath: Platform.isWindows
+            ? '${Platform.environment['SystemRoot']}/System32/kernel32.dll'
+            : '/lib/x86_64-linux-gnu/libc.so.6',
       ),
       throwsA(
         isA<StateError>().having(

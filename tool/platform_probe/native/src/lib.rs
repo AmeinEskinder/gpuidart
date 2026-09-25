@@ -93,7 +93,7 @@ impl Render for Probe {
         if count <= 3 || self.last_size != Some(window.viewport_size()) {
             report(
                 "render",
-                serde_json::json!({"count": count, "size": format!("{:?}", window.viewport_size()), "scale": window.scale_factor()}),
+                serde_json::json!({"count": count, "size": format!("{:?}", window.viewport_size()), "scale": window.scale_factor(), "gpu": window.gpu_specs()}),
             );
         }
         self.last_size = Some(window.viewport_size());

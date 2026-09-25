@@ -1,18 +1,17 @@
 part of 'host.dart';
 
-/// Bounded, opt-in tracing for one host attempt, using Windows QPC on both sides.
+/// Bounded, opt-in tracing for one host attempt, using the same OS clock on both sides.
 /// Export after [GpuiHost.done] for a finalized capture. No UI values are recorded.
 final class GpuiTrace {
   GpuiTrace({this.capacity = 4096}) {
     if (capacity < 1 || capacity > 8192) {
       throw RangeError.range(capacity, 1, 8192, 'capacity');
     }
-    if (!Platform.isWindows) throw UnsupportedError('Tracing requires Windows');
-    _clock = _TraceClock();
+    _clock = TraceClock();
   }
 
   final int capacity;
-  late final _TraceClock _clock;
+  late final TraceClock _clock;
   final _records = <_TraceRecord>[];
   List<_TraceRecord> _nativeRecords = [];
   int _dropped = 0;
@@ -71,6 +70,7 @@ final class GpuiTrace {
       final value = reader();
       final records = value['records'];
       if (value['schema'] != 1 ||
+          value['clock_failed'] == true ||
           value['limit'] != capacity ||
           value['dropped'] is! int ||
           (value['dropped'] as int) < 0 ||
@@ -178,7 +178,7 @@ final class GpuiTrace {
     );
   }
 
-  /// Chrome Trace JSON plus raw QPC records for stage correlation.
+  /// Chrome Trace JSON plus raw OS-clock records for stage correlation.
   /// Live exports can be incomplete. Inspect metadata before using measurements.
   Map<String, Object?> toJson() {
     _captureNative();
@@ -188,10 +188,15 @@ final class GpuiTrace {
     return {
       'schema': 1,
       'metadata': {
-        'clock': 'Windows QueryPerformanceCounter',
-        'origin_qpc': _clock.origin,
+        'clock': _clock.name,
+        'origin_ticks': _clock.origin,
+        if (Platform.isWindows) 'origin_qpc': _clock.origin,
         'frequency': _clock.frequency,
-        'cross_thread_order_uncertainty_ticks': 1,
+        'clock_epoch': _clock.epoch,
+        'suspend_behavior': _clock.suspendBehavior,
+        'resolution_ticks': _clock.resolutionTicks,
+        if (Platform.isWindows) 'cross_thread_order_uncertainty_ticks': 1,
+        if (!Platform.isWindows) 'ordering_uncertainty': 'Not independently calibrated; do not infer ordering from sub-resolution timestamp differences',
         'process_id': pid,
         'capacity_per_side': capacity,
         'dart_dropped': _dropped,
@@ -309,37 +314,6 @@ final class _TraceRecord {
     'status': ?status,
     'native_apply_us': ?nativeApplyUs,
   };
-}
-
-final class _TraceClock implements Finalizable {
-  _TraceClock() {
-    _finalizer.attach(this, _scratch.cast());
-    if (_frequency(_scratch) == 0 || _scratch.value <= 0) {
-      throw StateError('Windows QPC frequency is unavailable');
-    }
-    frequency = _scratch.value;
-    origin = now().$1;
-  }
-  static final _library = DynamicLibrary.open('kernel32.dll');
-  static final _counter = _library
-      .lookupFunction<
-        Int32 Function(Pointer<Int64>),
-        int Function(Pointer<Int64>)
-      >('QueryPerformanceCounter');
-  static final _frequency = _library
-      .lookupFunction<
-        Int32 Function(Pointer<Int64>),
-        int Function(Pointer<Int64>)
-      >('QueryPerformanceFrequency');
-  static final _thread = _library
-      .lookupFunction<Uint32 Function(), int Function()>('GetCurrentThreadId');
-  static final _finalizer = NativeFinalizer(calloc.nativeFree);
-  final _scratch = calloc<Int64>();
-  late final int frequency, origin;
-  (int, int) now() {
-    if (_counter(_scratch) == 0) throw StateError('Windows QPC is unavailable');
-    return (_scratch.value, _thread());
-  }
 }
 
 final class _NativeTraceBindings {

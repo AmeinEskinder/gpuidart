@@ -4,31 +4,12 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 
-#[link(name = "kernel32")]
-unsafe extern "system" {
-    fn QueryPerformanceCounter(value: *mut i64) -> i32;
-    fn GetCurrentThreadId() -> u32;
-}
+use crate::clock::Stamp;
 
 #[derive(Clone, Copy)]
 pub(crate) struct Key {
     pub operation: &'static str,
     pub request: u64,
-}
-
-#[derive(Clone, Copy)]
-pub(crate) struct Stamp {
-    qpc: i64,
-    thread: u32,
-}
-
-fn now() -> Stamp {
-    let mut qpc = 0;
-    unsafe { QueryPerformanceCounter(&mut qpc) };
-    Stamp {
-        qpc,
-        thread: unsafe { GetCurrentThreadId() },
-    }
 }
 
 #[derive(Clone, Serialize)]
@@ -38,7 +19,7 @@ struct Record {
     request: u64,
     start: i64,
     end: i64,
-    thread: u32,
+    thread: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
     bytes: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,6 +36,7 @@ struct Buffer {
 #[derive(Default)]
 pub(crate) struct Trace {
     enabled: AtomicBool,
+    clock_failed: AtomicBool,
     buffer: Mutex<Buffer>,
 }
 
@@ -75,7 +57,14 @@ impl Trace {
     }
 
     pub fn start(&self) -> Option<Stamp> {
-        self.enabled.load(Ordering::Relaxed).then(now)
+        if !self.enabled.load(Ordering::Relaxed) {
+            return None;
+        }
+        let stamp = crate::clock::now();
+        if stamp.is_none() {
+            self.clock_failed.store(true, Ordering::Relaxed);
+        }
+        stamp
     }
 
     pub fn complete(
@@ -86,14 +75,16 @@ impl Trace {
         bytes: Option<usize>,
         status: Option<i32>,
     ) {
-        if let Some(start) = start {
-            self.push(name, key, start, now().qpc, bytes, status);
+        if let Some(start) = start
+            && let Some(end) = self.start()
+        {
+            self.push(name, key, start, end.ticks, bytes, status);
         }
     }
 
     pub fn point(&self, name: &'static str, key: Key, bytes: Option<usize>, status: Option<i32>) {
         if let Some(stamp) = self.start() {
-            self.push(name, key, stamp, stamp.qpc, bytes, status);
+            self.push(name, key, stamp, stamp.ticks, bytes, status);
         }
     }
 
@@ -115,7 +106,7 @@ impl Trace {
             name,
             operation: key.operation,
             request: key.request,
-            start: start.qpc,
+            start: start.ticks,
             end,
             thread: start.thread,
             bytes,
@@ -137,7 +128,7 @@ impl Trace {
             (buffer.limit, buffer.dropped, buffer.records.clone())
         };
         serde_json::to_vec(
-            &serde_json::json!({"schema": 1, "limit": limit, "dropped": dropped, "records": records}),
+            &serde_json::json!({"schema": 1, "limit": limit, "dropped": dropped, "records": records, "clock_failed": self.clock_failed.load(Ordering::Relaxed)}),
         )
     }
 }

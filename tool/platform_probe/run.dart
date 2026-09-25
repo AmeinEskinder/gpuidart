@@ -145,6 +145,7 @@ Future<void> main(List<String> args) async {
       'SPDisplaysDataType',
     ]);
     await run('os', 'sw_vers', []);
+    await run('metal', 'swift', ['tool/platform_probe/metal.swift']);
   } else if (Platform.isLinux) {
     await run('os', 'uname', ['-a']);
     await run('vulkan', 'vulkaninfo', ['--summary']);

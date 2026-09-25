@@ -1,0 +1,191 @@
+{
+  "created_at": "2026-09-25T20:07:48.232147Z",
+  "os": "macos",
+  "os_version": "Version 15.7.9 (Build 24G830)",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"macos_arm64\"",
+  "display": null,
+  "wayland_display": null,
+  "results": [
+    {
+      "name": "source",
+      "executable": "git",
+      "arguments": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 66,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "rust",
+      "executable": "rustc",
+      "arguments": [
+        "-vV"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 94,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "hardware",
+      "executable": "system_profiler",
+      "arguments": [
+        "SPHardwareDataType",
+        "SPDisplaysDataType"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 893,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "os",
+      "executable": "sw_vers",
+      "arguments": [],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 21,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "rust-main",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+      "arguments": [],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 11971,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "rust-worker",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+      "arguments": [
+        "--worker"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 59,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": true
+    },
+    {
+      "name": "dart-jit",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "--enable-vm-service=0",
+        "tool/platform_probe/probe.dart",
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/libgpuidart_platform_probe.dylib"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 799,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": true
+    },
+    {
+      "name": "aot-compile",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "compile",
+        "exe",
+        "tool/platform_probe/probe.dart",
+        "-o",
+        "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/probe"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 2052,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "dart-aot",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/probe",
+      "arguments": [
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/libgpuidart_platform_probe.dylib"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 83,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": true
+    },
+    {
+      "name": "companion-jit",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "tool/platform_probe/companion.dart",
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 2763,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "companion-compile",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "compile",
+        "exe",
+        "tool/platform_probe/companion.dart",
+        "-o",
+        "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/companion"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 1494,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "companion-aot",
+      "executable": "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/companion",
+      "arguments": [
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 2410,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    },
+    {
+      "name": "companion-reload",
+      "executable": "/Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart",
+      "arguments": [
+        "tool/platform_probe/reload.dart",
+        "/Users/runner/work/gpuidart/gpuidart/target/debug/gpuidart-platform-window",
+        "/Users/runner/work/gpuidart/gpuidart/build/platform-probe/reload.json"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "error": null,
+      "elapsed_ms": 3626,
+      "input_driver_error": null,
+      "unsupported_non_main_thread": false
+    }
+  ],
+  "limits": "Probe only. No IME, clean-machine or presentation claim."
+}
