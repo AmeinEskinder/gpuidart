@@ -20,6 +20,11 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
         assert_eq!(gd_run(null()), -1);
         let host = gd_create(initial.as_ptr(), initial.len(), event);
         assert!(!host.is_null());
+        assert_eq!(trace::gd_trace_version(), 1);
+        assert_eq!(trace::gd_trace_enable(null(), 8), -1);
+        assert_eq!(trace::gd_trace_enable(host, 0), -2);
+        assert_eq!(trace::gd_trace_enable(host, 256), 0);
+        assert_eq!(trace::gd_trace_enable(host, 256), -2);
         assert!(gd_create(initial.as_ptr(), initial.len(), event).is_null());
         assert_eq!(gd_publish(host, null(), 0), -1);
         assert_eq!(
@@ -33,6 +38,22 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
             assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), 0);
         }
         assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), -3);
+        let mut length = 0;
+        assert!(trace::gd_trace_read(host, std::ptr::null_mut()).is_null());
+        assert!(trace::gd_trace_read(null(), &mut length).is_null());
+        assert_eq!(length, 0);
+        let bytes = trace::gd_trace_read(host, &mut length);
+        assert!(!bytes.is_null());
+        let capture: Value = serde_json::from_slice(slice::from_raw_parts(bytes, length)).unwrap();
+        gd_free_event(bytes, length);
+        let records = capture["records"].as_array().unwrap();
+        assert!(records.iter().any(|record| record["status"] == -3));
+        assert!(
+            records
+                .iter()
+                .any(|record| record["name"] == "native.parse" && record["request"] == 2)
+        );
+        assert_eq!(capture["dropped"], 0);
         gd_close(host);
         assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), -3);
         gd_destroy(host);

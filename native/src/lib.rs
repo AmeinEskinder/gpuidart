@@ -7,6 +7,7 @@ mod diagnostics;
 #[path = "../../benchmarks/native/src/input_trace.rs"]
 mod input_trace;
 mod protocol;
+mod trace;
 mod ui;
 
 use async_channel::{Receiver, Sender};
@@ -34,6 +35,43 @@ pub(crate) enum Command {
     Close,
 }
 
+impl Command {
+    fn trace_key(&self) -> trace::Key {
+        match self {
+            Self::Publish(snapshot) => trace::Key {
+                operation: "snapshot",
+                request: snapshot.revision,
+            },
+            Self::Dataset(update, _) => trace::Key {
+                operation: "dataset",
+                request: update.request,
+            },
+            Self::Diagnostic(request) => trace::Key {
+                operation: "diagnostic",
+                request: request.id(),
+            },
+            Self::Close => trace::Key {
+                operation: "close",
+                request: 0,
+            },
+        }
+    }
+}
+
+fn submit(host: &Host, command: Command, len: usize, started: Option<trace::Stamp>) -> i32 {
+    let key = command.trace_key();
+    host.trace
+        .complete("native.parse", key, started, Some(len), None);
+    host.trace.point("native.enqueue_attempt", key, None, None);
+    let status = match host.sender.try_send(command) {
+        Ok(()) => 0,
+        Err(_) => -3,
+    };
+    host.trace
+        .point("native.submit_return", key, None, Some(status));
+    status
+}
+
 /// Queues an opt-in diagnostic request. Input is copied before returning.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_diagnostic(host: *const Host, bytes: *const u8, len: usize) -> i32 {
@@ -45,13 +83,21 @@ unsafe fn diagnostic(host: *const Host, bytes: *const u8, len: usize) -> i32 {
         return -1;
     }
     let host = unsafe { &*host };
+    let started = host.trace.start();
     let Ok(request) = serde_json::from_slice(unsafe { slice::from_raw_parts(bytes, len) }) else {
+        host.trace.complete(
+            "native.parse",
+            trace::Key {
+                operation: "diagnostic",
+                request: 0,
+            },
+            started,
+            Some(len),
+            Some(-2),
+        );
         return -2;
     };
-    match host.sender.try_send(Command::Diagnostic(request)) {
-        Ok(()) => 0,
-        Err(_) => -3,
-    }
+    submit(host, Command::Diagnostic(request), len, started)
 }
 
 pub struct Host {
@@ -60,6 +106,7 @@ pub struct Host {
     receiver: Receiver<Command>,
     events: Events,
     running: AtomicBool,
+    trace: Arc<trace::Trace>,
     #[cfg(test)]
     panic_on_run: AtomicBool,
 }
@@ -95,11 +142,16 @@ unsafe fn create(bytes: *const u8, len: usize, callback: EventCallback) -> *mut 
     let Ok(initial) = datasets::Initial::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
         return std::ptr::null_mut();
     };
+    let trace = Arc::new(trace::Trace::default());
+    let event_trace = trace.clone();
     let events = Events(Arc::new(move |event| {
         let bytes = serde_json::to_vec(&event)
             .expect("event serialization")
             .into_boxed_slice();
         let len = bytes.len();
+        if let Some(key) = event.trace_key() {
+            event_trace.point("native.emit", key, Some(len), None);
+        }
         callback(Box::into_raw(bytes).cast(), len);
     }));
     let (sender, receiver) = async_channel::bounded(64);
@@ -109,6 +161,7 @@ unsafe fn create(bytes: *const u8, len: usize, callback: EventCallback) -> *mut 
         receiver,
         events,
         running: AtomicBool::new(false),
+        trace,
         #[cfg(test)]
         panic_on_run: AtomicBool::new(false),
     });
@@ -157,7 +210,12 @@ unsafe fn run(host: *const Host) -> i32 {
             !host.panic_on_run.load(Ordering::Acquire),
             "injected UI failure"
         );
-        ui::run(initial, host.receiver.clone(), host.events.clone())
+        ui::run(
+            initial,
+            host.receiver.clone(),
+            host.events.clone(),
+            host.trace.clone(),
+        )
     });
     let (result, status) = match result {
         Ok(result) => {
@@ -191,12 +249,22 @@ unsafe fn publish(host: *const Host, bytes: *const u8, len: usize) -> i32 {
         return -1;
     }
     let host = unsafe { &*host };
+    let started = host.trace.start();
     match Snapshot::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
-        Ok(snapshot) => match host.sender.try_send(Command::Publish(snapshot)) {
-            Ok(()) => 0,
-            Err(_) => -3,
-        },
-        Err(_) => -2,
+        Ok(snapshot) => submit(host, Command::Publish(snapshot), len, started),
+        Err(_) => {
+            host.trace.complete(
+                "native.parse",
+                trace::Key {
+                    operation: "snapshot",
+                    request: 0,
+                },
+                started,
+                Some(len),
+                Some(-2),
+            );
+            -2
+        }
     }
 }
 
@@ -210,18 +278,24 @@ unsafe fn dataset(host: *const Host, bytes: *const u8, len: usize) -> i32 {
     if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
         return -1;
     }
+    let host = unsafe { &*host };
+    let started = host.trace.start();
     let timer = Instant::now();
     let Ok(update) = datasets::Update::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
+        host.trace.complete(
+            "native.parse",
+            trace::Key {
+                operation: "dataset",
+                request: 0,
+            },
+            started,
+            Some(len),
+            Some(-2),
+        );
         return -2;
     };
     let parse_us = timer.elapsed().as_micros() as u64;
-    match unsafe { &*host }
-        .sender
-        .try_send(Command::Dataset(update, parse_us))
-    {
-        Ok(()) => 0,
-        Err(_) => -3,
-    }
+    submit(host, Command::Dataset(update, parse_us), len, started)
 }
 
 /// Close is delivered even when the command queue is full.
@@ -235,6 +309,15 @@ unsafe fn close(host: *const Host) {
         return;
     }
     let host = unsafe { &*host };
+    host.trace.point(
+        "native.close",
+        trace::Key {
+            operation: "close",
+            request: 0,
+        },
+        None,
+        None,
+    );
     let _ = host.sender.try_send(Command::Close);
     host.sender.close();
 }

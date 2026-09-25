@@ -46,6 +46,17 @@ pub(crate) enum Request {
     },
 }
 
+impl Request {
+    pub(crate) fn id(&self) -> u64 {
+        match self {
+            Self::Cell { request, .. }
+            | Self::Inspect { request }
+            | Self::Repaint { request, .. }
+            | Self::Prepare { request, .. } => *request,
+        }
+    }
+}
+
 pub(crate) fn handle(
     request: Request,
     view: &Entity<DartView>,

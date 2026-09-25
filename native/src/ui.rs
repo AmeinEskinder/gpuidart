@@ -517,7 +517,13 @@ pub(crate) fn run(
     initial: Initial,
     receiver: Receiver<Command>,
     events: Events,
+    trace: Arc<crate::trace::Trace>,
 ) -> Result<(), String> {
+    let initial_key = crate::trace::Key {
+        operation: "initial",
+        request: 1,
+    };
+    trace.point("native.run", initial_key, None, None);
     let failure = Arc::new(std::sync::Mutex::new(None));
     let result = failure.clone();
     gpui_kit::application()
@@ -561,6 +567,7 @@ pub(crate) fn run(
                 cx.quit();
                 return;
             }
+            trace.point("native.window_opened", initial_key, None, None);
             cx.on_window_closed(|cx, _| {
                 if cx.windows().is_empty() {
                     cx.quit();
@@ -574,6 +581,8 @@ pub(crate) fn run(
             });
             cx.spawn(async move |cx| {
                 while let Ok(command) = receiver.recv().await {
+                    trace.point("native.dequeue", command.trace_key(), None, None);
+                    let _dispatch = trace.dispatch(command.trace_key());
                     match command {
                         Command::Publish(snapshot) => {
                             if handle
