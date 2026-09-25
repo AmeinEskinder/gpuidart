@@ -8,9 +8,9 @@ pub(crate) fn read() -> Value {
         let mut usage: libc::rusage = std::mem::zeroed();
         if libc::getrusage(libc::RUSAGE_SELF, &mut usage) == 0 {
             value["cpu_user_us"] =
-                json!(usage.ru_utime.tv_sec * 1_000_000 + usage.ru_utime.tv_usec);
+                json!(usage.ru_utime.tv_sec * 1_000_000 + i64::from(usage.ru_utime.tv_usec));
             value["cpu_system_us"] =
-                json!(usage.ru_stime.tv_sec * 1_000_000 + usage.ru_stime.tv_usec);
+                json!(usage.ru_stime.tv_sec * 1_000_000 + i64::from(usage.ru_stime.tv_usec));
         }
     }
     #[cfg(target_os = "linux")]

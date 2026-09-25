@@ -1,0 +1,82 @@
+﻿headless	Native and headless Dart contracts	﻿2026-09-25T21:14:17.4204810Z ##[group]Run dart run tool/check.dart --headless
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4205430Z [36;1mdart run tool/check.dart --headless[0m
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4284670Z shell: /bin/bash -e {0}
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4285070Z env:
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4285330Z   CARGO_INCREMENTAL: 0
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4285620Z   CARGO_BUILD_JOBS: 2
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4285900Z   RUST_BACKTRACE: 1
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4286190Z   DART_HOME: /Users/runner/hostedtoolcache/dart/3.13.4/arm64
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4286580Z   PUB_CACHE: /Users/runner/.pub-cache
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.4286830Z ##[endgroup]
+headless	Native and headless Dart contracts	2026-09-25T21:14:17.9084730Z > cargo fmt --all --check
+headless	Native and headless Dart contracts	2026-09-25T21:14:18.0896840Z > rustfmt --edition 2024 --check test/fixtures/fault_host.rs
+headless	Native and headless Dart contracts	2026-09-25T21:14:18.1519730Z > cargo test --locked -p gpuidart
+headless	Native and headless Dart contracts	2026-09-25T21:14:19.3336410Z    Compiling gpuidart v0.1.0 (/Users/runner/work/gpuidart/gpuidart/native)
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0554530Z warning: use of deprecated function `libc::mach_absolute_time`: Use the `mach2` crate instead
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0556010Z   --> native/src/clock.rs:36:35
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0556720Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0557180Z 36 |             ticks: unsafe { libc::mach_absolute_time() } as i64,
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0557670Z    |                                   ^^^^^^^^^^^^^^^^^^
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0558020Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0558510Z    = note: `#[warn(deprecated)]` on by default
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0558780Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0559110Z warning: use of deprecated function `libc::_dyld_image_count`: Use the `mach2` crate instead
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0559640Z   --> native/src/runtime_info.rs:58:27
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0560080Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0560330Z 58 |         for i in 0..libc::_dyld_image_count() {
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0560750Z    |                           ^^^^^^^^^^^^^^^^^
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0560960Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0561260Z warning: use of deprecated function `libc::_dyld_get_image_name`: Use the `mach2` crate instead
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0561850Z   --> native/src/runtime_info.rs:59:30
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0562260Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0562630Z 59 |             let name = libc::_dyld_get_image_name(i);
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0563540Z    |                              ^^^^^^^^^^^^^^^^^^^^
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.0563850Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6386420Z error[E0308]: mismatched types
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6387270Z   --> native/src/runtime_info.rs:11:59
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6387810Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6388310Z 11 |                 json!(usage.ru_utime.tv_sec * 1_000_000 + usage.ru_utime.tv_usec);
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6389230Z    |                                                           ^^^^^^^^^^^^^^^^^^^^^^ expected `i64`, found `i32`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6389680Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6964520Z error[E0277]: cannot add `i32` to `i64`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6972410Z   --> native/src/runtime_info.rs:11:57
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6973210Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6973720Z 11 |                 json!(usage.ru_utime.tv_sec * 1_000_000 + usage.ru_utime.tv_usec);
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6986740Z    |                                                         ^ no implementation for `i64 + i32`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6987400Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6987880Z    = help: the trait `Add<i32>` is not implemented for `i64`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.6989170Z    = help: the following other types implement trait `Add<Rhs>`:
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7034600Z              `&i64` implements `Add<i64>`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7035170Z              `&i64` implements `Add`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7035810Z              `i64` implements `Add<&i64>`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7036350Z              `i64` implements `Add<zerocopy::byteorder::I64<O>>`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7036890Z              `i64` implements `Add`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7071340Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7071970Z error[E0308]: mismatched types
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7073040Z   --> native/src/runtime_info.rs:13:59
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7073420Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7073900Z 13 |                 json!(usage.ru_stime.tv_sec * 1_000_000 + usage.ru_stime.tv_usec);
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7074610Z    |                                                           ^^^^^^^^^^^^^^^^^^^^^^ expected `i64`, found `i32`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7076100Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7076370Z error[E0277]: cannot add `i32` to `i64`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7076840Z   --> native/src/runtime_info.rs:13:57
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7077220Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7077670Z 13 |                 json!(usage.ru_stime.tv_sec * 1_000_000 + usage.ru_stime.tv_usec);
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7078470Z    |                                                         ^ no implementation for `i64 + i32`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7079010Z    |
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7079520Z    = help: the trait `Add<i32>` is not implemented for `i64`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7080170Z    = help: the following other types implement trait `Add<Rhs>`:
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7080850Z              `&i64` implements `Add<i64>`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7081220Z              `&i64` implements `Add`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7082110Z              `i64` implements `Add<&i64>`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7082590Z              `i64` implements `Add<zerocopy::byteorder::I64<O>>`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7084070Z              `i64` implements `Add`
+headless	Native and headless Dart contracts	2026-09-25T21:14:23.7084450Z 
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2322310Z Some errors have detailed explanations: E0277, E0308.
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2339320Z For more information about an error, try `rustc --explain E0277`.
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2359850Z warning: `gpuidart` (lib) generated 3 warnings (1 duplicate)
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2360600Z error: could not compile `gpuidart` (lib) due to 4 previous errors; 3 warnings emitted
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2361460Z warning: build failed, waiting for other jobs to finish...
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2749760Z warning: `gpuidart` (lib test) generated 3 warnings (2 duplicates)
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.2750980Z error: could not compile `gpuidart` (lib test) due to 4 previous errors; 3 warnings emitted
+headless	Native and headless Dart contracts	2026-09-25T21:14:24.3275710Z ##[error]Process completed with exit code 101.
