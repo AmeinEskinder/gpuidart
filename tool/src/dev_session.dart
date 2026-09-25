@@ -5,11 +5,14 @@ import 'dart:io';
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
+import 'owned_process.dart';
+
 class DevSession {
-  DevSession._(this.process, this.service, this.isolateId, this.directory) {
+  DevSession._(this._owned, this.service, this.isolateId, this.directory) {
     unawaited(process.exitCode.then((_) => _exited = true));
   }
-  final Process process;
+  final OwnedProcess _owned;
+  Process get process => _owned.process;
   final VmService service;
   final String isolateId;
   final Directory directory;
@@ -23,13 +26,20 @@ class DevSession {
   }) async {
     final directory = await Directory.systemTemp.createTemp('gpuidart-vm-');
     final serviceInfo = File.fromUri(directory.uri.resolve('service.json'));
-    final process = await Process.start(Platform.resolvedExecutable, [
-      '--enable-vm-service=0',
-      '--write-service-info=${serviceInfo.path}',
-      '--packages=${File('.dart_tool/package_config.json').absolute.path}',
-      entry,
-      ...arguments,
-    ]);
+    late final OwnedProcess owned;
+    try {
+      owned = await OwnedProcess.start(Platform.resolvedExecutable, [
+        '--enable-vm-service=0',
+        '--write-service-info=${serviceInfo.path}',
+        '--packages=${File('.dart_tool/package_config.json').absolute.path}',
+        entry,
+        ...arguments,
+      ]);
+    } catch (_) {
+      await removeSessionDirectory(directory);
+      rethrow;
+    }
+    final process = owned.process;
     process.stdout.listen(stdout.add);
     process.stderr.listen(stderr.add);
     int? exitStatus;
@@ -65,7 +75,7 @@ class DevSession {
               .timeout(remaining());
           if (isolate.extensionRPCs?.contains('ext.gpuidart.reassemble') ??
               false) {
-            return DevSession._(process, service, ref.id!, directory);
+            return DevSession._(owned, service, ref.id!, directory);
           }
         }
         await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -75,7 +85,7 @@ class DevSession {
       );
     } catch (error) {
       final startupExitStatus = exitStatus;
-      await stopProcessTree(process);
+      await owned.stop();
       await service?.dispose();
       await removeSessionDirectory(directory);
       if (error is TimeoutException) {
@@ -125,12 +135,14 @@ class DevSession {
         await process.exitCode.timeout(
           const Duration(seconds: 10),
           onTimeout: () async {
-            await stopProcessTree(process);
+            await _owned.stop();
             return process.exitCode;
           },
         );
       }
     } finally {
+      // A normally exited Dart process may still have native descendants.
+      if (!Platform.isWindows) await _owned.stop();
       await service.dispose();
       await removeSessionDirectory(directory);
     }
@@ -171,16 +183,6 @@ Future<Uri> waitForVmServiceUri(
   throw StateError(
     'VM service did not publish a complete URI before the startup deadline',
   );
-}
-
-Future<void> stopProcessTree(Process process) async {
-  if (Platform.isWindows) {
-    // dart.exe can have a dartvm.exe child that owns the native window.
-    await Process.run('taskkill.exe', ['/PID', '${process.pid}', '/T', '/F']);
-  } else {
-    process.kill();
-  }
-  await process.exitCode.timeout(const Duration(seconds: 10));
 }
 
 Future<void> removeSessionDirectory(Directory directory) async {

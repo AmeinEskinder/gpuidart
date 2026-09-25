@@ -22,3 +22,27 @@ String resolveNativeLibrary(String? supplied) {
             : 'target/debug/$name'),
   ).absolute.path;
 }
+
+String resolveLauncher({String? libraryPath}) {
+  final name = Platform.isWindows
+      ? 'gpuidart-launcher.exe'
+      : 'gpuidart-launcher';
+  final candidates = [
+    if (Platform.environment['GPUIDART_LAUNCHER'] case final String supplied)
+      supplied
+    else ...[
+      if (libraryPath != null)
+        File.fromUri(File(libraryPath).parent.uri.resolve(name)).path,
+      File.fromUri(File(Platform.resolvedExecutable).parent.uri.resolve(name))
+          .path,
+      'target/debug/$name',
+    ],
+  ];
+  for (final path in candidates) {
+    if (File(path).existsSync()) return File(path).absolute.path;
+  }
+  throw StateError(
+    'GPUI launcher is missing. Build cargo build -p gpuidart-launcher, '
+    'or include $name beside the packaged library.',
+  );
+}

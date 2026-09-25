@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "initial": {
+    "signal": 7,
+    "pid": 13609
+  },
+  "before": {
+    "pid": 13609,
+    "callbacks": [
+      1,
+      7,
+      7
+    ],
+    "signal": 7
+  },
+  "reload": {
+    "signal": 8,
+    "pid": 13609
+  },
+  "after": {
+    "pid": 13609,
+    "callbacks": [
+      1,
+      7,
+      7,
+      8
+    ],
+    "signal": 8
+  },
+  "invalid_source_rejected": true,
+  "recovery": {
+    "signal": 8,
+    "pid": 13609
+  },
+  "exit_code": 0
+}

@@ -43,8 +43,13 @@ added because `system_profiler` did not identify a display device on the VM.
 
 Windows verification before the implementation commit passed 12 native and 27
 Dart tests, formatting and analysis. The portable headless runner also passed
-the same 12 native tests and 22 applicable Dart tests. Linux SDK execution is
-pending its first hosted run. No shipped Windows candidate was replaced.
+the same 12 native tests and 22 applicable Dart tests. Linux SDK execution passed
+in [36186548153](https://github.com/AmeinEskinder/gpuidart/actions/runs/36186548153):
+12 native tests, 22 headless Dart tests and five real-window Dart tests, plus the
+100k JIT/AOT trace workload and actual watchlist reload. The renderer is X11 on
+Xvfb with Mesa software Vulkan. Windows hosted checks passed at the same source,
+`0893240`, in [36186548065](https://github.com/AmeinEskinder/gpuidart/actions/runs/36186548065).
+No shipped Windows candidate was replaced.
 
 The initial edit had one Rust import visibility error and three Dart formatting
 lints. Those were corrected before the checks above. The dependency pin and
@@ -59,3 +64,21 @@ frequency adjustments. [Apple's Mach clock documentation](https://developer.appl
 defines absolute uptime ticks excluding sleep; [the timebase documentation](https://developer.apple.com/library/archive/qa/qa1398/_index.html)
 describes conversion. This is documented clock behavior. No sleep/resume or
 physical presentation experiment has been performed by these checks.
+
+## Owned Unix development sessions
+
+The small `gpuidart-launcher` executable creates a new Unix session with
+`setsid`, then replaces itself with Dart. Development teardown sends TERM to
+that owned process group, waits at most two seconds, then sends KILL. It also
+cleans descendants after the Dart parent exits and handles failure before
+session creation. Windows retains `taskkill /T /F`.
+
+The launcher has a separate, version-checked entry for the upcoming macOS UI
+companion. It loads the SDK library dynamically so the helper does not include
+a second statically linked GPUI copy.
+
+Windows analysis and 22 headless Dart tests passed after this change. The two
+new Unix checks exercise a descendant that ignores TERM after its parent exits,
+and a failed exec. Their hosted results are pending. The macOS clock probe now
+identifies an Apple Paravirtual Metal device; this is a VM renderer, with no
+physical GPU or presentation claim. Raw probe logs are in `hosted-clock/`.

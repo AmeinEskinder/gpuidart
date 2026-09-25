@@ -78,7 +78,7 @@ jobs:
         run: |
           rustup show active-toolchain
           dart pub get --enforce-lockfile
-          cargo build --locked -p gpuidart
+          cargo build --locked -p gpuidart -p gpuidart-launcher
           mkdir -p build/linux-window .cache
           dart compile exe tool/capture_publication_trace.dart -o build/linux-window/capture
           cp target/debug/libgpuidart.so build/linux-window/

@@ -55,10 +55,12 @@ jobs:
             ~/.cargo/git
             target
           key: platform-probe-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            platform-probe-${{ runner.os }}-${{ runner.arch }}-
       - name: Build isolated pinned-backend probe
         run: |
           mkdir -p build/platform-probe
-          cargo build --locked -p gpuidart-platform-probe 2>&1 | tee build/platform-probe/build.log
+          cargo build --locked -p gpuidart-platform-probe -p gpuidart-launcher 2>&1 | tee build/platform-probe/build.log
           cp target/debug/gpuidart-platform-window build/platform-probe/
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             cp target/debug/libgpuidart_platform_probe.dylib build/platform-probe/

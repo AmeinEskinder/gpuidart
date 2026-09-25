@@ -26,6 +26,7 @@ Future<void> main(List<String> args) async {
     'test/fixtures/fault_host.rs',
   ]);
   await run('cargo', ['test', '--locked', '-p', 'gpuidart']);
+  await run('cargo', ['build', '--locked', '-p', 'gpuidart-launcher']);
   if (!headless) await run('cargo', ['build', '--locked', '-p', 'gpuidart']);
   await run(Platform.resolvedExecutable, [
     'format',
