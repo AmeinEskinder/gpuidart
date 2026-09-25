@@ -1,0 +1,74 @@
+{
+  "source": "7690c74c2dee0758ab89178c405352e04bc7ff18",
+  "os": "Version 15.7.9 (Build 24G830)",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"macos_arm64\"",
+  "runs": [
+    {
+      "mode": "jit",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 483119.4166666667,
+        "records_constructed": 521275.25,
+        "host_ready": 1445637.0416666667,
+        "verified_draw_ack": 1580747.0
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 26642.791666666668,
+        "records_constructed": 44658.5,
+        "host_ready": 248096.0,
+        "verified_draw_ack": 383454.7083333333
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 26487.208333333332,
+        "records_constructed": 48539.0,
+        "host_ready": 451030.5833333333,
+        "verified_draw_ack": 593310.375
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 738042.0,
+        "records_constructed": 773531.0833333334,
+        "host_ready": 1189821.8333333333,
+        "verified_draw_ack": 1345320.0
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 500065.2916666667,
+        "records_constructed": 557479.2083333334,
+        "host_ready": 940715.5833333334,
+        "verified_draw_ack": 1106446.125
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 61764.291666666664,
+        "records_constructed": 97049.375,
+        "host_ready": 394009.2083333333,
+        "verified_draw_ack": 533702.75
+      }
+    }
+  ],
+  "scope": "Three instrumented repetitions per mode on one runner. Shared OS-clock stage boundaries. No input-to-present or cross-platform hardware-normalized comparison."
+}

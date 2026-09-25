@@ -41,3 +41,10 @@ Latest verified Windows source: `f56bea1`,
 The same 12 native/22 headless Dart checks passed. Local reload additionally
 checks native process identity; Unix native-window results are recorded under
 cross-platform acceptance.
+
+Latest verified implementation: `7690c74`,
+[run 36193687122](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687122),
+passed 12 native tests, 22 headless Dart tests and analysis. The matching macOS,
+Linux and Unix package jobs passed too; their distinct scopes and remaining
+human/clean-machine gates are recorded in
+[cross-platform status](../cross-platform/status.md).

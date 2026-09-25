@@ -138,3 +138,32 @@ checks file hashes, signatures, actual loaded images and application behavior;
 it labels static inspection as recorded at build time. Default mode reruns the
 inspection tools. A hosted check with an invalid `DEVELOPER_DIR` is being added
 to prove that this mode does not invoke `otool`. It is not a clean-Mac claim.
+
+## Runtime-only and scale follow-up at `7690c74`
+
+[Run 36193689853](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193689853)
+passed both package jobs. [Raw follow-up records](packages-7690c74/) retain the
+new artifacts, repeated baselines and Linux container verification separately
+from the first baseline series above.
+
+The macOS runtime-only verifier passed while `xcrun --find otool` failed with an
+invalid `DEVELOPER_DIR`. No machine-wide tool setting changed. Hashes, ad-hoc
+signatures, actual library loading and the self-test still passed. Static
+dependencies were explicitly labeled as inspected at build time. This closes
+the verifier's dependency on developer tools in that mode, while a clean Mac
+without installed tools remains a separate environment check.
+
+The X11 display probe passed at 100% and 125%, including OS-requested resizing.
+It compares the native logical viewport against `xdotool` client geometry.
+At 125%, 960×720 logical became 1200×900 physical, then 800×600 became 1000×750.
+The scale came from the pinned backend's `GPUI_X11_SCALE_FACTOR` override under
+Xvfb; it does not establish physical monitor or compositor scaling behavior.
+
+| Current evaluation artifact | Archive bytes | Installed payload bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| macOS ARM64 | 13,530,171 | 37,081,380 | `570f9394406840a64a8149bdb03005ab4a4532a42b3169e844196b11491e1a7b` |
+| Linux x64 | 23,637,345 | 72,282,256 | `d8ae256197dc61c96692d7fb38dd42838959931e5ef450d186df3ae48d25b0a9` |
+
+Downloaded artifacts in `build/unix-evaluation-packages-7690c74/` match these
+hashes. Both manifests report clean source at `7690c74`. The size includes the
+standalone verifier and documentation, and excludes system prerequisites.

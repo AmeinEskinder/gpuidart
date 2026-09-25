@@ -28,6 +28,13 @@ home directory, an unrelated working directory and a restricted environment.
 It checks native window dimensions and records scale. A positive scale at one
 setting does not prove Retina, fractional scaling or mixed-monitor behavior.
 
+The supplied watchlist implements the verifier's internal `--self-test`
+contract: one JSON object with `passed: true`, `mode: "aot"`, native window
+geometry, and runtime diagnostics for application/UI processes. A custom entry
+point must supply equivalent checks; a successful process exit alone is not a
+verification pass. Use [the watchlist entry point](../example/watchlist/main.dart)
+as the current reference. This diagnostic format is not a public SDK API.
+
 ## Linux runtime environment
 
 Use an X11 session with `DISPLAY` set. Unset `WAYLAND_DISPLAY` and `ZED_HEADLESS`

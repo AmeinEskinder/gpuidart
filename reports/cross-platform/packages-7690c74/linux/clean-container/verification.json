@@ -1,0 +1,824 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-09-25T21:52:51.056787Z",
+  "environment_declared_by_operator": "clean_container",
+  "package_path": "/evaluation/extracted",
+  "os": "Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026",
+  "runtime_only": false,
+  "manifest": {
+    "target": "linux-x64",
+    "native_abi": 1,
+    "companion_extension": 2,
+    "build_dependency_inspection": {
+      "Watchlist": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007f9c26e54000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f9c26e3a000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f9c26e35000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f9c26717000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9c26400000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f9c26e56000)"
+      },
+      "libgpuidart.so": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007f2ac921c000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f2ac91de000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007f2ac69b7000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007f2ac91d4000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f2ac6989000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2ac68a0000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2ac6600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f2ac921e000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007f2ac91cc000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f2ac6898000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007f2ac687a000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007f2ac6864000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007f2ac6853000)"
+      },
+      "gpuidart-launcher": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007f92153b8000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f9215313000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9215000000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f92153ba000)"
+      },
+      "verify": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007f2fa00cb000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f2fa00b1000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f2fa00ac000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2f9ffc3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2f9f600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f2fa00cd000)"
+      }
+    },
+    "executable": "Watchlist",
+    "library": "libgpuidart.so",
+    "minimum_os": "Ubuntu 24.04 x64, glibc 2.39, X11",
+    "signing": "unsigned evaluation archive",
+    "build": {
+      "git_commit": "7690c74c2dee0758ab89178c405352e04bc7ff18",
+      "source_dirty": false,
+      "source_files": [
+        {
+          "path": "Cargo.lock",
+          "sha256": "a0ddcaeb0ba1b9df5fb83c6e64d0b8cb654ffaea56f1923363a1a4cc5c30f813"
+        },
+        {
+          "path": "Cargo.toml",
+          "sha256": "461401ee94697f5482ccef49905e0e9f1abff6c8f560bd396492f96afb2ca8a0"
+        },
+        {
+          "path": "example/app.dart",
+          "sha256": "8019540ffd5b1ee2f7e3996109fcd6a77c5a996e574efadf1ce5f18d5f840653"
+        },
+        {
+          "path": "example/main.dart",
+          "sha256": "6f0dfe9f1237e14565a650655388e161812ec03231eb01c020a8ef3593a5a1e7"
+        },
+        {
+          "path": "example/measure_data.dart",
+          "sha256": "8b5984915fd8fa31990de1cfcfea17b7c24bd03bc7812178812eff7c8d5bb9da"
+        },
+        {
+          "path": "example/watchlist/app.dart",
+          "sha256": "01f88fa8cca35343e8fb2ab61678032c03b25b5cd84ce31e4770e8361ef413b0"
+        },
+        {
+          "path": "example/watchlist/main.dart",
+          "sha256": "f89d0bc22eca38639c5c798097573b8f3fe628b1165f7525202706d8a7f82821"
+        },
+        {
+          "path": "launcher/Cargo.toml",
+          "sha256": "81344a15006884b74ab3dfebc8dd039eac7d1966dee875e17535cf88041f7625"
+        },
+        {
+          "path": "launcher/src/main.rs",
+          "sha256": "d9c796c27eb2468607b874e6494b5588817fd54eca7581a6787d98f81e7b6282"
+        },
+        {
+          "path": "lib/development.dart",
+          "sha256": "7c776f1ea49b692615fbbf428a0856b49495ba7d7ec61d670cb6837a5190ca6f"
+        },
+        {
+          "path": "lib/gpuidart.dart",
+          "sha256": "21093366506ebf53b5e3e9ccae5ef4fc9aec1bc5acbcd9de1aad2cfbc9898abb"
+        },
+        {
+          "path": "lib/src/companion.dart",
+          "sha256": "821fbbe1f4d4167169d8daa27190d852cc08b625e40a28a8951c2295b06df4ff"
+        },
+        {
+          "path": "lib/src/dataset.dart",
+          "sha256": "dc7bd21ce5cf1c87dc4c84e32c40bd934ac99beaf582c341a7998ab4c7e1074c"
+        },
+        {
+          "path": "lib/src/host.dart",
+          "sha256": "671b1d0b558f6748c9cf9dbba0d7693c6743fa5294071f3c853259bddd80a378"
+        },
+        {
+          "path": "lib/src/metrics.dart",
+          "sha256": "935693164acd252c16e537ccd6a337c1c2c50b9495abfeb556be3ec639109860"
+        },
+        {
+          "path": "lib/src/native_event.dart",
+          "sha256": "a0c1c3589295e12a11f35efd3ead418a26046092ed8d435bafdda34d03b50d4e"
+        },
+        {
+          "path": "lib/src/nodes.dart",
+          "sha256": "23683dcb0f09ee6fa738484bcf82e9dd1002535b9c4ae53fa3ec94d621ef6a5e"
+        },
+        {
+          "path": "lib/src/platform.dart",
+          "sha256": "a7e9d3e401ed154ed74c624068eee28bb20ab3e5522bc890f2fc1bef9a40ee64"
+        },
+        {
+          "path": "lib/src/runtime_info.dart",
+          "sha256": "824d2b22c2122af836ae24fc7f7eb90e39af02ed4583645612810549ee4634c5"
+        },
+        {
+          "path": "lib/src/trace_clock.dart",
+          "sha256": "e40c9a047d6431cc678a6fb8d5770d3e50d4a2f51eaf3d32d78bc865a4711e39"
+        },
+        {
+          "path": "lib/src/tracing.dart",
+          "sha256": "249cf4d84c99c0770305a675e3238c5221f15b435ae2cddaed150521d58383f5"
+        },
+        {
+          "path": "lib/src/window_options.dart",
+          "sha256": "5729d98b4a36c41d56e8fd38138f9c217118b05bfc8875061f30e4d91d2d3a81"
+        },
+        {
+          "path": "lib/src/windows.dart",
+          "sha256": "a937f1791494cbb3418bca28035bcf241e50f2e0b52bd9f06d209c8ce750d1a2"
+        },
+        {
+          "path": "lib/tracing.dart",
+          "sha256": "2b80a77e7f03630d3b8b14b73c9f6e1c1412e981e34d33cf39be27052aa18c61"
+        },
+        {
+          "path": "native/Cargo.toml",
+          "sha256": "4c8c9a78d2ed63db8841a7c3cb745e719fffe69fc4795fd37bb87a3f89479287"
+        },
+        {
+          "path": "native/build.rs",
+          "sha256": "3044de7cec699db4d11d0a239102645ab2b067d373977ed3fffd0dd344ce4ee3"
+        },
+        {
+          "path": "native/include/gpuidart.h",
+          "sha256": "fb48638e14bb8b99cb909b16f5a1a06129ddbebb75c5742d44ff04c9dd386ace"
+        },
+        {
+          "path": "native/src/allocations.rs",
+          "sha256": "a0c86b674f7f141eb2738137f6f98ca79bb5c44eef50712ec53dfc54f18a3898"
+        },
+        {
+          "path": "native/src/boundary.rs",
+          "sha256": "32f6aa3d58a45904fe9b49cf06a8bb0170654ec95c94c0a9e54283fcf12f2994"
+        },
+        {
+          "path": "native/src/clock.rs",
+          "sha256": "5aca9ea7e63cbce909fa4a5ab7bf61e9b7d10c475f6f20df25fb36cdf249d4af"
+        },
+        {
+          "path": "native/src/companion.rs",
+          "sha256": "6be769465f5e3dea566b4d285a8292df28de2c6631ce1e0c3c86ae3c9769b952"
+        },
+        {
+          "path": "native/src/datasets.rs",
+          "sha256": "4121f0f93fc58bc96eb753b6d118a79fd92551032d15c7462d0c4d50c951040f"
+        },
+        {
+          "path": "native/src/datasets/tests.rs",
+          "sha256": "584f14c874402bd1c40e3636b70d278d6591f9b3b70d60aef985b8f56fea3038"
+        },
+        {
+          "path": "native/src/diagnostics.rs",
+          "sha256": "fe483c5eb0f2ba9e25b75fd3016f8269d3d74828a479d5d59c2e5001950b3d44"
+        },
+        {
+          "path": "native/src/ffi_tests.rs",
+          "sha256": "b6da24eaece2ebeae73e565cd15d49f3e4a45dfba3c5d20bdaf268edcde3dc08"
+        },
+        {
+          "path": "native/src/lib.rs",
+          "sha256": "a7e0f6f0f3403cfc8db80a592b953f659a846489f466d1da7604fd443d09cb31"
+        },
+        {
+          "path": "native/src/protocol.rs",
+          "sha256": "f46047592fa73c17187fc55da273484a766d61407477ed2580a5c10a2202ff1d"
+        },
+        {
+          "path": "native/src/runtime_info.rs",
+          "sha256": "ddff95fb3e18682ac4f53a5a56704bfdea043c2e33d4dbf30e5056267cdd2179"
+        },
+        {
+          "path": "native/src/trace.rs",
+          "sha256": "5723f97bc81e316bd1ac1f0a886843ce7f10db9d8ec9780809dae8ae43c0b757"
+        },
+        {
+          "path": "native/src/ui.rs",
+          "sha256": "3e5dae7f754aac2265fa0535ee91607a1f18806549733acb0a209b3a23055045"
+        },
+        {
+          "path": "native/src/ui/tests.rs",
+          "sha256": "ffb9e212cde6554bfbffb6e6492b66e5a0d24b8acda67bb92a80267ae2468f5c"
+        },
+        {
+          "path": "pubspec.lock",
+          "sha256": "433334ba5708b954f5776dacc966c4e77d2b87b1f9c5672630e5dc67d92cd2ad"
+        },
+        {
+          "path": "pubspec.yaml",
+          "sha256": "f2609bc579dd5f5bca43fb8097c42ce7e338ada86e8e044ea0bcc8f37df7d73f"
+        },
+        {
+          "path": "rust-toolchain.toml",
+          "sha256": "d7c30241dcc347f1ea6f7f509f19891b16be5443c8d97d0d4cc5480aa645df26"
+        },
+        {
+          "path": "tool/build.dart",
+          "sha256": "35f697e339ce26d210f372d3c5f73e51780edab3dd56cb49bb17246cd8511e80"
+        },
+        {
+          "path": "tool/build.ps1",
+          "sha256": "526d268b5226d74efda0a051d10614ef52c115c8464c2f560b56261ff9a9bed7"
+        },
+        {
+          "path": "tool/build_test_fixtures.ps1",
+          "sha256": "3adf1d3aa2ef579dedcc72afc8b343c5efc7cb158dbc7705f2b668d7431d7ac2"
+        },
+        {
+          "path": "tool/capture_host_baseline.dart",
+          "sha256": "1848e2d9c9db94d8da03ce00e7a24006cdb82720f300f6e3baf04eb0bd718e14"
+        },
+        {
+          "path": "tool/capture_publication_trace.dart",
+          "sha256": "a7a7ac69bc94bb88b82bbfd8fa873fb953e7bd84f476dca2d337fa1f7d2958bd"
+        },
+        {
+          "path": "tool/check.dart",
+          "sha256": "646910bed13a1f12885be94474fd8be2ba78a3af976bb28ad5276291b875095c"
+        },
+        {
+          "path": "tool/check.ps1",
+          "sha256": "78346e40f96270d14ca3bfbd352b38d545759d0da0f24f944846b0fe3e46e37e"
+        },
+        {
+          "path": "tool/dev.dart",
+          "sha256": "dd7e3e204a0108509d84836963e6b1b3dcb7652fcca546b959ec7b2bdd80a500"
+        },
+        {
+          "path": "tool/env.ps1",
+          "sha256": "4dad1fe5ae25b66e8ab77b89ac29c742168416ad1cc104d294214dc4b56f2cec"
+        },
+        {
+          "path": "tool/measure_data.dart",
+          "sha256": "f9d4a1b39385b551208eff1e2cfde10c0d5a00bf6b7c717545efbb3ddc857080"
+        },
+        {
+          "path": "tool/package.dart",
+          "sha256": "0b1f92c423bd6956ffdf7ce8cac0c766bd88d74ef54b566bd47e2534051a112f"
+        },
+        {
+          "path": "tool/package.ps1",
+          "sha256": "17dbadda12c43249d99694abffd526ec2525126061fcf93ef53652d9584d2545"
+        },
+        {
+          "path": "tool/platform_probe/README.md",
+          "sha256": "1840158ecf34456b04aff9ac644b2719278e9b1b2510a3c3ad9e39d1a61797be"
+        },
+        {
+          "path": "tool/platform_probe/companion.dart",
+          "sha256": "077136e4414ec3adbf7e03294e4b69e180798f1d18e1cdb09514ad45fb5ab772"
+        },
+        {
+          "path": "tool/platform_probe/metal.swift",
+          "sha256": "77d16e27191f40170fbfa6b86f0c84acedb04aa8cb0797a63553f25dab9f2882"
+        },
+        {
+          "path": "tool/platform_probe/native/Cargo.toml",
+          "sha256": "8e2a48fb4053df5f103c9a37b61603dccb6287edf46592f3b3fceef1b8fc9587"
+        },
+        {
+          "path": "tool/platform_probe/native/build.rs",
+          "sha256": "1bdee8eb8b342ccf6fa9e589052275a1bb1292a7752ec85e27a9e1b622a408bd"
+        },
+        {
+          "path": "tool/platform_probe/native/src/lib.rs",
+          "sha256": "2ef3f5a3eceb906609ff21adccbffd1e5a66e60ab2b58d549d8a8e9cb07b80af"
+        },
+        {
+          "path": "tool/platform_probe/native/src/main.rs",
+          "sha256": "93c898ebcc4491c6a3c08ea7c08b7b36c5c4246f3e90c9b64d488e1cc7e150d4"
+        },
+        {
+          "path": "tool/platform_probe/probe.dart",
+          "sha256": "ceaf9032d41767081a7d511304ddce86da3b902cd71d610f9d62d9dbdb78fc73"
+        },
+        {
+          "path": "tool/platform_probe/reload.dart",
+          "sha256": "f1b2a793e021d859cdefd8b7601197b5729dc93dac873f7a1ec4d8a43bd33fae"
+        },
+        {
+          "path": "tool/platform_probe/reload_ffi.dart",
+          "sha256": "1b8e9d3fff9ac719189f82c2d2b1becfd360eb5d6d2fa65c4080655f5e985f4e"
+        },
+        {
+          "path": "tool/platform_probe/run.dart",
+          "sha256": "842175e15646bc720aa6f074c6c840e52d127f1fa7ada101795a13b1bed95aa4"
+        },
+        {
+          "path": "tool/prepare_windows_release_checks.ps1",
+          "sha256": "25c77f99787ad1b3d7380420ef11b77a5d9d6ff82f657f45147ea79475c576d1"
+        },
+        {
+          "path": "tool/record_platform_environment.dart",
+          "sha256": "d9f02f0b4b5693bb622e9949999a1895c5102cf89545995d193093a028c83fba"
+        },
+        {
+          "path": "tool/run_host_baselines.dart",
+          "sha256": "e62821b077dd572b6f86de3d8e01ee4bee5ee4e27d5e1bfbc84f7891b4740692"
+        },
+        {
+          "path": "tool/src/commands.dart",
+          "sha256": "f746e1eae36feb03173cce4be5f162beaa8659451cb17f89ffc46bb6dd45f4d2"
+        },
+        {
+          "path": "tool/src/dev_session.dart",
+          "sha256": "4a6a33d488d695af0fe8d30c033264c191df9f3d0da9158ed3ce1a883b7af321"
+        },
+        {
+          "path": "tool/src/owned_process.dart",
+          "sha256": "0859c57f4dfe85bda929af84b2c3f831229b561c56c94295b8854ddf97f437fd"
+        },
+        {
+          "path": "tool/summarize.dart",
+          "sha256": "2309ee0b87f827644b76419f1a5998143a256814195a67effe7360d5c53646f1"
+        },
+        {
+          "path": "tool/unix/Dockerfile.runtime",
+          "sha256": "ccb51ee2d56931a8230844d71a8346689cf89cbe90eb8acf7ef57f6ba8c72288"
+        },
+        {
+          "path": "tool/unix/verify.dart",
+          "sha256": "71c8200fb707cc7322066b2429aa44abbf2691343d586e31d0dad4adb4eeb5e9"
+        },
+        {
+          "path": "tool/verify_dev_failures.dart",
+          "sha256": "eb8d6a1c27f3bd307128724e23af00462eb0935d637840d3560f6fc6fb6a3349"
+        },
+        {
+          "path": "tool/verify_dev_launcher.dart",
+          "sha256": "eda2a3ef7f2de8afab5d168bddd5604a189baf423f046cef138b25229c79d1b0"
+        },
+        {
+          "path": "tool/verify_mvp.ps1",
+          "sha256": "a6f0269dc634dea71ef54d9770ccf7405a24babca09f5d386e5fa8f49ecdb677"
+        },
+        {
+          "path": "tool/verify_package.dart",
+          "sha256": "a9dc8eb4705ea3683ad61f3c2437465d4578ab5273c9668c995ebbcf1103e64f"
+        },
+        {
+          "path": "tool/verify_package.ps1",
+          "sha256": "b791effb7a66133f8f0f0a515a0358dbafb972acc2358af2b9b43aadaddc4895"
+        },
+        {
+          "path": "tool/verify_package_failures.ps1",
+          "sha256": "da7788227821166dd86bfdc96a54055bf315549a434935f8a312b74b4c400c2d"
+        },
+        {
+          "path": "tool/verify_reload.dart",
+          "sha256": "6b94b5356a7b313b0d975a56a00898810bf66a2d328e3790daf256476772fc05"
+        },
+        {
+          "path": "tool/verify_watchlist_reload.dart",
+          "sha256": "f260f629984caba7f971998a2e44ff16316733aad7b4efe8975f72a98b4056d1"
+        },
+        {
+          "path": "tool/verify_watchlist_stability.dart",
+          "sha256": "2e125c6cba859a1f2b9b5c026b575b59ea5df4203cf89f6622f2ea983990c1aa"
+        },
+        {
+          "path": "tool/verify_watchlist_ui.dart",
+          "sha256": "8ebc731076ef2d63faf69f92906278fb985e3dce26af8e7373adfc38140ebacf"
+        },
+        {
+          "path": "tool/verify_windows_prerequisites.ps1",
+          "sha256": "59eb978e89d89d9ad07eb048e1a987f21d47665b038e0bc394c79f9fd7ab6720"
+        },
+        {
+          "path": "tool/verify_x11_display.dart",
+          "sha256": "dae3227ac7e771c340788294e6d2f4cdaed8f11d4cba5495c1dd176827af8052"
+        },
+        {
+          "path": "tool/windows/app.manifest",
+          "sha256": "bc8919877937cdde35c14cd117876cb9de3f1be4dc74c2b07306973962cc58ea"
+        },
+        {
+          "path": "tool/windows/capability_state.ps1",
+          "sha256": "c5a5f64a9bb366b13f19b113988519ba8d0f99fb1d84ad1dcfb46f31d4c37dce"
+        },
+        {
+          "path": "tool/windows/enable_release_checks.ps1",
+          "sha256": "1487894b9cbd7a8e827ea833167cac2496ad9eaa624a59f59797e30606dedb82"
+        },
+        {
+          "path": "tool/windows/ime-results.md",
+          "sha256": "62a0265974444a52e94f21a9690feb9df385c616e0fd75f112555597b5900b56"
+        },
+        {
+          "path": "tool/windows/sandbox_release_check.ps1",
+          "sha256": "07b3872278a57a2a99d6d4ada719f99498aaaf6b4ac42f3ce24a636576d9250a"
+        },
+        {
+          "path": "tool/windows/verify.ps1",
+          "sha256": "0761a995c2d3adf7b5dace3df81ea1462b86c57ad9ec2d8ccf2659cb22d3381f"
+        },
+        {
+          "path": "tool/windows/watchlist_probe.ps1",
+          "sha256": "e437a48ff2f270c6f741af93ba9fd21a4604694c491ee44ec0dddfa5cfddadb8"
+        }
+      ],
+      "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+      "built_at_utc": "2026-09-25T21:51:48.890999Z"
+    },
+    "files": [
+      {
+        "name": "Dart-LICENSE.txt",
+        "bytes": 1502,
+        "sha256": "2cfa3ee8e7512e6d44c854b986510810fadc815f93f890373b3a81c1b6ccd256"
+      },
+      {
+        "name": "GPUI-Kit-LICENSE.txt",
+        "bytes": 10305,
+        "sha256": "d1b0449e5478c574ba4f686c2656df7fe77d66821a61f8b6ed3378a58ed9a811"
+      },
+      {
+        "name": "README.txt",
+        "bytes": 681,
+        "sha256": "3f7e0cc9183844e90823cf09a3093c1039f7120acda5149cbb3ab965b35a89bb"
+      },
+      {
+        "name": "RELEASE-CHECKS.md",
+        "bytes": 6122,
+        "sha256": "279c2a5d3246a94cefd2ff270b8307dc54729864bff3f297fc8d043bea3976d9"
+      },
+      {
+        "name": "THIRD-PARTY.json",
+        "bytes": 73932,
+        "sha256": "825510f18ddaa6f0458362b4c4c1a26eedc33fbb6e84f9a7214ea8993c0151a2"
+      },
+      {
+        "name": "Watchlist",
+        "bytes": 7090128,
+        "sha256": "70b2c97d48bd2673bcd86efb74f34bb262399f27f43ad496ad4a493afc94542e"
+      },
+      {
+        "name": "gpuidart-launcher",
+        "bytes": 506496,
+        "sha256": "4b484dd8ff28bbf9c81005cadac1132807648cd64ef41be7578fc69325076c4a"
+      },
+      {
+        "name": "libgpuidart.so",
+        "bytes": 57648160,
+        "sha256": "0ec5a8d187b6acabc6e23ad365c92de8818fb3c9ced5f5e30ecca37a23ff44cf"
+      },
+      {
+        "name": "verify",
+        "bytes": 6926896,
+        "sha256": "5e6489bdf2ed426263f8f1081c7f36ec5793df0c2887c56a96641dfa8825dcb2"
+      }
+    ]
+  },
+  "installed_payload_bytes": 72282256,
+  "installed_size_scope": "Extracted payload including verifier, manifest and documentation; excludes system runtime prerequisites",
+  "dependency_inspection": {
+    "/evaluation/extracted/Watchlist": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f2a8cfdb000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f2a8ca5a000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f2a8ca55000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2a8c96c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2a8c759000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f2a8cfdd000)\n",
+      "stderr": ""
+    },
+    "/evaluation/extracted/libgpuidart.so": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f378116e000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f377e96e000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007f377e925000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007f377e91b000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f377e8ed000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f377e804000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f377e5ef000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f3781170000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007f377e5e9000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f377e5e1000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007f377e5c3000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007f377e5ad000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007f377e59c000)\n",
+      "stderr": ""
+    },
+    "/evaluation/extracted/gpuidart-launcher": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fe8710da000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fe87103e000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe870e2b000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fe8710dc000)\n",
+      "stderr": ""
+    },
+    "/evaluation/extracted/verify": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f22dc188000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f22dbc07000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f22dbc02000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f22dbb19000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f22db906000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f22dc18a000)\n",
+      "stderr": ""
+    }
+  },
+  "working_directory": "/tmp/gpuidart-package-run-NTPBGK",
+  "environment": {
+    "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+    "HOME": "/tmp/gpuidart-package-run-NTPBGK/home",
+    "TMPDIR": "/tmp/gpuidart-package-run-NTPBGK",
+    "DISPLAY": ":99",
+    "XAUTHORITY": "/tmp/xvfb-run.dlDDlS/Xauthority",
+    "LIBGL_ALWAYS_SOFTWARE": "1"
+  },
+  "application_exit_code": 0,
+  "stderr": "",
+  "stdout": "{\"application\":\"watchlist\",\"mode\":\"aot\",\"passed\":true,\"rows\":1000,\"native\":{\"revision\":13,\"native_process_id\":60,\"inputs\":{\"search\":{\"entity\":4294967298,\"text\":\"\",\"selection\":{\"start\":0,\"end\":0},\"focused\":false}},\"tables\":{\"watchlist\":{\"entity\":4294967300,\"visible_rows\":{\"start\":0,\"end\":8},\"row_count\":1000,\"dataset\":\"instruments\",\"dataset_revision\":8,\"scroll_y\":0.0}},\"labels\":{\"title\":\"Market watch\",\"source\":\"Sample instruments and prices. No live market feed.\",\"summary\":\"1000 instruments shown · 0 saved\",\"selection\":\"No instrument selected\",\"status\":\"ALP0000 removed from shortlist.\"},\"window\":{\"width\":960.0,\"height\":720.0,\"scale_factor\":1.0,\"scroll_y\":0.0},\"native\":{\"materializations\":3,\"rows_constructed\":32,\"cells_constructed\":101,\"data_records_checked\":1005,\"data_cells_written\":4011},\"draw\":{\"samples\":3,\"p50_us\":2297.855,\"p95_us\":7311.359,\"p99_us\":7311.359},\"dirty_to_present_submit\":{\"samples\":1,\"p50_us\":28770.303,\"p95_us\":28770.303,\"p99_us\":28770.303},\"present_interval\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0},\"input_to_frame\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0}},\"runtime\":{\"application\":{\"pid\":60,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":651029,\"cpu_system_us\":68529,\"loaded_images\":[\"/evaluation/extracted/Watchlist\",\"/evaluation/extracted/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":187342848,\"Pss\":183484416,\"Pss_Dirty\":74948608,\"Pss_Anon\":64270336,\"Pss_File\":108539904,\"Pss_Shmem\":10674176,\"Shared_Clean\":5976064,\"Shared_Dirty\":0,\"Private_Clean\":106418176,\"Private_Dirty\":74948608,\"Referenced\":187342848,\"Anonymous\":64270336,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false},\"ui\":{\"pid\":60,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":742909,\"cpu_system_us\":77722,\"loaded_images\":[\"/evaluation/extracted/Watchlist\",\"/evaluation/extracted/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":190136320,\"Pss\":186277888,\"Pss_Dirty\":77742080,\"Pss_Anon\":64294912,\"Pss_File\":108539904,\"Pss_Shmem\":13443072,\"Shared_Clean\":5976064,\"Shared_Dirty\":0,\"Private_Clean\":106418176,\"Private_Dirty\":77742080,\"Referenced\":190136320,\"Anonymous\":64294912,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false}},\"metrics\":{\"description_builds\":13,\"encoded_snapshots\":12,\"encoded_bytes\":9841,\"ffi_callbacks\":28,\"ui_callbacks\":4,\"diagnostic_callbacks\":3,\"description_build\":{\"samples\":13,\"p50_us\":20,\"p95_us\":25,\"p99_us\":33},\"encode\":{\"samples\":12,\"p50_us\":24,\"p95_us\":33,\"p99_us\":41},\"publish_to_applied\":{\"samples\":12,\"p50_us\":146,\"p95_us\":304,\"p99_us\":2419},\"initial\":{\"bytes\":40789,\"encode_us\":939},\"data_messages\":7,\"data_bytes\":40937,\"data_records_checked\":1005,\"data_cells_written\":4011,\"data_encode\":{\"samples\":7,\"p50_us\":9,\"p95_us\":858,\"p99_us\":858},\"data_publish_to_applied\":{\"samples\":7,\"p50_us\":83,\"p95_us\":27736,\"p99_us\":27736},\"native_data_parse\":{\"samples\":7,\"p50_us\":5,\"p95_us\":555,\"p99_us\":555},\"native_data_apply\":{\"samples\":7,\"p50_us\":4,\"p95_us\":68,\"p99_us\":68},\"native_snapshot_apply\":{\"samples\":12,\"p50_us\":3,\"p95_us\":8,\"p99_us\":10}}}\n",
+  "application": {
+    "application": "watchlist",
+    "mode": "aot",
+    "passed": true,
+    "rows": 1000,
+    "native": {
+      "revision": 13,
+      "native_process_id": 60,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "",
+          "selection": {
+            "start": 0,
+            "end": 0
+          },
+          "focused": false
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 0,
+            "end": 8
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 8,
+          "scroll_y": 0.0
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "No instrument selected",
+        "status": "ALP0000 removed from shortlist."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.0,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 3,
+        "rows_constructed": 32,
+        "cells_constructed": 101,
+        "data_records_checked": 1005,
+        "data_cells_written": 4011
+      },
+      "draw": {
+        "samples": 3,
+        "p50_us": 2297.855,
+        "p95_us": 7311.359,
+        "p99_us": 7311.359
+      },
+      "dirty_to_present_submit": {
+        "samples": 1,
+        "p50_us": 28770.303,
+        "p95_us": 28770.303,
+        "p99_us": 28770.303
+      },
+      "present_interval": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "runtime": {
+      "application": {
+        "pid": 60,
+        "os": "linux",
+        "arch": "x86_64",
+        "cpu_user_us": 651029,
+        "cpu_system_us": 68529,
+        "loaded_images": [
+          "/evaluation/extracted/Watchlist",
+          "/evaluation/extracted/libgpuidart.so",
+          "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1",
+          "/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so",
+          "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1",
+          "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+          "/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0",
+          "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0",
+          "/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72",
+          "/usr/lib/x86_64-linux-gnu/libelf-0.190.so",
+          "/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1",
+          "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+          "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "/usr/lib/x86_64-linux-gnu/libicudata.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5",
+          "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+          "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+          "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4",
+          "/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so",
+          "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14",
+          "/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+          "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5"
+        ],
+        "loaded_images_source": "/proc/self/maps executable file mappings",
+        "memory_bytes": {
+          "Rss": 187342848,
+          "Pss": 183484416,
+          "Pss_Dirty": 74948608,
+          "Pss_Anon": 64270336,
+          "Pss_File": 108539904,
+          "Pss_Shmem": 10674176,
+          "Shared_Clean": 5976064,
+          "Shared_Dirty": 0,
+          "Private_Clean": 106418176,
+          "Private_Dirty": 74948608,
+          "Referenced": 187342848,
+          "Anonymous": 64270336,
+          "KSM": 0,
+          "LazyFree": 0,
+          "AnonHugePages": 6291456,
+          "ShmemPmdMapped": 0,
+          "FilePmdMapped": 0,
+          "Shared_Hugetlb": 0,
+          "Private_Hugetlb": 0,
+          "Swap": 0,
+          "SwapPss": 0,
+          "Locked": 0
+        },
+        "memory_source": "/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them",
+        "main_thread": false
+      },
+      "ui": {
+        "pid": 60,
+        "os": "linux",
+        "arch": "x86_64",
+        "cpu_user_us": 742909,
+        "cpu_system_us": 77722,
+        "loaded_images": [
+          "/evaluation/extracted/Watchlist",
+          "/evaluation/extracted/libgpuidart.so",
+          "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1",
+          "/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so",
+          "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1",
+          "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+          "/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0",
+          "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0",
+          "/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72",
+          "/usr/lib/x86_64-linux-gnu/libelf-0.190.so",
+          "/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1",
+          "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+          "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "/usr/lib/x86_64-linux-gnu/libicudata.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5",
+          "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+          "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+          "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4",
+          "/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so",
+          "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14",
+          "/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+          "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5"
+        ],
+        "loaded_images_source": "/proc/self/maps executable file mappings",
+        "memory_bytes": {
+          "Rss": 190136320,
+          "Pss": 186277888,
+          "Pss_Dirty": 77742080,
+          "Pss_Anon": 64294912,
+          "Pss_File": 108539904,
+          "Pss_Shmem": 13443072,
+          "Shared_Clean": 5976064,
+          "Shared_Dirty": 0,
+          "Private_Clean": 106418176,
+          "Private_Dirty": 77742080,
+          "Referenced": 190136320,
+          "Anonymous": 64294912,
+          "KSM": 0,
+          "LazyFree": 0,
+          "AnonHugePages": 6291456,
+          "ShmemPmdMapped": 0,
+          "FilePmdMapped": 0,
+          "Shared_Hugetlb": 0,
+          "Private_Hugetlb": 0,
+          "Swap": 0,
+          "SwapPss": 0,
+          "Locked": 0
+        },
+        "memory_source": "/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them",
+        "main_thread": false
+      }
+    },
+    "metrics": {
+      "description_builds": 13,
+      "encoded_snapshots": 12,
+      "encoded_bytes": 9841,
+      "ffi_callbacks": 28,
+      "ui_callbacks": 4,
+      "diagnostic_callbacks": 3,
+      "description_build": {
+        "samples": 13,
+        "p50_us": 20,
+        "p95_us": 25,
+        "p99_us": 33
+      },
+      "encode": {
+        "samples": 12,
+        "p50_us": 24,
+        "p95_us": 33,
+        "p99_us": 41
+      },
+      "publish_to_applied": {
+        "samples": 12,
+        "p50_us": 146,
+        "p95_us": 304,
+        "p99_us": 2419
+      },
+      "initial": {
+        "bytes": 40789,
+        "encode_us": 939
+      },
+      "data_messages": 7,
+      "data_bytes": 40937,
+      "data_records_checked": 1005,
+      "data_cells_written": 4011,
+      "data_encode": {
+        "samples": 7,
+        "p50_us": 9,
+        "p95_us": 858,
+        "p99_us": 858
+      },
+      "data_publish_to_applied": {
+        "samples": 7,
+        "p50_us": 83,
+        "p95_us": 27736,
+        "p99_us": 27736
+      },
+      "native_data_parse": {
+        "samples": 7,
+        "p50_us": 5,
+        "p95_us": 555,
+        "p99_us": 555
+      },
+      "native_data_apply": {
+        "samples": 7,
+        "p50_us": 4,
+        "p95_us": 68,
+        "p99_us": 68
+      },
+      "native_snapshot_apply": {
+        "samples": 12,
+        "p50_us": 3,
+        "p95_us": 8,
+        "p99_us": 10
+      }
+    }
+  },
+  "limitation": "Hash, extracted launch, dependency and native-window checks only. Environment cleanliness is an operator declaration. Human IME, Retina/fractional scaling and physical presentation remain separate checks."
+}

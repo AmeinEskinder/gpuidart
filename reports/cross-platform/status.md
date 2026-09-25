@@ -5,6 +5,24 @@ implementation with automated host acceptance, not a stable-release declaration.
 The public Dart API, native ABI 1 and snapshot/dataset format are unchanged.
 The GPUI Kit dependency pin is unchanged.
 
+Latest verified implementation: **`7690c74`**. Windows
+[36193687122](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687122),
+macOS [36193687196](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687196),
+Linux [36193687198](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687198)
+and Unix packaging [36193689853](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193689853)
+all passed. Subsequent evidence-only commits do not change runtime code.
+
+| Work-order area | Implementation / automated result | Remaining acceptance |
+| --- | --- | --- |
+| Backend and launcher feasibility | Proven on declared hosted targets; pin unchanged | Other hardware/backends unverified |
+| Host lifecycle and clocks | Full applicable contracts, JIT/AOT and actual reload passed | Physical presentation not measured |
+| Display/input integration | Native backends used; X11 geometry/resize verified at 1 and 1.25 | Human IME, Retina and physical/mixed-monitor checks |
+| Build/check/package/CI | Implemented; both extracted packages passed; fresh Ubuntu container passed | Clean Mac and desktop/VM launches; distribution signing |
+| Startup/memory baseline | Three JIT/AOT repetitions per host retained with stage/metric definitions | First useful display and presentation unmeasured |
+
+The remaining acceptance items require desktop access or owner decisions. The
+complete work order is therefore still open; automated passes do not close it.
+
 ## Declared targets
 
 | Target | Launch strategy | Verified environment |
@@ -49,7 +67,14 @@ image checks. [Packaging evidence](packaging.md) retains the first metadata-quer
 failure and the successful `f56bea1` follow-up: extracted AOT self-tests on both
 targets, a fresh Ubuntu runtime-only container, and three JIT plus three AOT
 startup/memory baselines per target. Clean Mac/desktop checks remain separate.
-An explicit runtime-only verifier mode is being added for Macs without `otool`.
+Source `7690c74` also passed the runtime-only macOS verifier with developer-tool
+lookup disabled, both Unix package checks and the fresh Linux container again.
+The [follow-up records](packages-7690c74/) retain these results separately.
+
+X11 automated geometry checks passed at forced scales 1 and 1.25. At 1.25, the
+960 by 720 logical viewport measured 1200 by 900 X11 client pixels; after resize,
+800 by 600 logical measured 1000 by 750 physical. These are Xvfb checks, not
+physical fractional-scaling or mixed-monitor verification.
 
 ## Gates that remain open
 
@@ -57,8 +82,9 @@ An explicit runtime-only verifier mode is being added for Macs without `otool`.
   container is a narrower automated target; clean desktop/VM checks remain.
 - Human IME composition, candidate placement/commit/cancel, selection,
   scrolling and window resizing on every declared OS/backend.
-- Retina, Linux fractional scaling and mixed-monitor movement. Current hosted
-  checks only record valid scale-1 geometry.
+- Retina, physical Linux fractional scaling and mixed-monitor movement. Hosted
+  macOS checks cover scale 1; Linux additionally has forced-scale 1.25 geometry
+  and resize checks.
 - Owner license selection and macOS public-distribution signing/notarization.
 - The original Windows [reload observation](../mvp/attempt-023eef4/README.md).
   Passing later regressions does not localize that historical observation.

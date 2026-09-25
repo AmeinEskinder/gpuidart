@@ -24,6 +24,22 @@ The Dart callback validates UTF-8, the event envelope and required field types b
 
 The native event subscription receives a terminal error event. Await or handle request futures and `done` as well. Stop application timers and event handlers when the host fails. The SDK catches protocol handling errors, not exceptions in application event listeners.
 
+## macOS companion lifecycle
+
+macOS owns GPUI in a separate main-thread process. Dart creates and reaps that
+child; native transport never competes with the Dart VM for its exit status.
+Host disposal waits for transport return and child exit before freeing the
+callback. During close, a four-second timer kills a child that has not exited.
+The child independently exits four seconds after losing its parent connection
+if its UI loop has not stopped. Early exit or missing final trace data is
+reported as failure, not a successful shutdown.
+
+Unix development sessions use an owned process group for bounded descendant
+cleanup. The [cross-platform evidence](../reports/cross-platform/host-implementation.md)
+includes actual early-child-exit and never-connect regressions, delayed socket
+frames, and retained failures from the first macOS implementation. These checks
+do not establish recovery from every native platform crash.
+
 ## Dart regression evidence
 
 `./tool/check.ps1` builds the test-only `test/fixtures/fault_host.rs` DLL under `.cache` before running Dart tests. The fixture uses the public ABI to send malformed events, omit acknowledgements, mismatch dataset identity, report a native failure, omit closed and delay native exit. It counts allocated/freed event buffers and early destruction attempts. The test checks that failed transactions preserve Dart data and shutdown never destroys a running host.
