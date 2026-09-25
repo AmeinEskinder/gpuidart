@@ -123,7 +123,11 @@ extension _DatasetTransactions on GpuiHost {
     final request = ++_request;
     final pending = Completer<void>();
     dataset._busy = true;
-    _dataPending[request] = pending;
+    _dataPending[request] = (
+      id: dataset.id,
+      revision: revision,
+      completion: pending,
+    );
     _dataTimers[request] = Stopwatch()..start();
     try {
       final status = _withMessage(
@@ -137,8 +141,15 @@ extension _DatasetTransactions on GpuiHost {
         'dataset',
         (bytes, length) => _bindings.dataset(_handle, bytes, length),
       );
-      if (status != 0) throw StateError('Dataset submission failed: $status');
-      await pending.future;
+      if (status != 0) {
+        final error = StateError('Dataset submission failed: $status');
+        if (status == -4) {
+          _dataPending.remove(request);
+          _fail(error, StackTrace.current);
+        }
+        throw error;
+      }
+      await _withDeadline(pending.future, 'dataset $request');
       commit();
       dataset._revision = revision;
       if (create) {

@@ -2,7 +2,7 @@
 
 GPUI-Dart 0.1 is a Windows x64 SDK preview. DPI setup requires Windows 10 version 1803 or later, using Microsoft's [process DPI-context API](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiawarenesscontextforprocess); this build was tested on Windows 11. The supported application model is one host and one window per process, immutable UI descriptions, and retained native controls and datasets. The JSON wire format and diagnostic commands are internal. Build the Dart package and native DLL from the same revision.
 
-The Dart host checks native ABI/protocol version 1 before creating a host. Older DLLs without a version export, and DLLs with a different version, fail with a rebuild instruction. The native library rejects a second active host, including callers from another Dart isolate. Await the previous host's done Future before opening another one.
+The Dart host checks native ABI/protocol version 1 before creating a host. Older DLLs without a version export, and DLLs with a different version, fail with a rebuild instruction. The native library rejects a second active host, including callers from another Dart isolate. Await successful completion of the previous host's done Future before opening another one. A shutdown timeout requires process recovery if the native runner remains stuck.
 
 ## Run the representative screen
 
@@ -53,8 +53,11 @@ final subscription = host.events.listen((event) {
 try {
   await host.done;
 } finally {
-  await host.close();
-  await subscription.cancel();
+  try {
+    await host.close();
+  } finally {
+    await subscription.cancel();
+  }
 }
 ```
 
@@ -74,11 +77,13 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | publish / rebuild | Completes after native application of a snapshot. This is not a presentation fence. |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. See [datasets](datasets.md). |
-| close / done | Close is idempotent; done completes after the native UI loop and callback teardown finish. Pending publications settle with success or an error. A paused event subscriber does not delay done; it receives queued events and stream completion when resumed. |
+| close / done | Close is idempotent. Normal completion follows native teardown. Failure can precede teardown on a shutdown timeout; native memory stays alive until the runner returns. Pending requests settle with success or an error. A paused event subscriber does not delay done. |
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.
 
 Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size. Datasets have at most 100,000 rows and 64 columns. The native command queue has 64 slots. Invalid descriptions, stale revisions, a full/closed queue and overlapping transactions are errors. Await or handle the returned Future.
+
+Native acknowledgements have a 30-second deadline; shutdown reporting has a 10-second deadline. Configure these with `requestTimeout` and `shutdownTimeout` when opening the host. Missing acknowledgements, malformed events and caught native panics close the host and settle pending requests. See [failure handling and its limits](failures.md).
 
 ## Package an AOT application
 

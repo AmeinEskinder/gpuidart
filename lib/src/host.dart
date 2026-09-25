@@ -10,6 +10,7 @@ import 'nodes.dart';
 import 'metrics.dart';
 import 'window_options.dart';
 import 'windows.dart';
+import 'native_event.dart';
 
 part 'dataset.dart';
 
@@ -114,9 +115,15 @@ final class TableSelection {
 /// Experimental Windows host. The Dart application isolate keeps its event loop.
 /// A dedicated isolate blocks inside GPUI's native UI loop.
 final class GpuiHost {
-  GpuiHost._(this._bindings);
+  GpuiHost._(this._bindings, this.requestTimeout, this.shutdownTimeout);
 
   final _Bindings _bindings;
+
+  /// Deadline for ready and native acknowledgements. A timeout closes the host.
+  final Duration requestTimeout;
+
+  /// Deadline for shutdown reporting. Native memory is retained until run exits.
+  final Duration shutdownTimeout;
   final _events = StreamController<GpuiEvent>.broadcast();
   final _ready = Completer<void>();
   final _closed = Completer<void>();
@@ -124,14 +131,19 @@ final class GpuiHost {
   final _publishTimers = <int, Stopwatch>{};
   final _diagnostics = <int, Completer<Map<String, dynamic>>>{};
   final _datasets = <String, TableDataset>{};
-  final _dataPending = <int, Completer<void>>{};
+  final _dataPending =
+      <int, ({String id, int revision, Completer<void> completion})>{};
   final _dataTimers = <int, Stopwatch>{};
   final metrics = HostMetrics();
   UiNode Function()? _builder;
   int _request = 0;
   late final NativeCallable<_EventNative> _callback;
   late final Pointer<Void> _handle;
-  late final Future<void> done;
+  final _done = Completer<void>();
+  Future<void> get done => _done.future;
+  Timer? _shutdownDeadline;
+  Object? _failure;
+  StackTrace? _failureStack;
   int _revision = 1;
   bool _closing = false;
 
@@ -143,6 +155,8 @@ final class GpuiHost {
     String? libraryPath,
     List<TableDataset> datasets = const [],
     GpuiWindowOptions window = const GpuiWindowOptions(),
+    Duration requestTimeout = const Duration(seconds: 30),
+    Duration shutdownTimeout = const Duration(seconds: 10),
   }) async {
     final timer = Stopwatch()..start();
     final root = builder();
@@ -152,6 +166,8 @@ final class GpuiHost {
       libraryPath: libraryPath,
       datasets: datasets,
       window: window,
+      requestTimeout: requestTimeout,
+      shutdownTimeout: shutdownTimeout,
     );
     host._builder = builder;
     host.metrics.descriptionBuilds = 1;
@@ -175,11 +191,16 @@ final class GpuiHost {
     String? libraryPath,
     List<TableDataset> datasets = const [],
     GpuiWindowOptions window = const GpuiWindowOptions(),
+    Duration requestTimeout = const Duration(seconds: 30),
+    Duration shutdownTimeout = const Duration(seconds: 10),
   }) async {
     if (!Platform.isWindows) {
       throw UnsupportedError(
         'The initial native host currently supports Windows.',
       );
+    }
+    if (requestTimeout <= Duration.zero || shutdownTimeout <= Duration.zero) {
+      throw ArgumentError('Host deadlines must be positive');
     }
     final windowDescription = window.toJson();
     configureWindowsDpi();
@@ -194,7 +215,7 @@ final class GpuiHost {
               ? sibling.path
               : 'target/debug/gpuidart.dll'),
     ).absolute.path;
-    final host = GpuiHost._(_Bindings(path));
+    final host = GpuiHost._(_Bindings(path), requestTimeout, shutdownTimeout);
     for (final dataset in datasets) {
       if (dataset._owner != null ||
           dataset._busy ||
@@ -240,6 +261,7 @@ final class GpuiHost {
         _runNative,
         (path, host._handle.address, result.sendPort),
         onError: result.sendPort,
+        onExit: result.sendPort,
         errorsAreFatal: true,
         debugName: 'gpui-native-loop',
       );
@@ -253,11 +275,11 @@ final class GpuiHost {
       await host._events.close();
       rethrow;
     }
-    host.done = host._finish(nativeDone, result);
+    unawaited(host._finish(nativeDone, result));
     // Register a handler immediately; callers also receive the original future.
     unawaited(host.done.catchError((Object _) {}));
     try {
-      await host._ready.future;
+      await host._withDeadline(host._ready.future, 'startup');
     } catch (_) {
       await host.done.catchError((Object _) {});
       rethrow;
@@ -289,8 +311,9 @@ final class GpuiHost {
     final accepted = Completer<void>();
     _pending[revision] = accepted;
     _publishTimers[revision] = Stopwatch()..start();
+    var status = 0;
     try {
-      final status = _withMessage(
+      status = _withMessage(
         {'revision': revision, 'root': root.toJson()},
         'snapshot',
         (bytes, length) => _bindings.publish(_handle, bytes, length),
@@ -298,12 +321,13 @@ final class GpuiHost {
       if (status != 0) {
         throw StateError('Native snapshot submission failed: $status');
       }
-    } catch (_) {
+    } catch (error, stack) {
       _pending.remove(revision);
       _publishTimers.remove(revision);
+      if (status == -4) _fail(error, stack);
       rethrow;
     }
-    return accepted.future;
+    return _withDeadline(accepted.future, 'snapshot $revision');
   }
 
   Future<void> registerDataset(TableDataset dataset) => _transact(
@@ -356,10 +380,74 @@ final class GpuiHost {
 
   Future<void> close() {
     if (!_closing && !_closed.isCompleted) {
+      _beginClose();
+    }
+    return done;
+  }
+
+  void _beginClose() {
+    if (_done.isCompleted) return;
+    if (!_closing) {
       _closing = true;
       _bindings.close(_handle);
     }
-    return done;
+    _shutdownDeadline ??= Timer(shutdownTimeout, () {
+      final error = TimeoutException(
+        'Native runner did not finish shutdown; '
+        'its memory is retained until it exits',
+        shutdownTimeout,
+      );
+      _recordFailure(error, StackTrace.current);
+      if (!_done.isCompleted) _done.completeError(_failure!, _failureStack);
+    });
+  }
+
+  Future<T> _withDeadline<T>(Future<T> future, String operation) async {
+    try {
+      return await future.timeout(requestTimeout);
+    } on TimeoutException {
+      final error = TimeoutException(
+        'No native acknowledgement for $operation; '
+        'the application outcome is unknown and the host is closing',
+        requestTimeout,
+      );
+      _fail(error, StackTrace.current);
+      throw error;
+    }
+  }
+
+  void _recordFailure(Object error, StackTrace stack) {
+    if (_failure == null) {
+      _failure = error;
+      _failureStack = stack;
+      _events.add(
+        GpuiEvent._(Map.unmodifiable({'type': 'error', 'message': '$error'})),
+      );
+    }
+    _settlePending(error, stack);
+  }
+
+  void _fail(Object error, StackTrace stack) {
+    _recordFailure(error, stack);
+    _beginClose();
+  }
+
+  void _settlePending(Object error, [StackTrace? stack]) {
+    if (!_ready.isCompleted) _ready.completeError(error, stack);
+    for (final pending in _pending.values) {
+      pending.completeError(error, stack);
+    }
+    _pending.clear();
+    _publishTimers.clear();
+    for (final pending in _dataPending.values) {
+      pending.completion.completeError(error, stack);
+    }
+    _dataPending.clear();
+    _dataTimers.clear();
+    for (final pending in _diagnostics.values) {
+      pending.completeError(error, stack);
+    }
+    _diagnostics.clear();
   }
 
   /// Opt-in native inspection and test control; no commands run during repaint.
@@ -377,20 +465,25 @@ final class GpuiHost {
     try {
       bytes.asTypedList(data.length).setAll(0, data);
       final status = _bindings.diagnostic(_handle, bytes, data.length);
-      if (status != 0) throw StateError('Diagnostic request failed: $status');
+      if (status != 0) {
+        final error = StateError('Diagnostic request failed: $status');
+        if (status == -4) _fail(error, StackTrace.current);
+        throw error;
+      }
       _diagnostics[request] = completion;
     } finally {
       calloc.free(bytes);
     }
-    return completion.future;
+    return _withDeadline(completion.future, 'diagnostic $request');
   }
 
   void _receive(Pointer<Uint8> bytes, int length) {
     try {
-      final event = GpuiEvent._(
-        jsonDecode(utf8.decode(bytes.asTypedList(length)))
-            as Map<String, dynamic>,
-      );
+      if (bytes == nullptr || length <= 0 || length > 16 * 1024 * 1024) {
+        throw const FormatException('Invalid native event buffer');
+      }
+      final event = GpuiEvent._(decodeNativeEvent(bytes.asTypedList(length)));
+      if (_failure != null && event.type != 'closed') return;
       metrics.ffiCallbacks++;
       if (event.type == 'click' ||
           event.type == 'input' ||
@@ -420,6 +513,13 @@ final class GpuiHost {
               .remove(event.revision)
               ?.completeError(StateError(event.data['message'] as String));
         case 'dataset_applied':
+          final pending = _dataPending[event.data['request']];
+          if (pending != null &&
+              (pending.id != event.id || pending.revision != event.revision)) {
+            throw const FormatException(
+              'Dataset acknowledgement identity mismatch',
+            );
+          }
           final timer = _dataTimers.remove(event.data['request']);
           if (timer != null) {
             HostMetrics.sample(
@@ -439,17 +539,19 @@ final class GpuiHost {
               event.data['work']['records_checked'] as int;
           metrics.dataCellsWritten +=
               event.data['work']['cells_written'] as int;
-          _dataPending.remove(event.data['request'])?.complete();
+          _dataPending.remove(event.data['request'])?.completion.complete();
         case 'dataset_rejected':
           _dataTimers.remove(event.data['request']);
           _dataPending
               .remove(event.data['request'])
-              ?.completeError(StateError(event.data['message'] as String));
+              ?.completion
+              .completeError(StateError(event.data['message'] as String));
         case 'diagnostic':
           _diagnostics
               .remove(event.data['request'])
               ?.complete(event.data['data'] as Map<String, dynamic>);
         case 'closed':
+          _beginClose();
           _closing = true;
           if (!_closed.isCompleted) _closed.complete();
           if (!_ready.isCompleted) {
@@ -458,11 +560,15 @@ final class GpuiHost {
             );
           }
         case 'error':
-          if (!_ready.isCompleted) {
-            _ready.completeError(StateError(event.data['message'] as String));
-          }
+          _fail(
+            StateError(event.data['message'] as String),
+            StackTrace.current,
+          );
+          return;
       }
       _events.add(event);
+    } catch (error, stack) {
+      _fail(error, stack);
     } finally {
       _bindings.freeEvent(bytes, length);
     }
@@ -477,39 +583,38 @@ final class GpuiHost {
         }
         throw StateError('Native runner failed: $status');
       }
-      await _closed.future;
+      await _closed.future.timeout(
+        shutdownTimeout,
+        onTimeout: () {
+          throw StateError('Native runner exited without a closed event');
+        },
+      );
       if (status != 0) throw StateError('Native UI loop failed: $status');
+    } catch (error, stack) {
+      _recordFailure(error, stack);
     } finally {
       _closing = true;
-      for (final pending in _pending.values) {
-        pending.completeError(
-          StateError('Host closed before the snapshot was applied'),
-        );
-      }
-      _pending.clear();
-      _publishTimers.clear();
-      for (final pending in _dataPending.values) {
-        pending.completeError(
-          StateError('Host closed during dataset transaction'),
-        );
-      }
-      _dataPending.clear();
-      _dataTimers.clear();
+      _shutdownDeadline?.cancel();
+      _settlePending(
+        _failure ?? StateError('Host closed before acknowledgement'),
+        _failureStack,
+      );
       for (final dataset in _datasets.values) {
         dataset._owner = null;
       }
       _datasets.clear();
-      for (final pending in _diagnostics.values) {
-        pending.completeError(
-          StateError('Host closed during diagnostic request'),
-        );
-      }
-      _diagnostics.clear();
       result.close();
       _bindings.destroy(_handle);
       _callback.close();
       // A paused event subscriber must not keep native shutdown pending.
       unawaited(_events.close());
+      if (!_done.isCompleted) {
+        if (_failure case final failure?) {
+          _done.completeError(failure, _failureStack);
+        } else {
+          _done.complete();
+        }
+      }
     }
   }
 }
