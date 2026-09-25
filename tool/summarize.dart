@@ -35,6 +35,8 @@ void main() {
 
 Generated from the adjacent JSON reports by `dart run tool/summarize.dart`.
 
+This is the earlier prototype milestone, preserved with its original test counts and environment observations. Later SDK changes do not inherit these measurements. See [current MVP acceptance](mvp/README.md) and [boundary hardening](../docs/failures.md) for subsequent verification.
+
 ## Packaged application
 
 - ZIP: **${mib(package['zip_bytes'])} MiB**. Payload files: **${mib(unpacked)} MiB**, excluding manifest/ZIP overhead.

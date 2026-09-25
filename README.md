@@ -88,6 +88,8 @@ The native tests render GPUI controls and exercise pointer/keyboard input, Unico
 
 `cargo test` and `cargo build` produce different native artifacts. The check script builds the normal DLL before running Dart.
 
+The check script also builds a test DLL that injects protocol and shutdown failures. See [failure handling](docs/failures.md) for deadlines, panic-containment limits and regression coverage. [GitHub Actions configuration](docs/ci.md) runs the headless checks; its first hosted run is pending publication of this repository.
+
 ## Example
 
 ```dart

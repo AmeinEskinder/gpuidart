@@ -1,4 +1,5 @@
 @TestOn('windows')
+@Tags(['live-window'])
 library;
 
 import 'dart:async';
