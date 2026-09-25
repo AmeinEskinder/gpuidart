@@ -104,6 +104,8 @@ The manifest records the native ABI, Git commit, whether source files were modif
 
 ## Verification status
 
+The [MVP release-candidate record](../reports/mvp/README.md) contains the latest committed-source package and acceptance result. Run `./tool/verify_mvp.ps1` for the full local release gate. Its source hash covers repository source files; when packaging an application outside this repository, retain that application's own revision separately.
+
 Run the SDK checks after building the native library:
 
 ```powershell

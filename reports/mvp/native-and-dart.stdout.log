@@ -1,0 +1,26 @@
+﻿
+running 8 tests
+test protocol::tests::rejects_inline_table_records ... ok
+test protocol::tests::rejects_ambiguous_retained_identity ... ok
+test datasets::tests::invalid_batch_and_stale_revision_preserve_all_records ... ok
+test datasets::tests::initial_upload_rejects_bad_data_and_missing_references ... ok
+test datasets::tests::one_cell_decode_and_apply_allocations_are_independent_of_dataset_size ... ok
+test ui::tests::narrow_windows_wrap_actions_and_scroll_to_footer ... ok
+test ui::tests::native_events_retained_input_and_virtualized_table ... ok
+test ui::tests::construction_and_allocations_scale_with_viewport ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Analyzing gpuidart...
+No issues found!
+00:00 +0: loading test\native_host_test.dart
+00:00 +0: test\native_host_test.dart: an incompatible DLL fails before host creation
+00:00 +1: test\native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it
+00:00 +2: test\native_host_test.dart: failed initial descriptions release resources for another host
+00:01 +3: All tests passed!
+

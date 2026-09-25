@@ -22,8 +22,10 @@ Clean-machine launch and human IME composition require separate evidence under [
 - Milestone 1: benchmark series and SDK preview completed. See [comparison](../reports/comparison/dart-js-20260925.md) and [SDK verification](../reports/sdk/README.md).
 - Milestone 2: host boundary and lifecycle hardened. Seven native tests, three Dart/native tests and Dart analysis passed. See [lifecycle evidence](../reports/sdk/lifecycle.md).
 - Milestone 3: bounded launcher startup, process cleanup, named packaging, strict verification and source/build identity completed. See [development and packaging evidence](../reports/sdk/development-packaging.md).
-- Milestone 4: in progress.
+- Milestone 4: all nine local acceptance checks passed from committed source `739bd18`. See [the release-candidate record](../reports/mvp/README.md).
 - External release gates: clean Windows environment and human IME results are not available yet.
+
+The local MVP implementation and verification are complete. The stable-release goal remains open until those two external gates have evidence. Testing movement between monitors with different DPI remains additional pending coverage.
 
 ## Reproduce local release acceptance
 
