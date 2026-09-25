@@ -61,6 +61,76 @@ fn initial(count: usize) -> Initial {
 }
 
 #[gpui::test]
+fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(
+            WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(Bounds {
+                    origin: Point::default(),
+                    size: size(px(360.), px(320.)),
+                })),
+                ..Default::default()
+            },
+            cx,
+            |window, cx| {
+                let mut data = initial(100);
+                let Node::Column { children, .. } = &mut data.snapshot.root else {
+                    unreachable!()
+                };
+                children.insert(
+                    1,
+                    Node::Row {
+                        id: "actions".into(),
+                        children: (0..3)
+                            .map(|i| Node::Button {
+                                id: format!("action-{i}"),
+                                label: format!("A long action label {i}"),
+                            })
+                            .collect(),
+                    },
+                );
+                children.push(Node::Button {
+                    id: "footer".into(),
+                    label: "End of screen".into(),
+                });
+                cx.new(|cx| DartView::new(data, Events(Arc::new(|_| {})), window, cx))
+            },
+        )
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        for id in ["action-0", "action-1", "action-2"] {
+            assert!(
+                window.find(id).bounds().right() <= px(360.),
+                "Action must fit in the narrow window"
+            );
+        }
+        window.scroll(
+            "action-0",
+            ScrollDelta::Pixels(point(px(0.), px(-1600.))),
+            cx,
+        );
+        assert!(
+            window.find("footer").bounds().bottom() <= px(320.),
+            "Footer must be reachable by scrolling the screen"
+        );
+    })
+    .unwrap();
+    cx.simulate_window_resize(handle.into(), size(px(960.), px(720.)));
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert_eq!(
+            view.read(cx).scroll.offset().y,
+            px(0.),
+            "Growing the viewport must remove obsolete scroll offset"
+        );
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn construction_and_allocations_scale_with_viewport(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let (handle, view) = cx.update(|cx| {

@@ -66,7 +66,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 
 | API | Contract |
 | --- | --- |
-| UiColumn / UiRow | Vertical/horizontal groups with the native theme's standard spacing. Not a general style system. |
+| UiColumn / UiRow | Vertical/horizontal groups with the native theme's standard spacing. Rows wrap when space is limited. The screen scrolls vertically when its content exceeds the window. |
 | UiText / UiButton | Text and native button. Click events carry node ID and snapshot revision. |
 | UiInput | Native input owns text, cursor, selection, undo and composition. Dart receives input events. No controlled-value setter is exposed. |
 | UiTable | References a registered dataset ID. Cells contain strings and render in Rust. |
@@ -109,6 +109,7 @@ Run the SDK checks after building the native library:
 ```powershell
 ./tool/check.ps1
 dart run tool/verify_watchlist_ui.dart
+dart run tool/verify_watchlist_stability.dart
 dart run tool/verify_watchlist_reload.dart
 dart run tool/verify_dev_launcher.dart
 dart run tool/verify_dev_failures.dart

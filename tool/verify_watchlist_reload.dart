@@ -79,9 +79,42 @@ Future<void> main() async {
       intact['state']['labels']['title'] == 'Market watch reloaded',
       'Rejected reload changed the running app',
     );
+    for (var i = 1; i <= 10; i++) {
+      final heading = 'Market watch recovered $i';
+      await app.writeAsString(
+        source.replaceFirst("'Market watch'", "'$heading'"),
+      );
+      await session.reload();
+      final recovered = await session.call('inspect');
+      require(
+        recovered['state']['labels']['title'] == heading,
+        'Reload did not recover after invalid source',
+      );
+      require(
+        (await session.service.getVM()).pid == applicationPid,
+        'Recovery restarted the application',
+      );
+      for (final field in ['query', 'selected', 'ticks', 'dataset_revision']) {
+        require(
+          before[field] == recovered[field],
+          'Repeated reload changed $field',
+        );
+      }
+      for (final field in ['inputs', 'tables']) {
+        require(
+          jsonEncode(before['state'][field]) ==
+              jsonEncode(recovered['state'][field]),
+          'Repeated reload changed native $field',
+        );
+      }
+      require(
+        before['metrics']['data_bytes'] == recovered['metrics']['data_bytes'],
+        'Repeated reload republished data',
+      );
+    }
     await Directory('reports/sdk').create(recursive: true);
     await File('reports/sdk/reload.json').writeAsString(
-      '${const JsonEncoder.withIndent('  ').convert({'same_application_process_id': applicationPid, 'launcher_process_id': session.process.pid, 'same_isolate_id': session.isolateId, 'changed_code_executed': true, 'invalid_source_rejected': rejected, 'before': before, 'after': after})}\n',
+      '${const JsonEncoder.withIndent('  ').convert({'same_application_process_id': applicationPid, 'launcher_process_id': session.process.pid, 'same_isolate_id': session.isolateId, 'changed_code_executed': true, 'invalid_source_rejected': rejected, 'successful_reloads': 11, 'recovered_after_invalid_source': true, 'before': before, 'after': after})}\n',
     );
     stdout.writeln(
       'PASS: watchlist code reload preserved application state, input text/focus/selection, table identity and scroll without republishing data.',

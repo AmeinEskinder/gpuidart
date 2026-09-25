@@ -10,6 +10,7 @@ use gpui_kit::component::{
     ActiveTheme, StyledExt,
     button::{Button, ButtonVariants},
     input::{Input, InputEvent, InputState},
+    scroll::ScrollableElement,
     table::{Column, DataTable, TableDelegate, TableEvent, TableState},
 };
 use gpui_kit::*;
@@ -70,6 +71,7 @@ pub(crate) struct DartView {
     inputs: HashMap<String, RetainedInput>,
     tables: HashMap<String, Entity<TableState<Rows>>>,
     table_subscriptions: HashMap<String, Subscription>,
+    scroll: ScrollHandle,
     datasets: Store,
     counters: Rc<Counters>,
 }
@@ -135,7 +137,7 @@ impl DartView {
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
         json!({"revision": self.snapshot.revision, "inputs": inputs, "tables": tables, "labels": labels,
-            "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor()},
+            "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
             "draw": histogram!(frames.draw_duration_histogram),
             "dirty_to_present_submit": histogram!(frames.dirty_to_present_histogram),
@@ -182,6 +184,7 @@ impl DartView {
             inputs: HashMap::new(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
+            scroll: ScrollHandle::new(),
             counters: Rc::new(Counters::default()),
         };
         view.reconcile(window, cx);
@@ -393,6 +396,7 @@ impl DartView {
             Node::Row { children, .. } => div()
                 .id(id)
                 .h_flex()
+                .flex_wrap()
                 .gap_3()
                 .w_full()
                 .children(children.iter().map(|child| self.materialize(child)))
@@ -441,10 +445,17 @@ impl Render for DartView {
         let root = div()
             .id("gpuidart")
             .size_full()
-            .p_5()
+            .overflow_y_scroll()
+            .track_scroll(&self.scroll)
             .bg(cx.theme().background)
             .text_color(cx.theme().foreground)
-            .child(self.materialize(&self.snapshot.root));
+            .child(
+                div()
+                    .w_full()
+                    .p_5()
+                    .child(self.materialize(&self.snapshot.root)),
+            )
+            .vertical_scrollbar(&self.scroll);
         #[cfg(feature = "benchmark-trace")]
         let root = crate::input_trace::observe(root);
         root

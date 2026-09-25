@@ -30,6 +30,7 @@ Future<void> main() async {
 
   try {
     await Directory('reports/sdk/visual').create(recursive: true);
+    await step('focus-input');
     final cleared = await step('type-clear');
     require(
       cleared['query'] == '' &&

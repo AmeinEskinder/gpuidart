@@ -16,7 +16,7 @@ final class UiColumn extends UiNode {
   };
 }
 
-/// A horizontal group of controls, using the native theme's standard spacing.
+/// A horizontal group that wraps to another line when the window is narrow.
 final class UiRow extends UiNode {
   UiRow(super.id, List<UiNode> children)
     : children = List.unmodifiable(children);
