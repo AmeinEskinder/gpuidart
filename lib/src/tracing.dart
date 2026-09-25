@@ -204,7 +204,7 @@ final class GpuiTrace {
             !_nativeError &&
             _dropped == 0 &&
             _nativeDropped == 0,
-        'scope': 'Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch includes acknowledgement serialization/callback submission. Tracing adds overhead.',
+        'scope': 'Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch covers synchronous handling; deferred diagnostic replies occur later. Tracing adds overhead.',
       },
       'records': raw,
       'traceEvents': records.map((record) {

@@ -46,7 +46,7 @@ acknowledgement when counting replacement snapshots. Later snapshots start at 2.
 | `dart.ffi` | Synchronous native call; includes native parsing and queue submission |
 | `native.parse` | Decode/validation before queue submission; excludes initial creation |
 | `native.enqueue_attempt` → `native.dequeue` | Submission attempt through command pickup, including instrumentation and channel overhead; use only successful submissions |
-| `native.dispatch` | UI command handling, including acknowledgement serialization and callback submission; excludes rendering |
+| `native.dispatch` | Synchronous UI command handling; immediate replies include acknowledgement serialization and callback submission. Deferred diagnostics reply later. Excludes rendering |
 | `native.emit` → `dart.receive` | After native event serialization through entry to the Dart callback |
 | `dart.decode` | Event decode/validation, plus recording its receive marker |
 | `dart.ack` | Validated acknowledgement handled in Dart; native application microseconds are attached when supplied |

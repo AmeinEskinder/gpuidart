@@ -193,6 +193,73 @@ fn construction_and_allocations_scale_with_viewport(cx: &mut TestAppContext) {
 }
 
 #[gpui::test]
+fn preparation_ack_waits_for_rendered_scroll(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let captured = Arc::new(Mutex::new(Vec::new()));
+    let events = Events(Arc::new({
+        let captured = captured.clone();
+        move |event| {
+            if let Event::Diagnostic { request, data } = event {
+                captured.lock().unwrap().push((request, data));
+            }
+        }
+    }));
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial(125), events.clone(), window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let before = view.read(cx).inspect(window, cx);
+        crate::diagnostics::handle(
+            crate::diagnostics::Request::Prepare {
+                request: 7,
+                input: "name".into(),
+                text: "ALP".into(),
+                start: 0,
+                end: 3,
+                table: "table".into(),
+                row: 25,
+            },
+            &view,
+            &events,
+            window,
+            cx,
+        );
+        assert!(captured.lock().unwrap().is_empty());
+        window.simulate_next_frame(cx);
+        assert!(
+            captured.lock().unwrap().is_empty(),
+            "A frame callback before drawing must not acknowledge an unapplied scroll"
+        );
+        // A replacement can be applied while the deferred scroll is still pending.
+        view.update(cx, |view, cx| view.publish(description(2), window, cx));
+        window.render_frame(cx);
+        window.simulate_next_frame(cx);
+        let replies = captured.lock().unwrap();
+        assert_eq!(replies.len(), 1);
+        assert_eq!(replies[0].0, 7);
+        let after = &replies[0].1;
+        assert_eq!(after["revision"], 2);
+        assert_eq!(
+            after["tables"]["table"]["entity"],
+            before["tables"]["table"]["entity"]
+        );
+        assert_eq!(after["tables"]["table"]["visible_rows"]["start"], 25);
+        assert!(after["tables"]["table"]["scroll_y"].as_f64().unwrap() < 0.);
+        assert_eq!(after["inputs"]["name"]["text"], "ALP");
+        assert_eq!(
+            after["inputs"]["name"]["selection"],
+            serde_json::json!({"start":0,"end":3})
+        );
+        assert_eq!(after["inputs"]["name"]["focused"], true);
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let (handle, view) = cx.update(|cx| {

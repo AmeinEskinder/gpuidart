@@ -96,11 +96,12 @@ pub(crate) fn handle(
                 view.prepare(&input, &text, start..end, &table, row, window, cx)
             });
             match outcome {
-                Ok(()) => window.on_next_frame({
-                    let view = view.clone();
-                    let events = events.clone();
-                    move |window, cx| reply(request, &view, &events, window, cx)
-                }),
+                Ok(()) => {
+                    // A next-frame callback can run before the draw that consumes
+                    // TableState's deferred scroll. Require a render before reply.
+                    let target = view.read(cx).materialization_count() + 1;
+                    repaint(request, target, view.clone(), events.clone(), window, cx);
+                }
                 Err(error) => events.emit(Event::Diagnostic {
                     request,
                     data: json!({"error": error}),

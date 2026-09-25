@@ -5,14 +5,21 @@ import 'dart:io';
 
 import 'package:gpuidart/development.dart';
 import 'package:gpuidart/gpuidart.dart';
+import 'package:gpuidart/tracing.dart';
 
 import 'app.dart';
 
 Future<void> main(List<String> args) async {
+  final tracePath = args
+      .where((arg) => arg.startsWith('--trace='))
+      .firstOrNull
+      ?.substring(8);
+  final trace = tracePath == null ? null : GpuiTrace(capacity: 8192);
   final app = WatchlistApplication();
   final host = await GpuiHost.openView(
     app.build,
     datasets: [app.dataset],
+    trace: trace,
     window: const GpuiWindowOptions(
       title: 'Market watch',
       width: 960,
@@ -85,6 +92,12 @@ Future<void> main(List<String> args) async {
   });
 
   if (!const bool.fromEnvironment('dart.vm.product')) {
+    registerExtension('ext.gpuidart.repaint', (_, _) async {
+      await pending;
+      return ServiceExtensionResponse.result(
+        jsonEncode(await host.diagnose('repaint', {'frames': 2})),
+      );
+    });
     registerExtension('ext.gpuidart.inspect', (_, _) async {
       await pending;
       return ServiceExtensionResponse.result(
@@ -173,5 +186,6 @@ Future<void> main(List<String> args) async {
     await host.close();
     await subscription.cancel();
     await pending;
+    if (tracePath != null) await trace!.writeTo(tracePath);
   }
 }
