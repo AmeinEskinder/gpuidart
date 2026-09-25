@@ -121,6 +121,7 @@ Future<void> main(List<String> args) async {
       }
       stdout.writeln(
         jsonEncode({
+          'passed': true,
           'mode': const bool.fromEnvironment('gpuidart.packaged')
               ? 'aot'
               : 'jit',

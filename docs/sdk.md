@@ -26,6 +26,8 @@ dart run tool/dev.dart path/to/main.dart --your-app-argument
 
 Run the launcher from the project root. It watches the entry point's directory recursively and the package's lib directory. It reports compilation/reload errors and keeps the previous running code on a rejected reload. Rust changes and Dart changes that the VM cannot reload require a restart. Close the application window to stop the launcher.
 
+Startup waits at most 30 seconds for reload registration. Failed startup cleans up the launched process tree, including Dart's VM child process. Ctrl+C requests application shutdown. Reload service calls also have a timeout, so an unavailable application does not leave the launcher waiting indefinitely.
+
 ## Application lifecycle
 
 ```dart
@@ -96,7 +98,9 @@ Custom entry point and filename:
 ./tool/verify_package.ps1 -Zip build/MyApp-windows-x64.zip
 ```
 
-The verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot. The supplied examples implement that contract. A custom application supplies its own meaningful self-test. Supply -CrtDirectory when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
+The verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot and passed set to the boolean true. The supplied examples implement that contract. A custom application supplies its own meaningful self-test. Failed verification writes passed false and the error to its report, replacing any earlier success. Supply -CrtDirectory when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
+
+The manifest records the native ABI, Git commit, whether source files were modified, tool versions and hashes of source files and shipped files. Keep that manifest with a result. Use verify_package.ps1 -ReportPath to retain separate verification reports for different packages.
 
 ## Verification status
 
@@ -107,6 +111,7 @@ Run the SDK checks after building the native library:
 dart run tool/verify_watchlist_ui.dart
 dart run tool/verify_watchlist_reload.dart
 dart run tool/verify_dev_launcher.dart
+dart run tool/verify_dev_failures.dart
 ./tool/package.ps1
 ./tool/verify_package.ps1
 ```

@@ -4,11 +4,12 @@ param(
     [ValidatePattern('^[a-zA-Z0-9_-]+$')][string]$Name = 'gpuidart'
 )
 $ErrorActionPreference = 'Stop'
-& "$PSScriptRoot/build.ps1" -Release
 . "$PSScriptRoot/env.ps1"
 Push-Location $projectRoot
 try {
     if (!(Test-Path -LiteralPath $EntryPoint -PathType Leaf)) { throw "Entry point not found: $EntryPoint" }
+    if ($Name -match '^(CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])$') { throw "Reserved Windows application filename: $Name" }
+    & "$PSScriptRoot/build.ps1" -Release
     $packageDirectory = Join-Path $projectRoot "build/$Name-windows-x64"
     New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
     & dart compile exe '--define=gpuidart.packaged=true' -o "$packageDirectory/$Name.exe" $EntryPoint
@@ -43,7 +44,7 @@ try {
     $applicationNotes = if ($EntryPoint.Replace('\','/') -eq 'example/watchlist/main.dart') {
         "Market watch has search, row selection, a shortlist and sample price updates.`r`nAll data is fictitious. No live market feed or trading connection is used.`r`n$Name.exe --self-test checks search, edits and shortlist transactions, prints JSON and closes."
     } else {
-        "The application supplies its own --self-test behavior. The verifier expects one JSON result with mode set to aot. Adapt the example interaction checks to this application."
+        "The application supplies its own --self-test behavior. The verifier expects one JSON result with mode set to aot and passed set to true. Adapt the example interaction checks to this application."
     }
     @'
 GPUI-Dart Windows x64 SDK example
@@ -69,8 +70,24 @@ See the source lockfiles for dependencies. This is an evaluation ZIP, not a sign
         $path = Join-Path $packageDirectory $fileName
         [ordered]@{name=$fileName; bytes=(Get-Item -LiteralPath $path).Length; sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()}
     }
-    [ordered]@{architecture='windows-x64'; executable="$Name.exe"; entry_point=$EntryPoint; dpi_awareness='PerMonitorV2'; kit_revision='21622a70efd25219d26aa459164878c4da9e39f8'; files=@($files)} |
-        ConvertTo-Json -Depth 5 | Set-Content -LiteralPath "$packageDirectory/manifest.json" -Encoding UTF8
+    $sourcePaths = @(git ls-files --cached --others --exclude-standard -- lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock | Sort-Object -Unique)
+    if ($LASTEXITCODE -ne 0) { throw 'Could not identify package source files' }
+    $sourceFiles = @($sourcePaths | ForEach-Object {
+        [ordered]@{path=$_; sha256=(Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant()}
+    })
+    $sourceText = ($sourceFiles | ForEach-Object { "$($_.path):$($_.sha256)" }) -join "`n"
+    $hasher = [Security.Cryptography.SHA256]::Create()
+    try { $sourceHash = ([BitConverter]::ToString($hasher.ComputeHash([Text.Encoding]::UTF8.GetBytes($sourceText)))).Replace('-','').ToLowerInvariant() }
+    finally { $hasher.Dispose() }
+    $sourceStatus = @(git status --porcelain --untracked-files=normal -- lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock)
+    $build = [ordered]@{
+        git_commit = (git rev-parse HEAD).Trim(); source_dirty = ($sourceStatus.Count -gt 0)
+        source_sha256 = $sourceHash; source_files = $sourceFiles
+        dart = ((& dart --version) -join ' ').Trim(); rustc = ((& rustc --version) -join ' ').Trim()
+        cargo = ((& cargo --version) -join ' ').Trim(); built_at_utc = [DateTime]::UtcNow.ToString('o')
+    }
+    [ordered]@{architecture='windows-x64'; executable="$Name.exe"; entry_point=$EntryPoint; dpi_awareness='PerMonitorV2'; native_abi=1; kit_revision='21622a70efd25219d26aa459164878c4da9e39f8'; build=$build; files=@($files)} |
+        ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "$packageDirectory/manifest.json" -Encoding UTF8
     $paths = @($names + 'manifest.json' | ForEach-Object { Join-Path $packageDirectory $_ })
     Compress-Archive -LiteralPath $paths -DestinationPath "build/$Name-windows-x64.zip" -CompressionLevel Optimal -Force
     Get-Item -LiteralPath "build/$Name-windows-x64.zip" | Select-Object FullName, Length

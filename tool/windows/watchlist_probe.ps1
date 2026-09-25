@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][int]$AppProcessId, [ValidateSet('select','search','type-clear','pin','tick','shortlist','capture')][string]$Step)
+param([Parameter(Mandatory)][int]$AppProcessId, [ValidateSet('select','search','type-clear','pin','tick','shortlist','capture','close')][string]$Step)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 Add-Type -Path (Join-Path $root 'benchmarks/windows.cs') -ReferencedAssemblies System.Drawing
@@ -35,5 +35,6 @@ try {
         tick { [WatchlistInput]::Click($window, 370, 154, $scale) }
         shortlist { [WatchlistInput]::Click($window, 50, 154, $scale) }
         capture { [BenchmarkWindow]::CaptureOffscreen($window, (Join-Path $root 'reports/sdk/visual/watchlist-edited.png')) }
+        close { [BenchmarkWindow]::Close($window) }
     }
 } finally { [BenchmarkWindow]::Finish() }

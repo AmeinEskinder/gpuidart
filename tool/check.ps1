@@ -7,7 +7,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Native tests failed' }
     & cargo build --locked -p gpuidart
     if ($LASTEXITCODE -ne 0) { throw 'Native build failed' }
-    & dart analyze
+    & dart analyze --fatal-infos
     if ($LASTEXITCODE -ne 0) { throw 'Dart analysis failed' }
     & dart test
     if ($LASTEXITCODE -ne 0) { throw 'Dart integration test failed' }

@@ -4,6 +4,12 @@ param(
     [string]$Environment = 'development_machine'
 )
 $ErrorActionPreference = 'Stop'
+$report = [ordered]@{
+    tested_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $false
+    environment_declared_by_operator = $Environment; package_path = $PSScriptRoot
+}
+$report | ConvertTo-Json | Set-Content -LiteralPath $ReportPath -Encoding UTF8
+try {
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot 'manifest.json') | ConvertFrom-Json
 foreach ($file in $manifest.files) {
     if ((Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $file.name)).Hash.ToLowerInvariant() -ne $file.sha256) {
@@ -61,13 +67,16 @@ try {
     if (!($modules | Where-Object { $_ -match '\\WinSxS\\.*\\comctl32\.dll$' })) { throw 'Common Controls v6 was not loaded' }
     if ($modules | Where-Object { $_ -match '\\(dart-sdk|flutter)\\' }) { throw 'An SDK module was loaded' }
     $application = $output.Result.Trim() | ConvertFrom-Json
-    if ($application.mode -ne 'aot' -or $application.passed -eq $false) { throw 'Application self-test did not pass in AOT mode' }
+    if ($application.mode -cne 'aot' -or $application.passed -isnot [bool] -or !$application.passed) {
+        throw 'Application self-test must report mode aot and boolean passed true'
+    }
     $report = [ordered]@{
         tested_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $true
         environment_declared_by_operator = $Environment
         os = (Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,OSArchitecture)
         package_path = $PSScriptRoot; working_directory = $start.WorkingDirectory
         path = $start.EnvironmentVariables['PATH']; window_dpi = $dpi; per_monitor_v2 = $perMonitorV2
+        build = $manifest.build; native_abi = $manifest.native_abi
         files = $manifest.files; loaded_modules = $modules; application = $application; stderr = $errors.Result
         limitation = 'Machine cleanliness requires an independently provisioned machine or VM; this script verifies launch, application checks, loaded modules and DPI.'
     }
@@ -76,4 +85,10 @@ try {
 } finally {
     if (!$process.HasExited) { $process.Kill(); $process.WaitForExit() }
     $process.Dispose()
+}
+} catch {
+    $report.passed = $false
+    $report['error'] = $_.Exception.Message
+    $report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
+    throw
 }

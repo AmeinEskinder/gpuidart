@@ -68,15 +68,23 @@ Future<void> main() async {
     if (state['state']['labels']['title'] != 'Market watch from file watcher') {
       throw StateError('File watcher did not apply changed code');
     }
-    await service.callServiceExtension(
-      'ext.gpuidart.close',
-      isolateId: isolateId,
-    );
+    final close = await Process.run('powershell.exe', [
+      '-NoProfile',
+      '-File',
+      'tool/windows/watchlist_probe.ps1',
+      '-AppProcessId',
+      '${vm.pid!}',
+      '-Step',
+      'close',
+    ]);
+    if (close.exitCode != 0) {
+      throw StateError('Window close failed: ${close.stderr}');
+    }
     final status = await process.exitCode.timeout(const Duration(seconds: 15));
     if (status != 0) throw StateError('Launcher exited with $status: $errors');
     await Directory('reports/sdk').create(recursive: true);
     await File('reports/sdk/launcher.json').writeAsString(
-      '${jsonEncode({'passed': true, 'custom_entry': entry.path, 'file_save_reloaded': true, 'window_close_stopped_launcher': true, 'exit_code': status})}\n',
+      '${jsonEncode({'passed': true, 'custom_entry': entry.path, 'file_save_reloaded': true, 'window_close_stopped_launcher': true, 'close_method': 'WM_CLOSE to application HWND', 'exit_code': status})}\n',
     );
     stdout.writeln(
       'PASS: launcher watched a custom entry directory, reloaded saved code and exited after window close.',
