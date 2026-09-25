@@ -1,0 +1,15 @@
+Unhandled exception:
+FormatException: Unexpected end of input (at character 1)
+
+^
+
+#0      _ChunkedJsonParser.fail (dart:convert-patch/convert_patch.dart:1466:5)
+#1      _ChunkedJsonParser.close (dart:convert-patch/convert_patch.dart:496:7)
+#2      _parseJson (dart:convert-patch/convert_patch.dart:36:10)
+#3      JsonDecoder.convert (dart:convert/json.dart:640:36)
+#4      JsonCodec.decode (dart:convert/json.dart:219:41)
+#5      jsonDecode (dart:convert/json.dart:160:12)
+#6      DevSession.start (file:///D:/Dev/gpuidart/tool/src/dev_session.dart:57:11)
+<asynchronous suspension>
+#7      main (file:///D:/Dev/gpuidart/tool/verify_watchlist_ui.dart:7:19)
+<asynchronous suspension>

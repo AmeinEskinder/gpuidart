@@ -1,0 +1,25 @@
+﻿{
+    "started_at_utc":  "2026-09-25T03:38:01.4153206Z",
+    "source_commit":  "95481ba533d3e7ea0e165aae0ce1f4d8478f3fa1",
+    "local_acceptance_passed":  false,
+    "release_status":  "candidate_pending_external_checks",
+    "external_checks":  {
+                            "clean_windows_launch":  "pending",
+                            "human_ime":  "pending",
+                            "mixed_monitor_dpi":  "pending"
+                        },
+    "checks":  [
+                   {
+                       "name":  "native-and-dart",
+                       "exit_code":  0,
+                       "elapsed_ms":  18008
+                   },
+                   {
+                       "name":  "watchlist-ui",
+                       "exit_code":  255,
+                       "elapsed_ms":  1513
+                   }
+               ],
+    "error":  "watchlist-ui failed. See reports/mvp/watchlist-ui.stderr.log and stdout.log",
+    "finished_at_utc":  "2026-09-25T03:38:22.2355000Z"
+}
