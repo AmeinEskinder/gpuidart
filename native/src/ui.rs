@@ -2,10 +2,14 @@ use crate::datasets::{self, Change, Initial, SharedDataset, Store, Update};
 use crate::diagnostics::Counters;
 use crate::{
     Command, Events,
-    protocol::{Event, Node, Snapshot},
+    protocol::{
+        Align as StyleAlign, Color as StyleColor, Event, FontWeight as StyleFontWeight,
+        Justify as StyleJustify, Node, Size as StyleSize, Snapshot, Style, ThemeToken,
+    },
 };
 use async_channel::Receiver;
 use gpui_kit::base::ScrollbarHandle;
+use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
     ActiveTheme, StyledExt,
     button::{Button, ButtonVariants},
@@ -120,7 +124,7 @@ impl DartView {
             .collect::<serde_json::Map<_, _>>();
         let mut labels = serde_json::Map::new();
         self.snapshot.root.visit(&mut |node| {
-            if let Node::Text { id, text } = node {
+            if let Node::Text { id, text, .. } = node {
                 labels.insert(id.clone(), json!(text));
             }
         });
@@ -318,7 +322,9 @@ impl DartView {
         let mut table_ids = HashSet::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
-            Node::Input { id, placeholder } => {
+            Node::Input {
+                id, placeholder, ..
+            } => {
                 input_ids.insert(id.clone());
                 if let Some(input) = self.inputs.get_mut(id) {
                     if input.placeholder != *placeholder {
@@ -351,7 +357,7 @@ impl DartView {
                     );
                 }
             }
-            Node::Table { id, dataset } => {
+            Node::Table { id, dataset, .. } => {
                 let Some(data) = self.datasets.entries.get(dataset).cloned() else {
                     failure = Some(format!("Missing retained dataset: {dataset}"));
                     return;
@@ -408,79 +414,196 @@ impl DartView {
         Ok(())
     }
 
-    fn materialize(&self, node: &Node) -> Result<AnyElement, String> {
+    fn materialize(&self, node: &Node, colors: &ThemeColor) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
         Ok(match node {
-            Node::Column { children, .. } => div()
-                .id(id)
-                .v_flex()
-                .gap_3()
-                .w_full()
-                .children(
+            Node::Column { children, .. } => apply_node_style(
+                div().id(id).v_flex().gap_3().w_full().children(
                     children
                         .iter()
-                        .map(|child| self.materialize(child))
+                        .map(|child| self.materialize(child, colors))
                         .collect::<Result<Vec<_>, _>>()?,
-                )
-                .into_any_element(),
-            Node::Row { children, .. } => div()
-                .id(id)
-                .h_flex()
-                .flex_wrap()
-                .gap_3()
-                .w_full()
-                .children(
+                ),
+                node,
+                colors,
+            )
+            .into_any_element(),
+            Node::Row { children, .. } => apply_node_style(
+                div().id(id).h_flex().flex_wrap().gap_3().w_full().children(
                     children
                         .iter()
-                        .map(|child| self.materialize(child))
+                        .map(|child| self.materialize(child, colors))
                         .collect::<Result<Vec<_>, _>>()?,
-                )
-                .into_any_element(),
-            Node::Text { text, .. } => div().id(id).child(text.clone()).into_any_element(),
+                ),
+                node,
+                colors,
+            )
+            .into_any_element(),
+            Node::Text { text, .. } => {
+                apply_node_style(div().id(id).child(text.clone()), node, colors).into_any_element()
+            }
             Node::Button { label, .. } => {
                 let events = self.events.clone();
                 let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
-                Button::new(id)
-                    .primary()
-                    .label(label.clone())
-                    .on_click(move |_, _, _| {
-                        #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
-                        crate::input_trace::record("native_click_handler", json!({"id": event_id}));
-                        events.emit(Event::Click {
-                            revision,
-                            id: event_id.clone(),
+                apply_node_style(
+                    Button::new(id)
+                        .primary()
+                        .label(label.clone())
+                        .on_click(move |_, _, _| {
                             #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
-                            debug_input_sequence: crate::input_trace::sequence(),
-                        });
-                    })
-                    .into_any_element()
-            }
-            Node::Input { id, .. } => Input::new(
-                &self
-                    .inputs
-                    .get(id)
-                    .ok_or_else(|| format!("Missing retained input: {id}"))?
-                    .state,
-            )
-            .id(SharedString::from(id.clone()))
-            .into_any_element(),
-            Node::Table { id, .. } => div()
-                .id(SharedString::from(id.clone()))
-                .w_full()
-                .h(px(320.))
-                .child(
-                    DataTable::new(
-                        self.tables
-                            .get(id)
-                            .ok_or_else(|| format!("Missing retained table: {id}"))?,
-                    )
-                    .stripe(true)
-                    .bordered(true),
+                            crate::input_trace::record(
+                                "native_click_handler",
+                                json!({"id": event_id}),
+                            );
+                            events.emit(Event::Click {
+                                revision,
+                                id: event_id.clone(),
+                                #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
+                                debug_input_sequence: crate::input_trace::sequence(),
+                            });
+                        }),
+                    node,
+                    colors,
                 )
-                .into_any_element(),
+                .into_any_element()
+            }
+            Node::Input { id, .. } => apply_node_style(
+                Input::new(
+                    &self
+                        .inputs
+                        .get(id)
+                        .ok_or_else(|| format!("Missing retained input: {id}"))?
+                        .state,
+                )
+                .id(SharedString::from(id.clone())),
+                node,
+                colors,
+            )
+            .into_any_element(),
+            Node::Table { id, .. } => apply_node_style(
+                div()
+                    .id(SharedString::from(id.clone()))
+                    .w_full()
+                    .h(px(320.))
+                    .child(
+                        DataTable::new(
+                            self.tables
+                                .get(id)
+                                .ok_or_else(|| format!("Missing retained table: {id}"))?,
+                        )
+                        .stripe(true)
+                        .bordered(true),
+                    ),
+                node,
+                colors,
+            )
+            .into_any_element(),
         })
     }
+}
+
+fn apply_node_style<T: Styled>(element: T, node: &Node, colors: &ThemeColor) -> T {
+    match node.style() {
+        Some(style) => apply_style(element, style, colors),
+        None => element,
+    }
+}
+
+fn style_length(size: StyleSize) -> Length {
+    match size {
+        StyleSize::Px(value) => px(value).into(),
+        StyleSize::Full => relative(1.).into(),
+        StyleSize::Fit => Length::Auto,
+    }
+}
+
+fn resolve_color(color: StyleColor, colors: &ThemeColor) -> Hsla {
+    match color {
+        StyleColor::Hex(value) => rgba(value).into(),
+        StyleColor::Token(token) => match token {
+            ThemeToken::Background => colors.background,
+            ThemeToken::Foreground => colors.foreground,
+            ThemeToken::Primary => colors.primary,
+            ThemeToken::PrimaryForeground => colors.primary_foreground,
+            ThemeToken::Secondary => colors.secondary,
+            ThemeToken::SecondaryForeground => colors.secondary_foreground,
+            ThemeToken::Muted => colors.muted,
+            ThemeToken::MutedForeground => colors.muted_foreground,
+            ThemeToken::Accent => colors.accent,
+            ThemeToken::AccentForeground => colors.accent_foreground,
+            ThemeToken::Danger => colors.danger,
+            ThemeToken::DangerForeground => colors.danger_foreground,
+            ThemeToken::Border => colors.border,
+            ThemeToken::Success => colors.success,
+            ThemeToken::Warning => colors.warning,
+            ThemeToken::Info => colors.info,
+        },
+    }
+}
+
+/// Applies a wire style to any styled element. `border_color` implies a 1 px
+/// border so the color is visible; no border-width field exists in this milestone.
+fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
+    let mut element = element;
+    if let Some([top, right, bottom, left]) = style.padding {
+        element = element
+            .pt(px(top))
+            .pr(px(right))
+            .pb(px(bottom))
+            .pl(px(left));
+    }
+    if let Some(gap) = style.gap {
+        element = element.gap(px(gap));
+    }
+    if let Some(width) = style.width {
+        element = element.w(style_length(width));
+    }
+    if let Some(height) = style.height {
+        element = element.h(style_length(height));
+    }
+    if let Some(align) = style.align {
+        element = match align {
+            StyleAlign::Start => element.items_start(),
+            StyleAlign::Center => element.items_center(),
+            StyleAlign::End => element.items_end(),
+            StyleAlign::Stretch => element.items_stretch(),
+        };
+    }
+    if let Some(justify) = style.justify {
+        element = match justify {
+            StyleJustify::Start => element.justify_start(),
+            StyleJustify::Center => element.justify_center(),
+            StyleJustify::End => element.justify_end(),
+            StyleJustify::SpaceBetween => element.justify_between(),
+        };
+    }
+    if let Some(background) = style.background {
+        element = element.bg(resolve_color(background, colors));
+    }
+    if let Some(foreground) = style.foreground {
+        element = element.text_color(resolve_color(foreground, colors));
+    }
+    if let Some(border_color) = style.border_color {
+        element = element
+            .border_1()
+            .border_color(resolve_color(border_color, colors));
+    }
+    if let Some(radius) = style.border_radius {
+        element = element.rounded(px(radius));
+    }
+    if let Some(size) = style.font_size {
+        element = element.text_size(px(size));
+    }
+    if let Some(weight) = style.font_weight {
+        element = element.font_weight(match weight {
+            StyleFontWeight::Normal => FontWeight::NORMAL,
+            StyleFontWeight::Medium => FontWeight::MEDIUM,
+            StyleFontWeight::Semibold => FontWeight::SEMIBOLD,
+            StyleFontWeight::Bold => FontWeight::BOLD,
+        });
+    }
+    element
 }
 
 #[cfg(test)]
@@ -491,7 +614,8 @@ impl Render for DartView {
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);
-        let content = match self.materialize(&self.snapshot.root) {
+        let colors = cx.theme().colors.clone();
+        let content = match self.materialize(&self.snapshot.root, &colors) {
             Ok(content) => content,
             Err(message) => {
                 self.fail(message, cx);

@@ -4,6 +4,7 @@ use crate::{
     datasets::{Change, Initial, Update, Upload},
     protocol::{Event, Node, Snapshot, TableData},
 };
+use gpui_kit::component::ActiveTheme;
 use gpui_kit::gpui;
 use gpui_kit::test::TestWindowExt;
 use gpui_kit::{
@@ -17,21 +18,26 @@ fn description(revision: u64) -> Snapshot {
         revision,
         root: Node::Column {
             id: "root".into(),
+            style: None,
             children: vec![
                 Node::Text {
                     id: "label".into(),
+                    style: None,
                     text: format!("Revision {revision}"),
                 },
                 Node::Button {
                     id: "increment".into(),
+                    style: None,
                     label: "Increment".into(),
                 },
                 Node::Input {
                     id: "name".into(),
+                    style: None,
                     placeholder: "Name".into(),
                 },
                 Node::Table {
                     id: "table".into(),
+                    style: None,
                     dataset: "records".into(),
                 },
             ],
@@ -82,9 +88,11 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                     1,
                     Node::Row {
                         id: "actions".into(),
+                        style: None,
                         children: (0..3)
                             .map(|i| Node::Button {
                                 id: format!("action-{i}"),
+                                style: None,
                                 label: format!("A long action label {i}"),
                             })
                             .collect(),
@@ -92,6 +100,7 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                 );
                 children.push(Node::Button {
                     id: "footer".into(),
+                    style: None,
                     label: "End of screen".into(),
                 });
                 cx.new(|cx| DartView::new(data, Events(Arc::new(|_| {})), window, cx))
@@ -271,19 +280,27 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
     cx.update_window(handle, |_, window, cx| {
         view.update(cx, |view, cx| {
             assert!(
-                view.materialize(&Node::Input {
-                    id: "missing-input".into(),
-                    placeholder: String::new(),
-                })
+                view.materialize(
+                    &Node::Input {
+                        id: "missing-input".into(),
+                        style: None,
+                        placeholder: String::new(),
+                    },
+                    &cx.theme().colors.clone(),
+                )
                 .err()
                 .unwrap()
                 .contains("missing-input")
             );
             assert!(
-                view.materialize(&Node::Table {
-                    id: "missing-table".into(),
-                    dataset: "records".into(),
-                })
+                view.materialize(
+                    &Node::Table {
+                        id: "missing-table".into(),
+                        style: None,
+                        dataset: "records".into(),
+                    },
+                    &cx.theme().colors.clone(),
+                )
                 .err()
                 .unwrap()
                 .contains("missing-table")
@@ -434,6 +451,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
                     revision: 3,
                     root: Node::Text {
                         id: "empty".into(),
+                        style: None,
                         text: "Closed".into(),
                     },
                 },
@@ -463,4 +481,38 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
             .iter()
             .any(|event| matches!(event, Event::Input { value, .. } if value == "Dart 🦀"))
     );
+}
+
+#[gpui::test]
+fn styled_nodes_render_without_error(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial(1), Events(Arc::new(|_| {})), window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let snapshot = Snapshot::parse(
+            br##"{"revision":2,"root":{"kind":"column","id":"root",
+                "style":{"padding":[8,8,8,8],"gap":4,"background":"token:muted","border_color":"#33415580","border_radius":6},
+                "children":[
+                    {"kind":"text","id":"heading","text":"Styled","style":{"font_size":20,"font_weight":"bold","foreground":"token:primary"}},
+                    {"kind":"button","id":"cta","label":"Go","style":{"width":{"px":120}}},
+                    {"kind":"row","id":"actions","style":{"justify":"space_between","align":"center"},"children":[]},
+                    {"kind":"input","id":"name","placeholder":"Name","style":{"width":"full"}},
+                    {"kind":"table","id":"table","dataset":"records","style":{"height":{"px":200}}}
+                ]}}"##,
+        )
+        .unwrap();
+        view.update(cx, |view, cx| view.publish(snapshot, window, cx));
+        window.render_frame(cx);
+        let view = view.read(cx);
+        assert!(view.failure.is_none());
+        assert_eq!(view.snapshot.revision, 2);
+        assert_eq!(window.find("cta").bounds().size.width, px(120.));
+        assert_eq!(window.find("table").bounds().size.height, px(200.));
+    })
+    .unwrap();
 }
