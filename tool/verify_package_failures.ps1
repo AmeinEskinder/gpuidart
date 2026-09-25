@@ -21,6 +21,11 @@ try {
     }
     $tampered = Join-Path $fixture 'tampered'
     Expand-Archive -LiteralPath $Zip -DestinationPath $tampered
+    $candidate = Get-Content -LiteralPath (Join-Path $tampered 'manifest.json') -Raw | ConvertFrom-Json
+    $releaseChecks = Get-Content -LiteralPath (Join-Path $tampered 'RELEASE-CHECKS.md') -Raw
+    if (!$releaseChecks.Contains("Launch $($candidate.executable) normally")) {
+        throw 'Release instructions do not name the shipped executable'
+    }
     Add-Content -LiteralPath (Join-Path $tampered 'README.txt') -Value 'Changed after packaging'
     $hashResult = Assert-RejectedPackage $tampered 'Package hash mismatch'
 
@@ -37,10 +42,18 @@ Future<void> main() async {
 }
 '@ | Set-Content -LiteralPath $entry -Encoding UTF8
     & "$PSScriptRoot/package.ps1" -EntryPoint $entry -Name MissingSelfTestResult | Out-Host
+    $custom = Get-Content -LiteralPath 'build/MissingSelfTestResult-windows-x64/manifest.json' -Raw | ConvertFrom-Json
+    $entryHash = (Get-FileHash -LiteralPath $entry -Algorithm SHA256).Hash.ToLowerInvariant()
+    if (!$custom.build.source_dirty -or $custom.build.application_entry.tracked_in_sdk_repository -or
+        $custom.build.application_entry.sha256 -ne $entryHash -or
+        @($custom.build.source_files | Where-Object sha256 -eq $entryHash).Count -ne 1) {
+        throw 'Ignored custom entry source is missing from package identity'
+    }
     $resultCheck = Assert-RejectedPackage (Join-Path $projectRoot 'build/MissingSelfTestResult-windows-x64') 'boolean passed true'
     [ordered]@{
         passed=$true; tampered_file_rejected=$hashResult; missing_self_test_result_rejected=$resultCheck
         stale_success_report_replaced=$true
+        named_release_instructions=$true; ignored_entry_hashed=$true; ignored_entry_reported_uncommitted=$true
     } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath 'reports/sdk/package-failures.json' -Encoding UTF8
     Write-Output 'PASS: changed package contents and absent self-test success are rejected; failures replace stale success reports.'
 } finally { Pop-Location }

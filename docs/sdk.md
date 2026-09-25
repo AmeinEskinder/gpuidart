@@ -100,11 +100,11 @@ Custom entry point and filename:
 
 The verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot and passed set to the boolean true. The supplied examples implement that contract. A custom application supplies its own meaningful self-test. Failed verification writes passed false and the error to its report, replacing any earlier success. Supply -CrtDirectory when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
 
-The manifest records the native ABI, Git commit, whether source files were modified, tool versions and hashes of source files and shipped files. Keep that manifest with a result. Use verify_package.ps1 -ReportPath to retain separate verification reports for different packages.
+The manifest records the native ABI, Git commit, whether source files were modified, tool versions and hashes of source files and shipped files. It includes the application entry file even if that file is ignored by Git or outside the SDK repository. Such an entry is marked as uncommitted source. The included release instructions use the chosen executable filename. Keep the manifest with a result. Use verify_package.ps1 -ReportPath to retain separate verification reports for different packages.
 
 ## Verification status
 
-The [MVP release-candidate record](../reports/mvp/README.md) contains the latest committed-source package and acceptance result. Run `./tool/verify_mvp.ps1` for the full local release gate. Its source hash covers repository source files; when packaging an application outside this repository, retain that application's own revision separately.
+The [MVP release-candidate record](../reports/mvp/README.md) contains the latest committed-source package and acceptance result. Run `./tool/verify_mvp.ps1` for the full local release gate. Its source hash covers repository source files and the application entry; when packaging an application outside this repository, retain that application's own revision and dependency sources separately.
 
 Run the SDK checks after building the native library:
 

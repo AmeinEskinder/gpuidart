@@ -40,7 +40,8 @@ try {
     $kitRoot = Split-Path (Split-Path (Split-Path $kit.manifest_path -Parent) -Parent) -Parent
     Copy-Item -LiteralPath (Join-Path $kitRoot 'LICENSE-APACHE') -Destination "$packageDirectory/GPUI-Kit-LICENSE.txt"
     Copy-Item -LiteralPath "$PSScriptRoot/windows/verify.ps1" -Destination "$packageDirectory/verify.ps1"
-    Copy-Item -LiteralPath "$projectRoot/docs/windows-release-checks.md" -Destination "$packageDirectory/RELEASE-CHECKS.md"
+    (Get-Content -Raw -LiteralPath "$projectRoot/docs/windows-release-checks.md").Replace('gpuidart-windows-x64.zip', "$Name-windows-x64.zip").Replace('gpuidart.exe', "$Name.exe") |
+        Set-Content -LiteralPath "$packageDirectory/RELEASE-CHECKS.md" -Encoding UTF8
     $applicationNotes = if ($EntryPoint.Replace('\','/') -eq 'example/watchlist/main.dart') {
         "Market watch has search, row selection, a shortlist and sample price updates.`r`nAll data is fictitious. No live market feed or trading connection is used.`r`n$Name.exe --self-test checks search, edits and shortlist transactions, prints JSON and closes."
     } else {
@@ -72,6 +73,20 @@ See the source lockfiles for dependencies. This is an evaluation ZIP, not a sign
     }
     $sourcePaths = @(git ls-files --cached --others --exclude-standard -- lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock | Sort-Object -Unique)
     if ($LASTEXITCODE -ne 0) { throw 'Could not identify package source files' }
+    $entryAbsolute = (Resolve-Path -LiteralPath $EntryPoint).ProviderPath
+    $rootPrefix = "$projectRoot\"
+    $entryTracked = $false
+    $entrySourcePath = $entryAbsolute
+    if ($entryAbsolute.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        $entrySourcePath = $entryAbsolute.Substring($rootPrefix.Length).Replace('\','/')
+        $entryTracked = @(git ls-files --cached -- $entrySourcePath).Count -eq 1
+    }
+    if ($sourcePaths -notcontains $entrySourcePath) { $sourcePaths += $entrySourcePath }
+    $sourcePaths = @($sourcePaths | Sort-Object -Unique)
+    $applicationEntry = [ordered]@{
+        path=$entrySourcePath; tracked_in_sdk_repository=$entryTracked
+        sha256=(Get-FileHash -LiteralPath $entryAbsolute -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
     $sourceFiles = @($sourcePaths | ForEach-Object {
         [ordered]@{path=$_; sha256=(Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant()}
     })
@@ -81,8 +96,9 @@ See the source lockfiles for dependencies. This is an evaluation ZIP, not a sign
     finally { $hasher.Dispose() }
     $sourceStatus = @(git status --porcelain --untracked-files=normal -- lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock)
     $build = [ordered]@{
-        git_commit = (git rev-parse HEAD).Trim(); source_dirty = ($sourceStatus.Count -gt 0)
+        git_commit = (git rev-parse HEAD).Trim(); source_dirty = ($sourceStatus.Count -gt 0 -or !$entryTracked)
         source_sha256 = $sourceHash; source_files = $sourceFiles
+        application_entry = $applicationEntry
         dart = ((& dart --version) -join ' ').Trim(); rustc = ((& rustc --version) -join ' ').Trim()
         cargo = ((& cargo --version) -join ' ').Trim(); built_at_utc = [DateTime]::UtcNow.ToString('o')
     }
