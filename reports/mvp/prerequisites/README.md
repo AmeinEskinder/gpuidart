@@ -48,18 +48,39 @@ The latest [inspection check](inspection-check.json) covers the combined and
 Japanese-only commands. The Japanese-only inspection retains the restart warning
 without blocking the DISM attempt. A test copy that restored the blanket
 inspection block failed the regression check. This verifies setup-tool behavior;
-the elevated installation and actual IME composition have not yet been run.
+the independent elevated installation had not yet been run at that point.
+
+## Download completed, installation pending
+
+The subsequent [Japanese-only attempt](japanese-install-pending.json) changed
+`Language.Basic~~~ja-JP~0.0.1.0` from `NotPresent` to `InstallPending`. DISM
+returned `RestartNeeded: true`. The runner stopped before requesting Japanese
+fonts, which remain `NotPresent`. The attempt lasted about 25 minutes.
+
+This is evidence that the unmetered connection resolved the download block and
+Windows staged the typing capability. It is not evidence of a usable IME yet.
+Microsoft describes [InstallPending](https://learn.microsoft.com/en-us/powershell/dsc/reference/resources/microsoft/windows/featureondemandlist/?view=dsc-3.0)
+as requiring a restart to complete.
+
+The generic failure message in the original result was misleading. The runner
+now records `status: restart_required` for this outcome and prints a progress
+message without a failure exception. `passed` and `installation_passed` remain
+false while requested components are unfinished. Actual servicing errors still
+throw. Retrying before restart recognizes `InstallPending` and stops before
+another download. The recorded states, successful installed states, a missing
+capability and a partial installation are covered by the prerequisite check.
 
 ## Next steps
 
-To try Japanese input while postponing the Windows restart, run from
-Administrator PowerShell:
+The current local attempt is waiting for the restart requested by DISM. It can
+remain pending until the operator chooses to restart. Afterward, run from
+Administrator PowerShell to finish any remaining capabilities:
 
 ```powershell
 & 'D:\Dev\gpuidart\tool\windows\enable_release_checks.ps1' -Japanese
 ```
 
-DISM can still reject installation or require a restart. Complete the pending
-Windows restart later to proceed with Sandbox setup and launch verification.
+Complete the pending Windows restart later to proceed with Sandbox setup and
+launch verification as well. No further installer retries are needed beforehand.
 The script does not restart Windows or alter network-cost settings. The clean-VM
 launch and human IME release gates remain pending. The release ZIP is unchanged.

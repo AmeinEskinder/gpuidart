@@ -1,0 +1,61 @@
+﻿{
+    "started_at_utc":  "2026-09-25T17:07:08.4866354Z",
+    "passed":  false,
+    "steps":  [
+                  {
+                      "name":  "Japanese",
+                      "passed":  false,
+                      "capabilities_before":  [
+                                                  {
+                                                      "Name":  "Language.Basic~~~ja-JP~0.0.1.0",
+                                                      "State":  "NotPresent"
+                                                  },
+                                                  {
+                                                      "Name":  "Language.Fonts.Jpan~~~und-JPAN~0.0.1.0",
+                                                      "State":  "NotPresent"
+                                                  }
+                                              ],
+                      "restart_needed":  true,
+                      "capabilities_after":  [
+                                                 {
+                                                     "Name":  "Language.Basic~~~ja-JP~0.0.1.0",
+                                                     "State":  "InstallPending"
+                                                 },
+                                                 {
+                                                     "Name":  "Language.Fonts.Jpan~~~und-JPAN~0.0.1.0",
+                                                     "State":  "NotPresent"
+                                                 }
+                                             ],
+                      "error":  "Japanese typing or fonts are not installed yet. See capability states in the report."
+                  }
+              ],
+    "mode":  "install",
+    "environment_before":  {
+                               "restart_pending":  true,
+                               "restart_reasons":  [
+                                                       "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending",
+                                                       "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\RebootRequired"
+                                                   ],
+                               "network":  {
+                                               "cost":  "Unrestricted",
+                                               "roaming":  false,
+                                               "over_data_limit":  false
+                                           }
+                           },
+    "restart_needed":  true,
+    "previous_report":  "D:\\Dev\\gpuidart\\build\\windows-prerequisites.json.20260925-170708-496-40eefe1e.json",
+    "environment_after":  {
+                              "restart_pending":  true,
+                              "restart_reasons":  [
+                                                      "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending",
+                                                      "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\RebootRequired"
+                                                  ],
+                              "network":  {
+                                              "cost":  "Unrestricted",
+                                              "roaming":  false,
+                                              "over_data_limit":  false
+                                          }
+                          },
+    "installation_passed":  false,
+    "finished_at_utc":  "2026-09-25T17:32:07.6179609Z"
+}

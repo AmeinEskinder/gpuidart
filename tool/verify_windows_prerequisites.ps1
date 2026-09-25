@@ -1,6 +1,19 @@
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 $setup = Join-Path $PSScriptRoot 'windows/enable_release_checks.ps1'
+. (Join-Path $PSScriptRoot 'windows/capability_state.ps1')
+$pendingInstallation = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'reports/mvp/prerequisites/japanese-install-pending.json') | ConvertFrom-Json
+$pendingStep = $pendingInstallation.steps | Where-Object name -eq 'Japanese'
+if ((Get-CapabilityInstallStatus -Capabilities $pendingStep.capabilities_after -RestartNeeded $pendingStep.restart_needed) -ne 'restart_required') {
+    throw 'The recorded staged Japanese installation must be classified as awaiting restart.'
+}
+$installedCapabilities = @([pscustomobject]@{State='Installed'}, [pscustomobject]@{State='Installed'})
+if ((Get-CapabilityInstallStatus $installedCapabilities $false) -ne 'installed') { throw 'Installed capabilities were not recognized.' }
+if ((Get-CapabilityInstallStatus $installedCapabilities $true) -ne 'restart_required') { throw 'A DISM restart requirement was discarded.' }
+$incompleteCapabilities = @([pscustomobject]@{State='Installed'}, [pscustomobject]@{State='NotPresent'})
+if ((Get-CapabilityInstallStatus $incompleteCapabilities $false) -ne 'incomplete') { throw 'Missing capabilities were accepted without a pending installation.' }
+$partialCapabilities = @([pscustomobject]@{State='PartiallyInstalled'}, [pscustomobject]@{State='InstallPending'})
+if ((Get-CapabilityInstallStatus $partialCapabilities $true) -ne 'incomplete') { throw 'A partial installation was hidden by a restart flag.' }
 $directory = Join-Path $projectRoot ('.cache/prerequisite-check-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $directory | Out-Null
 $reportPath = Join-Path $directory 'inspection.json'
@@ -48,6 +61,7 @@ $result = [ordered]@{
     tested_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $true
     scope = 'Read-only setup inspection and report preservation; no Windows installation or release-gate pass'
     inspection = $report; japanese_only_inspection = $japaneseReport
+    capability_states = 'Recorded InstallPending, installed, restart-requested, missing and partial states classified correctly'
 }
 $destination = Join-Path $projectRoot 'reports/mvp/prerequisites/inspection-check.json'
 New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null

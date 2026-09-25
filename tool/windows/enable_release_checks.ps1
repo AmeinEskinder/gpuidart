@@ -5,6 +5,7 @@ param(
     [string]$ReportPath = (Join-Path $PSScriptRoot '../../build/windows-prerequisites.json')
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'capability_state.ps1')
 if (!$Sandbox -and !$Japanese) { throw 'Specify -Sandbox, -Japanese, or both. No settings have changed.' }
 $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
 if (!$CheckOnly -and !$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -77,7 +78,7 @@ if ($CheckOnly) {
 $japaneseCapabilities = @('Language.Basic~~~ja-JP~0.0.1.0','Language.Fonts.Jpan~~~und-JPAN~0.0.1.0')
 foreach ($step in @('Sandbox','Japanese')) {
     if (($step -eq 'Sandbox' -and !$Sandbox) -or ($step -eq 'Japanese' -and !$Japanese)) { continue }
-    $result = [ordered]@{ name = $step; passed = $false }
+    $result = [ordered]@{ name = $step; passed = $false; status = 'failed' }
     try {
         $environment = Get-ReleaseSetupEnvironment
         if ($step -eq 'Sandbox' -and ($environment.restart_pending -or $report.restart_needed)) {
@@ -96,6 +97,8 @@ foreach ($step in @('Sandbox','Japanese')) {
             }
             $result['state'] = [string](Get-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM).State
             if ($result.state -notin @('Enabled','EnablePending')) { throw "Sandbox feature state is $($result.state)." }
+            $result.restart_needed = $result.restart_needed -or $result.state -eq 'EnablePending'
+            $result.status = if ($result.restart_needed) { 'restart_required' } else { 'installed' }
         } else {
             if ($environment.restart_pending) {
                 Write-Warning 'Windows has a pending restart. Attempting Japanese capabilities through DISM; Windows may still refuse or report that these capabilities need a restart.'
@@ -108,7 +111,7 @@ foreach ($step in @('Sandbox','Japanese')) {
                 if ($capability.State -eq 'Installed') { continue }
                 if ($capability.State -eq 'InstallPending') {
                     $result.restart_needed = $true
-                    throw 'Japanese capability installation is pending a Windows restart.'
+                    break
                 }
                 Assert-DownloadAvailable (Get-ReleaseSetupEnvironment)
                 Write-Output "Installing $($capability.Name). Windows Update may take several minutes."
@@ -121,13 +124,18 @@ foreach ($step in @('Sandbox','Japanese')) {
             $result['capabilities_after'] = @($japaneseCapabilities | ForEach-Object {
                 Get-WindowsCapability -Online -Name $_ | Select-Object Name,@{n='State';e={[string]$_.State}}
             })
-            if (@($result.capabilities_after | Where-Object State -ne 'Installed').Count -ne 0) {
+            $result.status = Get-CapabilityInstallStatus -Capabilities $result.capabilities_after -RestartNeeded $result.restart_needed
+            if ($result.status -eq 'restart_required') { $result.restart_needed = $true }
+            if ($result.status -eq 'incomplete') {
                 throw 'Japanese typing or fonts are not installed yet. See capability states in the report.'
             }
-            $result['next_step'] = 'Add Japanese to the original user language list. Windows display language is unchanged.'
+            $result['next_step'] = if ($result.status -eq 'restart_required') {
+                'Windows staged installation and requires a restart. Rerun -Japanese after restarting to finish any remaining capabilities. Repeating before restarting will not reinstall the pending capability.'
+            } else { 'Add Japanese to the original user language list. Windows display language is unchanged.' }
         }
-        $result.passed = $true
+        $result.passed = $result.status -eq 'installed'
     } catch {
+        $result.status = 'failed'
         $result['error'] = $_.Exception.Message
         if ($step -eq 'Japanese' -and $result.Contains('capabilities_before')) {
             try {
@@ -143,6 +151,7 @@ foreach ($step in @('Sandbox','Japanese')) {
     }
     if ($result['restart_needed']) { $report.restart_needed = $true }
     if ($result.passed) { Write-Output "$step installation checked." }
+    if ($result.status -eq 'restart_required') { Write-Warning "$step installation is awaiting a Windows restart. Progress is saved in the capability states." }
     $report.steps += $result
     $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
 }
@@ -150,12 +159,18 @@ $report['environment_after'] = Get-ReleaseSetupEnvironment
 $report.restart_needed = $report.restart_needed -or $report.environment_after.restart_pending
 $report['installation_passed'] = @($report.steps | Where-Object { !$_.passed }).Count -eq 0
 $report.passed = $report.installation_passed -and !$report.restart_needed
+$failedSteps = @($report.steps | Where-Object status -eq 'failed')
+$report['status'] = if ($failedSteps.Count) { 'failed' } elseif ($report.restart_needed) { 'restart_required' } else { 'installed' }
 $report['finished_at_utc'] = [DateTime]::UtcNow.ToString('o')
 $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
 Write-Output "Saved $ReportPath. No restart was initiated."
-if ($report.restart_needed) { Write-Warning 'Windows still reports a pending restart. This does not establish whether the IME is usable in this session; actual composition must be checked separately.' }
-if (!$report.installation_passed) {
-    $failures = @($report.steps | Where-Object { !$_.passed } | ForEach-Object { "$($_.name): $($_.error)" })
+if ($report.restart_needed) { Write-Warning 'Windows still reports pending servicing. See the per-step status and capability states in the report.' }
+if ($failedSteps.Count) {
+    $failures = @($failedSteps | ForEach-Object { "$($_.name): $($_.error)" })
     throw ($failures -join [Environment]::NewLine)
 }
-Write-Output 'Requested components are installed. Installation success and pending restart status are recorded separately; release verification remains pending.'
+if ($report.installation_passed) {
+    Write-Output 'Requested components are installed. Installation success and pending restart status are recorded separately; release verification remains pending.'
+} else {
+    Write-Output 'Installation progress saved. Windows requires a restart before setup can finish; release verification remains pending.'
+}

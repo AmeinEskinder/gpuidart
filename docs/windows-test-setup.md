@@ -54,6 +54,14 @@ whether all requested components reached the installed state. `restart_needed`
 retains the Windows restart requirement; `passed` stays false while it remains.
 Successful installation alone does not prove that IME composition works.
 
+If a capability becomes `InstallPending` or DISM requests a restart, the report
+records `status: restart_required` and preserves the progress. The command does
+not treat that outcome as an installation error, but `installation_passed` stays
+false until every requested component is installed. Rerun after restarting to
+finish the remaining capabilities. Genuine servicing errors still produce a
+failure. Repeating a pending installation before restarting does not request
+another download.
+
 If the connection is metered, Windows can
 refuse language downloads with `0x800F0908`, `CBS_E_METERED_NETWORK`. Connect to
 an unmetered network, or turn off **Metered connection** for the current network

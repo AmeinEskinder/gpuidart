@@ -1,9 +1,9 @@
 ﻿{
-    "tested_at_utc":  "2026-09-25T17:04:51.3739824Z",
+    "tested_at_utc":  "2026-09-25T17:36:41.3925130Z",
     "passed":  true,
     "scope":  "Read-only setup inspection and report preservation; no Windows installation or release-gate pass",
     "inspection":  {
-                       "started_at_utc":  "2026-09-25T17:04:50.5871843Z",
+                       "started_at_utc":  "2026-09-25T17:36:40.4859304Z",
                        "passed":  null,
                        "steps":  [
 
@@ -22,17 +22,17 @@
                                                               }
                                               },
                        "restart_needed":  true,
-                       "previous_report":  "D:\\Dev\\gpuidart\\.cache\\prerequisite-check-971a1032c2a3427d989e20379f140497\\inspection.json.20260925-170450-600-00df13cd.json",
+                       "previous_report":  "D:\\Dev\\gpuidart\\.cache\\prerequisite-check-c371a47683e84b1296dd2f6f817b0376\\inspection.json.20260925-173640-503-bee7d16e.json",
                        "blockers":  [
                                         "Restart Windows to complete pending servicing before Sandbox setup."
                                     ],
                        "notes":  [
                                      "A Windows restart is pending. A Japanese-only installation can ask DISM whether the requested capabilities can be installed now; this inspection cannot establish that outcome."
                                  ],
-                       "finished_at_utc":  "2026-09-25T17:04:50.6949143Z"
+                       "finished_at_utc":  "2026-09-25T17:36:40.6285031Z"
                    },
     "japanese_only_inspection":  {
-                                     "started_at_utc":  "2026-09-25T17:04:51.2056589Z",
+                                     "started_at_utc":  "2026-09-25T17:36:41.2156457Z",
                                      "passed":  null,
                                      "steps":  [
 
@@ -57,6 +57,7 @@
                                      "notes":  [
                                                    "A Windows restart is pending. A Japanese-only installation can ask DISM whether the requested capabilities can be installed now; this inspection cannot establish that outcome."
                                                ],
-                                     "finished_at_utc":  "2026-09-25T17:04:51.3317663Z"
-                                 }
+                                     "finished_at_utc":  "2026-09-25T17:36:41.3410458Z"
+                                 },
+    "capability_states":  "Recorded InstallPending, installed, restart-requested, missing and partial states classified correctly"
 }
