@@ -68,6 +68,8 @@ The actual packaged watchlist was verified at 125% scaling: window DPI 120, PerM
 
 ## Next experiments
 
+The [post-hardening roadmap](roadmap.md) evaluates proposed patches, styles, actions and dataset views against the actual benchmark workload and records the prerequisites for each.
+
 1. Complete the [clean-machine and human IME checks](windows-release-checks.md) using the SDK package.
 2. Continue the small [SDK API and representative screen](sdk.md) over the existing snapshot/dataset bridge. No rewrite is justified by the [completed comparison](../reports/comparison/dart-js-20260925.md).
 3. Measure controlled OS input-to-presentation latency when suitable trace access and changed-frame correlation are available.
