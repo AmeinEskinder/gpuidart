@@ -1,0 +1,13 @@
+FROM ubuntu:24.04
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    libstdc++6 libfontconfig1 libfreetype6 libx11-6 libxcb1 libx11-xcb1 \
+    libxkbcommon0 libxkbcommon-x11-0 libwayland-client0 libglib2.0-0t64 \
+    libssl3t64 libzstd1 libvulkan1 mesa-vulkan-drivers xvfb openbox xauth fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+ENV LIBGL_ALWAYS_SOFTWARE=1
+WORKDIR /evaluation
+COPY Watchlist-linux-x64.tar.gz /evaluation/package.tar.gz
+RUN mkdir extracted && tar -xzf package.tar.gz -C extracted \
+    && dpkg-query -W > /evaluation/runtime-packages.txt \
+    && ! command -v dart && ! command -v rustc && ! command -v cargo
+CMD ["sh", "-c", "xvfb-run -a -s '-screen 0 1280x800x24' sh -c 'openbox >/evidence/openbox.log 2>&1 & /evaluation/extracted/verify --environment=clean_container --report=/evidence/verification.json'"]

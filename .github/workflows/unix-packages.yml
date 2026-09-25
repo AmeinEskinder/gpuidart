@@ -1,0 +1,105 @@
+name: Unix release packages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unix-packages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - name: Install Linux build and display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers xvfb openbox xauth
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        id: cache
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: unix-package-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            unix-package-${{ runner.os }}-${{ runner.arch }}-
+            platform-probe-${{ runner.os }}-${{ runner.arch }}-
+      - name: Build AOT evaluation package
+        run: |
+          mkdir -p build/package-evidence
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+          dart run tool/package.dart --name=Watchlist 2>&1 | tee build/package-evidence/build.log
+      - name: Verify macOS extraction and record release-native baselines
+        if: runner.os == 'macOS'
+        run: |
+          dart run tool/verify_package.dart build/Watchlist-macos-arm64.tar.gz build/package-evidence/verification.json
+          dart run tool/run_host_baselines.dart build/package-evidence/baselines
+      - name: Verify Linux extraction and record release-native baselines
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'CHECKS'
+          unset WAYLAND_DISPLAY ZED_HEADLESS
+          openbox >build/package-evidence/openbox.log 2>&1 &
+          dart run tool/verify_package.dart build/Watchlist-linux-x64.tar.gz build/package-evidence/verification.json
+          dart run tool/run_host_baselines.dart build/package-evidence/baselines
+          CHECKS
+      - name: Verify Linux in a fresh runtime-only container
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p build/package-evidence/clean-container build/runtime-context
+          cp build/Watchlist-linux-x64.tar.gz build/runtime-context/
+          cp tool/unix/Dockerfile.runtime build/runtime-context/Dockerfile
+          docker build -t gpuidart-runtime-check build/runtime-context 2>&1 | tee build/package-evidence/container-build.log
+          docker run --name gpuidart-runtime-check -v "$PWD/build/package-evidence/clean-container:/evidence" gpuidart-runtime-check
+          docker cp gpuidart-runtime-check:/evaluation/runtime-packages.txt build/package-evidence/clean-container/
+          docker image inspect gpuidart-runtime-check >build/package-evidence/clean-container/image.json
+      - name: Retain package evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: package-evidence-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/package-evidence/**/*.json
+            build/package-evidence/**/*.log
+            build/package-evidence/**/*.txt
+          retention-days: 30
+      - name: Retain evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: evaluation-package-${{ runner.os }}-${{ runner.arch }}
+          path: build/Watchlist-*.tar.gz
+          retention-days: 30
+      - name: Retain release compilation cache
+        if: always() && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: unix-package-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
