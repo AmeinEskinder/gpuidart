@@ -7,3 +7,12 @@ debug = 0
 
 [profile.test]
 debug = 0
+
+[profile.dev.package.gpuidart]
+debug = 1
+
+[profile.test.package.gpuidart]
+debug = 1
+
+[profile.release]
+panic = "unwind"

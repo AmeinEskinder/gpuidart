@@ -193,6 +193,42 @@ fn construction_and_allocations_scale_with_viewport(cx: &mut TestAppContext) {
 }
 
 #[gpui::test]
+fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial(1), Events(Arc::new(|_| {})), window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        view.update(cx, |view, cx| {
+            assert!(
+                view.materialize(&Node::Input {
+                    id: "missing-input".into(),
+                    placeholder: String::new(),
+                })
+                .err()
+                .unwrap()
+                .contains("missing-input")
+            );
+            assert!(
+                view.materialize(&Node::Table {
+                    id: "missing-table".into(),
+                    dataset: "records".into(),
+                })
+                .err()
+                .unwrap()
+                .contains("missing-table")
+            );
+            view.datasets.entries.remove("records");
+            assert!(view.reconcile(window, cx).unwrap_err().contains("records"));
+        });
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
     let events = Arc::new(Mutex::new(Vec::new()));
     let collected = events.clone();

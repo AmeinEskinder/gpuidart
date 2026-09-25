@@ -74,6 +74,7 @@ pub(crate) struct DartView {
     scroll: ScrollHandle,
     datasets: Store,
     counters: Rc<Counters>,
+    failure: Option<String>,
 }
 
 impl DartView {
@@ -186,9 +187,22 @@ impl DartView {
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
             counters: Rc::new(Counters::default()),
+            failure: None,
         };
-        view.reconcile(window, cx);
+        if let Err(message) = view.reconcile(window, cx) {
+            view.fail(message, cx);
+        }
         view
+    }
+
+    fn fail(&mut self, message: String, cx: &mut Context<Self>) {
+        if self.failure.is_none() {
+            self.events.emit(Event::Error {
+                message: message.clone(),
+            });
+            self.failure = Some(message);
+            cx.quit();
+        }
     }
 
     fn publish(&mut self, snapshot: Snapshot, window: &mut Window, cx: &mut Context<Self>) {
@@ -200,9 +214,9 @@ impl DartView {
             });
             return;
         }
-        if let Err(message) =
+        if let Err(message) = snapshot.validate().and_then(|_| {
             datasets::validate_references(&snapshot, |id| self.datasets.entries.contains_key(id))
-        {
+        }) {
             self.events.emit(Event::Rejected {
                 revision: snapshot.revision,
                 message,
@@ -210,7 +224,10 @@ impl DartView {
             return;
         }
         self.snapshot = snapshot;
-        self.reconcile(window, cx);
+        if let Err(message) = self.reconcile(window, cx) {
+            self.fail(message, cx);
+            return;
+        }
         self.events.emit(Event::Applied {
             revision: self.snapshot.revision,
             native_apply_us: timer.elapsed().as_micros() as u64,
@@ -296,9 +313,10 @@ impl DartView {
         }
     }
 
-    fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
+        let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
             Node::Input { id, placeholder } => {
                 input_ids.insert(id.clone());
@@ -334,7 +352,10 @@ impl DartView {
                 }
             }
             Node::Table { id, dataset } => {
-                let data = self.datasets.entries[dataset].clone();
+                let Some(data) = self.datasets.entries.get(dataset).cloned() else {
+                    failure = Some(format!("Missing retained dataset: {dataset}"));
+                    return;
+                };
                 table_ids.insert(id.clone());
                 if let Some(table) = self.tables.get(id) {
                     table.update(cx, |table, cx| {
@@ -377,21 +398,30 @@ impl DartView {
             }
             _ => {}
         });
+        if let Some(message) = failure {
+            return Err(message);
+        }
         self.inputs.retain(|id, _| input_ids.contains(id));
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
+        Ok(())
     }
 
-    fn materialize(&self, node: &Node) -> AnyElement {
+    fn materialize(&self, node: &Node) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
-        match node {
+        Ok(match node {
             Node::Column { children, .. } => div()
                 .id(id)
                 .v_flex()
                 .gap_3()
                 .w_full()
-                .children(children.iter().map(|child| self.materialize(child)))
+                .children(
+                    children
+                        .iter()
+                        .map(|child| self.materialize(child))
+                        .collect::<Result<Vec<_>, _>>()?,
+                )
                 .into_any_element(),
             Node::Row { children, .. } => div()
                 .id(id)
@@ -399,7 +429,12 @@ impl DartView {
                 .flex_wrap()
                 .gap_3()
                 .w_full()
-                .children(children.iter().map(|child| self.materialize(child)))
+                .children(
+                    children
+                        .iter()
+                        .map(|child| self.materialize(child))
+                        .collect::<Result<Vec<_>, _>>()?,
+                )
                 .into_any_element(),
             Node::Text { text, .. } => div().id(id).child(text.clone()).into_any_element(),
             Node::Button { label, .. } => {
@@ -421,16 +456,30 @@ impl DartView {
                     })
                     .into_any_element()
             }
-            Node::Input { id, .. } => Input::new(&self.inputs[id].state)
-                .id(SharedString::from(id.clone()))
-                .into_any_element(),
+            Node::Input { id, .. } => Input::new(
+                &self
+                    .inputs
+                    .get(id)
+                    .ok_or_else(|| format!("Missing retained input: {id}"))?
+                    .state,
+            )
+            .id(SharedString::from(id.clone()))
+            .into_any_element(),
             Node::Table { id, .. } => div()
                 .id(SharedString::from(id.clone()))
                 .w_full()
                 .h(px(320.))
-                .child(DataTable::new(&self.tables[id]).stripe(true).bordered(true))
+                .child(
+                    DataTable::new(
+                        self.tables
+                            .get(id)
+                            .ok_or_else(|| format!("Missing retained table: {id}"))?,
+                    )
+                    .stripe(true)
+                    .bordered(true),
+                )
                 .into_any_element(),
-        }
+        })
     }
 }
 
@@ -442,6 +491,13 @@ impl Render for DartView {
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);
+        let content = match self.materialize(&self.snapshot.root) {
+            Ok(content) => content,
+            Err(message) => {
+                self.fail(message, cx);
+                div().child("Unable to render this view").into_any_element()
+            }
+        };
         let root = div()
             .id("gpuidart")
             .size_full()
@@ -449,12 +505,7 @@ impl Render for DartView {
             .track_scroll(&self.scroll)
             .bg(cx.theme().background)
             .text_color(cx.theme().foreground)
-            .child(
-                div()
-                    .w_full()
-                    .p_5()
-                    .child(self.materialize(&self.snapshot.root)),
-            )
+            .child(div().w_full().p_5().child(content))
             .vertical_scrollbar(&self.scroll);
         #[cfg(feature = "benchmark-trace")]
         let root = crate::input_trace::observe(root);
@@ -493,12 +544,23 @@ pub(crate) fn run(
             let handle = match opened {
                 Ok(handle) => handle,
                 Err(error) => {
-                    *failure.lock().unwrap() = Some(error.to_string());
+                    *failure.lock().unwrap_or_else(|error| error.into_inner()) =
+                        Some(error.to_string());
                     cx.quit();
                     return;
                 }
             };
-            let view = content.expect("window content");
+            let Some(view) = content else {
+                *failure.lock().unwrap_or_else(|error| error.into_inner()) =
+                    Some("Window opened without view content".into());
+                cx.quit();
+                return;
+            };
+            if let Some(message) = &view.read(cx).failure {
+                *failure.lock().unwrap_or_else(|error| error.into_inner()) = Some(message.clone());
+                cx.quit();
+                return;
+            }
             cx.on_window_closed(|cx, _| {
                 if cx.windows().is_empty() {
                     cx.quit();
@@ -552,7 +614,10 @@ pub(crate) fn run(
             })
             .detach();
         });
-    let error = result.lock().unwrap().take();
+    let error = result
+        .lock()
+        .unwrap_or_else(|error| error.into_inner())
+        .take();
     match error {
         Some(error) => Err(error),
         None => Ok(()),
