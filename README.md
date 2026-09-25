@@ -107,6 +107,8 @@ Node IDs must be nonempty and unique throughout one description. An input or tab
 
 ## Current limits
 
+The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
+
 - Windows only, one application host with one window. The dedicated UI isolate is a Windows experiment; macOS needs a different launch/thread arrangement.
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.

@@ -1,0 +1,128 @@
+﻿{
+    "captured_utc":  "2026-09-25T00:12:42.3416571Z",
+    "packages":  [
+                     {
+                         "payload_bytes":  19347328,
+                         "files":  [
+                                       {
+                                           "sha256":  "d95d3500a88d83657d7e34d39b2b4957310ef07cd7e67db37be9b43cfea98c75",
+                                           "name":  "gpui-native-comparison.exe",
+                                           "bytes":  19212288
+                                       },
+                                       {
+                                           "sha256":  "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+                                           "name":  "vcruntime140.dll",
+                                           "bytes":  124544
+                                       },
+                                       {
+                                           "sha256":  "3f82f6c7a0b3b96f7bad54436174e90e9ccb757683ecdf169d2941160048135d",
+                                           "name":  "GPUI-Kit-LICENSE.txt",
+                                           "bytes":  10496
+                                       }
+                                   ],
+                         "closure_status":  "explicit runtime payload; PE direct imports checked; clean-machine launch pending",
+                         "implementation":  "rust"
+                     },
+                     {
+                         "payload_bytes":  30916480,
+                         "files":  [
+                                       {
+                                           "sha256":  "4c076ec4cb342a229cc3c4da030688664001832cb1981abd2ad6de80b0b09be7",
+                                           "name":  "gpui-dart-comparison.exe",
+                                           "bytes":  6498816
+                                       },
+                                       {
+                                           "sha256":  "6848048298fe28bcede53bd073442cb814d1fd5adbf6b1192c1d9b3df176566b",
+                                           "name":  "gpuidart.dll",
+                                           "bytes":  24282624
+                                       },
+                                       {
+                                           "sha256":  "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+                                           "name":  "vcruntime140.dll",
+                                           "bytes":  124544
+                                       },
+                                       {
+                                           "sha256":  "3f82f6c7a0b3b96f7bad54436174e90e9ccb757683ecdf169d2941160048135d",
+                                           "name":  "GPUI-Kit-LICENSE.txt",
+                                           "bytes":  10496
+                                       }
+                                   ],
+                         "closure_status":  "explicit runtime payload; PE direct imports checked; clean-machine launch pending",
+                         "implementation":  "dart"
+                     },
+                     {
+                         "payload_bytes":  112402304,
+                         "files":  [
+                                       {
+                                           "sha256":  "c6d92cfe8f02b553b0543dfc6ab904f923e0e2b158b2a3e163ea37f442b6fc3b",
+                                           "name":  "gpui-solid-comparison.exe",
+                                           "bytes":  89337344
+                                       },
+                                       {
+                                           "sha256":  "9dd4d8f91c28025f67da2eb76682a6b3968f0327bfaecad97ebc11857a1a7249",
+                                           "name":  "gpuix-native.win32-x64-msvc.node",
+                                           "bytes":  22929920
+                                       },
+                                       {
+                                           "sha256":  "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+                                           "name":  "vcruntime140.dll",
+                                           "bytes":  124544
+                                       },
+                                       {
+                                           "sha256":  "3f82f6c7a0b3b96f7bad54436174e90e9ccb757683ecdf169d2941160048135d",
+                                           "name":  "GPUI-Kit-LICENSE.txt",
+                                           "bytes":  10496
+                                       }
+                                   ],
+                         "closure_status":  "explicit runtime payload; PE direct imports checked; clean-machine launch pending",
+                         "implementation":  "solid"
+                     },
+                     {
+                         "payload_bytes":  61551424,
+                         "files":  [
+                                       {
+                                           "sha256":  "af4654682b058976ba12503fd94b6a3d608f45cf6369ced33a12718f8a0c3ddf",
+                                           "name":  "gpui-component-shell.exe",
+                                           "bytes":  61413888
+                                       },
+                                       {
+                                           "sha256":  "4dda160ef9279a5c95c6cd3e241227d9b3cac7f989b84675d8b611edd9948217",
+                                           "name":  "main.js",
+                                           "bytes":  2496
+                                       },
+                                       {
+                                           "sha256":  "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+                                           "name":  "vcruntime140.dll",
+                                           "bytes":  124544
+                                       },
+                                       {
+                                           "sha256":  "3f82f6c7a0b3b96f7bad54436174e90e9ccb757683ecdf169d2941160048135d",
+                                           "name":  "GPUI-Kit-LICENSE.txt",
+                                           "bytes":  10496
+                                       }
+                                   ],
+                         "closure_status":  "explicit runtime payload; PE direct imports checked; clean-machine launch pending",
+                         "implementation":  "shell"
+                     }
+                 ],
+    "versions":  {
+                     "kit_revision":  "21622a70efd25219d26aa459164878c4da9e39f8",
+                     "rust_build":  "cargo --release (optimized); profiler enabled for native reference and GPUI-Dart",
+                     "gpuix_solid":  "0.10.0",
+                     "solid_lock_sha256":  "BDB7CA53DD9EF38FCC12C76F7796B08382AC47A91A0E38D92E60AC8E4310D697",
+                     "gpuix_binary_provenance":  "published npm artifact pinned by bun.lock integrity; upstream does not publish gitHead for this artifact",
+                     "solid_build":  "Bun compile + minify + Solid production plugin; npm Windows native addon",
+                     "bun":  "1.4.0",
+                     "dart":  "Dart SDK version: 3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"windows_x64\"",
+                     "quickjs_jit_revision":  "82d3808f3aa7d1c4ad2f360f5b3bd5979501d599",
+                     "presentmon":  "2.6.0",
+                     "root_lock_sha256":  "8400D91A2190D216AD2B543154C516DB09D12519CD9B429F64744C0F76A2E46A",
+                     "gpui_shell":  "0.6.5",
+                     "rust":  "rustc 1.98.1 (48a229cea 2026-09-01)",
+                     "shell_lock_sha256":  "4C766A7AC03FC42FDFBCD79B1E37A444CF42F3BC3407C86F7BAF8783E9B90852",
+                     "gpui_pre":  "0.3.6",
+                     "quickjs_jit_stdlib_revision":  "605da483611a3548edb8c33fdff602e3f5f42076",
+                     "gpuix_native":  "0.10.0",
+                     "solid_js":  "1.9.15"
+                 }
+}
