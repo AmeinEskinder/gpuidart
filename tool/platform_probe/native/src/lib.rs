@@ -13,6 +13,12 @@ use std::sync::{
 use std::time::Duration;
 
 static SIGNAL: AtomicU32 = AtomicU32::new(0);
+static KEEP_ALIVE: AtomicU32 = AtomicU32::new(0);
+
+#[unsafe(no_mangle)]
+pub extern "C" fn gdp_keep_alive(value: u32) {
+    KEEP_ALIVE.store(value, Ordering::Release);
+}
 
 #[unsafe(no_mangle)]
 pub extern "C" fn gdp_thread_id() -> u64 {
@@ -254,7 +260,7 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
         }
         cx.activate(true);
         cx.spawn(async move |cx| {
-            let steps = if commands.is_some() { 3000 } else { 500 };
+            let steps = if commands.is_some() || KEEP_ALIVE.load(Ordering::Acquire) == 1 { 3000 } else { 500 };
             for step in 0..steps {
                 cx.background_executor()
                     .timer(Duration::from_millis(10))
@@ -264,12 +270,40 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
                         window.update(cx, |_, window, _| window.resize(size(px(720.), px(420.))));
                     report("resize_requested", serde_json::Value::Null);
                 }
+                if step == 100 && std::env::var("GPUIDART_PROBE_DISPATCH").as_deref() == Ok("1") {
+                    let _ = window.update(cx, |_, window, cx| {
+                        let input = view.read(cx).input.clone();
+                        input.update(cx, |input, cx| input.focus(window, cx));
+                        for key in "gpui-probe".chars() {
+                            window.dispatch_keystroke(Keystroke::parse(&key.to_string()).expect("fixed probe key"), cx);
+                        }
+                        let position = point(px(80.), px(105.));
+                        window.dispatch_event(PlatformInput::MouseDown(MouseDownEvent {
+                            position, button: MouseButton::Left, click_count: 1, ..Default::default()
+                        }), cx);
+                        window.dispatch_event(PlatformInput::MouseUp(MouseUpEvent {
+                            position, button: MouseButton::Left, click_count: 1, ..Default::default()
+                        }), cx);
+                        report("gpui_input_dispatched", serde_json::json!({"scope": "Synthetic GPUI events on a real window; bypasses OS event injection and IME"}));
+                    });
+                }
                 let signal = SIGNAL.swap(0, Ordering::AcqRel);
                 if signal != 0 {
                     report("signal_received", serde_json::json!({"value": signal}));
+                    if signal != 99 {
+                        let _ = view.update(cx, |view, cx| {
+                            view.label = format!("Dart signal {signal}");
+                            report("signal_applied", serde_json::json!({
+                                "value": signal, "input_entity": format!("{:?}", view.input.entity_id()),
+                                "input_value": view.input.read(cx).value().to_string(),
+                            }));
+                            cx.notify();
+                        });
+                    }
                     if let Some(callback) = callback {
                         callback(signal);
                     }
+                    if signal == 99 { break; }
                 }
                 if let Some(commands) = &commands {
                     let mut closing = false;
@@ -321,7 +355,8 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
     if result_opened.load(Ordering::Acquire) == 1
         && renders >= 2
         && result_resized.load(Ordering::Acquire) == 1
-        && (std::env::var("GPUIDART_PROBE_INPUT").as_deref() != Ok("1")
+        && ((std::env::var("GPUIDART_PROBE_INPUT").as_deref() != Ok("1")
+            && std::env::var("GPUIDART_PROBE_DISPATCH").as_deref() != Ok("1"))
             || (result_input_matches.load(Ordering::Acquire) == 1
                 && result_clicks.load(Ordering::Acquire) >= 1))
     {

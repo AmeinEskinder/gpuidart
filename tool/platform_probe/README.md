@@ -27,6 +27,12 @@ negative capability check; the native-main and companion checks must pass for
 the macOS job to succeed. A zero process exit without its required checkpoints
 does not pass.
 
+`reload_ffi.dart` separately exercises the existing dedicated-isolate launcher
+through VM-service method reload, native echo, invalid-source rejection,
+recovery and requested shutdown. `GPUIDART_PROBE_DISPATCH=1` runs synthetic GPUI
+mouse/key events on the real native window. Unlike Linux's XTest driver, this
+mode bypasses OS event injection. Neither mode establishes human IME behavior.
+
 The probe reports native thread IDs and platform main-thread predicates. Windows
 does not have a main-thread predicate in this probe and reports `-1`; compare its
 executable entry and UI thread IDs directly. macOS uses `pthread_main_np`, Linux

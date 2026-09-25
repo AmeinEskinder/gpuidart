@@ -63,6 +63,8 @@ jobs:
           fi
       - name: Probe macOS native main thread and Dart JIT/AOT workers
         if: runner.os == 'macOS'
+        env:
+          GPUIDART_PROBE_DISPATCH: '1'
         run: dart run tool/platform_probe/run.dart
       - name: Probe Linux X11 software rendering and Dart JIT/AOT workers
         if: runner.os == 'Linux'

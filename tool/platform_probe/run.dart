@@ -26,7 +26,9 @@ Future<void> main(List<String> args) async {
       final process = await Process.start(
         executable,
         arguments,
-        environment: companion ? {'GPUIDART_PROBE_INPUT': '0'} : null,
+        environment: companion
+            ? {'GPUIDART_PROBE_INPUT': '0', 'GPUIDART_PROBE_DISPATCH': '0'}
+            : null,
       );
       final driver = driveInput
           ? injectInput().then<void>(
@@ -94,6 +96,13 @@ Future<void> main(List<String> args) async {
       if (beforeQuit == null ||
           beforeQuit['detail']['resized_render'] != true) {
         error ??= 'No checkpoint proving resized rendering before quit';
+      }
+      if ((Platform.environment['GPUIDART_PROBE_INPUT'] == '1' ||
+              Platform.environment['GPUIDART_PROBE_DISPATCH'] == '1') &&
+          !companion &&
+          (beforeQuit?['detail']['input_matches'] != true ||
+              (beforeQuit?['detail']['clicks'] as int? ?? 0) < 1)) {
+        error ??= 'Input and click checkpoint missing';
       }
       if (!Platform.isMacOS &&
           !events.any((event) => event['stage'] == 'run_return')) {
@@ -204,6 +213,20 @@ Future<void> main(List<String> args) async {
     timeout: const Duration(seconds: 45),
   );
 
+  final ffiReload = !Platform.isMacOS
+      ? await run(
+          'ffi-reload',
+          Platform.resolvedExecutable,
+          [
+            'tool/platform_probe/reload_ffi.dart',
+            library,
+            '${output.path}/reload-ffi.json',
+          ],
+          companion: true,
+          timeout: const Duration(seconds: 45),
+        )
+      : null;
+
   bool successful(Map<String, Object?>? result) =>
       result?['exit_code'] == 0 &&
       result?['timeout'] == false &&
@@ -222,6 +245,7 @@ Future<void> main(List<String> args) async {
         companionCompile,
         companionAot,
         reload,
+        if (!Platform.isMacOS) ffiReload,
       ].every(successful) &&
       (!Platform.isMacOS ||
           [nativeWorker, jit, aot].every(

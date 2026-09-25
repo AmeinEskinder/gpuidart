@@ -146,3 +146,24 @@ checks based on `8afcece`; macOS/Linux candidate runs are still pending.
 The next hosted runner treats macOS's rejected worker calls as explicit negative
 capability checks. Only successful native-main and companion JIT/AOT/reload
 checks can satisfy the macOS job. No rejected worker call counts as UI support.
+
+## Direct FFI development lifecycle
+
+The direct FFI probe now names its blocking isolate `gpui-native-loop`, matching
+the development launcher's isolate selection contract. A method edit changes a
+signal from 7 to 8; the native view applies that value and echoes it. VM-service
+discovery, native acknowledgements, unchanged process identity, invalid-source
+rejection, recovery and requested shutdown passed locally on Windows. See
+[the direct FFI reload report](reload-ffi-windows.json). Linux execution is the
+next gate before adopting this launch strategy in production.
+
+The next macOS probe adds synthetic GPUI mouse/key dispatch on the real window.
+It requires the input's exact text and the button handler, and labels the result
+as GPUI-dispatched input. It bypasses OS input injection and IME; those checks
+remain unverified. This path passed locally on Windows before the hosted run.
+
+Local Linux container preparation installed backend/display dependencies. TLS
+downloads of rustup and Dart from inside that container failed with connection
+resets/timeouts. Hosted builds continue to work. Native artifacts and the Dart
+SDK are being downloaded through Windows for further isolated Linux execution;
+no Windows servicing or restart change was made.
