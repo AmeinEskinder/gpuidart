@@ -66,6 +66,10 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         }
         if (value['row'] != null) integer('row');
       }
+    case 'action':
+      integer('revision', minimum: 1);
+      string('name');
+      string('context');
     case 'error':
       string('message');
     default:

@@ -16,6 +16,7 @@ use std::sync::{Arc, Mutex};
 fn description(revision: u64) -> Snapshot {
     Snapshot {
         revision,
+        actions: Vec::new(),
         root: Node::Column {
             id: "root".into(),
             style: None,
@@ -449,6 +450,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
             view.publish(
                 Snapshot {
                     revision: 3,
+                    actions: Vec::new(),
                     root: Node::Text {
                         id: "empty".into(),
                         style: None,
@@ -513,6 +515,92 @@ fn styled_nodes_render_without_error(cx: &mut TestAppContext) {
         assert_eq!(view.snapshot.revision, 2);
         assert_eq!(window.find("cta").bounds().size.width, px(120.));
         assert_eq!(window.find("table").bounds().size.height, px(200.));
+    })
+    .unwrap();
+}
+
+#[gpui::test]
+fn scoped_actions_dispatch_by_focus_and_unmatched_keys_type(cx: &mut TestAppContext) {
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let sink = Events(Arc::new(move |event| collected.lock().unwrap().push(event)));
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial(1), sink, window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let snapshot = Snapshot::parse(
+            br#"{"revision":2,"actions":[
+                {"name":"app.search","keys":"ctrl+f","context":"global"},
+                {"name":"input.search","keys":"ctrl+f","context":"form"},
+                {"name":"watchlist.add","keys":"ctrl+enter","context":"name"}
+            ],"root":{"kind":"column","id":"root","children":[
+                {"kind":"column","id":"form","children":[
+                    {"kind":"input","id":"name","placeholder":"Name"}
+                ]}
+            ]}}"#,
+        )
+        .unwrap();
+        view.update(cx, |view, cx| view.publish(snapshot, window, cx));
+        window.render_frame(cx);
+
+        // Nothing focused: node-context bindings do not fire, global ones do.
+        window.press("ctrl-enter", cx);
+        window.press("ctrl-f", cx);
+        {
+            let events = events.lock().unwrap();
+            let actions: Vec<_> = events
+                .iter()
+                .filter_map(|event| match event {
+                    Event::Action { name, context, .. } => Some((name.as_str(), context.as_str())),
+                    _ => None,
+                })
+                .collect();
+            assert_eq!(actions, [("app.search", "global")]);
+        }
+
+        // Focus the input: the innermost matching context wins over global.
+        window.click("name", cx);
+        window.press("ctrl-f", cx);
+        window.press("ctrl-enter", cx);
+        {
+            let events = events.lock().unwrap();
+            let actions: Vec<_> = events
+                .iter()
+                .filter_map(|event| match event {
+                    Event::Action {
+                        name,
+                        context,
+                        revision,
+                    } => Some((name.as_str(), context.as_str(), *revision)),
+                    _ => None,
+                })
+                .collect();
+            assert_eq!(
+                actions,
+                [
+                    ("app.search", "global", 2),
+                    ("input.search", "form", 2),
+                    ("watchlist.add", "name", 2),
+                ]
+            );
+        }
+
+        // An unmatched printable key still reaches the input as text.
+        window.press("a", cx);
+        assert_eq!(window.find("name").value(), Some("a"));
+        let count = events.lock().unwrap().len();
+        window.press("ctrl-x", cx);
+        assert_eq!(
+            events.lock().unwrap().len(),
+            count,
+            "unbound keys do not emit action events"
+        );
+        assert_eq!(window.find("name").value(), Some("a"));
     })
     .unwrap();
 }

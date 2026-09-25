@@ -71,6 +71,14 @@ Native dispatch produces a new event: `{ "type": "action", "revision": N, "name"
 - Text editing and IME composition shortcuts are owned by the native input and are never intercepted: a binding whose single key is printable text (a bare letter/digit with no modifier) is rejected. Human IME verification remains an open release gate; this design must not change the input's composition path.
 - Actions with no matching binding do nothing silently; a binding whose `name` no Dart listener handles is still delivered as an event. There is no native-side command execution in this milestone.
 
+### Dispatch implementation (as shipped)
+
+- Dispatch is a manual match in a GPUI keystroke interceptor (`App::intercept_keystrokes`), not the GPUI keymap. The keymap's `Action` trait requires a `&'static str` name, so bindings cannot carry the dynamic wire `name`, and `bind_keys` has no removal API, so snapshot-driven refresh would leak stale bindings. The interceptor fires before all other key handling regardless of focus; a matched binding emits the event and consumes the keystroke via `stop_propagation` + `prevent_default`, an unmatched key passes through untouched, so text input and IME composition are unaffected (they never match, since bare printable keys are rejected).
+- Modifier semantics are literal: `ctrl` is always the control key and `meta` is the platform meta key (cmd on macOS, windows key on Windows, super on Linux). There is no `secondary`/platform-primary alias; apps that want cmd-on-macOS/ctrl-elsewhere declare both bindings. The wire separator is `+` (`ctrl+enter`); GPUI's own `-` syntax is an internal detail.
+- Focus tracking scope: inputs and tables resolve as their node IDs, so their contexts and ancestors apply. gpui-kit `Button` creates its focus handle internally and does not expose it, so a focused button currently resolves as *no focused node* — only `global` bindings match. This is a known limitation of the milestone, not a rule.
+- On Windows, AltGr produces ctrl+alt; a `ctrl+alt+<key>` binding can therefore fire while typing national characters. This falls under the existing human IME release gate above.
+- Held keys repeat: a held matched binding emits repeated `action` events.
+
 ## 3. Stable record identity and dataset views
 
 ### Record identity

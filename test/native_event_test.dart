@@ -42,6 +42,14 @@ void main() {
         'dataset_revision': 1,
         'row': -1,
       },
+      {'type': 'action', 'revision': 2, 'name': 'app.search'},
+      {
+        'type': 'action',
+        'revision': 0,
+        'name': 'app.search',
+        'context': 'global',
+      },
+      {'type': 'action', 'revision': 2, 'name': 1, 'context': 'global'},
     ]) {
       expect(() => decode(value), throwsFormatException, reason: '$value');
     }
@@ -74,6 +82,14 @@ void main() {
         })['row'],
         isNull,
       );
+      final action = decode({
+        'type': 'action',
+        'revision': 4,
+        'name': 'watchlist.add',
+        'context': 'quotes-table',
+      });
+      expect(action['name'], 'watchlist.add');
+      expect(action['context'], 'quotes-table');
     },
   );
 }

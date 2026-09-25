@@ -6,6 +6,7 @@ import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 
+import 'actions.dart';
 import 'nodes.dart';
 import 'metrics.dart';
 import 'window_options.dart';
@@ -98,8 +99,28 @@ final class GpuiEvent {
           data['row'] as int?,
         )
       : null;
+
+  /// A matched action binding. Native never executes commands; the
+  /// application decides what [ActionEvent.name] means.
+  ActionEvent? get action => type == 'action'
+      ? ActionEvent._(
+          data['revision'] as int?,
+          data['name'] as String,
+          data['context'] as String,
+        )
+      : null;
   @override
   String toString() => jsonEncode(data);
+}
+
+/// A matched key binding from the snapshot's `actions` list.
+final class ActionEvent {
+  const ActionEvent._(this.revision, this.name, this.context);
+  final int? revision;
+  final String name;
+
+  /// The context that matched: the winning node ID or `global`.
+  final String context;
 }
 
 /// A row index is meaningful only within [datasetRevision]. Null means cleared.
@@ -142,6 +163,7 @@ final class GpuiHost {
   final _publishTimers = <int, Stopwatch>{};
   final _diagnostics = <int, Completer<Map<String, dynamic>>>{};
   final _datasets = <String, TableDataset>{};
+  List<UiAction> _viewActions = const [];
   final _dataPending =
       <int, ({String id, int revision, Completer<void> completion})>{};
   final _dataTimers = <int, Stopwatch>{};
@@ -166,6 +188,7 @@ final class GpuiHost {
     UiNode Function() builder, {
     String? libraryPath,
     List<TableDataset> datasets = const [],
+    List<UiAction> actions = const [],
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
@@ -181,12 +204,14 @@ final class GpuiHost {
       root,
       libraryPath: libraryPath,
       datasets: datasets,
+      actions: actions,
       window: window,
       requestTimeout: requestTimeout,
       shutdownTimeout: shutdownTimeout,
       trace: trace,
     );
     host._builder = builder;
+    host._viewActions = List.unmodifiable(actions);
     host.metrics.descriptionBuilds = 1;
     HostMetrics.sample(host.metrics.buildMicroseconds, elapsed);
     return host;
@@ -202,13 +227,14 @@ final class GpuiHost {
         ? builder()
         : _trace._measure('dart.build', 'snapshot', _revision + 1, builder);
     HostMetrics.sample(metrics.buildMicroseconds, timer.elapsedMicroseconds);
-    return publish(root);
+    return publish(root, actions: _viewActions);
   }
 
   static Future<GpuiHost> open(
     UiNode root, {
     String? libraryPath,
     List<TableDataset> datasets = const [],
+    List<UiAction> actions = const [],
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
@@ -246,7 +272,12 @@ final class GpuiHost {
     }
     final describeStart = trace?._clock.now();
     final initial = <String, Object>{
-      'snapshot': {'revision': 1, 'root': root.toJson()},
+      'snapshot': {
+        'revision': 1,
+        'root': root.toJson(),
+        if (actions.isNotEmpty)
+          'actions': actions.map((action) => action.toJson()).toList(),
+      },
       'datasets': datasets.map((dataset) => dataset._upload()).toList(),
       'window': windowDescription,
     };
@@ -371,7 +402,11 @@ final class GpuiHost {
   }
 
   /// Completes when Rust applies the snapshot. This is not a GPU presentation fence.
-  Future<void> publish(UiNode root) {
+  ///
+  /// Actions are declared per snapshot like the node tree: [actions] replaces
+  /// the bindings, and omitting it clears them. [openView] rebuilds redeclare
+  /// the actions passed to [openView].
+  Future<void> publish(UiNode root, {List<UiAction> actions = const []}) {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     final revision = ++_revision;
     _trace?._point('dart.request', 'snapshot', revision);
@@ -384,7 +419,12 @@ final class GpuiHost {
           ? root.toJson()
           : _trace._measure('dart.describe', 'snapshot', revision, root.toJson);
       status = _withMessage(
-        {'revision': revision, 'root': rootDescription},
+        {
+          'revision': revision,
+          'root': rootDescription,
+          if (actions.isNotEmpty)
+            'actions': actions.map((action) => action.toJson()).toList(),
+        },
         'snapshot',
         revision,
         (bytes, length) => _bindings.publish(_handle, bytes, length),
@@ -560,6 +600,7 @@ final class GpuiHost {
       metrics.ffiCallbacks++;
       if (event.type == 'click' ||
           event.type == 'input' ||
+          event.type == 'action' ||
           event.type == 'table_selection') {
         metrics.uiCallbacks++;
       }

@@ -4,7 +4,8 @@ use crate::{
     Command, Events,
     protocol::{
         Align as StyleAlign, Color as StyleColor, Event, FontWeight as StyleFontWeight,
-        Justify as StyleJustify, Node, Size as StyleSize, Snapshot, Style, ThemeToken,
+        Justify as StyleJustify, KeystrokeSpec, Node, Size as StyleSize, Snapshot, Style,
+        ThemeToken,
     },
 };
 use async_channel::Receiver;
@@ -79,6 +80,7 @@ pub(crate) struct DartView {
     datasets: Store,
     counters: Rc<Counters>,
     failure: Option<String>,
+    _key_interceptor: Subscription,
 }
 
 impl DartView {
@@ -182,6 +184,20 @@ impl DartView {
     }
 
     fn new(initial: Initial, events: Events, window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let this = cx.entity();
+        let key_interceptor = cx.intercept_keystrokes(move |event, window, cx| {
+            let view = this.read(cx);
+            let Some((name, context)) = view.match_action(&event.keystroke, window, cx) else {
+                return;
+            };
+            view.events.emit(Event::Action {
+                revision: view.snapshot.revision,
+                name,
+                context,
+            });
+            window.prevent_default();
+            cx.stop_propagation();
+        });
         let mut view = Self {
             snapshot: initial.snapshot,
             datasets: Store::new(initial.datasets),
@@ -192,6 +208,7 @@ impl DartView {
             scroll: ScrollHandle::new(),
             counters: Rc::new(Counters::default()),
             failure: None,
+            _key_interceptor: key_interceptor,
         };
         if let Err(message) = view.reconcile(window, cx) {
             view.fail(message, cx);
@@ -414,6 +431,74 @@ impl DartView {
         Ok(())
     }
 
+    /// Resolves a keystroke against the snapshot's action bindings. Contexts
+    /// are tried from the focused node up to the root, then `global`.
+    fn match_action(
+        &self,
+        keystroke: &Keystroke,
+        window: &Window,
+        cx: &App,
+    ) -> Option<(String, String)> {
+        if self.snapshot.actions.is_empty() {
+            return None;
+        }
+        let spec = spec_from_keystroke(keystroke);
+        let mut chain = self.focused_context_chain(window, cx).unwrap_or_default();
+        chain.push("global".to_owned());
+        for context in &chain {
+            if let Some(binding) = self.snapshot.actions.iter().find(|binding| {
+                binding.context == *context
+                    && KeystrokeSpec::parse(&binding.keys).is_ok_and(|keys| keys == spec)
+            }) {
+                return Some((binding.name.clone(), binding.context.clone()));
+            }
+        }
+        None
+    }
+
+    /// Node IDs from the focused input or table up to the root, innermost
+    /// first. Buttons use an internal focus handle that gpui-kit does not
+    /// expose, so a focused button resolves as no focused node.
+    fn focused_context_chain(&self, window: &Window, cx: &App) -> Option<Vec<String>> {
+        let focused = window.focused(cx)?;
+        for (id, input) in &self.inputs {
+            if input.state.read(cx).focus_handle(cx) == focused {
+                return self.context_chain(id);
+            }
+        }
+        for (id, table) in &self.tables {
+            if table.read(cx).focus_handle(cx) == focused {
+                return self.context_chain(id);
+            }
+        }
+        None
+    }
+
+    fn context_chain(&self, target: &str) -> Option<Vec<String>> {
+        fn visit(node: &Node, target: &str, trail: &mut Vec<String>) -> bool {
+            trail.push(node.id().to_owned());
+            if node.id() == target {
+                return true;
+            }
+            if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+                for child in children {
+                    if visit(child, target, trail) {
+                        return true;
+                    }
+                }
+            }
+            trail.pop();
+            false
+        }
+        let mut trail = Vec::new();
+        if visit(&self.snapshot.root, target, &mut trail) {
+            trail.reverse();
+            Some(trail)
+        } else {
+            None
+        }
+    }
+
     fn materialize(&self, node: &Node, colors: &ThemeColor) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
         Ok(match node {
@@ -500,6 +585,16 @@ impl DartView {
             )
             .into_any_element(),
         })
+    }
+}
+
+fn spec_from_keystroke(keystroke: &Keystroke) -> KeystrokeSpec {
+    KeystrokeSpec {
+        ctrl: keystroke.modifiers.control,
+        alt: keystroke.modifiers.alt,
+        shift: keystroke.modifiers.shift,
+        meta: keystroke.modifiers.platform,
+        key: keystroke.key.to_ascii_lowercase(),
     }
 }
 

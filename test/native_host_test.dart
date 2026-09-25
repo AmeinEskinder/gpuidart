@@ -66,6 +66,32 @@ void main() {
           throwsStateError,
         );
         await host.publish(build('Valid after rejected update'));
+        await host.publish(
+          build('With actions'),
+          actions: [
+            const UiAction(name: 'app.search', keys: 'ctrl+f'),
+            const UiAction(
+              name: 'records.add',
+              keys: 'ctrl+enter',
+              context: UiActionContext.node('table'),
+            ),
+          ],
+        );
+        // Structurally invalid snapshots reject synchronously at submission.
+        expect(
+          () => host.publish(
+            build('Dangling action context'),
+            actions: [
+              const UiAction(
+                name: 'broken',
+                keys: 'ctrl+b',
+                context: UiActionContext.node('missing'),
+              ),
+            ],
+          ),
+          throwsStateError,
+        );
+        await host.publish(build('Valid after rejected actions'));
         await host.editDataset(dataset, [
           const CellEdit(4, 1, 'changed'),
           RowEdit(9999, ['9999', 'last']),
