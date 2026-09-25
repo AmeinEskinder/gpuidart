@@ -518,6 +518,7 @@ pub(crate) fn run(
     receiver: Receiver<Command>,
     events: Events,
     trace: Arc<crate::trace::Trace>,
+    before_quit: Option<Arc<dyn Fn() + Send + Sync>>,
 ) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     if gpui::guess_compositor() != "X11" {
@@ -540,6 +541,13 @@ pub(crate) fn run(
     gpui_kit::application()
         .with_assets(gpui_kit::assets::Assets)
         .run(move |cx| {
+            if let Some(before_quit) = before_quit {
+                cx.on_app_quit(move |_| {
+                    before_quit();
+                    std::future::ready(())
+                })
+                .detach();
+            }
             gpui_kit::init(cx);
             let options = WindowOptions {
                 window_bounds: Some(WindowBounds::centered(
@@ -561,6 +569,9 @@ pub(crate) fn run(
             let handle = match opened {
                 Ok(handle) => handle,
                 Err(error) => {
+                    events.emit(Event::Error {
+                        message: error.to_string(),
+                    });
                     *failure.lock().unwrap_or_else(|error| error.into_inner()) =
                         Some(error.to_string());
                     cx.quit();
@@ -568,6 +579,9 @@ pub(crate) fn run(
                 }
             };
             let Some(view) = content else {
+                events.emit(Event::Error {
+                    message: "Window opened without view content".into(),
+                });
                 *failure.lock().unwrap_or_else(|error| error.into_inner()) =
                     Some("Window opened without view content".into());
                 cx.quit();

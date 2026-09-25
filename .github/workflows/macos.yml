@@ -1,0 +1,91 @@
+name: macOS SDK checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-sdk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  headless:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: macos-sdk-headless-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            macos-sdk-headless-
+            platform-probe-macOS-ARM64-
+      - name: Pin toolchain and dependencies
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+      - name: Native and headless Dart contracts
+        run: dart run tool/check.dart --headless
+
+  window:
+    needs: headless
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: macos-sdk-window-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            macos-sdk-window-
+            macos-sdk-headless-
+      - name: Build native companion and AOT trace application
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+          cargo build --locked -p gpuidart -p gpuidart-launcher
+          mkdir -p build/macos-window .cache
+          dart compile exe tool/capture_publication_trace.dart -o build/macos-window/capture
+          cp target/debug/libgpuidart.dylib target/debug/gpuidart-launcher build/macos-window/
+      - name: Real-window lifecycle, 100k JIT/AOT traces and code reload
+        run: |
+          set -o pipefail
+          dart test --tags live-window 2>&1 | tee build/macos-window/tests.log
+          dart run tool/capture_publication_trace.dart build/macos-window/jit-trace.json 2>&1 | tee build/macos-window/jit.log
+          build/macos-window/capture build/macos-window/aot-trace.json 2>&1 | tee build/macos-window/aot.log
+          dart run tool/verify_watchlist_reload.dart --report=build/macos-window/reload.json --trace --prepare-delay-ms=0 2>&1 | tee build/macos-window/reload.log
+      - name: Retain successful and failed window evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: macos-window
+          path: |
+            build/macos-window/*.json
+            build/macos-window/*.log
+          retention-days: 14

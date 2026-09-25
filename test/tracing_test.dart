@@ -1,4 +1,4 @@
-@TestOn('windows || linux')
+@TestOn('windows || linux || mac-os')
 library;
 
 import 'package:gpuidart/gpuidart.dart';

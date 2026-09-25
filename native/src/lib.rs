@@ -2,6 +2,8 @@
 mod allocations;
 mod boundary;
 mod clock;
+#[cfg(unix)]
+mod companion;
 mod datasets;
 mod diagnostics;
 #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
@@ -29,6 +31,7 @@ impl Events {
     }
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
 pub(crate) enum Command {
     Publish(Snapshot),
     Dataset(datasets::Update, u64),
@@ -150,7 +153,9 @@ unsafe fn create(bytes: *const u8, len: usize, callback: EventCallback) -> *mut 
             .expect("event serialization")
             .into_boxed_slice();
         let len = bytes.len();
-        if let Some(key) = event.trace_key() {
+        if !event_trace.is_remote()
+            && let Some(key) = event.trace_key()
+        {
             event_trace.point("native.emit", key, Some(len), None);
         }
         callback(Box::into_raw(bytes).cast(), len);
@@ -183,6 +188,23 @@ pub unsafe extern "C" fn gd_run(host: *const Host) -> i32 {
 }
 
 unsafe fn run(host: *const Host) -> i32 {
+    unsafe {
+        run_with(host, |host, initial| {
+            ui::run(
+                initial,
+                host.receiver.clone(),
+                host.events.clone(),
+                host.trace.clone(),
+                None,
+            )
+        })
+    }
+}
+
+unsafe fn run_with(
+    host: *const Host,
+    execute: impl FnOnce(&Host, datasets::Initial) -> Result<(), String>,
+) -> i32 {
     if host.is_null() {
         return -1;
     }
@@ -211,12 +233,7 @@ unsafe fn run(host: *const Host) -> i32 {
             !host.panic_on_run.load(Ordering::Acquire),
             "injected UI failure"
         );
-        ui::run(
-            initial,
-            host.receiver.clone(),
-            host.events.clone(),
-            host.trace.clone(),
-        )
+        execute(host, initial)
     });
     let (result, status) = match result {
         Ok(result) => {

@@ -79,6 +79,35 @@ a second statically linked GPUI copy.
 
 Windows analysis and 22 headless Dart tests passed after this change. The two
 new Unix checks exercise a descendant that ignores TERM after its parent exits,
-and a failed exec. Their hosted results are pending. The macOS clock probe now
+and a failed exec. Both passed on macOS and Linux in
+[36187694484](https://github.com/AmeinEskinder/gpuidart/actions/runs/36187694484).
+The macOS clock probe now
 identifies an Apple Paravirtual Metal device; this is a VM renderer, with no
 physical GPU or presentation claim. Raw probe logs are in `hosted-clock/`.
+
+## macOS companion implementation
+
+The production bridge now starts the native helper through lifecycle extension
+version 1. The helper loads the same SDK dylib and calls its UI entry on the
+process main thread. Dart retains the host handle, callback and all pending
+acknowledgements until the child is reaped. A private inherited Unix socket
+carries length-bounded internal frames; stdout is not part of this transport.
+The public snapshot/dataset format and ABI version remain unchanged.
+
+Both command queues have capacity 64, with bounded socket buffers and message
+frames. This adds buffering and process cost compared with direct FFI. A native
+watchdog terminates a child that has not exited four seconds after close.
+macOS sends its final trace before AppKit terminates the child process. Missing
+completion, early exit and malformed frames remain failures. A parent EOF closes
+the child's UI queue. Unix development group cleanup covers forced parent exit.
+
+Trace records identify their process. Both processes use the same OS clock;
+enqueue-to-dequeue now includes socket transport and both queues. Each native
+process has a bounded buffer, merged into the configured export capacity, with
+overflow counted. Pending or missing child traces keep a capture incomplete.
+
+Windows passed analysis, 12 native tests and all 27 Dart tests after these edits.
+The added Unix frame, child failure, shutdown and trace-merge tests and full
+macOS SDK jobs are pending hosted execution. The helper is also selectable on
+Linux with the internal `GPUIDART_COMPANION=1` test switch. Linux's default remains
+the verified direct FFI runner. No new performance claim is made.

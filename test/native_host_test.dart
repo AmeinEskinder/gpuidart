@@ -1,4 +1,4 @@
-@TestOn('windows || linux')
+@TestOn('windows || linux || mac-os')
 @Tags(['live-window'])
 library;
 
@@ -15,6 +15,8 @@ void main() {
         const UiText('text', 'Hello'),
         libraryPath: Platform.isWindows
             ? '${Platform.environment['SystemRoot']}/System32/kernel32.dll'
+            : Platform.isMacOS
+            ? '/usr/lib/libSystem.B.dylib'
             : '/lib/x86_64-linux-gnu/libc.so.6',
       ),
       throwsA(

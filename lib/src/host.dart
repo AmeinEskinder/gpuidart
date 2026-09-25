@@ -211,10 +211,9 @@ final class GpuiHost {
     Duration shutdownTimeout = const Duration(seconds: 10),
     GpuiTrace? trace,
   }) async {
-    if (!Platform.isWindows && !Platform.isLinux) {
+    if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
       throw UnsupportedError(
-        'This host currently supports Windows and Linux X11. '
-        'The macOS companion lifecycle is not installed yet.',
+        'This host supports Windows, macOS and Linux X11.',
       );
     }
     if (requestTimeout <= Duration.zero || shutdownTimeout <= Duration.zero) {
@@ -698,7 +697,37 @@ final class GpuiHost {
 
 void _runNative((String, int, SendPort) args) {
   try {
-    args.$3.send(_Bindings(args.$1).run(Pointer<Void>.fromAddress(args.$2)));
+    final bindings = _Bindings(args.$1);
+    final handle = Pointer<Void>.fromAddress(args.$2);
+    if (Platform.isMacOS ||
+        (Platform.isLinux &&
+            Platform.environment['GPUIDART_COMPANION'] == '1')) {
+      final version = bindings.library
+          .lookupFunction<Uint32 Function(), int Function()>(
+            'gd_companion_version',
+          )();
+      if (version != 1) {
+        throw StateError('Incompatible GPUI companion extension');
+      }
+      final run = bindings.library.lookupFunction<_PublishNative, _PublishDart>(
+        'gd_run_companion',
+      );
+      final bytes = utf8.encode(
+        jsonEncode({
+          'launcher': resolveLauncher(libraryPath: args.$1),
+          'library': args.$1,
+        }),
+      );
+      final buffer = calloc<Uint8>(bytes.length);
+      try {
+        buffer.asTypedList(bytes.length).setAll(0, bytes);
+        args.$3.send(run(handle, buffer, bytes.length));
+      } finally {
+        calloc.free(buffer);
+      }
+    } else {
+      args.$3.send(bindings.run(handle));
+    }
   } catch (error, stack) {
     args.$3.send('$error\n$stack');
   }

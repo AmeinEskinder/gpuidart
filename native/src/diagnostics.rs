@@ -1,6 +1,6 @@
 use crate::{Events, protocol::Event, ui::DartView};
 use gpui_kit::{App, Entity, Window};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::cell::Cell;
 
@@ -19,7 +19,7 @@ impl Counters {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub(crate) enum Request {
     Cell {

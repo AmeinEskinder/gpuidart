@@ -13,7 +13,7 @@ fn main() -> ExitCode {
 fn run(args: Vec<OsString>) -> Result<u8, String> {
     match args.first().and_then(|arg| arg.to_str()) {
         Some("--session") if args.len() >= 2 => session(&args[1..]),
-        Some("--ui-host") if args.len() == 2 => unsafe {
+        Some("--ui-host") if args.len() == 3 => unsafe {
             // The SDK loads its own sibling library. Keep it loaded until the UI exits.
             let library = libloading::Library::new(&args[1]).map_err(|e| e.to_string())?;
             let version: libloading::Symbol<unsafe extern "C" fn() -> u32> = library
@@ -22,12 +22,17 @@ fn run(args: Vec<OsString>) -> Result<u8, String> {
             if version() != 1 {
                 return Err("incompatible companion extension; rebuild the package".into());
             }
-            let main: libloading::Symbol<unsafe extern "C" fn() -> i32> = library
+            let fd = args[2]
+                .to_str()
+                .and_then(|s| s.parse::<i32>().ok())
+                .filter(|fd| *fd >= 3)
+                .ok_or("invalid companion descriptor")?;
+            let main: libloading::Symbol<unsafe extern "C" fn(i32) -> i32> = library
                 .get(b"gd_ui_process_main")
                 .map_err(|e| e.to_string())?;
-            Ok(if main() == 0 { 0 } else { 1 })
+            Ok(if main(fd) == 0 { 0 } else { 1 })
         },
-        _ => Err("expected --session PROGRAM [ARGS...] or --ui-host LIBRARY".into()),
+        _ => Err("expected --session PROGRAM [ARGS...] or --ui-host LIBRARY FD".into()),
     }
 }
 

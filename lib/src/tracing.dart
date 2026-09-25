@@ -19,6 +19,7 @@ final class GpuiTrace {
   bool _claimed = false;
   bool _nativeAttached = false;
   bool _nativeError = false;
+  bool _remoteComplete = true;
   Map<String, dynamic> Function()? _reader;
 
   /// Measures synchronous application work. Use a static label without user data.
@@ -81,6 +82,7 @@ final class GpuiTrace {
       final decoded = records.map(_TraceRecord.fromNative).toList();
       _nativeRecords = decoded;
       _nativeDropped = value['dropped'] as int;
+      _remoteComplete = value['remote_complete'] != false;
     } catch (_) {
       // A diagnostic capture must not change application shutdown semantics.
       _nativeError = true;
@@ -198,6 +200,11 @@ final class GpuiTrace {
         if (Platform.isWindows) 'cross_thread_order_uncertainty_ticks': 1,
         if (!Platform.isWindows) 'ordering_uncertainty': 'Not independently calibrated; do not infer ordering from sub-resolution timestamp differences',
         'process_id': pid,
+        'native_process_ids': _nativeRecords
+            .map((r) => r.process ?? pid)
+            .toSet()
+            .toList(),
+        'remote_complete': _remoteComplete,
         'capacity_per_side': capacity,
         'dart_dropped': _dropped,
         'native_dropped': _nativeDropped,
@@ -207,6 +214,7 @@ final class GpuiTrace {
             _nativeAttached &&
             _reader == null &&
             !_nativeError &&
+            _remoteComplete &&
             _dropped == 0 &&
             _nativeDropped == 0,
         'scope': 'Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch covers synchronous handling; deferred diagnostic replies occur later. Tracing adds overhead.',
@@ -221,7 +229,7 @@ final class GpuiTrace {
           if (duration == 0) 's': 't',
           'ts': (record.start - _clock.origin) * (1000000 / _clock.frequency),
           if (duration != 0) 'dur': duration * (1000000 / _clock.frequency),
-          'pid': pid,
+          'pid': record.process ?? pid,
           'tid': record.thread,
           'args': {
             'operation': record.operation,
@@ -252,10 +260,11 @@ final class _TraceRecord {
     this.bytes,
     this.status,
     this.nativeApplyUs,
+    this.process,
   });
   final String name, operation;
   final int request, start, end, thread;
-  final int? bytes, status, nativeApplyUs;
+  final int? bytes, status, nativeApplyUs, process;
 
   factory _TraceRecord.fromNative(Object? value) {
     if (value is! Map<String, dynamic> ||
@@ -288,7 +297,9 @@ final class _TraceRecord {
     if ((value['end'] as int) < (value['start'] as int) ||
         (value['bytes'] != null &&
             (value['bytes'] is! int || (value['bytes'] as int) < 0)) ||
-        (value['status'] != null && value['status'] is! int)) {
+        (value['status'] != null && value['status'] is! int) ||
+        (value['process'] != null &&
+            (value['process'] is! int || (value['process'] as int) <= 0))) {
       throw const FormatException('Invalid native trace duration or counters');
     }
     return _TraceRecord(
@@ -300,6 +311,7 @@ final class _TraceRecord {
       value['thread'] as int,
       bytes: value['bytes'] as int?,
       status: value['status'] as int?,
+      process: value['process'] as int?,
     );
   }
 
@@ -310,6 +322,7 @@ final class _TraceRecord {
     'start': start,
     'end': end,
     'thread': thread,
+    'process': process ?? pid,
     'bytes': ?bytes,
     'status': ?status,
     'native_apply_us': ?nativeApplyUs,

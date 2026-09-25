@@ -6,7 +6,7 @@ use std::{
     rc::Rc,
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Initial {
     pub snapshot: Snapshot,
@@ -15,7 +15,7 @@ pub struct Initial {
     pub window: WindowConfig,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct WindowConfig {
     pub title: String,
@@ -33,7 +33,7 @@ impl Default for WindowConfig {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Upload {
     pub id: String,
@@ -90,7 +90,7 @@ pub fn validate_references(
     missing.map_or(Ok(()), |id| Err(format!("Unknown dataset: {id}")))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Update {
     pub request: u64,
@@ -100,7 +100,7 @@ pub struct Update {
     pub change: Change,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Change {
     Replace { data: TableData },
@@ -108,7 +108,7 @@ pub enum Change {
     Release,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Edit {
     Cell {
@@ -152,7 +152,7 @@ pub struct Store {
     used_ids: HashSet<String>,
 }
 
-#[derive(Clone, Default, Debug, Serialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct Work {
     pub records_checked: usize,
     pub cells_written: usize,

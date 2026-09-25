@@ -1,4 +1,5 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::sync::{
     Mutex,
     atomic::{AtomicBool, Ordering},
@@ -12,14 +13,15 @@ pub(crate) struct Key {
     pub request: u64,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 struct Record {
-    name: &'static str,
-    operation: &'static str,
+    name: Cow<'static, str>,
+    operation: Cow<'static, str>,
     request: u64,
     start: i64,
     end: i64,
     thread: u64,
+    process: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     bytes: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -37,10 +39,51 @@ struct Buffer {
 pub(crate) struct Trace {
     enabled: AtomicBool,
     clock_failed: AtomicBool,
+    remote: AtomicBool,
+    remote_complete: AtomicBool,
     buffer: Mutex<Buffer>,
 }
 
 impl Trace {
+    pub fn is_remote(&self) -> bool {
+        self.remote.load(Ordering::Relaxed)
+    }
+
+    #[cfg(unix)]
+    pub fn begin_remote(&self) -> usize {
+        self.remote.store(true, Ordering::Release);
+        self.buffer.lock().unwrap_or_else(|e| e.into_inner()).limit
+    }
+
+    #[cfg(unix)]
+    pub fn import_remote(&self, bytes: &[u8]) -> Result<(), String> {
+        #[derive(Deserialize)]
+        struct Snapshot {
+            schema: u32,
+            limit: usize,
+            dropped: u64,
+            records: Vec<Record>,
+            clock_failed: bool,
+        }
+        let snapshot: Snapshot = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+        let mut buffer = self.buffer.lock().unwrap_or_else(|e| e.into_inner());
+        if snapshot.schema != 1
+            || snapshot.limit != buffer.limit
+            || snapshot.records.len() > buffer.limit
+        {
+            return Err("Invalid companion trace bounds".into());
+        }
+        buffer.records.extend(snapshot.records);
+        buffer.records.sort_by_key(|r| r.start);
+        buffer.dropped +=
+            snapshot.dropped + buffer.records.len().saturating_sub(buffer.limit) as u64;
+        let limit = buffer.limit;
+        buffer.records.truncate(limit);
+        self.clock_failed
+            .fetch_or(snapshot.clock_failed, Ordering::Relaxed);
+        self.remote_complete.store(true, Ordering::Release);
+        Ok(())
+    }
     /// Called once before starting the native loop. Normal hosts never enable it.
     pub fn enable(&self, limit: usize) -> Result<(), ()> {
         if !(1..=8192).contains(&limit) {
@@ -103,12 +146,13 @@ impl Trace {
             return;
         }
         buffer.records.push(Record {
-            name,
-            operation: key.operation,
+            name: name.into(),
+            operation: key.operation.into(),
             request: key.request,
             start: start.ticks,
             end,
             thread: start.thread,
+            process: std::process::id(),
             bytes,
             status,
         });
@@ -128,7 +172,7 @@ impl Trace {
             (buffer.limit, buffer.dropped, buffer.records.clone())
         };
         serde_json::to_vec(
-            &serde_json::json!({"schema": 1, "limit": limit, "dropped": dropped, "records": records, "clock_failed": self.clock_failed.load(Ordering::Relaxed)}),
+            &serde_json::json!({"schema": 1, "limit": limit, "dropped": dropped, "records": records, "clock_failed": self.clock_failed.load(Ordering::Relaxed), "remote_complete": !self.is_remote() || self.remote_complete.load(Ordering::Acquire)}),
         )
     }
 }
@@ -234,6 +278,33 @@ pub unsafe extern "C" fn gd_trace_read(host: *const crate::Host, length: *mut us
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(unix)]
+    #[test]
+    fn remote_trace_merge_is_bounded_and_pending_capture_is_explicit() {
+        let parent = Trace::default();
+        parent.enable(2).unwrap();
+        assert_eq!(parent.begin_remote(), 2);
+        let pending: serde_json::Value =
+            serde_json::from_slice(&parent.snapshot().unwrap()).unwrap();
+        assert_eq!(pending["remote_complete"], false);
+        let child = Trace::default();
+        child.enable(2).unwrap();
+        let key = Key {
+            operation: "snapshot",
+            request: 2,
+        };
+        parent.point("native.parse", key, None, None);
+        child.point("native.dequeue", key, None, None);
+        child.point("native.emit", key, None, None);
+        parent.import_remote(&child.snapshot().unwrap()).unwrap();
+        let merged: serde_json::Value =
+            serde_json::from_slice(&parent.snapshot().unwrap()).unwrap();
+        assert_eq!(merged["remote_complete"], true);
+        assert_eq!(merged["dropped"], 1);
+        assert_eq!(merged["records"].as_array().unwrap().len(), 2);
+        assert_eq!(merged["records"][0]["process"], std::process::id());
+    }
 
     #[test]
     fn tracing_is_opt_in_bounded_and_preserves_complete_records() {
