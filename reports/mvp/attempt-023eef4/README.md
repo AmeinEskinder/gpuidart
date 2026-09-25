@@ -7,3 +7,8 @@ The verifier stopped at the table comparison before writing its before/after val
 The verifier now writes before/after state on failure and preserves the latest repeated-reload state. Its equality checks and timing were not relaxed. Seven isolated follow-ups passed all eleven code reloads each, recorded in reload-probe-1.json through reload-probe-7.json. A further [stability-then-reload repetition](reload-after-stability.json) also passed eleven reloads. These follow-ups used the same production implementation with additional verifier reporting. They do not explain or erase the original failure.
 
 The production snapshot, retention and reload algorithms were not changed in response to this observation. Future failures will retain the values needed to determine which property changed.
+
+The [later reload investigation](../../reload-investigation/README.md) reproduced
+and fixed a preparation acknowledgement arriving before the requested scroll was
+rendered. The original failure's missing values prevent attributing it to that
+diagnostic race. This observation remains unresolved.

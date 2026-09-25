@@ -1,0 +1,12 @@
+Command: cargo test --locked -p gpuidart preparation_ack_waits_for_rendered_scroll
+Native diagnostic implementation: d463696, with the new regression test added.
+Exit code: 1
+
+running 1 test
+test ui::tests::preparation_ack_waits_for_rendered_scroll ... FAILED
+
+---- ui::tests::preparation_ack_waits_for_rendered_scroll stdout ----
+thread 'ui::tests::preparation_ack_waits_for_rendered_scroll' (17128) panicked at native\src\ui\tests.rs:233:9:
+A frame callback before drawing must not acknowledge an unapplied scroll
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.05s

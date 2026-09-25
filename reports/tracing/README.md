@@ -46,7 +46,8 @@ Reproduction commands are in [the tracing guide](../../docs/tracing.md#reproduce
 
 This development milestone does not replace the packaged candidate recorded in
 [the MVP report](../mvp/README.md). Clean-machine launch, human IME verification,
-the [unlocalized reload observation](../mvp/attempt-023eef4/README.md), owner license
-selection and first hosted CI execution remain open. Inspector RPCs, rendering and
+the [unlocalized reload observation](../mvp/attempt-023eef4/README.md) and owner license
+selection remain open. [Hosted CI subsequently passed](../ci/README.md) through this
+tracing milestone. Inspector RPCs, rendering and
 presentation correlation remain future tracing work. The roadmap's snapshot /
 subview / patch comparison still requires a demonstrated snapshot-heavy workload.

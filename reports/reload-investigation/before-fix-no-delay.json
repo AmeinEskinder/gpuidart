@@ -1,0 +1,506 @@
+{
+  "passed": true,
+  "prepare_delay_ms": 0,
+  "tracing": true,
+  "prepared": {
+    "revision": 5,
+    "inputs": {
+      "search": {
+        "entity": 4294967298,
+        "text": "ALP",
+        "selection": {
+          "start": 0,
+          "end": 3
+        },
+        "focused": true
+      }
+    },
+    "tables": {
+      "watchlist": {
+        "entity": 4294967300,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 125,
+        "dataset": "instruments",
+        "dataset_revision": 3,
+        "scroll_y": 0.0
+      }
+    },
+    "labels": {
+      "title": "Market watch",
+      "source": "Sample instruments and prices. No live market feed.",
+      "summary": "125 instruments shown · 0 saved",
+      "selection": "ALP0200 · Alpine Research · 114.07",
+      "status": "Updated ALP0200 to 114.07."
+    },
+    "window": {
+      "width": 960.0,
+      "height": 720.0,
+      "scale_factor": 1.25,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 7,
+      "rows_constructed": 77,
+      "cells_constructed": 329,
+      "data_records_checked": 126,
+      "data_cells_written": 501
+    },
+    "draw": {
+      "samples": 7,
+      "p50_us": 27394.047,
+      "p95_us": 46071.807,
+      "p99_us": 46071.807
+    },
+    "dirty_to_present_submit": {
+      "samples": 6,
+      "p50_us": 28131.327,
+      "p95_us": 41746.431,
+      "p99_us": 41746.431
+    },
+    "present_interval": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    },
+    "input_to_frame": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    }
+  },
+  "before": {
+    "state": {
+      "revision": 5,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "ALP",
+          "selection": {
+            "start": 0,
+            "end": 3
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 25,
+            "end": 34
+          },
+          "row_count": 125,
+          "dataset": "instruments",
+          "dataset_revision": 3,
+          "scroll_y": -800.0
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "125 instruments shown · 0 saved",
+        "selection": "ALP0200 · Alpine Research · 114.07",
+        "status": "Updated ALP0200 to 114.07."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.25,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 8,
+        "rows_constructed": 88,
+        "cells_constructed": 376,
+        "data_records_checked": 126,
+        "data_cells_written": 501
+      },
+      "draw": {
+        "samples": 8,
+        "p50_us": 25477.119,
+        "p95_us": 46071.807,
+        "p99_us": 46071.807
+      },
+      "dirty_to_present_submit": {
+        "samples": 7,
+        "p50_us": 29605.887,
+        "p95_us": 41746.431,
+        "p99_us": 41746.431
+      },
+      "present_interval": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "query": "ALP",
+    "selected": "ALP0200",
+    "ticks": 1,
+    "dataset_revision": 3,
+    "metrics": {
+      "description_builds": 5,
+      "encoded_snapshots": 4,
+      "encoded_bytes": 3341,
+      "ffi_callbacks": 11,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 2,
+      "description_build": {
+        "samples": 5,
+        "p50_us": 475,
+        "p95_us": 3295,
+        "p99_us": 3295
+      },
+      "encode": {
+        "samples": 4,
+        "p50_us": 133,
+        "p95_us": 156,
+        "p99_us": 156
+      },
+      "publish_to_applied": {
+        "samples": 4,
+        "p50_us": 33969,
+        "p95_us": 36178,
+        "p99_us": 36178
+      },
+      "initial": {
+        "bytes": 40789,
+        "encode_us": 20672
+      },
+      "data_messages": 2,
+      "data_bytes": 5564,
+      "data_records_checked": 126,
+      "data_cells_written": 501,
+      "data_encode": {
+        "samples": 2,
+        "p50_us": 1704,
+        "p95_us": 1704,
+        "p99_us": 1704
+      },
+      "data_publish_to_applied": {
+        "samples": 2,
+        "p50_us": 28716,
+        "p95_us": 28716,
+        "p99_us": 28716
+      },
+      "native_data_parse": {
+        "samples": 2,
+        "p50_us": 416,
+        "p95_us": 416,
+        "p99_us": 416
+      },
+      "native_data_apply": {
+        "samples": 2,
+        "p50_us": 458,
+        "p95_us": 458,
+        "p99_us": 458
+      },
+      "native_snapshot_apply": {
+        "samples": 4,
+        "p50_us": 60,
+        "p95_us": 69,
+        "p99_us": 69
+      }
+    }
+  },
+  "after": {
+    "state": {
+      "revision": 6,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "ALP",
+          "selection": {
+            "start": 0,
+            "end": 3
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 25,
+            "end": 34
+          },
+          "row_count": 125,
+          "dataset": "instruments",
+          "dataset_revision": 3,
+          "scroll_y": -800.0
+        }
+      },
+      "labels": {
+        "title": "Market watch reloaded",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "125 instruments shown · 0 saved",
+        "selection": "ALP0200 · Alpine Research · 114.07",
+        "status": "Updated ALP0200 to 114.07."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.25,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 14,
+        "rows_constructed": 154,
+        "cells_constructed": 658,
+        "data_records_checked": 126,
+        "data_cells_written": 501
+      },
+      "draw": {
+        "samples": 14,
+        "p50_us": 25264.127,
+        "p95_us": 46071.807,
+        "p99_us": 46071.807
+      },
+      "dirty_to_present_submit": {
+        "samples": 13,
+        "p50_us": 28131.327,
+        "p95_us": 41746.431,
+        "p99_us": 41746.431
+      },
+      "present_interval": {
+        "samples": 6,
+        "p50_us": 25411.583,
+        "p95_us": 37224.447,
+        "p99_us": 37224.447
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "query": "ALP",
+    "selected": "ALP0200",
+    "ticks": 1,
+    "dataset_revision": 3,
+    "metrics": {
+      "description_builds": 6,
+      "encoded_snapshots": 5,
+      "encoded_bytes": 4160,
+      "ffi_callbacks": 13,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 3,
+      "description_build": {
+        "samples": 6,
+        "p50_us": 595,
+        "p95_us": 3295,
+        "p99_us": 3295
+      },
+      "encode": {
+        "samples": 5,
+        "p50_us": 133,
+        "p95_us": 1203,
+        "p99_us": 1203
+      },
+      "publish_to_applied": {
+        "samples": 5,
+        "p50_us": 24761,
+        "p95_us": 36178,
+        "p99_us": 36178
+      },
+      "initial": {
+        "bytes": 40789,
+        "encode_us": 20672
+      },
+      "data_messages": 2,
+      "data_bytes": 5564,
+      "data_records_checked": 126,
+      "data_cells_written": 501,
+      "data_encode": {
+        "samples": 2,
+        "p50_us": 1704,
+        "p95_us": 1704,
+        "p99_us": 1704
+      },
+      "data_publish_to_applied": {
+        "samples": 2,
+        "p50_us": 28716,
+        "p95_us": 28716,
+        "p99_us": 28716
+      },
+      "native_data_parse": {
+        "samples": 2,
+        "p50_us": 416,
+        "p95_us": 416,
+        "p99_us": 416
+      },
+      "native_data_apply": {
+        "samples": 2,
+        "p50_us": 458,
+        "p95_us": 458,
+        "p99_us": 458
+      },
+      "native_snapshot_apply": {
+        "samples": 5,
+        "p50_us": 59,
+        "p95_us": 69,
+        "p99_us": 69
+      }
+    }
+  },
+  "latest_recovery": {
+    "state": {
+      "revision": 16,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "ALP",
+          "selection": {
+            "start": 0,
+            "end": 3
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 25,
+            "end": 34
+          },
+          "row_count": 125,
+          "dataset": "instruments",
+          "dataset_revision": 3,
+          "scroll_y": -800.0
+        }
+      },
+      "labels": {
+        "title": "Market watch recovered 10",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "125 instruments shown · 0 saved",
+        "selection": "ALP0200 · Alpine Research · 114.07",
+        "status": "Updated ALP0200 to 114.07."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.25,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 30,
+        "rows_constructed": 330,
+        "cells_constructed": 1410,
+        "data_records_checked": 126,
+        "data_cells_written": 501
+      },
+      "draw": {
+        "samples": 30,
+        "p50_us": 24707.071,
+        "p95_us": 33210.367,
+        "p99_us": 46071.807
+      },
+      "dirty_to_present_submit": {
+        "samples": 29,
+        "p50_us": 28524.543,
+        "p95_us": 41746.431,
+        "p99_us": 42663.935
+      },
+      "present_interval": {
+        "samples": 11,
+        "p50_us": 25509.887,
+        "p95_us": 37224.447,
+        "p99_us": 37224.447
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "query": "ALP",
+    "selected": "ALP0200",
+    "ticks": 1,
+    "dataset_revision": 3,
+    "metrics": {
+      "description_builds": 16,
+      "encoded_snapshots": 15,
+      "encoded_bytes": 12388,
+      "ffi_callbacks": 34,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 14,
+      "description_build": {
+        "samples": 16,
+        "p50_us": 2303,
+        "p95_us": 2671,
+        "p99_us": 3295
+      },
+      "encode": {
+        "samples": 15,
+        "p50_us": 855,
+        "p95_us": 1203,
+        "p99_us": 1263
+      },
+      "publish_to_applied": {
+        "samples": 15,
+        "p50_us": 5372,
+        "p95_us": 33969,
+        "p99_us": 36178
+      },
+      "initial": {
+        "bytes": 40789,
+        "encode_us": 20672
+      },
+      "data_messages": 2,
+      "data_bytes": 5564,
+      "data_records_checked": 126,
+      "data_cells_written": 501,
+      "data_encode": {
+        "samples": 2,
+        "p50_us": 1704,
+        "p95_us": 1704,
+        "p99_us": 1704
+      },
+      "data_publish_to_applied": {
+        "samples": 2,
+        "p50_us": 28716,
+        "p95_us": 28716,
+        "p99_us": 28716
+      },
+      "native_data_parse": {
+        "samples": 2,
+        "p50_us": 416,
+        "p95_us": 416,
+        "p99_us": 416
+      },
+      "native_data_apply": {
+        "samples": 2,
+        "p50_us": 458,
+        "p95_us": 458,
+        "p99_us": 458
+      },
+      "native_snapshot_apply": {
+        "samples": 15,
+        "p50_us": 68,
+        "p95_us": 79,
+        "p99_us": 88
+      }
+    }
+  },
+  "same_application_process_id": 26640,
+  "launcher_process_id": 28332,
+  "same_isolate_id": "isolates/6902865661336415",
+  "changed_code_executed": true,
+  "invalid_source_rejected": true,
+  "successful_reloads": 11,
+  "recovered_after_invalid_source": true
+}
