@@ -13,6 +13,7 @@ import 'windows.dart';
 import 'native_event.dart';
 
 part 'dataset.dart';
+part 'tracing.dart';
 
 typedef _EventNative = Void Function(Pointer<Uint8>, Size);
 typedef _CreateNative = Pointer<Void> Function(
@@ -115,9 +116,15 @@ final class TableSelection {
 /// Experimental Windows host. The Dart application isolate keeps its event loop.
 /// A dedicated isolate blocks inside GPUI's native UI loop.
 final class GpuiHost {
-  GpuiHost._(this._bindings, this.requestTimeout, this.shutdownTimeout);
+  GpuiHost._(
+    this._bindings,
+    this.requestTimeout,
+    this.shutdownTimeout,
+    this._trace,
+  );
 
   final _Bindings _bindings;
+  final GpuiTrace? _trace;
 
   /// Deadline for ready and native acknowledgements. A timeout closes the host.
   final Duration requestTimeout;
@@ -157,9 +164,13 @@ final class GpuiHost {
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
+    GpuiTrace? trace,
   }) async {
+    trace?._ensureUnclaimed();
     final timer = Stopwatch()..start();
-    final root = builder();
+    final root = trace == null
+        ? builder()
+        : trace._measure('dart.build', 'initial', 1, builder);
     final elapsed = timer.elapsedMicroseconds;
     final host = await open(
       root,
@@ -168,6 +179,7 @@ final class GpuiHost {
       window: window,
       requestTimeout: requestTimeout,
       shutdownTimeout: shutdownTimeout,
+      trace: trace,
     );
     host._builder = builder;
     host.metrics.descriptionBuilds = 1;
@@ -181,7 +193,9 @@ final class GpuiHost {
     if (builder == null) throw StateError('Use openView to register a builder');
     final timer = Stopwatch()..start();
     metrics.descriptionBuilds++;
-    final root = builder();
+    final root = _trace == null
+        ? builder()
+        : _trace._measure('dart.build', 'snapshot', _revision + 1, builder);
     HostMetrics.sample(metrics.buildMicroseconds, timer.elapsedMicroseconds);
     return publish(root);
   }
@@ -193,6 +207,7 @@ final class GpuiHost {
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
+    GpuiTrace? trace,
   }) async {
     if (!Platform.isWindows) {
       throw UnsupportedError(
@@ -203,6 +218,8 @@ final class GpuiHost {
       throw ArgumentError('Host deadlines must be positive');
     }
     final windowDescription = window.toJson();
+    trace?._claim();
+    trace?._point('dart.request', 'initial', 1);
     configureWindowsDpi();
     final sibling = File.fromUri(
       File(Platform.resolvedExecutable).parent.uri.resolve('gpuidart.dll'),
@@ -215,7 +232,13 @@ final class GpuiHost {
               ? sibling.path
               : 'target/debug/gpuidart.dll'),
     ).absolute.path;
-    final host = GpuiHost._(_Bindings(path), requestTimeout, shutdownTimeout);
+    final bindings = trace == null
+        ? _Bindings(path)
+        : trace._measure('dart.library', 'initial', 1, () => _Bindings(path));
+    final nativeTrace = trace == null
+        ? null
+        : _NativeTraceBindings(bindings.library);
+    final host = GpuiHost._(bindings, requestTimeout, shutdownTimeout, trace);
     for (final dataset in datasets) {
       if (dataset._owner != null ||
           dataset._busy ||
@@ -226,16 +249,22 @@ final class GpuiHost {
       }
       host._datasets[dataset.id] = dataset;
     }
+    final describeStart = trace?._clock.now();
     final initial = <String, Object>{
       'snapshot': {'revision': 1, 'root': root.toJson()},
       'datasets': datasets.map((dataset) => dataset._upload()).toList(),
       'window': windowDescription,
     };
+    if (describeStart != null) {
+      trace!._span('dart.describe', 'initial', 1, describeStart);
+    }
     host._callback = NativeCallable<_EventNative>.listener(host._receive);
+    Pointer<Void> created = nullptr;
     try {
-      host._handle = host._withMessage(
+      created = host._handle = host._withMessage(
         initial,
         'initial',
+        1,
         (bytes, length) =>
             host._bindings.create(bytes, length, host._callback.nativeFunction),
       );
@@ -245,7 +274,15 @@ final class GpuiHost {
           'only one GPUI host may be active in a process.',
         );
       }
+      if (nativeTrace != null) {
+        if (nativeTrace.enable(host._handle, trace!.capacity) != 0) {
+          throw StateError('Native trace enable failed');
+        }
+        trace._attach(() => nativeTrace.snapshot(bindings, host._handle));
+      }
     } catch (_) {
+      trace?._finish();
+      if (created != nullptr) bindings.destroy(created);
       host._callback.close();
       await host._events.close();
       rethrow;
@@ -270,6 +307,7 @@ final class GpuiHost {
         dataset._owner = null;
       }
       result.close();
+      trace?._finish();
       host._bindings.destroy(host._handle);
       host._callback.close();
       await host._events.close();
@@ -290,15 +328,46 @@ final class GpuiHost {
   T _withMessage<T>(
     Map<String, Object> message,
     String kind,
+    int request,
     T Function(Pointer<Uint8>, int) action,
   ) {
     final timer = Stopwatch()..start();
+    final encodingStart = _trace?._clock.now();
     final data = utf8.encode(jsonEncode(message));
     final bytes = calloc<Uint8>(data.length);
     try {
       bytes.asTypedList(data.length).setAll(0, data);
       metrics.recordEncoding(kind, data.length, timer.elapsedMicroseconds);
-      return action(bytes, data.length);
+      if (encodingStart != null) {
+        _trace!._span(
+          'dart.encode',
+          kind,
+          request,
+          encodingStart,
+          bytes: data.length,
+        );
+      }
+      final ffiStart = _trace?._clock.now();
+      int? status;
+      try {
+        final result = action(bytes, data.length);
+        status = result is int ? result : null;
+        return result;
+      } catch (_) {
+        status = -1;
+        rethrow;
+      } finally {
+        if (ffiStart != null) {
+          _trace!._span(
+            'dart.ffi',
+            kind,
+            request,
+            ffiStart,
+            bytes: data.length,
+            status: status,
+          );
+        }
+      }
     } finally {
       calloc.free(bytes);
     }
@@ -308,14 +377,19 @@ final class GpuiHost {
   Future<void> publish(UiNode root) {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     final revision = ++_revision;
+    _trace?._point('dart.request', 'snapshot', revision);
     final accepted = Completer<void>();
     _pending[revision] = accepted;
     _publishTimers[revision] = Stopwatch()..start();
     var status = 0;
     try {
+      final rootDescription = _trace == null
+          ? root.toJson()
+          : _trace._measure('dart.describe', 'snapshot', revision, root.toJson);
       status = _withMessage(
-        {'revision': revision, 'root': root.toJson()},
+        {'revision': revision, 'root': rootDescription},
         'snapshot',
+        revision,
         (bytes, length) => _bindings.publish(_handle, bytes, length),
       );
       if (status != 0) {
@@ -389,6 +463,7 @@ final class GpuiHost {
     if (_done.isCompleted) return;
     if (!_closing) {
       _closing = true;
+      _trace?._point('dart.close', 'close', 0);
       _bindings.close(_handle);
     }
     _shutdownDeadline ??= Timer(shutdownTimeout, () {
@@ -418,6 +493,7 @@ final class GpuiHost {
 
   void _recordFailure(Object error, StackTrace stack) {
     if (_failure == null) {
+      _trace?._point('dart.failure', 'failure', 0);
       _failure = error;
       _failureStack = stack;
       _events.add(
@@ -457,32 +533,31 @@ final class GpuiHost {
   ]) {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     final request = ++_request;
+    _trace?._point('dart.request', 'diagnostic', request);
     final completion = Completer<Map<String, dynamic>>();
-    final data = utf8.encode(
-      jsonEncode({...arguments, 'op': op, 'request': request}),
+    final status = _withMessage(
+      {...arguments, 'op': op, 'request': request},
+      'diagnostic',
+      request,
+      (bytes, length) => _bindings.diagnostic(_handle, bytes, length),
     );
-    final bytes = calloc<Uint8>(data.length);
-    try {
-      bytes.asTypedList(data.length).setAll(0, data);
-      final status = _bindings.diagnostic(_handle, bytes, data.length);
-      if (status != 0) {
-        final error = StateError('Diagnostic request failed: $status');
-        if (status == -4) _fail(error, StackTrace.current);
-        throw error;
-      }
-      _diagnostics[request] = completion;
-    } finally {
-      calloc.free(bytes);
+    if (status != 0) {
+      final error = StateError('Diagnostic request failed: $status');
+      if (status == -4) _fail(error, StackTrace.current);
+      throw error;
     }
+    _diagnostics[request] = completion;
     return _withDeadline(completion.future, 'diagnostic $request');
   }
 
   void _receive(Pointer<Uint8> bytes, int length) {
     try {
+      final received = _trace?._clock.now();
       if (bytes == nullptr || length <= 0 || length > 16 * 1024 * 1024) {
         throw const FormatException('Invalid native event buffer');
       }
       final event = GpuiEvent._(decodeNativeEvent(bytes.asTypedList(length)));
+      if (received != null) _trace!._received(event.data, received, length);
       if (_failure != null && event.type != 'closed') return;
       metrics.ffiCallbacks++;
       if (event.type == 'click' ||
@@ -560,12 +635,14 @@ final class GpuiHost {
             );
           }
         case 'error':
+          _trace?._acknowledged(event.data);
           _fail(
             StateError(event.data['message'] as String),
             StackTrace.current,
           );
           return;
       }
+      _trace?._acknowledged(event.data);
       _events.add(event);
     } catch (error, stack) {
       _fail(error, stack);
@@ -577,6 +654,12 @@ final class GpuiHost {
   Future<void> _finish(Future<dynamic> nativeDone, ReceivePort result) async {
     try {
       final status = await nativeDone;
+      _trace?._point(
+        'dart.runner_result',
+        'close',
+        0,
+        status: status is int ? status : -1,
+      );
       if (status is! int) {
         if (!_ready.isCompleted) {
           _ready.completeError(StateError('Native runner failed: $status'));
@@ -604,6 +687,7 @@ final class GpuiHost {
       }
       _datasets.clear();
       result.close();
+      _trace?._finish();
       _bindings.destroy(_handle);
       _callback.close();
       // A paused event subscriber must not keep native shutdown pending.

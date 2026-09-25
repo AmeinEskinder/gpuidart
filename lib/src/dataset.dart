@@ -121,6 +121,7 @@ extension _DatasetTransactions on GpuiHost {
     final base = create ? 0 : dataset._revision;
     final revision = base + 1;
     final request = ++_request;
+    _trace?._point('dart.request', 'dataset', request);
     final pending = Completer<void>();
     dataset._busy = true;
     _dataPending[request] = (
@@ -139,6 +140,7 @@ extension _DatasetTransactions on GpuiHost {
           'change': change,
         },
         'dataset',
+        request,
         (bytes, length) => _bindings.dataset(_handle, bytes, length),
       );
       if (status != 0) {
@@ -156,6 +158,7 @@ extension _DatasetTransactions on GpuiHost {
         dataset._owner = this;
         _datasets[dataset.id] = dataset;
       }
+      _trace?._point('dart.commit', 'dataset', request);
     } finally {
       _dataPending.remove(request);
       _dataTimers.remove(request);

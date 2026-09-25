@@ -63,6 +63,8 @@ The Dart FFI request buffer is freed in finally, and Rust retains parsed descrip
 5. Optimize the startup/memory stages identified by traces. Recheck CPU, both memory measures, peak allocations, payload and useful-content readiness on equivalent builds.
 6. Evaluate general node patches only against a demonstrated snapshot-heavy workload. Compare whole-view snapshots, independently invalidated subviews and patches. Measure build/diff work, bytes, native validation/application, layout/draw and memory separately. Include unchanged publication, property edits, inserts/removes/reorders and retained-state failures. Require measured benefit on that workload without regressions before changing the production protocol.
 
+Step 2 implementation: [opt-in publication tracing](tracing.md) now records correlated request stages with bounded buffers and Chrome Trace export. It does not yet provide inspector RPCs, rendering/presentation correlation, or an explanation of the historical acknowledgement tails. Step 6 remains gated on a demonstrated snapshot-heavy workload.
+
 Keep the current out-of-band dataset design. Shell's bridge limit explains the pinned benchmark's alternate table fixture; it does not invalidate all of Shell's host, registry or type-generation ideas. Per-cell application callbacks and per-signal crossings should be evaluated by call rate and measured cost rather than a claim that all FFI crossings are inherently prohibitive.
 
 Correlated input-to-present measurement remains required for comparative responsiveness claims. Its absence does not prevent profiling and improving independently measured startup, CPU, allocation or publication costs.
