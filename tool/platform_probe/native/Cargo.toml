@@ -1,0 +1,17 @@
+[package]
+name = "gpuidart-platform-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "gpuidart-platform-window"
+path = "src/main.rs"
+
+[dependencies]
+gpui-kit = { git = "https://github.com/longbridge/gpui-kit", rev = "21622a70efd25219d26aa459164878c4da9e39f8" }
+serde_json = "1"
+libc = "0.2"

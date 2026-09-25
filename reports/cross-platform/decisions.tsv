@@ -1,0 +1,5 @@
+ts	phase	decision	why	evidence	result
+2026-09-25T19:32:45Z	planning	Start isolated probes for macOS 15 ARM64 and Ubuntu 24.04 x64 X11	The work order requires backend and OS-thread evidence before production changes	docs/cross-platform.md	open
+2026-09-25T19:32:45Z	planning	Keep the existing Windows MVP goal unfinished and track the new objective in this report	The goal service rejected creation while the old goal remains unfinished	reports/cross-platform/spike.md	open
+2026-09-25T19:46:00Z	probe	Fix the probe DLL manifest and isolate closure capture before remote probes	Local Windows validation exposed probe defects that would obscure backend evidence	tool/platform_probe/README.md; reports/cross-platform/windows-initial/results.json	fixed
+2026-09-25T19:46:00Z	probe	Accept the Windows probe baseline and preserve production code	Four launch variants and existing 12 native plus 27 Dart tests passed	reports/cross-platform/windows-dpi/results.json	Windows checks passed; other targets untested

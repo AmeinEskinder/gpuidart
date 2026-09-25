@@ -1,0 +1,72 @@
+name: Platform feasibility probes
+
+on:
+  push:
+    paths:
+      - '.github/workflows/platform-probe.yml'
+      - 'tool/platform_probe/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
+        with:
+          sdk: '3.13.4'
+      - name: Install Linux backend and software-display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 vulkan-validationlayers mesa-vulkan-drivers vulkan-tools xvfb openbox xdotool
+      - name: Restore pinned toolchains and packages
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: platform-probe-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Build isolated pinned-backend probe
+        run: |
+          mkdir -p build/platform-probe
+          cargo build --locked -p gpuidart-platform-probe 2>&1 | tee build/platform-probe/build.log
+      - name: Probe macOS native main thread and Dart JIT/AOT workers
+        if: runner.os == 'macOS'
+        run: dart run tool/platform_probe/run.dart
+      - name: Probe Linux X11 software rendering and Dart JIT/AOT workers
+        if: runner.os == 'Linux'
+        env:
+          GPUI_BACKEND: X11
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: xvfb-run -a -s '-screen 0 1280x800x24' bash -c 'openbox >build/platform-probe/openbox.log 2>&1 & dart run tool/platform_probe/run.dart'
+      - name: Preserve successful and failed probe evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: platform-probe-${{ runner.os }}-${{ runner.arch }}
+          path: build/platform-probe/
+          retention-days: 14

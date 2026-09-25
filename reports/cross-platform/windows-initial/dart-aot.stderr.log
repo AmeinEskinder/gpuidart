@@ -1,0 +1,11 @@
+Unhandled exception:
+Invalid argument(s): Illegal argument in isolate message: object is unsendable - Library:'dart:async' Class: _AsyncCompleter@5048458 (see restrictions listed at `SendPort.send()` documentation for more information)
+ <- Context num_variables: 7 <- main.<anonymous closure> (from file:///d:/dev/gpuidart/tool/platform_probe/probe.dart)
+ <- Instance of '_RemoteRunner<int>' (from dart:isolate)
+
+#0      Isolate._spawnFunction (dart:isolate-patch/isolate_patch.dart:430)
+#1      Isolate.spawn (dart:isolate-patch/isolate_patch.dart:399)
+#2      Isolate.run (dart:isolate:288)
+#3      main (file:///d:/dev/gpuidart/tool/platform_probe/probe.dart:62)
+#4      _delayEntrypointInvocation.<anonymous closure> (dart:isolate-patch/isolate_patch.dart:311)
+#5      _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:192)
