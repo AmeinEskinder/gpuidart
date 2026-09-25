@@ -78,6 +78,11 @@ The latest acceptance report and this handoff are saved in the following documen
 
 ## Remaining external checks
 
+The [Windows test setup](../../docs/windows-test-setup.md) now prepares this exact
+candidate for an automatic Sandbox run and provides the administrator setup
+command for Sandbox and Japanese input. Its generated IME sheet records actual
+observations separately. These checks remain pending until their results exist.
+
 The [environment record](environment.json) shows only en-US input, no Windows Sandbox executable, no available VM launcher, no Hyper-V service and a non-elevated process. Local isolated-PATH execution cannot establish a clean machine. Posted characters cannot establish human IME composition.
 
 1. On a clean Windows x64 machine or VM without development SDKs, extract this exact ZIP and run `./verify.ps1 -Environment clean_vm` or `clean_machine`. Retain verification.json, the machine image/prerequisite details and any failure before adding dependencies.

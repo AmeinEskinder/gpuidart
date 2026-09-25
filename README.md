@@ -112,6 +112,8 @@ Node IDs must be nonempty and unique throughout one description. An input or tab
 
 ## Current limits
 
+The remaining clean-Windows launch and human IME checks have a [setup guide](docs/windows-test-setup.md), an automatic Sandbox runner and an observation sheet. Windows feature installation requires administrator access; neither generated test files nor installed language components count as completed verification.
+
 The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 
 - Windows only, one application host with one window. The dedicated UI isolate is a Windows experiment; macOS needs a different launch/thread arrangement.
