@@ -1,0 +1,127 @@
+{
+  "implementation": "dart",
+  "rows": 100000,
+  "updates": 50,
+  "cells_written": 50,
+  "first_price": "Tick 000050",
+  "native_first_price": {
+    "value": "Tick 000050",
+    "revision": 51
+  },
+  "native": {
+    "revision": 1,
+    "inputs": {},
+    "tables": {
+      "table": {
+        "entity": 4294967298,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 100000,
+        "dataset": "quotes",
+        "dataset_revision": 51,
+        "scroll_y": 0.0
+      }
+    },
+    "labels": {
+      "title": "GPUI comparison · 100,000 records"
+    },
+    "native": {
+      "materializations": 62,
+      "rows_constructed": 682,
+      "cells_constructed": 2356,
+      "data_records_checked": 50,
+      "data_cells_written": 50
+    },
+    "draw": {
+      "samples": 62,
+      "p50_us": 2418.687,
+      "p95_us": 3264.511,
+      "p99_us": 9134.079
+    },
+    "dirty_to_present_submit": {
+      "samples": 61,
+      "p50_us": 6615.039,
+      "p95_us": 18431.999,
+      "p99_us": 19808.255
+    },
+    "present_interval": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    },
+    "input_to_frame": {
+      "samples": 54,
+      "p50_us": 5861.375,
+      "p95_us": 18579.455,
+      "p99_us": 19808.255
+    }
+  },
+  "publication": {
+    "description_builds": 1,
+    "encoded_snapshots": 0,
+    "encoded_bytes": 0,
+    "ffi_callbacks": 105,
+    "ui_callbacks": 51,
+    "diagnostic_callbacks": 2,
+    "description_build": {
+      "samples": 1,
+      "p50_us": 29,
+      "p95_us": 29,
+      "p99_us": 29
+    },
+    "encode": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "publish_to_applied": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "initial": {
+      "bytes": 3788261,
+      "encode_us": 113195
+    },
+    "data_messages": 50,
+    "data_bytes": 7524,
+    "data_records_checked": 50,
+    "data_cells_written": 50,
+    "data_encode": {
+      "samples": 50,
+      "p50_us": 18,
+      "p95_us": 29,
+      "p99_us": 65
+    },
+    "data_publish_to_applied": {
+      "samples": 50,
+      "p50_us": 137,
+      "p95_us": 2902,
+      "p99_us": 3683
+    },
+    "native_data_parse": {
+      "samples": 50,
+      "p50_us": 16,
+      "p95_us": 33,
+      "p99_us": 64
+    },
+    "native_data_apply": {
+      "samples": 50,
+      "p50_us": 5,
+      "p95_us": 8,
+      "p99_us": 12
+    },
+    "native_snapshot_apply": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    }
+  },
+  "scope": "cumulative since window creation; includes startup and warmup"
+}

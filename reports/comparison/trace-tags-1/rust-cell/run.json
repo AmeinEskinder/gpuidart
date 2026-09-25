@@ -1,0 +1,184 @@
+﻿{
+    "end_qpc":  298460579567,
+    "input_count":  10,
+    "cpu_ms":  46.875,
+    "process_samples":  [
+                            {
+                                "working_set_bytes":  90546176,
+                                "private_bytes":  103198720,
+                                "cpu_ms":  0,
+                                "elapsed_ms":  1.2822
+                            },
+                            {
+                                "working_set_bytes":  90583040,
+                                "private_bytes":  103231488,
+                                "cpu_ms":  0,
+                                "elapsed_ms":  251.22250000000003
+                            },
+                            {
+                                "working_set_bytes":  90591232,
+                                "private_bytes":  103235584,
+                                "cpu_ms":  0,
+                                "elapsed_ms":  501.2316
+                            },
+                            {
+                                "working_set_bytes":  90669056,
+                                "private_bytes":  103280640,
+                                "cpu_ms":  0,
+                                "elapsed_ms":  750.78190000000006
+                            },
+                            {
+                                "working_set_bytes":  90411008,
+                                "private_bytes":  103014400,
+                                "cpu_ms":  15.625,
+                                "elapsed_ms":  1000.4235000000001
+                            },
+                            {
+                                "working_set_bytes":  90570752,
+                                "private_bytes":  103174144,
+                                "cpu_ms":  15.625,
+                                "elapsed_ms":  1250.5098
+                            },
+                            {
+                                "working_set_bytes":  90587136,
+                                "private_bytes":  103190528,
+                                "cpu_ms":  15.625,
+                                "elapsed_ms":  1500.5165000000002
+                            },
+                            {
+                                "working_set_bytes":  90591232,
+                                "private_bytes":  103194624,
+                                "cpu_ms":  31.25,
+                                "elapsed_ms":  1751.3446000000001
+                            }
+                        ],
+    "inputs":  [
+                   {
+                       "injection_completed_qpc":  298440899422,
+                       "scheduled_ms":  0,
+                       "packets_accepted":  2,
+                       "sequence":  1,
+                       "sent_ms":  1.2822,
+                       "qpc":  298440616023
+                   },
+                   {
+                       "injection_completed_qpc":  298442602479,
+                       "scheduled_ms":  200,
+                       "packets_accepted":  2,
+                       "sequence":  2,
+                       "sent_ms":  201.3223,
+                       "qpc":  298442590214
+                   },
+                   {
+                       "injection_completed_qpc":  298444730121,
+                       "scheduled_ms":  400,
+                       "packets_accepted":  2,
+                       "sequence":  3,
+                       "sent_ms":  400.78790000000004,
+                       "qpc":  298444584573
+                   },
+                   {
+                       "injection_completed_qpc":  298446741105,
+                       "scheduled_ms":  600,
+                       "packets_accepted":  2,
+                       "sequence":  4,
+                       "sent_ms":  600.8825,
+                       "qpc":  298446585505
+                   },
+                   {
+                       "injection_completed_qpc":  298448588843,
+                       "scheduled_ms":  800,
+                       "packets_accepted":  2,
+                       "sequence":  5,
+                       "sent_ms":  800.1141,
+                       "qpc":  298448577903
+                   },
+                   {
+                       "injection_completed_qpc":  298450736661,
+                       "scheduled_ms":  1000,
+                       "packets_accepted":  2,
+                       "sequence":  6,
+                       "sent_ms":  1000.4235000000001,
+                       "qpc":  298450580925
+                   },
+                   {
+                       "injection_completed_qpc":  298452589719,
+                       "scheduled_ms":  1200,
+                       "packets_accepted":  2,
+                       "sequence":  7,
+                       "sent_ms":  1200.3246000000001,
+                       "qpc":  298452579996
+                   },
+                   {
+                       "injection_completed_qpc":  298454597281,
+                       "scheduled_ms":  1400,
+                       "packets_accepted":  2,
+                       "sequence":  8,
+                       "sent_ms":  1401.2721000000001,
+                       "qpc":  298454589415
+                   },
+                   {
+                       "injection_completed_qpc":  298456738474,
+                       "scheduled_ms":  1600,
+                       "packets_accepted":  2,
+                       "sequence":  9,
+                       "sent_ms":  1601.3814,
+                       "qpc":  298456590526
+                   },
+                   {
+                       "injection_completed_qpc":  298458586981,
+                       "scheduled_ms":  1800,
+                       "packets_accepted":  2,
+                       "sequence":  10,
+                       "sent_ms":  1800.0866,
+                       "qpc":  298458577585
+                   }
+               ],
+    "trace_exit_code":  null,
+    "rows":  100000,
+    "window_available_ms":  296.26370000000003,
+    "isolated_path":  false,
+    "driver_wait":  "one-millisecond high resolution waitable timer",
+    "harness_timer_resolution_ms":  1,
+    "wheel_delta":  -120,
+    "logical_processors":  16,
+    "window_dpi":  120,
+    "input_trace":  true,
+    "purpose":  "foreground input tracing; ineligible for performance comparison",
+    "startup_boundary":  "process launch to created HWND; window explicitly shown afterward; not first displayed frame",
+    "correctness":  {
+                        "application_price":  "Tick 000010",
+                        "native_price":  "Tick 000010",
+                        "observed_updates":  10,
+                        "passed":  true,
+                        "expected_cells":  10,
+                        "expected_updates":  10,
+                        "observed_cells":  10,
+                        "expected_price":  "Tick 000010",
+                        "issues":  [
+
+                                   ]
+                    },
+    "qpc_frequency":  10000000,
+    "launch_qpc":  298403081725,
+    "exe_sha256":  "B744A18062B724392BCF033FBBB6BE558FCDA4D5D6CE9FF4DF6AF8735E1B8C71",
+    "packaged":  false,
+    "input_deadlines_missed":  0,
+    "client_pixels":  {
+                          "Left":  0,
+                          "Top":  0,
+                          "Right":  1075,
+                          "Bottom":  812
+                      },
+    "seconds_requested":  2,
+    "trace_status":  "not requested",
+    "pointer_warmup":  true,
+    "process_id":  21772,
+    "dpi_scale":  1.25,
+    "cpu_percent_one_core":  2.3430559868167049,
+    "workload":  "cell",
+    "implementation":  "rust",
+    "start_qpc":  298440576061,
+    "duration_ms":  2000.5924,
+    "run_id":  "trace-tags-1"
+}

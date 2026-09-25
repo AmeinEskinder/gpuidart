@@ -16,6 +16,19 @@ final class UiColumn extends UiNode {
   };
 }
 
+/// A horizontal group of controls, using the native theme's standard spacing.
+final class UiRow extends UiNode {
+  UiRow(super.id, List<UiNode> children)
+    : children = List.unmodifiable(children);
+  final List<UiNode> children;
+  @override
+  Map<String, Object> toJson() => {
+    'kind': 'row',
+    'id': id,
+    'children': children.map((child) => child.toJson()).toList(),
+  };
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text);
   final String text;

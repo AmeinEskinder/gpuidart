@@ -39,6 +39,9 @@ public static class BenchmarkWindow {
     [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr window, int command);
     [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] static extern bool MoveWindow(IntPtr window, int x, int y, int width, int height, bool repaint);
+    [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int width, int height, uint flags);
+    [DllImport("user32.dll")] static extern IntPtr WindowFromPoint(Point point);
+    [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr window, uint flags);
     [DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll", SetLastError = true)] static extern uint SendInput(uint count, Input[] inputs, int size);
     [DllImport("user32.dll")] static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
@@ -46,9 +49,26 @@ public static class BenchmarkWindow {
     [DllImport("user32.dll")] static extern bool PrintWindow(IntPtr window, IntPtr device, uint flags);
     [DllImport("winmm.dll")] static extern uint timeBeginPeriod(uint period);
     [DllImport("winmm.dll")] static extern uint timeEndPeriod(uint period);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] static extern IntPtr CreateWaitableTimerExW(IntPtr attributes, string name, uint flags, uint access);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool SetWaitableTimer(IntPtr timer, ref long dueTime, int period, IntPtr callback, IntPtr argument, bool resume);
+    [DllImport("kernel32.dll")] static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
+    [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr handle);
+    static IntPtr driverTimer;
+    public static int ActivationClicks { get; private set; }
 
-    public static void Initialize() { SetProcessDPIAware(); timeBeginPeriod(1); }
-    public static void Finish() { timeEndPeriod(1); }
+    public static void Initialize() {
+        SetProcessDPIAware();
+        ActivationClicks = 0;
+        driverTimer = CreateWaitableTimerExW(IntPtr.Zero, null, 2, 0x00100002);
+        if (driverTimer == IntPtr.Zero) throw new InvalidOperationException("Cannot create high resolution driver timer: " + Marshal.GetLastWin32Error());
+        timeBeginPeriod(1);
+    }
+    public static void Finish() { timeEndPeriod(1); if (driverTimer != IntPtr.Zero) CloseHandle(driverTimer); driverTimer = IntPtr.Zero; }
+    public static void Pause() {
+        long dueTime = -10000; // Relative time in 100 ns units: one millisecond.
+        if (!SetWaitableTimer(driverTimer, ref dueTime, 0, IntPtr.Zero, IntPtr.Zero, false) || WaitForSingleObject(driverTimer, 2000) != 0)
+            throw new InvalidOperationException("Driver timer wait failed");
+    }
     public static IntPtr Find(int process) {
         IntPtr found = IntPtr.Zero;
         EnumWindows((window, _) => {
@@ -75,7 +95,23 @@ public static class BenchmarkWindow {
         double scale = Scale(window);
         MoveWindow(window, 80, 80, (int)(860 * scale) + outer.Right - outer.Left - inner.Right,
             (int)(650 * scale) + outer.Bottom - outer.Top - inner.Bottom, true);
-        if (activate) SetForegroundWindow(window);
+        if (activate && GetForegroundWindow() != window) {
+            SetForegroundWindow(window);
+            if (GetForegroundWindow() != window) {
+                // Temporarily expose only our own window so activation cannot click another app.
+                if (!SetWindowPos(window, new IntPtr(-1), 0, 0, 0, 0, 0x13)) throw new InvalidOperationException("Cannot expose benchmark window for activation");
+                try {
+                    Point point = new Point { X = (int)(800 * scale), Y = (int)(600 * scale) };
+                    ClientToScreen(window, ref point);
+                    if (GetAncestor(WindowFromPoint(point), 2) != window) throw new InvalidOperationException("Benchmark activation point is occluded; no click sent");
+                    if (!SetCursorPos(point.X, point.Y)) throw new InvalidOperationException("Cannot position benchmark activation click");
+                    Mouse(Packet(2, 0), Packet(4, 0));
+                    ActivationClicks++;
+                } finally {
+                    SetWindowPos(window, new IntPtr(-2), 0, 0, 0, 0, 0x13);
+                }
+            }
+        }
     }
     public static void RequireFocus(IntPtr window) {
         if (GetForegroundWindow() != window) throw new InvalidOperationException("Benchmark window lost focus; input stopped. Target: " + Describe(window) + "; foreground: " + Describe(GetForegroundWindow()));
@@ -91,15 +127,21 @@ public static class BenchmarkWindow {
         ClientToScreen(window, ref point);
         if (!SetCursorPos(point.X, point.Y)) throw new InvalidOperationException("SetCursorPos failed");
     }
-    static void Mouse(params Input[] inputs) {
-        if (SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input))) != inputs.Length)
+    static uint Mouse(params Input[] inputs) {
+        uint accepted = SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
+        if (accepted != inputs.Length)
             throw new InvalidOperationException("SendInput failed: " + Marshal.GetLastWin32Error());
+        return accepted;
     }
-    static Input Packet(uint flags, uint data) { return new Input { Union = new InputUnion { Mouse = new MouseInput { Flags = flags, Data = data } } }; }
-    public static void Click(IntPtr window, double y) {
+    static Input Packet(uint flags, uint data, uint sequence = 0) {
+        return new Input { Union = new InputUnion { Mouse = new MouseInput {
+            Flags = flags, Data = data, Extra = sequence == 0 ? UIntPtr.Zero : new UIntPtr(0x47500000UL | sequence)
+        } } };
+    }
+    public static uint Click(IntPtr window, double y, uint sequence = 0) {
         Pointer(window, 140, y);
         RequireFocus(window);
-        Mouse(Packet(2, 0), Packet(4, 0));
+        return Mouse(Packet(2, 0, sequence), Packet(4, 0, sequence));
     }
     public static void MessageClick(IntPtr window, double y) {
         int x = (int)(140 * Scale(window));

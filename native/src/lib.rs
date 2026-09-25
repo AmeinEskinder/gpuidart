@@ -2,6 +2,9 @@
 mod allocations;
 mod datasets;
 mod diagnostics;
+#[cfg(feature = "benchmark-trace")]
+#[path = "../../benchmarks/native/src/input_trace.rs"]
+mod input_trace;
 mod protocol;
 mod ui;
 
@@ -101,6 +104,8 @@ pub unsafe extern "C" fn gd_run(host: *const Host) -> i32 {
     };
     host.running.store(true, Ordering::Release);
     let result = ui::run(initial, host.receiver.clone(), host.events.clone());
+    #[cfg(feature = "benchmark-trace")]
+    input_trace::save();
     host.sender.close();
     if let Err(message) = &result {
         host.events.emit(Event::Error {

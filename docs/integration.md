@@ -58,12 +58,19 @@ The packaged application uses the same blocking native UI isolate arrangement as
 
 The AOT package is built with [`dart compile exe`](https://dart.dev/tools/dart-compile#exe). Native assets are embedded in the GPUI DLL. DLL lookup uses the executable's directory, so the working directory can be unrelated to the package. The native DLL retains its Common Controls v6 manifest.
 
+### Windows production DPI requirement
+
+The shipping executable must select **per-monitor V2 DPI awareness before creating any windows**. Microsoft recommends an executable application manifest with `dpiAwareness` set to `PerMonitorV2`; programmatic configuration must also happen before the first HWND exists. See [Microsoft's process DPI guidance](https://learn.microsoft.com/en-us/windows/win32/hidpi/setting-the-default-dpi-awareness-for-a-process). The Common Controls dependency embedded in `gpuidart.dll` does not provide this executable setting.
+
+The shared Dart host now selects or verifies PerMonitorV2 before loading GPUI and creating a window. This applies to the demo, watchlist and custom SDK callers. The package script also embeds an executable manifest with this setting. An already configured PerMonitorV2 context is accepted; conflicting DPI configuration fails before startup. The DLL's Common Controls v6 manifest remains separate.
+
+The actual packaged watchlist was verified at 125% scaling: window DPI 120, PerMonitorV2 context, a 960 by 720 logical viewport and 1200 by 900 physical client pixels. See [the package audit](../reports/sdk/package.json) and [window capture](../reports/sdk/visual/watchlist.png). Moving between monitors with different DPI remains a separate, unverified check.
+
 ## Next experiments
 
-1. Complete human visual inspection and clean-machine package verification. Measure controlled OS input-to-presentation latency.
-2. Run matched release workloads against GPUI Shell/QuickJS and GPUIX/Solid. Keep unchanged repaints and invalidated views separate.
-3. If frequent updates make full descriptions expensive, introduce independently invalidated child views and compare them with the current whole-view baseline.
-4. Evaluate targeted mutations or a Shell engine port after measuring their expected benefit. A port must demonstrate concrete reuse of description, materialization or component infrastructure.
+1. Complete the [clean-machine and human IME checks](windows-release-checks.md) using the SDK package.
+2. Continue the small [SDK API and representative screen](sdk.md) over the existing snapshot/dataset bridge. No rewrite is justified by the [completed comparison](../reports/comparison/dart-js-20260925.md).
+3. Measure controlled OS input-to-presentation latency when suitable trace access and changed-frame correlation are available.
 
 ## Benchmark plan
 
@@ -80,7 +87,7 @@ Use the same native components, machine, window dimensions, visible rows and rel
 
 Compare QuickJS/Shell snapshots, Dart snapshots and GPUIX/Solid before changing the update architecture. Pin each repository and preserve equivalent components, table data, viewport, update cadence and presentation behavior. If equivalent widgets are unavailable, report that difference alongside runtime results. Separate Dart JIT and AOT results. Record p50/p95/p99 latency, allocations, memory, and display frame budget. The `applied` acknowledgement is not a presentation timestamp.
 
-The checked-in AOT sample measures only this host. It does not establish a performance ranking against Shell or GPUIX. Source counters instrument the registered Dart builder and callbacks; they cannot establish that the Dart runtime executes no code during repaints.
+The original AOT sample measures only this host. The separate three-repetition comparison supports workload-specific conclusions against the tested complete implementations. Source counters instrument the registered Dart builder and callbacks; they cannot establish that the Dart runtime executes no code during repaints. SDK changes made after those captures are not new performance measurements.
 
 ## Verification record
 
@@ -90,4 +97,4 @@ The checked-in AOT sample measures only this host. It does not establish a perfo
 - The Dart integration test opens the real Windows host, publishes from a timer, rejects an invalid table, applies the next valid description, closes, and verifies publication after close fails.
 - An extracted AOT package starts with a Windows-only PATH outside the repository. The verifier checks package hashes and loaded module paths, including Common Controls v6 and the bundled CRT. The SDK remains installed on the test machine.
 - The live JIT reload test changes component source and checks preserved Dart state, native entities, text, focus, selection and scroll offset. Invalid source leaves the previous code running. Preparation uses a development extension; it is separate from the headless typing tests.
-- Visual inspection remains unavailable because the computer-use helper could not connect to its native pipe after recovery attempts.
+- Native window captures now verify the watchlist's initial and edited screens at 125% scaling. Posted Windows input checks verify typing, filtering, row selection and toolbar actions. These do not establish human IME composition or presentation latency.

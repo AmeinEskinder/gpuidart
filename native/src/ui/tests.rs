@@ -50,6 +50,7 @@ fn table_data(count: usize) -> TableData {
 
 fn initial(count: usize) -> Initial {
     Initial {
+        window: Default::default(),
         snapshot: description(1),
         datasets: vec![Upload {
             id: "records".into(),
@@ -273,9 +274,16 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
     .unwrap();
     let events = events.lock().unwrap();
     assert!(
-        events
-            .iter()
-            .any(|event| matches!(event, Event::Click { revision: 1, id } if id == "increment"))
+        events.iter().any(|event| matches!(event,
+            Event::TableSelection { id, dataset, dataset_revision: 2, row: Some(_), .. }
+            if id == "table" && dataset == "records"
+        )),
+        "Pointer/keyboard row selection must reach Dart with its dataset revision"
+    );
+    assert!(
+        events.iter().any(
+            |event| matches!(event, Event::Click { revision: 1, id, .. } if id == "increment")
+        )
     );
     assert!(
         events

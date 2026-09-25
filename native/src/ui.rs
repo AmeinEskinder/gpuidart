@@ -10,7 +10,7 @@ use gpui_kit::component::{
     ActiveTheme, StyledExt,
     button::{Button, ButtonVariants},
     input::{Input, InputEvent, InputState},
-    table::{Column, DataTable, TableDelegate, TableState},
+    table::{Column, DataTable, TableDelegate, TableEvent, TableState},
 };
 use gpui_kit::*;
 use serde_json::{Value, json};
@@ -69,6 +69,7 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     tables: HashMap<String, Entity<TableState<Rows>>>,
+    table_subscriptions: HashMap<String, Subscription>,
     datasets: Store,
     counters: Rc<Counters>,
 }
@@ -134,6 +135,7 @@ impl DartView {
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
         json!({"revision": self.snapshot.revision, "inputs": inputs, "tables": tables, "labels": labels,
+            "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor()},
             "native": self.counters.read(),
             "draw": histogram!(frames.draw_duration_histogram),
             "dirty_to_present_submit": histogram!(frames.dirty_to_present_histogram),
@@ -179,6 +181,7 @@ impl DartView {
             events,
             inputs: HashMap::new(),
             tables: HashMap::new(),
+            table_subscriptions: HashMap::new(),
             counters: Rc::new(Counters::default()),
         };
         view.reconcile(window, cx);
@@ -269,6 +272,12 @@ impl DartView {
                 self.counters
                     .data_cells_written
                     .set(self.counters.data_cells_written.get() + work.cells_written as u64);
+                #[cfg(feature = "benchmark-trace")]
+                crate::input_trace::record_sequence(
+                    "update_applied",
+                    None,
+                    json!({"request": request, "revision": revision, "first_cell": self.cell(&id, 0, 2)}),
+                );
                 self.events.emit(Event::DatasetApplied {
                     request,
                     id,
@@ -343,6 +352,23 @@ impl DartView {
                     let table = cx.new(|cx| {
                         TableState::new(Rows(data.clone(), self.counters.clone()), window, cx)
                     });
+                    let event_id = id.clone();
+                    let subscription = cx.subscribe(&table, move |this, table, event, cx| {
+                        let row = match event {
+                            TableEvent::SelectRow(row) => Some(*row),
+                            TableEvent::ClearSelection => None,
+                            _ => return,
+                        };
+                        let data = table.read(cx).delegate().0.borrow();
+                        this.events.emit(Event::TableSelection {
+                            revision: this.snapshot.revision,
+                            id: event_id.clone(),
+                            dataset: data.id.clone(),
+                            dataset_revision: data.revision,
+                            row,
+                        });
+                    });
+                    self.table_subscriptions.insert(id.clone(), subscription);
                     self.tables.insert(id.clone(), table);
                 }
             }
@@ -350,6 +376,8 @@ impl DartView {
         });
         self.inputs.retain(|id, _| input_ids.contains(id));
         self.tables.retain(|id, _| table_ids.contains(id));
+        self.table_subscriptions
+            .retain(|id, _| table_ids.contains(id));
     }
 
     fn materialize(&self, node: &Node) -> AnyElement {
@@ -358,6 +386,13 @@ impl DartView {
             Node::Column { children, .. } => div()
                 .id(id)
                 .v_flex()
+                .gap_3()
+                .w_full()
+                .children(children.iter().map(|child| self.materialize(child)))
+                .into_any_element(),
+            Node::Row { children, .. } => div()
+                .id(id)
+                .h_flex()
                 .gap_3()
                 .w_full()
                 .children(children.iter().map(|child| self.materialize(child)))
@@ -371,9 +406,13 @@ impl DartView {
                     .primary()
                     .label(label.clone())
                     .on_click(move |_, _, _| {
+                        #[cfg(feature = "benchmark-trace")]
+                        crate::input_trace::record("native_click_handler", json!({"id": event_id}));
                         events.emit(Event::Click {
                             revision,
                             id: event_id.clone(),
+                            #[cfg(feature = "benchmark-trace")]
+                            debug_input_sequence: crate::input_trace::sequence(),
                         });
                     })
                     .into_any_element()
@@ -399,13 +438,16 @@ impl Render for DartView {
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);
-        div()
+        let root = div()
             .id("gpuidart")
             .size_full()
             .p_5()
             .bg(cx.theme().background)
             .text_color(cx.theme().foreground)
-            .child(self.materialize(&self.snapshot.root))
+            .child(self.materialize(&self.snapshot.root));
+        #[cfg(feature = "benchmark-trace")]
+        let root = crate::input_trace::observe(root);
+        root
     }
 }
 
@@ -421,9 +463,12 @@ pub(crate) fn run(
         .run(move |cx| {
             gpui_kit::init(cx);
             let options = WindowOptions {
-                window_bounds: Some(WindowBounds::centered(size(px(860.), px(650.)), cx)),
+                window_bounds: Some(WindowBounds::centered(
+                    size(px(initial.window.width), px(initial.window.height)),
+                    cx,
+                )),
                 titlebar: Some(TitlebarOptions {
-                    title: Some("GPUI-Dart integration spike".into()),
+                    title: Some(initial.window.title.clone().into()),
                     ..Default::default()
                 }),
                 ..Default::default()

@@ -8,6 +8,8 @@ import 'package:ffi/ffi.dart';
 
 import 'nodes.dart';
 import 'metrics.dart';
+import 'window_options.dart';
+import 'windows.dart';
 
 part 'dataset.dart';
 
@@ -62,8 +64,32 @@ final class GpuiEvent {
   String? get id => data['id'] as String?;
   int? get revision => data['revision'] as int?;
   String? get value => data['value'] as String?;
+
+  /// Native row selection, including the dataset revision used for the index.
+  TableSelection? get tableSelection => type == 'table_selection'
+      ? TableSelection._(
+          data['id'] as String,
+          data['dataset'] as String,
+          data['dataset_revision'] as int,
+          data['row'] as int?,
+        )
+      : null;
   @override
   String toString() => jsonEncode(data);
+}
+
+/// A row index is meaningful only within [datasetRevision]. Null means cleared.
+final class TableSelection {
+  const TableSelection._(
+    this.table,
+    this.dataset,
+    this.datasetRevision,
+    this.row,
+  );
+  final String table;
+  final String dataset;
+  final int datasetRevision;
+  final int? row;
 }
 
 /// Experimental Windows host. The Dart application isolate keeps its event loop.
@@ -97,11 +123,17 @@ final class GpuiHost {
     UiNode Function() builder, {
     String? libraryPath,
     List<TableDataset> datasets = const [],
+    GpuiWindowOptions window = const GpuiWindowOptions(),
   }) async {
     final timer = Stopwatch()..start();
     final root = builder();
     final elapsed = timer.elapsedMicroseconds;
-    final host = await open(root, libraryPath: libraryPath, datasets: datasets);
+    final host = await open(
+      root,
+      libraryPath: libraryPath,
+      datasets: datasets,
+      window: window,
+    );
     host._builder = builder;
     host.metrics.descriptionBuilds = 1;
     HostMetrics.sample(host.metrics.buildMicroseconds, elapsed);
@@ -123,12 +155,15 @@ final class GpuiHost {
     UiNode root, {
     String? libraryPath,
     List<TableDataset> datasets = const [],
+    GpuiWindowOptions window = const GpuiWindowOptions(),
   }) async {
     if (!Platform.isWindows) {
       throw UnsupportedError(
         'The initial native host currently supports Windows.',
       );
     }
+    final windowDescription = window.toJson();
+    configureWindowsDpi();
     final sibling = File.fromUri(
       File(Platform.resolvedExecutable).parent.uri.resolve('gpuidart.dll'),
     );
@@ -156,6 +191,7 @@ final class GpuiHost {
       {
         'snapshot': {'revision': 1, 'root': root.toJson()},
         'datasets': datasets.map((dataset) => dataset._upload()).toList(),
+        'window': windowDescription,
       },
       'initial',
       (bytes, length) =>
@@ -165,7 +201,8 @@ final class GpuiHost {
       host._callback.close();
       await host._events.close();
       throw ArgumentError(
-        'Invalid initial UI description. Check IDs and table row widths.',
+        'Invalid initial UI description or incompatible native DLL. '
+        'Check node IDs and dataset schema, and build the DLL from the same SDK revision.',
       );
     }
     for (final dataset in datasets) {
@@ -326,7 +363,11 @@ final class GpuiHost {
             as Map<String, dynamic>,
       );
       metrics.ffiCallbacks++;
-      if (event.type == 'click' || event.type == 'input') metrics.uiCallbacks++;
+      if (event.type == 'click' ||
+          event.type == 'input' ||
+          event.type == 'table_selection') {
+        metrics.uiCallbacks++;
+      }
       if (event.type == 'diagnostic') metrics.diagnosticCallbacks++;
       switch (event.type) {
         case 'ready':

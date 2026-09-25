@@ -11,12 +11,19 @@ function ColumnNumbers($Rows, [string]$Name) {
         if ([double]::TryParse($row.$Name, [Globalization.NumberStyles]::Float, [Globalization.CultureInfo]::InvariantCulture, [ref]$value) -and $value -ge 0) { $value }
     }
 }
-$results = foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run.json -Recurse) {
+$results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run.json -Recurse) {
     $run = Get-Content -Raw -LiteralPath $file.FullName | ConvertFrom-Json
     if ($run.purpose -ne 'foreground measurement') {
-        @{ implementation = $run.implementation; workload = $run.workload; status = 'excluded: background correctness run' }
+        @{ implementation = $run.implementation; workload = $run.workload; run_id = $run.run_id; status = "excluded from performance: $($run.purpose)"; correctness = $run.correctness; equal_work_timing_eligible = $false; input_count = $run.input_count; scheduled_inputs_missed = $run.input_deadlines_missed }
         continue
     }
+    $applicationPath = Join-Path $file.DirectoryName 'application.json'
+    $application = if (Test-Path -LiteralPath $applicationPath) { Get-Content -Raw -LiteralPath $applicationPath | ConvertFrom-Json } else { $null }
+    $native = switch ($run.implementation) { rust { $application }; dart { $application.native }; default { $null } }
+    $rate = switch ($run.workload) { idle { 0 }; scroll { 60 }; cell { 5 }; burst { 30 } }
+    $plannedInputs = if ($null -ne $run.seconds_requested) { $run.seconds_requested * $rate } else { $null }
+    $excessInputs = if ($null -ne $plannedInputs) { [math]::Max(0, $run.input_count - $plannedInputs) } else { $null }
+    $uninjectedInputs = if ($null -ne $plannedInputs) { [math]::Max(0, $plannedInputs - $run.input_count) } else { $null }
     $frames = @()
     $tracePath = Join-Path $file.DirectoryName 'present.csv'
     if (Test-Path -LiteralPath $tracePath) {
@@ -39,13 +46,40 @@ $results = foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run.j
         $missedSlots = ($intervals | ForEach-Object { [math]::Max(0, [math]::Round($_ / $targetMs) - 1) } | Measure-Object -Sum).Sum
     }
     @{
-        implementation = $run.implementation; workload = $run.workload
+        implementation = $run.implementation; workload = $run.workload; run_id = $run.run_id
+        correctness = $run.correctness
+        equal_work_timing_eligible = ($null -ne $plannedInputs -and $excessInputs -eq 0 -and $uninjectedInputs -eq 0 -and $run.input_deadlines_missed -eq 0 -and ($null -eq $run.correctness -or $run.correctness.passed))
+        input_delivery = @{ planned = $plannedInputs; injected = $run.input_count; excess = $excessInputs; uninjected = $uninjectedInputs }
         status = $(if ($frames.Count) { 'ETW captured; response-frame correlation and parity review still required' } else { 'presentation unavailable' })
         scheduled_inputs_missed = $run.input_deadlines_missed
+        input_count = $run.input_count; duration_ms = $run.duration_ms
+        delivery_quality = $(if ($run.input_deadlines_missed -gt 0) { 'driver missed deadlines; exclude from matched-cadence ranking' } else { 'no skipped input deadlines; inspect recorded input jitter separately' })
         cpu_percent_one_core = $run.cpu_percent_one_core
         working_set_bytes = Distribution @($run.process_samples.working_set_bytes)
         private_bytes = Distribution @($run.process_samples.private_bytes)
         window_available_ms = $run.window_available_ms
+        application_work = $(if ($application) { @{
+            updates = $application.updates; cells_written = $application.cells_written
+            shell_view_builds = $application.view_builds; shell_cell_builds = $application.cell_builds
+            shell_visible_range = $application.visible_range
+            solid_row_components_created = $application.row_components_created
+            solid_mounted_window = $application.mounted_window; solid_scroll_offset = $application.scroll_offset
+        } } else { $null })
+        native_diagnostics = $(if ($native) { @{
+            scope = $application.scope
+            draw = $native.draw
+            dirty_to_present_submit = $native.dirty_to_present_submit
+            input_to_frame = $native.input_to_frame
+            limit = 'Cumulative native histories include startup and warmup; no changed-cell presentation correlation'
+        } } else { $null })
+        solid_draw_overlay = $(if ($run.implementation -eq 'solid') { @{
+            scope = $application.scope; statistics = $application.draw_overlay
+        } } else { $null })
+        dart_publication = $(if ($run.implementation -eq 'dart') { @{
+            scope = 'Dataset edits from delivered workload clicks, through the applied acknowledgement; initial upload reported separately'
+            statistics = $application.publication
+            limit = 'Application-defined percentile estimator; do not add stage percentiles or treat acknowledgement as presentation'
+        } } else { $null })
         presentation = $(if ($frames.Count) { @{
             frames = $frames.Count; frames_not_displayed = $frames.Count - $displayed.Count
             between_presents_ms = Distribution @(ColumnNumbers @($frames | Select-Object -Skip 1) 'MsBetweenPresents')
@@ -55,6 +89,15 @@ $results = foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run.j
             input_to_response_present_ms = $null
             latency_limit = 'ETW input association does not prove the frame contains the changed cell'
         } } else { $null })
+    }
+})
+foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter failure.json -Recurse) {
+    if (Test-Path -LiteralPath (Join-Path $file.DirectoryName 'run.json')) { continue }
+    $failure = Get-Content -Raw -LiteralPath $file.FullName | ConvertFrom-Json
+    $results += @{
+        implementation = $failure.implementation; workload = $failure.workload; run_id = $failure.run_id
+        status = 'incomplete or legacy failed observation; retained for reliability accounting'
+        failure = $failure; equal_work_timing_eligible = $false; presentation = $null
     }
 }
 $results | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $Directory 'analysis.json') -Encoding UTF8

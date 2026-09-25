@@ -11,6 +11,26 @@ use std::{
 pub struct Initial {
     pub snapshot: Snapshot,
     pub datasets: Vec<Upload>,
+    #[serde(default)]
+    pub window: WindowConfig,
+}
+
+#[derive(Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct WindowConfig {
+    pub title: String,
+    pub width: f32,
+    pub height: f32,
+}
+
+impl Default for WindowConfig {
+    fn default() -> Self {
+        Self {
+            title: "GPUI-Dart".into(),
+            width: 860.,
+            height: 650.,
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -24,6 +44,12 @@ pub struct Upload {
 impl Initial {
     pub fn parse(bytes: &[u8]) -> Result<Self, String> {
         let initial: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+        if initial.window.title.trim().is_empty()
+            || !(320.0..=8192.0).contains(&initial.window.width)
+            || !(240.0..=8192.0).contains(&initial.window.height)
+        {
+            return Err("Invalid window title or dimensions".into());
+        }
         initial.snapshot.validate()?;
         let mut ids = HashSet::new();
         for upload in &initial.datasets {

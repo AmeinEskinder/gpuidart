@@ -15,6 +15,7 @@ pub struct Snapshot {
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Node {
     Column { id: String, children: Vec<Node> },
+    Row { id: String, children: Vec<Node> },
     Text { id: String, text: String },
     Button { id: String, label: String },
     Input { id: String, placeholder: String },
@@ -32,6 +33,7 @@ impl Node {
     pub fn id(&self) -> &str {
         match self {
             Self::Column { id, .. }
+            | Self::Row { id, .. }
             | Self::Text { id, .. }
             | Self::Button { id, .. }
             | Self::Input { id, .. }
@@ -41,7 +43,7 @@ impl Node {
 
     pub fn visit(&self, f: &mut impl FnMut(&Node)) {
         f(self);
-        if let Self::Column { children, .. } = self {
+        if let Self::Column { children, .. } | Self::Row { children, .. } = self {
             for child in children {
                 child.visit(f);
             }
@@ -72,7 +74,7 @@ impl Snapshot {
                 return Err(format!("Empty or duplicate node ID: {}", node.id()));
             }
             match node {
-                Node::Column { children, .. } => {
+                Node::Column { children, .. } | Node::Row { children, .. } => {
                     for child in children {
                         validate(child, depth + 1, ids)?;
                     }
@@ -119,11 +121,20 @@ pub enum Event {
     Click {
         revision: u64,
         id: String,
+        #[cfg(feature = "benchmark-trace")]
+        debug_input_sequence: Option<u64>,
     },
     Input {
         revision: u64,
         id: String,
         value: String,
+    },
+    TableSelection {
+        revision: u64,
+        id: String,
+        dataset: String,
+        dataset_revision: u64,
+        row: Option<usize>,
     },
     Error {
         message: String,

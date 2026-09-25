@@ -1,0 +1,136 @@
+﻿[
+    {
+        "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+        "implementation":  "rust",
+        "presentation":  null,
+        "window_available_ms":  244.881,
+        "scheduled_inputs_missed":  0,
+        "cpu_percent_one_core":  0.93694748206982337,
+        "input_delivery":  {
+                               "planned":  0,
+                               "uninjected":  0,
+                               "injected":  0,
+                               "excess":  0
+                           },
+        "input_count":  0,
+        "solid_draw_overlay":  null,
+        "correctness":  null,
+        "run_id":  "paired-20260925-0",
+        "equal_work_timing_eligible":  true,
+        "workload":  "idle",
+        "native_diagnostics":  {
+                                   "scope":  "cumulative since window creation; includes startup and warmup",
+                                   "limit":  "Cumulative native histories include startup and warmup; no changed-cell presentation correlation",
+                                   "input_to_frame":  {
+                                                          "samples":  1,
+                                                          "p50_us":  3377.151,
+                                                          "p95_us":  3377.151,
+                                                          "p99_us":  3377.151
+                                                      },
+                                   "draw":  {
+                                                "samples":  3,
+                                                "p50_us":  3354.623,
+                                                "p95_us":  10723.327,
+                                                "p99_us":  10723.327
+                                            },
+                                   "dirty_to_present_submit":  {
+                                                                   "samples":  2,
+                                                                   "p50_us":  3399.679,
+                                                                   "p95_us":  9084.927,
+                                                                   "p99_us":  9084.927
+                                                               }
+                               },
+        "working_set_bytes":  {
+                                  "p50":  89350144,
+                                  "p99":  89350144,
+                                  "samples":  40,
+                                  "max":  89350144,
+                                  "p95":  89350144
+                              },
+        "duration_ms":  10005.897,
+        "private_bytes":  {
+                              "p50":  102252544,
+                              "p99":  102252544,
+                              "samples":  40,
+                              "max":  102252544,
+                              "p95":  102252544
+                          },
+        "status":  "presentation unavailable",
+        "dart_publication":  null
+    },
+    {
+        "delivery_quality":  "driver missed deadlines; exclude from matched-cadence ranking",
+        "implementation":  "rust",
+        "presentation":  null,
+        "window_available_ms":  316.4816,
+        "scheduled_inputs_missed":  1,
+        "cpu_percent_one_core":  23.904283633628296,
+        "input_delivery":  {
+                               "planned":  600,
+                               "uninjected":  1,
+                               "injected":  599,
+                               "excess":  0
+                           },
+        "input_count":  599,
+        "solid_draw_overlay":  null,
+        "correctness":  null,
+        "run_id":  "paired-20260925-0",
+        "equal_work_timing_eligible":  false,
+        "workload":  "scroll",
+        "native_diagnostics":  {
+                                   "scope":  "cumulative since window creation; includes startup and warmup",
+                                   "limit":  "Cumulative native histories include startup and warmup; no changed-cell presentation correlation",
+                                   "input_to_frame":  {
+                                                          "samples":  559,
+                                                          "p50_us":  12050.431,
+                                                          "p95_us":  17383.423,
+                                                          "p99_us":  18448.383
+                                                      },
+                                   "draw":  {
+                                                "samples":  566,
+                                                "p50_us":  2584.575,
+                                                "p95_us":  3872.767,
+                                                "p99_us":  4304.895
+                                            },
+                                   "dirty_to_present_submit":  {
+                                                                   "samples":  565,
+                                                                   "p50_us":  12034.047,
+                                                                   "p95_us":  17383.423,
+                                                                   "p99_us":  18481.151
+                                                               }
+                               },
+        "working_set_bytes":  {
+                                  "p50":  101941248,
+                                  "p99":  115601408,
+                                  "samples":  40,
+                                  "max":  115601408,
+                                  "p95":  103854080
+                              },
+        "duration_ms":  10000.822600000001,
+        "private_bytes":  {
+                              "p50":  111738880,
+                              "p99":  125386752,
+                              "samples":  40,
+                              "max":  125386752,
+                              "p95":  113651712
+                          },
+        "status":  "presentation unavailable",
+        "dart_publication":  null
+    },
+    {
+        "implementation":  "rust",
+        "presentation":  null,
+        "run_id":  "paired-20260925-0",
+        "failure":  {
+                        "implementation":  "rust",
+                        "failed_at_utc":  "2026-09-25T00:31:10.5035172Z",
+                        "run_id":  "paired-20260925-0",
+                        "error":  "Input verification failed: 49 updates for 50 clicks",
+                        "status":  "failed; excluded from measurements",
+                        "workload":  "cell"
+                    },
+        "equal_work_timing_eligible":  false,
+        "status":  "incomplete or legacy failed observation; retained for reliability accounting",
+        "workload":  "cell"
+    }
+]

@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:gpuidart/gpuidart.dart';
+import 'package:gpuidart/development.dart';
 
 import 'app.dart';
 import 'measure_data.dart';
@@ -34,12 +35,10 @@ Future<void> main(List<String> args) async {
     );
   });
   if (!const bool.fromEnvironment('dart.vm.product')) {
-    registerExtension('ext.gpuidart.reassemble', (_, _) async {
-      await host.rebuild();
-      return ServiceExtensionResponse.result(
-        jsonEncode({'heading': app.heading, 'count': app.count}),
-      );
-    });
+    registerGpuiReload(
+      host,
+      describe: () => {'heading': app.heading, 'count': app.count},
+    );
     registerExtension('ext.gpuidart.inspect', (_, _) async {
       return ServiceExtensionResponse.result(
         jsonEncode({
@@ -73,10 +72,6 @@ Future<void> main(List<String> args) async {
         'row': 2000,
       });
       return ServiceExtensionResponse.result(jsonEncode(state));
-    });
-    registerExtension('ext.gpuidart.close', (_, _) async {
-      unawaited(host.close());
-      return ServiceExtensionResponse.result('{}');
     });
   }
 

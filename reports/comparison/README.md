@@ -1,6 +1,12 @@
 # Comparison status — 2026-09-25
 
-**The four fixtures run. There is no defensible performance ranking yet.** Production GPUI-Dart code and its snapshot/dataset architecture are unchanged.
+**All 36 Dart/Solid/Shell measurements are complete, with four incomplete attempts retained.** All 3,148 delivered update clicks passed application checks. See the [three-repetition results](dart-js-20260925.md) and [summary retaining all 40 attempts](dart-js-20260925-summary.json). Dart used fewer private bytes than Solid, with a higher idle working set; Shell was lower on both memory measures. Dart's single-cell CPU readings were lower than Solid's, while idle/burst ranges overlapped and every scroll run missed driver slots. Presentation remains unmeasured.
+
+Three repetitions of Rust/Dart workloads previously completed, with a repeated memory premium for the Dart build. See the [Rust/Dart measured results](rust-dart-20260925.md) for CPU, memory, publication, native drawing and reliability observations. That series and its corrected partial follow-up remain separate and have not been extended.
+
+The Rust/Dart series contains 24 foreground runs and 2,101 applied updates from 2,101 injected clicks. It retains one skipped scroll deadline and one extra click at the interval boundary. A follow-up after correcting the cutoff completed 12 runs before two focus interruptions. Diagnostic builds traced another 700 complete input-to-state chains. The original 49-of-50 observation remains unresolved and is retained in the report.
+
+The production snapshot/dataset architecture remains frozen. Native input tracing is opt-in through a diagnostic build feature. The earlier [pilot record](measurements-20260925.md) remains available.
 
 ## Completed
 
@@ -36,7 +42,8 @@ The payload files are enumerated by [artifacts.json](artifacts.json), including 
 
 | Measurement | Current status |
 | --- | --- |
-| Foreground workload CPU and memory | Runner implemented; final measurements pending uninterrupted foreground access |
+| Foreground workload CPU and memory | Rust/Dart series retained separately; Dart/Solid/Shell has 36 completed measurements and 4 incomplete attempts; 25 completed runs met the planned input cadence |
+| Native drawing and Dart publication | Recorded separately with original histogram scopes; Solid exports p90/p99 over up to 1,000 draws; Shell has no equivalent native timer |
 | Frame/presentation p95 and p99, undisplayed frames | PresentMon ETW capture denied by current Windows permissions; [error log](presentmon-preflight.txt) |
 | Input-to-response-present latency | Unmeasured; requires matching the changed-cell frame to its input sequence, in addition to ETW access |
 | Missed display deadlines | Unmeasured; driver deadline misses and estimated workload slots must remain separate |
@@ -44,6 +51,6 @@ The payload files are enumerated by [artifacts.json](artifacts.json), including 
 | Full installed size and clean-machine launch | Explicit payload recorded; clean Windows machine/VM still needed |
 | Human interaction and IME | Not established by this table benchmark |
 
-The foreground runner stopped when another application owned focus. A desktop availability question was left pending. No focus-loss run was accepted as a measurement. PresentMon needs an elevated trace-capable session or appropriate Performance Log Users configuration.
+The foreground runner now activates its own verified window when programmatic focus acquisition fails. It still stops on subsequent focus loss. Correctness failures and interrupted observations remain visible in reliability accounting, with equal-work timing eligibility recorded separately. PresentMon needs an elevated trace-capable session or appropriate Performance Log Users configuration. The [production DPI requirement](../../docs/integration.md#windows-production-dpi-requirement) records the configuration still needed by shipping applications.
 
 The [benchmark guide](../../benchmarks/README.md) contains exact build, capture and analysis commands. A first capture can use one repetition; formal comparisons should use repeated, rotated runs. Review widget parity, display/power settings and response-frame correlation before drawing an architectural conclusion. Publication-stage timings remain separate throughout.

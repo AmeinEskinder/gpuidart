@@ -1,8 +1,8 @@
 # GPUI-Dart
 
-An experimental Windows desktop host using Dart application code and GPUI Kit's Rust controls.
+An experimental Windows desktop SDK using Dart application code and GPUI Kit's Rust controls. Start with the [SDK guide](docs/sdk.md) and the [Market watch example](example/watchlist/main.dart).
 
-The first spike supports text, buttons, native text inputs and virtualized tables. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
+The SDK supports row/column layouts, text, buttons, native text inputs and virtualized tables, plus initial window options and table-selection events. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
 Table datasets upload once. View snapshots reference them by ID; cell and row edits transfer only changed data. See [the dataset API](docs/datasets.md) and [100,000-record acceptance measurements](reports/data-publication.md).
 
@@ -16,17 +16,17 @@ From this directory in PowerShell:
 
 ```powershell
 ./tool/build.ps1
-dart run example/main.dart
+dart run tool/dev.dart
 ```
 
-The example opens a native GPUI window. Increment the counter, type into the input, and scroll the 10,000-row table. Input text, focus, selection and scroll state survive description replacement.
+Market watch opens a native GPUI window with 1,000 fictitious instruments. Search, select a row, add it to your shortlist and simulate a price update. Input text, focus, selection and scroll state survive ordinary description replacement. Filtering deliberately replaces the table dataset and resets table selection/scroll. State is in memory. The earlier counter and 10,000-row measurement example remains in example/main.dart.
 
 For a release build:
 
 ```powershell
 ./tool/build.ps1 -Release
 $env:GPUIDART_LIBRARY = "$PWD/target/release/gpuidart.dll"
-dart run example/main.dart
+dart run example/watchlist/main.dart
 ```
 
 ## Portable Windows package
@@ -38,7 +38,7 @@ dart run example/main.dart
 
 The output is [build/gpuidart-windows-x64.zip](build/gpuidart-windows-x64.zip). Extract it and run `gpuidart.exe`; keep its DLLs beside it. The executable includes Dart's AOT runtime. The ZIP includes the native GPUI library and release Visual C++ runtime. On a machine without the project-local CRT archive, supply `-CrtDirectory` pointing to the Microsoft x64 redistributable folder.
 
-Verification extracts the ZIP outside the repository, changes to an unrelated working directory, restricts PATH to Windows directories and runs `--self-test` and `--measure`. It checks loaded module paths, including Common Controls v6. A clean machine without an SDK has not yet been tested.
+Verification extracts the ZIP outside the repository, changes to an unrelated working directory, restricts PATH to Windows directories and runs the watchlist's self-test. It checks loaded module paths, including Common Controls v6 and the sibling CRT, and the actual window's PerMonitorV2 awareness. The executable embeds a DPI manifest. A clean machine without an SDK has not yet been tested. The ZIP includes a standalone verifier and [manual release checks](docs/windows-release-checks.md).
 
 ## Development code reload
 
@@ -47,7 +47,7 @@ Verification extracts the ZIP outside the repository, changes to an unrelated wo
 dart run tool/dev.dart
 ```
 
-Save a Dart file under `example/` or `lib/` to reload. For a simple example, change `DemoApplication.heading` in [example/app.dart](example/app.dart). The development runner uses the VM service to reload changed code, then calls the existing view builder again. Existing Dart objects and native control entities remain alive. Close the window to exit.
+The launcher watches the chosen entry point's directory and lib. Change WatchlistApplication.heading in [the watchlist component](example/watchlist/app.dart) and save. The development runner uses the VM service to reload changed code, then calls the existing view builder again. Existing Dart objects and native control entities remain alive. Close the window to exit. Use `dart run tool/dev.dart example/main.dart` for the earlier demo, or provide your own entry point and arguments.
 
 This supports component method edits in Dart JIT development mode. It follows Dart's reload restrictions, does not rerun `main` or initializers, and does not reload AOT packages or Rust code. Changes to startup registration may require a restart.
 
@@ -56,6 +56,9 @@ The automated code-change test uses a source copy under `.cache`, keeps the proc
 ```powershell
 $env:GPUIDART_LIBRARY = "$PWD/target/release/gpuidart.dll"
 dart run tool/verify_reload.dart
+dart run tool/verify_watchlist_reload.dart
+dart run tool/verify_watchlist_ui.dart
+dart run tool/verify_dev_launcher.dart
 ```
 
 ## Measurements
@@ -71,7 +74,7 @@ dart run tool/verify_reload.dart
 dart run tool/summarize.dart
 ```
 
-`reports/environment.json` describes the machine used for the recorded run; refresh it when measuring elsewhere. Native histograms include startup, forced repaints and updates together. The 120-update workload now changes one visible price through a dataset edit and a counter through a view snapshot. Run `dart run tool/measure_data.dart` for separate cell, row, ten-cell and counter measurements at up to 100,000 records. Matched Shell/GPUIX comparisons remain outstanding.
+`reports/environment.json` describes the machine used for the recorded run; refresh it when measuring elsewhere. Native histograms include startup, forced repaints and updates together. The earlier 120-update workload changes one visible price through a dataset edit and a counter through a view snapshot. Run `dart run tool/measure_data.dart` for separate cell, row, ten-cell and counter measurements at up to 100,000 records. [Three repetitions against Shell and GPUIX/Solid](reports/comparison/dart-js-20260925.md) are complete, with implementation differences and timing limits recorded. [SDK verification](reports/sdk/README.md) is separate from those historical performance captures.
 
 ## Verify
 
@@ -113,6 +116,6 @@ The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/Q
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks, sorting and stable row identity are not implemented. Table selection follows row indices.
-- The adapter uses a fixed column layout and component theme. It is not a complete GPUI style binding.
+- The adapter has a small row/column layout API and fixed component theme. It is not a complete GPUI style binding.
 
 GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPUI dependency is `gpui-pre` 0.3.6. Both Cargo and Dart dependency lockfiles are included.

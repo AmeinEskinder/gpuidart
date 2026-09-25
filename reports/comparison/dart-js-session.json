@@ -1,0 +1,191 @@
+﻿{
+    "repetitions":  3,
+    "captured_at_utc":  "2026-09-25T01:47:54.5054594Z",
+    "files":  [
+                  {
+                      "path":  "build/gpui-dart-comparison.exe",
+                      "sha256":  "57233F800F0F6B9886F5C5228B8FF268755EDB04E59CD4FCC2BD407D89D046E7",
+                      "bytes":  6500352
+                  },
+                  {
+                      "path":  "target/release/gpuidart.dll",
+                      "sha256":  "33054B755409598C6B79B86EACC8B94A04C7A504161E62CFD4B4AFE136A474B6",
+                      "bytes":  24282624
+                  },
+                  {
+                      "path":  "target/release/gpui-component-shell.exe",
+                      "sha256":  "AF4654682B058976BA12503FD94B6A3D608F45CF6369CED33A12718F8A0C3DDF",
+                      "bytes":  61413888
+                  },
+                  {
+                      "path":  "benchmarks/solid/dist/gpui-solid-comparison.exe",
+                      "sha256":  "C6D92CFE8F02B553B0543DFC6AB904F923E0E2B158B2A3E163EA37F442B6FC3B",
+                      "bytes":  89337344
+                  },
+                  {
+                      "path":  "benchmarks/solid/dist/gpuix-native.win32-x64-msvc.node",
+                      "sha256":  "9DD4D8F91C28025F67DA2EB76682A6B3968F0327BFAECAD97EBC11857A1A7249",
+                      "bytes":  22929920
+                  },
+                  {
+                      "path":  "benchmarks/shell/main.js",
+                      "sha256":  "4DDA160EF9279A5C95C6CD3E241227D9B3CAC7F989B84675D8B611EDD9948217",
+                      "bytes":  2496
+                  },
+                  {
+                      "path":  "benchmarks/solid/app.tsx",
+                      "sha256":  "2E792C4A141EFBE86F3A4957E2D3700B2D7D7424012B28C83BD16AF21E1BD07E",
+                      "bytes":  3881
+                  },
+                  {
+                      "path":  "benchmarks/solid/main.ts",
+                      "sha256":  "56B88E485FF85DEE0D26A2E4623749729C1832799AEB00DF0CDDA189A88C5937",
+                      "bytes":  178
+                  },
+                  {
+                      "path":  "benchmarks/solid/build.ts",
+                      "sha256":  "B86110549681A1B1C0D76F584EB221C2D4C7F3BDCAF4655FFA12F2CD1836842F",
+                      "bytes":  503
+                  },
+                  {
+                      "path":  "benchmarks/solid/package.json",
+                      "sha256":  "697FC6A31DAE2CA1A715C791B9EB87499C6A683D6DD30CA49A343FF788A1A7E6",
+                      "bytes":  330
+                  },
+                  {
+                      "path":  "benchmarks/solid/bun.lock",
+                      "sha256":  "BDB7CA53DD9EF38FCC12C76F7796B08382AC47A91A0E38D92E60AC8E4310D697",
+                      "bytes":  18546
+                  },
+                  {
+                      "path":  "benchmarks/dart/main.dart",
+                      "sha256":  "72A3F9BE198A662C7B1D9D1625E33214F0BF289C0F0932430DA7E0E5AF40545D",
+                      "bytes":  4034
+                  },
+                  {
+                      "path":  "benchmarks/run.ps1",
+                      "sha256":  "19BC302F5B068BCAA8A6F0D9943558C0505BB6347D0413668B30163B54DEA916",
+                      "bytes":  15142
+                  },
+                  {
+                      "path":  "benchmarks/windows.cs",
+                      "sha256":  "E8C0DCF15580C07572F08CF3F77C78BE57088134210368ADAA5B4C92A5552B5D",
+                      "bytes":  11910
+                  },
+                  {
+                      "path":  "benchmarks/suite.ps1",
+                      "sha256":  "0E63F530D2109090334DF34E378D6AF423F889DEF425A6A65C8B43DF2EE77DCD",
+                      "bytes":  1451
+                  },
+                  {
+                      "path":  "benchmarks/analyze.ps1",
+                      "sha256":  "61876361EB1B7E4AB145BB12CAA71B0B9BD21246E72BC43C3A5D8E2FC0C95D2D",
+                      "bytes":  7676
+                  },
+                  {
+                      "path":  "benchmarks/summarize-pair.ps1",
+                      "sha256":  "27A2A5A9F42D7C1B97B2CBA8C380C28B447A2EBE7F7D42064B3B06ED28C4C559",
+                      "bytes":  4032
+                  }
+              ],
+    "workloads":  [
+                      "idle",
+                      "scroll",
+                      "cell",
+                      "burst"
+                  ],
+    "dependency_versions":  "artifacts.json",
+    "purpose":  "Three rotated foreground repetitions of Dart AOT, GPUIX/Solid/Bun, and GPUI Shell/QuickJS; production architecture frozen; no diagnostic tracing or ETW",
+    "current_power_plan":  "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+    "run_prefix":  "dart-js-20260925",
+    "order":  [
+                  [
+                      "dart",
+                      "solid",
+                      "shell"
+                  ],
+                  [
+                      "solid",
+                      "shell",
+                      "dart"
+                  ],
+                  [
+                      "shell",
+                      "dart",
+                      "solid"
+                  ]
+              ],
+    "current_video":  [
+                          {
+                              "Name":  "NVIDIA T1200 Laptop GPU",
+                              "DriverVersion":  "32.0.15.9608",
+                              "CurrentHorizontalResolution":  null,
+                              "CurrentVerticalResolution":  null,
+                              "CurrentRefreshRate":  null
+                          },
+                          {
+                              "Name":  "Intel(R) UHD Graphics",
+                              "DriverVersion":  "32.0.101.7085",
+                              "CurrentHorizontalResolution":  1920,
+                              "CurrentVerticalResolution":  1200,
+                              "CurrentRefreshRate":  59
+                          }
+                      ],
+    "seconds_per_workload":  10,
+    "background_load_controlled":  false,
+    "current_battery":  [
+                            {
+                                "BatteryStatus":  2,
+                                "EstimatedChargeRemaining":  100
+                            }
+                        ],
+    "source_head":  "ddfa24568bd5141d9b4869ef2531e40c1aa59baf",
+    "reference_environment":  "measurement-environment.json",
+    "capture_status":  {
+                           "verification":  "All 36 completed observations match recorded binary/driver hashes, DPI 120, viewport 1075x812, disabled tracing, expected application counts and final state. Input sent_ms values are before the requested interval cutoff.",
+                           "planned":  36,
+                           "resume_required":  false,
+                           "update_clicks":  3148,
+                           "next_attempt":  null,
+                           "driver_deadline_misses":  18,
+                           "updated_at_utc":  "2026-09-25T02:16:47.6471214Z",
+                           "interrupted":  4,
+                           "completed_order":  [
+                                                   "repetition 0: dart, solid, shell, with preserved Shell retries",
+                                                   "repetition 1: solid, shell, dart, with preserved Solid idle retry",
+                                                   "repetition 2: shell, dart, solid"
+                                               ],
+                           "interruptions_retained":  [
+                                                          "dart-js-20260925-0/shell-idle/failure.json",
+                                                          "dart-js-20260925-0/shell-scroll/failure.json",
+                                                          "dart-js-20260925-0-retry1/shell-scroll/failure.json",
+                                                          "dart-js-20260925-1/solid-idle/failure.json"
+                                                      ],
+                           "completed":  36,
+                           "equal_work_timing_eligible":  25,
+                           "resume_records":  [
+                                                  "dart-js-resume-20260925-050257.json",
+                                                  "dart-js-resume-20260925-050529.json",
+                                                  "dart-js-resume-20260925-050710.json"
+                                              ],
+                           "cells_written":  22034,
+                           "limitation":  "Background desktop load and CPU frequency were not isolated; capture was resumed across interruptions. Presentation remains unavailable. All scroll observations and two Shell bursts missed scheduled input slots.",
+                           "shell_scroll_range_checks":  [
+                                                             {
+                                                                 "observed_first_row":  1457,
+                                                                 "run_id":  "dart-js-20260925-0-retry2",
+                                                                 "expected_first_row":  1457
+                                                             },
+                                                             {
+                                                                 "observed_first_row":  1457,
+                                                                 "run_id":  "dart-js-20260925-1",
+                                                                 "expected_first_row":  1457
+                                                             },
+                                                             {
+                                                                 "observed_first_row":  1460,
+                                                                 "run_id":  "dart-js-20260925-2",
+                                                                 "expected_first_row":  1460
+                                                             }
+                                                         ]
+                       }
+}

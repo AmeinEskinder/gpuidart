@@ -1,0 +1,62 @@
+﻿[
+    {
+        "run":  "foreground-preflight-20260925",
+        "implementation":  "dart",
+        "workload":  "idle",
+        "duration_ms":  10003.076000000001,
+        "inputs":  0,
+        "misses":  0,
+        "cpu":  1.2496156182358304,
+        "ws_mib":  140.5546875,
+        "private_mib":  163.55078125,
+        "window_ms":  430.75530000000003,
+        "draw_samples":  3,
+        "draw_p95_ms":  8.732671,
+        "draw_p99_ms":  8.732671
+    },
+    {
+        "run":  "foreground-preflight-20260925",
+        "implementation":  "rust",
+        "workload":  "cell",
+        "duration_ms":  2013.6186,
+        "inputs":  10,
+        "misses":  0,
+        "cpu":  1.5519324265280425,
+        "ws_mib":  85.9296875,
+        "private_mib":  98.0703125,
+        "window_ms":  284.7515,
+        "draw_samples":  12,
+        "draw_p95_ms":  10.412031,
+        "draw_p99_ms":  10.412031
+    },
+    {
+        "run":  "paired-20260925-0",
+        "implementation":  "rust",
+        "workload":  "idle",
+        "duration_ms":  10005.897,
+        "inputs":  0,
+        "misses":  0,
+        "cpu":  0.93694748206982337,
+        "ws_mib":  85.2109375,
+        "private_mib":  97.515625,
+        "window_ms":  244.881,
+        "draw_samples":  3,
+        "draw_p95_ms":  10.723327,
+        "draw_p99_ms":  10.723327
+    },
+    {
+        "run":  "paired-20260925-0",
+        "implementation":  "rust",
+        "workload":  "scroll",
+        "duration_ms":  10000.822600000001,
+        "inputs":  599,
+        "misses":  1,
+        "cpu":  23.904283633628296,
+        "ws_mib":  97.21875,
+        "private_mib":  106.5625,
+        "window_ms":  316.4816,
+        "draw_samples":  566,
+        "draw_p95_ms":  3.872767,
+        "draw_p99_ms":  4.304895
+    }
+]

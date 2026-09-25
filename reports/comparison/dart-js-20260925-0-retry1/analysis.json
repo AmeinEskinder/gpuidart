@@ -1,0 +1,86 @@
+﻿[
+    {
+        "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+        "implementation":  "shell",
+        "presentation":  null,
+        "window_available_ms":  276.9821,
+        "scheduled_inputs_missed":  0,
+        "cpu_percent_one_core":  1.5623671987881029,
+        "input_delivery":  {
+                               "planned":  0,
+                               "uninjected":  0,
+                               "injected":  0,
+                               "excess":  0
+                           },
+        "input_count":  0,
+        "solid_draw_overlay":  null,
+        "correctness":  {
+                            "application_price":  "100.00",
+                            "native_price":  null,
+                            "observed_updates":  0,
+                            "passed":  true,
+                            "expected_cells":  0,
+                            "expected_updates":  0,
+                            "observed_cells":  0,
+                            "expected_scroll_y":  0,
+                            "observed_scroll_y":  null,
+                            "expected_price":  "100.00",
+                            "issues":  [
+
+                                       ]
+                        },
+        "run_id":  "dart-js-20260925-0-retry1",
+        "equal_work_timing_eligible":  true,
+        "workload":  "idle",
+        "native_diagnostics":  null,
+        "working_set_bytes":  {
+                                  "p50":  115392512,
+                                  "p99":  115396608,
+                                  "samples":  40,
+                                  "max":  115396608,
+                                  "p95":  115396608
+                              },
+        "application_work":  {
+                                 "shell_cell_builds":  99,
+                                 "shell_visible_range":  [
+                                                             0,
+                                                             9
+                                                         ],
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "solid_mounted_window":  null,
+                                 "cells_written":  0,
+                                 "updates":  0,
+                                 "shell_view_builds":  1
+                             },
+        "duration_ms":  10000.85,
+        "private_bytes":  {
+                              "p50":  122777600,
+                              "p99":  122781696,
+                              "samples":  40,
+                              "max":  122781696,
+                              "p95":  122781696
+                          },
+        "status":  "presentation unavailable",
+        "dart_publication":  null
+    },
+    {
+        "implementation":  "shell",
+        "presentation":  null,
+        "run_id":  "dart-js-20260925-0-retry1",
+        "failure":  {
+                        "process_samples":  null,
+                        "inputs":  null,
+                        "failed_at_utc":  "2026-09-25T02:02:59.2841766Z",
+                        "error":  "Exception calling \"Prepare\" with \"2\" argument(s): \"Benchmark activation point is occluded; no click sent\"",
+                        "scheduled_inputs_missed":  null,
+                        "workload":  "scroll",
+                        "run_id":  "dart-js-20260925-0-retry1",
+                        "status":  "interrupted observation; retain for reliability accounting",
+                        "implementation":  "shell"
+                    },
+        "equal_work_timing_eligible":  false,
+        "status":  "incomplete or legacy failed observation; retained for reliability accounting",
+        "workload":  "scroll"
+    }
+]

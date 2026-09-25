@@ -12,7 +12,10 @@ class DevSession {
   final String isolateId;
   final Directory directory;
 
-  static Future<DevSession> start({String entry = 'example/main.dart'}) async {
+  static Future<DevSession> start({
+    String entry = 'example/main.dart',
+    List<String> arguments = const [],
+  }) async {
     final directory = await Directory.systemTemp.createTemp('gpuidart-vm-');
     final serviceInfo = File.fromUri(directory.uri.resolve('service.json'));
     final process = await Process.start(Platform.resolvedExecutable, [
@@ -20,13 +23,25 @@ class DevSession {
       '--write-service-info=${serviceInfo.path}',
       '--packages=${File('.dart_tool/package_config.json').absolute.path}',
       entry,
+      ...arguments,
     ]);
     process.stdout.listen(stdout.add);
     process.stderr.listen(stderr.add);
+    int? exitStatus;
+    unawaited(
+      process.exitCode.then((value) {
+        exitStatus = value;
+      }),
+    );
     VmService? service;
     try {
       final deadline = DateTime.now().add(const Duration(seconds: 30));
       while (!serviceInfo.existsSync()) {
+        if (exitStatus != null) {
+          throw StateError(
+            'Application exited with code $exitStatus before starting the VM service',
+          );
+        }
         if (DateTime.now().isAfter(deadline)) {
           throw StateError('VM service did not start');
         }
@@ -39,6 +54,11 @@ class DevSession {
         uri.replace(scheme: 'ws', path: '${uri.path}ws').toString(),
       );
       while (DateTime.now().isBefore(deadline)) {
+        if (exitStatus != null) {
+          throw StateError(
+            'Application exited with code $exitStatus before registering reload',
+          );
+        }
         final vm = await service.getVM();
         for (final ref in vm.isolates ?? <IsolateRef>[]) {
           final isolate = await service.getIsolate(ref.id!);

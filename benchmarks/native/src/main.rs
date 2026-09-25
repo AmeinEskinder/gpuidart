@@ -8,6 +8,9 @@ use gpui_kit::*;
 use serde_json::json;
 use std::{cell::Cell, rc::Rc};
 
+#[cfg(feature = "benchmark-trace")]
+mod input_trace;
+
 const ROWS: usize = 100_000;
 
 struct Rows {
@@ -51,6 +54,11 @@ struct Benchmark {
 
 impl Benchmark {
     fn edit(&mut self, count: usize, cx: &mut Context<Self>) {
+        #[cfg(feature = "benchmark-trace")]
+        input_trace::record(
+            "application_handler",
+            json!({"count": count, "update_ordinal": self.updates + 1}),
+        );
         self.updates += 1;
         self.cells_written += count as u64;
         let value = format!("Tick {:06}", self.updates);
@@ -60,6 +68,17 @@ impl Benchmark {
             }
             cx.notify();
         });
+        #[cfg(feature = "benchmark-trace")]
+        {
+            input_trace::record(
+                "update_applied",
+                json!({"updates": self.updates, "cells_written": self.cells_written}),
+            );
+            input_trace::record(
+                "state_observed",
+                json!({"value": self.table.read(cx).delegate().data[0][2]}),
+            );
+        }
     }
 
     fn report(&self, window: &mut Window, cx: &mut Context<Self>) {
@@ -88,7 +107,7 @@ impl Benchmark {
 
 impl Render for Benchmark {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        div()
+        let root = div()
             .id("comparison")
             .size_full()
             .p_5()
@@ -104,13 +123,21 @@ impl Render for Benchmark {
                         Button::new("cell")
                             .primary()
                             .label("Update one cell")
-                            .on_click(cx.listener(|view, _, _, cx| view.edit(1, cx))),
+                            .on_click(cx.listener(|view, _, _, cx| {
+                                #[cfg(feature = "benchmark-trace")]
+                                input_trace::record("native_click_handler", json!({"id": "cell"}));
+                                view.edit(1, cx)
+                            })),
                     )
                     .child(
                         Button::new("burst")
                             .primary()
                             .label("Update eight visible cells")
-                            .on_click(cx.listener(|view, _, _, cx| view.edit(8, cx))),
+                            .on_click(cx.listener(|view, _, _, cx| {
+                                #[cfg(feature = "benchmark-trace")]
+                                input_trace::record("native_click_handler", json!({"id": "burst"}));
+                                view.edit(8, cx)
+                            })),
                     )
                     .child(
                         Button::new("report")
@@ -124,7 +151,10 @@ impl Render for Benchmark {
                             .h(px(320.))
                             .child(DataTable::new(&self.table).stripe(true).bordered(true)),
                     ),
-            )
+            );
+        #[cfg(feature = "benchmark-trace")]
+        let root = input_trace::observe(root);
+        root
     }
 }
 
@@ -181,4 +211,6 @@ fn main() {
             })
             .detach();
         });
+    #[cfg(feature = "benchmark-trace")]
+    input_trace::save();
 }
