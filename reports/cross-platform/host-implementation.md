@@ -158,3 +158,27 @@ before reading a reply. Linux does not inherit that flag. The accept boundary
 now explicitly selects blocking mode; a real-socket regression waits for a
 delayed frame. This second window failure is retained in
 `macos-socket-mode-failure.log`. It is separate from the fixed child-reaping bug.
+
+## Full SDK acceptance at `6467d6c`
+
+The corrected production hosts passed [macOS SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36191291207)
+and [Linux SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36191291412).
+Each ran 17 native tests, 24 headless Dart tests and seven live-library/window
+Dart tests. The added Unix cases cover owned process groups and companion
+startup failures. The common Windows contracts remain enabled. Windows passed
+12 native and 22 headless Dart tests at the same source in
+[36191291231](https://github.com/AmeinEskinder/gpuidart/actions/runs/36191291231).
+Windows live-window verification remains a local desktop check.
+
+Both Unix hosts also passed the 100,000-record JIT and AOT workload and actual
+watchlist code reload, including invalid-source rejection and recovery. The
+raw JSON/logs are retained in [sdk-6467d6c](sdk-6467d6c/). Captures use the debug
+native library and establish instrumentation and behavior, not comparative
+performance. macOS final traces contain records from both application and UI
+processes, use the same 24 MHz Mach clock, and report complete remote capture.
+
+The reload verifier now additionally requires the reported native process ID
+to remain unchanged across reload and recovery. This supplements application
+PID, retained entities, input/selection/scroll and publication checks. The new
+assertion passed locally on Windows with no preparation delay; Unix acceptance
+of this stronger assertion is pending the next hosted run.

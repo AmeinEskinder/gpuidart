@@ -137,7 +137,7 @@ impl DartView {
         }
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
-        json!({"revision": self.snapshot.revision, "inputs": inputs, "tables": tables, "labels": labels,
+        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels,
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
             "draw": histogram!(frames.draw_duration_histogram),

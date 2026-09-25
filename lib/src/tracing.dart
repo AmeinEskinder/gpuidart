@@ -348,7 +348,7 @@ final class _NativeTraceBindings {
           >('gd_trace_read');
     } on ArgumentError {
       throw StateError(
-        'Native library does not support tracing; rebuild the DLL',
+        'Native library does not support tracing; rebuild the native library',
       );
     }
   }

@@ -45,3 +45,17 @@ Windows development host, and the portable build command successfully delegates
 to the existing Windows build. This establishes tooling compilation/delegation
 only. Unix package execution, signing checks, loaded-library closure and the
 baseline runs remain pending the first release-package workflow.
+
+## First hosted package attempt
+
+Source `6467d6c`, [run 36191300257](https://github.com/AmeinEskinder/gpuidart/actions/runs/36191300257),
+built both release-native targets and compiled both Dart applications/verifiers.
+macOS ad-hoc signing and strict signature verification also succeeded. Both
+jobs then failed when offline `cargo metadata` requested dependencies belonging
+to the other operating system. Package verification and baselines were skipped.
+The [failure log](package-metadata-failure.log) and run metadata are retained.
+
+The metadata query now specifies the package's Rust target with
+`--filter-platform`. This preserves offline, locked dependency resolution and
+limits the inventory to that target. Extraction/runtime verification still
+requires a successful follow-up job.

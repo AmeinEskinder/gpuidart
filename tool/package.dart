@@ -118,6 +118,8 @@ Future<void> main(List<String> args) async {
       'metadata',
       '--locked',
       '--offline',
+      '--filter-platform',
+      Platform.isMacOS ? 'aarch64-apple-darwin' : 'x86_64-unknown-linux-gnu',
       '--format-version',
       '1',
     ]),

@@ -35,7 +35,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers xvfb openbox xauth
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers vulkan-tools x11-utils xvfb openbox xauth
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         id: cache
         with:
@@ -56,6 +56,7 @@ jobs:
       - name: Verify macOS extraction and record release-native baselines
         if: runner.os == 'macOS'
         run: |
+          dart run tool/record_platform_environment.dart build/package-evidence/environment.json
           dart run tool/verify_package.dart build/Watchlist-macos-arm64.tar.gz build/package-evidence/verification.json
           dart run tool/run_host_baselines.dart build/package-evidence/baselines
       - name: Verify Linux extraction and record release-native baselines
@@ -64,6 +65,7 @@ jobs:
           xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'CHECKS'
           unset WAYLAND_DISPLAY ZED_HEADLESS
           openbox >build/package-evidence/openbox.log 2>&1 &
+          dart run tool/record_platform_environment.dart build/package-evidence/environment.json
           dart run tool/verify_package.dart build/Watchlist-linux-x64.tar.gz build/package-evidence/verification.json
           dart run tool/run_host_baselines.dart build/package-evidence/baselines
           CHECKS

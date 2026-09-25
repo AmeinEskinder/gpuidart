@@ -98,5 +98,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: linux-x11-window
-          path: build/linux-window/
+          path: |
+            build/linux-window/*.json
+            build/linux-window/*.log
           retention-days: 14

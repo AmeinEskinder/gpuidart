@@ -47,13 +47,13 @@ final class _Bindings {
     } on ArgumentError {
       throw StateError(
         'Incompatible GPUI-Dart library at $path: missing ABI version. '
-        'Rebuild the native DLL with this SDK.',
+        'Rebuild the native library with this SDK.',
       );
     }
     if (version != expected) {
       throw StateError(
         'Incompatible GPUI-Dart library at $path: ABI $version, expected $expected. '
-        'Rebuild the native DLL with this SDK.',
+        'Rebuild the native library with this SDK.',
       );
     }
   }
@@ -117,7 +117,8 @@ final class TableSelection {
 }
 
 /// Experimental desktop host. The Dart application isolate keeps its event loop.
-/// A dedicated isolate blocks inside GPUI's native UI loop.
+/// A dedicated isolate blocks in the native host. On macOS the host connects to
+/// a companion process whose main thread owns the GPUI loop.
 final class GpuiHost {
   GpuiHost._(
     this._bindings,

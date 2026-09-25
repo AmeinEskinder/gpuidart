@@ -29,3 +29,9 @@ Windows source remains `e8a176a` until a corrected run succeeds.
 The corrected source `8afcece` passed [36182707028](https://github.com/AmeinEskinder/gpuidart/actions/runs/36182707028),
 including 12 native tests, 22 headless Dart tests and analysis. This is the latest
 verified hosted Windows source. [Run metadata](run-36182707028.json) is retained.
+
+The cross-platform implementation passed Windows checks at `6467d6c` in
+[36191291231](https://github.com/AmeinEskinder/gpuidart/actions/runs/36191291231):
+12 native tests, 22 headless Dart tests and analysis. This supersedes the older
+latest-source statements above. The five Windows live-window cases still need
+the local desktop command. [Run metadata](run-36191291231.json) is retained.

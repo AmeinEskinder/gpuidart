@@ -52,6 +52,13 @@ Future<void> main(List<String> args) async {
       await File('${root.path}/manifest.json').readAsString(),
     ) as Map<String, dynamic>;
     report['manifest'] = manifest;
+    report['installed_payload_bytes'] =
+        (manifest['files'] as List).fold<int>(
+          0,
+          (sum, file) => sum + (file['bytes'] as int),
+        ) +
+        await File('${root.path}/manifest.json').length();
+    report['installed_size_scope'] = 'Extracted payload including verifier, manifest and documentation; excludes system runtime prerequisites';
     File inside(String path) {
       if (path.startsWith('/') || path.split('/').contains('..')) {
         throw StateError('Invalid package path: $path');

@@ -56,6 +56,11 @@ Future<void> main(List<String> args) async {
     await Future<void>.delayed(Duration(milliseconds: prepareDelayMs));
     final before = await session.call('inspect');
     report['before'] = before;
+    final nativePid = before['state']['native_process_id'];
+    require(
+      nativePid is int && nativePid > 0,
+      'Native process ID was not reported',
+    );
     require(
       before['query'] == 'ALP' && before['ticks'] == 1,
       'Watchlist application state was not prepared',
@@ -79,6 +84,10 @@ Future<void> main(List<String> args) async {
     await session.reload();
     final after = await session.call('inspect');
     report['after'] = after;
+    require(
+      after['state']['native_process_id'] == nativePid,
+      'Native process changed during reload',
+    );
     require(
       (await session.service.getVM()).pid == applicationPid,
       'Application process changed during reload',
@@ -133,6 +142,10 @@ Future<void> main(List<String> args) async {
       final recovered = await session.call('inspect');
       report['latest_recovery'] = recovered;
       require(
+        recovered['state']['native_process_id'] == nativePid,
+        'Recovery restarted the native process',
+      );
+      require(
         recovered['state']['labels']['title'] == heading,
         'Reload did not recover after invalid source',
       );
@@ -169,6 +182,7 @@ Future<void> main(List<String> args) async {
     report.addAll({
       'passed': true,
       'same_application_process_id': applicationPid,
+      'same_native_process_id': nativePid,
       'launcher_process_id': session.process.pid,
       'same_isolate_id': session.isolateId,
       'changed_code_executed': true,

@@ -1,0 +1,88 @@
+package (ubuntu-24.04)	Build AOT evaluation package	?2026-09-25T21:24:33.3846723Z ##[group]Run mkdir -p build/package-evidence
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3847176Z [36;1mmkdir -p build/package-evidence[0m
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3847535Z [36;1mrustup show active-toolchain[0m
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3847872Z [36;1mdart pub get --enforce-lockfile[0m
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3848393Z [36;1mdart run tool/package.dart --name=Watchlist 2>&1 | tee build/package-evidence/build.log[0m
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3892508Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3892848Z env:
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3893043Z   CARGO_INCREMENTAL: 0
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3893260Z   CARGO_BUILD_JOBS: 2
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3893460Z   RUST_BACKTRACE: 1
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3893671Z   LIBGL_ALWAYS_SOFTWARE: 1
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3893930Z   DART_HOME: /opt/hostedtoolcache/dart/3.13.4/x64
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3894228Z   PUB_CACHE: /home/runner/.pub-cache
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:33.3894471Z ##[endgroup]
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:34.8199849Z info: syncing channel updates for 1.98.1-x86_64-unknown-linux-gnu
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:35.0690138Z info: latest update on 2026-09-03 for version 1.98.1 (48a229cea 2026-09-01)
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:35.0690652Z info: downloading 4 components
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6215380Z warn: the missing active toolchain `1.98.1-x86_64-unknown-linux-gnu` has been auto-installed
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6216266Z 1.98.1-x86_64-unknown-linux-gnu (overridden by '/home/runner/work/gpuidart/gpuidart/rust-toolchain.toml')
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6217096Z warn: auto-installation is deprecated for most `rustup` commands
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6217601Z warn: scripts relying on this behavior in `rustup` may stop working in the future
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6218060Z warn: to install the active toolchain, use `rustup install` instead
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6218499Z warn: see <https://github.com/rust-lang/rustup/issues/4836> for more info
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:43.6405180Z Resolving dependencies...
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:44.0828827Z Downloading packages...
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:46.5052634Z Got dependencies!
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:24:46.8409360Z > cargo build --locked -p gpuidart -p gpuidart-launcher --release
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:22.6046044Z > /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart pub get --enforce-lockfile
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:22.6874614Z > /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart compile exe --define=gpuidart.packaged=true example/watchlist/main.dart -o build/Watchlist-linux-x64-XMRKTN/Watchlist
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:24.4215841Z > chmod 755 build/Watchlist-linux-x64-XMRKTN/Watchlist build/Watchlist-linux-x64-XMRKTN/gpuidart-launcher
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:24.4250332Z > /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart compile exe tool/unix/verify.dart -o build/Watchlist-linux-x64-XMRKTN/verify
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:25.8912528Z > cargo metadata --locked --offline --format-version 1
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1363286Z Unhandled exception:
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1363706Z Bad state: cargo failed (101): 
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1364028Z error: failed to download `accesskit_macos v0.26.3`
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1364249Z 
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1364331Z Caused by:
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1364619Z   attempting to make an HTTP request, but --offline was specified
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1364908Z 
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1365146Z #0      command (file:///home/runner/work/gpuidart/gpuidart/tool/src/commands.dart:17:5)
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1365828Z <asynchronous suspension>
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1366165Z #1      main (file:///home/runner/work/gpuidart/gpuidart/tool/package.dart:117:5)
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1366544Z <asynchronous suspension>
+package (ubuntu-24.04)	Build AOT evaluation package	2026-09-25T21:34:26.1558068Z ##[error]Process completed with exit code 255.
+package (macos-15)	Build AOT evaluation package	?2026-09-25T21:24:22.5563160Z ##[group]Run mkdir -p build/package-evidence
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.5564010Z [36;1mmkdir -p build/package-evidence[0m
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.5564280Z [36;1mrustup show active-toolchain[0m
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.5564540Z [36;1mdart pub get --enforce-lockfile[0m
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.5565030Z [36;1mdart run tool/package.dart --name=Watchlist 2>&1 | tee build/package-evidence/build.log[0m
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.5989160Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6156240Z env:
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6156920Z   CARGO_INCREMENTAL: 0
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6157170Z   CARGO_BUILD_JOBS: 2
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6157350Z   RUST_BACKTRACE: 1
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6157650Z   LIBGL_ALWAYS_SOFTWARE: 1
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6158020Z   DART_HOME: /Users/runner/hostedtoolcache/dart/3.13.4/arm64
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6158340Z   PUB_CACHE: /Users/runner/.pub-cache
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.6158620Z ##[endgroup]
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:22.7767080Z info: syncing channel updates for 1.98.1-aarch64-apple-darwin
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:23.0144120Z info: latest update on 2026-09-03 for version 1.98.1 (48a229cea 2026-09-01)
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:23.0147710Z info: downloading 4 components
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:29.5955300Z 1.98.1-aarch64-apple-darwin (overridden by '/Users/runner/work/gpuidart/gpuidart/rust-toolchain.toml')
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:29.8015920Z Resolving dependencies...
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:30.1074970Z Downloading packages...
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:32.4207560Z Got dependencies!
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:24:33.2214770Z > cargo build --locked -p gpuidart -p gpuidart-launcher --release
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:10.9211100Z > /Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart pub get --enforce-lockfile
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:11.3116690Z > /Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart compile exe --define=gpuidart.packaged=true example/watchlist/main.dart -o build/Watchlist-macos-arm64-5xhmyA/Watchlist.app/Contents/MacOS/Watchlist
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:13.5080280Z > chmod 755 build/Watchlist-macos-arm64-5xhmyA/Watchlist.app/Contents/MacOS/Watchlist build/Watchlist-macos-arm64-5xhmyA/Watchlist.app/Contents/MacOS/gpuidart-launcher
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:13.5183670Z > /Users/runner/hostedtoolcache/dart/3.13.4/arm64/bin/dart compile exe tool/unix/verify.dart -o build/Watchlist-macos-arm64-5xhmyA/verify
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:15.0313690Z > codesign --force --sign - build/Watchlist-macos-arm64-5xhmyA/Watchlist.app/Contents/MacOS/libgpuidart.dylib
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:15.1782710Z > codesign --force --sign - build/Watchlist-macos-arm64-5xhmyA/Watchlist.app/Contents/MacOS/gpuidart-launcher
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:15.2211310Z > codesign --force --sign - build/Watchlist-macos-arm64-5xhmyA/Watchlist.app/Contents/MacOS/Watchlist
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:15.2672050Z > codesign --force --sign - build/Watchlist-macos-arm64-5xhmyA/Watchlist.app
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:15.3315450Z > codesign --verify --deep --strict build/Watchlist-macos-arm64-5xhmyA/Watchlist.app
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:15.3930040Z > cargo metadata --locked --offline --format-version 1
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0403490Z Unhandled exception:
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0406200Z Bad state: cargo failed (101): 
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0408530Z error: failed to download `accesskit_atspi_common v0.19.1`
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0409280Z 
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0411230Z Caused by:
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0411750Z   attempting to make an HTTP request, but --offline was specified
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0412020Z 
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0412340Z #0      command (file:///Users/runner/work/gpuidart/gpuidart/tool/src/commands.dart:17:5)
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0412940Z <asynchronous suspension>
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0413430Z #1      main (file:///Users/runner/work/gpuidart/gpuidart/tool/package.dart:117:5)
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0413910Z <asynchronous suspension>
+package (macos-15)	Build AOT evaluation package	2026-09-25T21:31:16.0806110Z ##[error]Process completed with exit code 255.

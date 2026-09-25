@@ -23,10 +23,18 @@ status codes. They omit control/dataset IDs, text, record values and error messa
 
 ## Clock and correlation
 
-Both runtimes use [Windows QueryPerformanceCounter](https://learn.microsoft.com/en-us/windows/win32/sysinfo/acquiring-high-resolution-time-stamps).
-The capture includes its frequency and origin, raw QPC records, and Chrome Trace
-events in microseconds. Cross-thread ordering within one QPC tick is ambiguous.
-Do not interpret those tiny differences as negative queue or callback delays.
+Both runtimes use the same OS clock. Windows uses
+[QueryPerformanceCounter](https://learn.microsoft.com/en-us/windows/win32/sysinfo/acquiring-high-resolution-time-stamps),
+Linux uses `CLOCK_MONOTONIC` nanoseconds, and macOS uses raw
+`mach_absolute_time` ticks. Captures record frequency, origin, epoch, suspend
+behavior and available resolution. Chrome Trace events convert those ticks to
+microseconds. The one-tick cross-thread ordering allowance applies only to QPC;
+Unix ordering uncertainty has not been independently calibrated.
+
+Records carry process IDs. On macOS, native parsing/enqueue occurs in the Dart
+process and dispatch/emit occurs in the companion. Enqueue-to-dequeue includes
+socket transport and both bounded queues; emit-to-receive includes return
+transport. These are complete integration intervals, not isolated FFI costs.
 
 Group records by `(operation, request)` within a capture. Snapshot requests use
 their revision; dataset and diagnostic requests use their request IDs. Initial
@@ -60,7 +68,7 @@ Adding stage durations or percentiles does not produce end-to-end latency.
 Nonzero `native.submit_return` / `dart.ffi` status denotes submission failure;
 nonzero `dart.ack` status denotes a rejected operation. Keep failures visible.
 
-Initial tracing includes Dart DLL loading, encoding/create-call time, native run
+Initial tracing includes native library loading, encoding/create-call time, native run
 entry and window-open completion. Initial native parsing precedes trace enable
 and is covered only by the Dart create-call span. Window-open completion is not
 proof that useful content has been displayed. This trace does not measure external
@@ -80,6 +88,12 @@ Await `host.done` or `host.close()` before the final export. Shutdown snapshots 
 native buffer before destroying the host. A failed trace read is reported in
 metadata and does not turn application shutdown into an error.
 
+The macOS companion sends a final trace before AppKit terminates it. Until that
+arrives, `remote_complete` is false. Each native process has a bounded buffer;
+the merged native export is capped at the configured capacity and counts dropped
+records. Host finalization also waits for the child process to exit. The extra
+process and buffers must be included when measuring the macOS integration.
+
 Check `metadata.finalized`, `capture_complete`, `dart_dropped`, `native_dropped` and
 `native_read_failed` before using a capture. Complete capture means no known record
 loss; it does not mean every application request succeeded. Inspect statuses and
@@ -88,8 +102,10 @@ such a capture remains unfinalized until the native runner actually exits.
 
 Tracing uses an optional native extension version 1 (`gd_trace_version`,
 `gd_trace_enable`, `gd_trace_read`). The host ABI remains version 1. Untraced hosts
-work with older compatible DLLs; tracing explicitly requires the new exports.
-Normal hosts do not allocate trace record buffers or call QPC for trace events.
+work with older compatible libraries on Windows/Linux; macOS additionally
+requires companion lifecycle extension version 2. Tracing requires its own
+exports. Normal hosts do not allocate trace record buffers or read clocks for
+trace events.
 Disabled tracing still adds branches and a small native trace object. Its overhead
 has not been isolated. Enabled captures include clock, allocation and mutex costs;
 do not compare them directly with historical uninstrumented benchmark timings.

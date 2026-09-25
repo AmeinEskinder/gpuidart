@@ -1,0 +1,12 @@
+
+::group::✅ Passing tests
+✅ test/companion_lifecycle_test.dart: companion exit startup settles and reaps the owned child
+✅ test/companion_lifecycle_test.dart: companion hung startup settles and reaps the owned child
+✅ test/native_host_test.dart: an incompatible native library fails before host creation
+✅ test/native_host_test.dart: Dart timers publish to the real GPUI loop and shutdown releases it
+✅ test/native_host_test.dart: failed initial descriptions release resources for another host
+✅ test/native_trace_test.dart: real requests correlate across the bridge without recording UI values
+✅ test/native_trace_test.dart: overflow is explicit and does not prevent updates or shutdown
+::endgroup::
+
+🎉 7 tests passed.
