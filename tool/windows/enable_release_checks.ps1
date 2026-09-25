@@ -59,13 +59,18 @@ if ($CheckOnly) {
     $report.mode = 'inspection'
     $report.passed = $null
     $report['blockers'] = @()
-    if ($environmentBefore.restart_pending) { $report.blockers += 'Restart Windows to complete pending servicing before installation.' }
+    $report['notes'] = @()
+    if ($environmentBefore.restart_pending) {
+        if ($Sandbox) { $report.blockers += 'Restart Windows to complete pending servicing before Sandbox setup.' }
+        if ($Japanese) { $report.notes += 'A Windows restart is pending. A Japanese-only installation can ask DISM whether the requested capabilities can be installed now; this inspection cannot establish that outcome.' }
+    }
     if ($Japanese) {
         try { Assert-DownloadAvailable $environmentBefore } catch { $report.blockers += $_.Exception.Message }
     }
     $report['finished_at_utc'] = [DateTime]::UtcNow.ToString('o')
     $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
     $report.blockers | ForEach-Object { Write-Output $_ }
+    $report.notes | ForEach-Object { Write-Output $_ }
     Write-Output "Inspection only; no installation attempted. Saved $ReportPath"
     return
 }
@@ -75,8 +80,8 @@ foreach ($step in @('Sandbox','Japanese')) {
     $result = [ordered]@{ name = $step; passed = $false }
     try {
         $environment = Get-ReleaseSetupEnvironment
-        if ($environment.restart_pending -or $report.restart_needed) {
-            throw 'Windows has pending servicing. Save your work, restart Windows, then rerun this command. No installation was attempted for this step.'
+        if ($step -eq 'Sandbox' -and ($environment.restart_pending -or $report.restart_needed)) {
+            throw 'Windows has pending servicing. Restart Windows before Sandbox setup, or use -Japanese alone to attempt the independent language installation. Sandbox installation was not attempted.'
         }
         if ($step -eq 'Sandbox') {
             $feature = Get-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM
@@ -92,6 +97,9 @@ foreach ($step in @('Sandbox','Japanese')) {
             $result['state'] = [string](Get-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM).State
             if ($result.state -notin @('Enabled','EnablePending')) { throw "Sandbox feature state is $($result.state)." }
         } else {
+            if ($environment.restart_pending) {
+                Write-Warning 'Windows has a pending restart. Attempting Japanese capabilities through DISM; Windows may still refuse or report that these capabilities need a restart.'
+            }
             $result['capabilities_before'] = @($japaneseCapabilities | ForEach-Object {
                 Get-WindowsCapability -Online -Name $_ | Select-Object Name,@{n='State';e={[string]$_.State}}
             })
@@ -140,13 +148,14 @@ foreach ($step in @('Sandbox','Japanese')) {
 }
 $report['environment_after'] = Get-ReleaseSetupEnvironment
 $report.restart_needed = $report.restart_needed -or $report.environment_after.restart_pending
-$report.passed = @($report.steps | Where-Object { !$_.passed }).Count -eq 0 -and !$report.restart_needed
+$report['installation_passed'] = @($report.steps | Where-Object { !$_.passed }).Count -eq 0
+$report.passed = $report.installation_passed -and !$report.restart_needed
 $report['finished_at_utc'] = [DateTime]::UtcNow.ToString('o')
 $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
 Write-Output "Saved $ReportPath. No restart was initiated."
-if ($report.restart_needed) { Write-Warning 'A Windows restart is required. Save your work before restarting.' }
-if (!$report.passed) {
+if ($report.restart_needed) { Write-Warning 'Windows still reports a pending restart. This does not establish whether the IME is usable in this session; actual composition must be checked separately.' }
+if (!$report.installation_passed) {
     $failures = @($report.steps | Where-Object { !$_.passed } | ForEach-Object { "$($_.name): $($_.error)" })
-    if ($report.restart_needed) { $failures += 'Restart Windows before the next attempt.' }
     throw ($failures -join [Environment]::NewLine)
 }
+Write-Output 'Requested components are installed. Installation success and pending restart status are recorded separately; release verification remains pending.'

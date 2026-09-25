@@ -39,13 +39,27 @@ installing anything:
 This writes `build/windows-prerequisites.inspection.json`. An inspection does not
 verify installed components and cannot produce an installation pass.
 
-The installer stops before new servicing if Windows has a pending restart, even
-when the Sandbox feature already says `Enabled`. Save your work and restart
-Windows before rerunning the command. If the connection is metered, Windows can
+The installer stops Sandbox setup if Windows has a pending restart, even when
+the feature already says `Enabled`. If you are postponing the restart, you can
+attempt Japanese input separately from Administrator PowerShell:
+
+```powershell
+./tool/windows/enable_release_checks.ps1 -Japanese
+```
+
+This calls DISM without clearing Windows servicing state. DISM decides whether
+the language capabilities can be installed in the current session. Installation
+may still fail or request a restart. The report's `installation_passed` records
+whether all requested components reached the installed state. `restart_needed`
+retains the Windows restart requirement; `passed` stays false while it remains.
+Successful installation alone does not prove that IME composition works.
+
+If the connection is metered, Windows can
 refuse language downloads with `0x800F0908`, `CBS_E_METERED_NETWORK`. Connect to
 an unmetered network, or turn off **Metered connection** for the current network
 in Settings if you accept the data usage. The script never changes network cost
-settings or repeatedly retries a blocked download.
+settings or repeatedly retries a blocked download. Cache cleanup or deleting
+restart flags does not perform the pending Windows servicing.
 
 These steps follow Microsoft's [Sandbox installation](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-install),
 [Sandbox configuration](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file)

@@ -31,10 +31,23 @@ if ($connection) {
 }
 $installedAfter = (Get-FileHash -LiteralPath (Join-Path $projectRoot 'build/windows-prerequisites.json') -ErrorAction SilentlyContinue).Hash
 if ($installedBefore -ne $installedAfter) { throw 'Inspection changed the installation report.' }
+$japaneseReportPath = Join-Path $directory 'japanese-inspection.json'
+& powershell.exe -NoProfile -File $setup -Japanese -CheckOnly -ReportPath $japaneseReportPath
+if ($LASTEXITCODE -ne 0) { throw 'Japanese-only inspection failed.' }
+$japaneseReport = Get-Content -Raw -LiteralPath $japaneseReportPath | ConvertFrom-Json
+if ($japaneseReport.mode -ne 'inspection' -or $null -ne $japaneseReport.passed -or @($japaneseReport.steps).Count -ne 0) {
+    throw 'Japanese-only inspection must not claim installation or invoke servicing.'
+}
+if ($japaneseReport.blockers -match 'restart|servicing') {
+    throw 'An unrelated pending restart must not preempt the Japanese-only DISM attempt.'
+}
+if ($pending -and ($japaneseReport.restart_needed -ne $true -or !($japaneseReport.notes -match 'restart'))) {
+    throw 'Japanese-only inspection must retain and explain the pending Windows restart.'
+}
 $result = [ordered]@{
     tested_at_utc = [DateTime]::UtcNow.ToString('o'); passed = $true
     scope = 'Read-only setup inspection and report preservation; no Windows installation or release-gate pass'
-    inspection = $report
+    inspection = $report; japanese_only_inspection = $japaneseReport
 }
 $destination = Join-Path $projectRoot 'reports/mvp/prerequisites/inspection-check.json'
 New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null

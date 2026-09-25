@@ -15,7 +15,7 @@ Sandbox client executable, Store package and Start entry were not yet available.
 The old script reported `restart_needed: false` solely because the feature state
 was `Enabled`. That was incomplete. No clean-VM execution is claimed.
 
-The setup script now:
+The first correction to the setup script:
 
 - Checks pending Windows servicing before starting another installation.
 - Reports metered or unavailable download access before requesting missing
@@ -25,22 +25,41 @@ The setup script now:
 - Saves capability states, prints specific failures, and archives previous reports.
 - Offers `-CheckOnly` without elevation or installation.
 
-[inspection-check.json](inspection-check.json) records the live read-only check.
-It detected both blockers, kept an earlier failure report byte-for-byte, and left
+The initial read-only check detected both blockers, kept an earlier failure
+report byte-for-byte, and left
 the actual installation report unchanged. A deliberate test copy with restart
 detection removed failed the regression check as expected. PowerShell parsing and
-the Git whitespace check also passed. The new installation path still requires
-an elevated run after the host is ready.
+the Git whitespace check also passed. The installation path still requires an
+elevated run.
+
+## Japanese input without restarting first
+
+The operator changed the network to unmetered. A subsequent query returned
+`Unrestricted`. The pending Windows restart remains.
+
+The first correction blocked both requested installations on any pending restart.
+That was too broad: it prevented us from asking DISM whether the Japanese
+capabilities could be installed independently. The script now permits a
+`-Japanese` attempt and preserves any error or restart requirement returned by
+Windows. It does not clear registry flags or change servicing state manually.
+Sandbox setup remains deferred while Windows servicing is pending.
+
+The latest [inspection check](inspection-check.json) covers the combined and
+Japanese-only commands. The Japanese-only inspection retains the restart warning
+without blocking the DISM attempt. A test copy that restored the blanket
+inspection block failed the regression check. This verifies setup-tool behavior;
+the elevated installation and actual IME composition have not yet been run.
 
 ## Next steps
 
-Save work and restart Windows to finish pending servicing. Use an unmetered
-connection, or turn off Metered connection if the operator accepts data usage.
-Then rerun the updated setup command from Administrator PowerShell:
+To try Japanese input while postponing the Windows restart, run from
+Administrator PowerShell:
 
 ```powershell
-& 'D:\Dev\gpuidart\tool\windows\enable_release_checks.ps1' -Sandbox -Japanese
+& 'D:\Dev\gpuidart\tool\windows\enable_release_checks.ps1' -Japanese
 ```
 
+DISM can still reject installation or require a restart. Complete the pending
+Windows restart later to proceed with Sandbox setup and launch verification.
 The script does not restart Windows or alter network-cost settings. The clean-VM
 launch and human IME release gates remain pending. The release ZIP is unchanged.
