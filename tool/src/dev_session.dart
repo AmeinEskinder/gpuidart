@@ -42,20 +42,11 @@ class DevSession {
     try {
       final deadline = DateTime.now().add(startupTimeout);
       Duration remaining() => deadline.difference(DateTime.now());
-      while (!serviceInfo.existsSync()) {
-        if (exitStatus != null) {
-          throw StateError(
-            'Application exited with code $exitStatus before starting the VM service',
-          );
-        }
-        if (DateTime.now().isAfter(deadline)) {
-          throw StateError('VM service did not start');
-        }
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-      }
-      final info =
-          jsonDecode(await serviceInfo.readAsString()) as Map<String, dynamic>;
-      final uri = Uri.parse(info['uri'] as String);
+      final uri = await waitForVmServiceUri(
+        serviceInfo,
+        deadline: deadline,
+        exitCode: process.exitCode,
+      );
       service = await vmServiceConnectUri(
         uri.replace(scheme: 'ws', path: '${uri.path}ws').toString(),
       ).timeout(remaining());
@@ -144,6 +135,42 @@ class DevSession {
       await removeSessionDirectory(directory);
     }
   }
+}
+
+Future<Uri> waitForVmServiceUri(
+  File serviceInfo, {
+  required DateTime deadline,
+  required Future<int> exitCode,
+}) async {
+  int? exitStatus;
+  unawaited(exitCode.then((value) => exitStatus = value));
+  while (DateTime.now().isBefore(deadline)) {
+    if (exitStatus != null) {
+      throw StateError(
+        'Application exited with code $exitStatus before publishing its VM service URI',
+      );
+    }
+    if (await serviceInfo.exists()) {
+      try {
+        if (jsonDecode(await serviceInfo.readAsString()) case {
+          'uri': final String value,
+        }) {
+          final uri = Uri.tryParse(value);
+          if (uri != null &&
+              (uri.scheme == 'http' || uri.scheme == 'https') &&
+              uri.host.isNotEmpty) {
+            return uri;
+          }
+        }
+      } on FormatException {
+        // The VM creates this file before its JSON write is complete.
+      }
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+  }
+  throw StateError(
+    'VM service did not publish a complete URI before the startup deadline',
+  );
 }
 
 Future<void> stopProcessTree(Process process) async {
