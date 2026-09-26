@@ -21,3 +21,4 @@ export 'src/style.dart';
 export 'src/table_view.dart';
 export 'src/window_options.dart';
 export 'src/theme.dart';
+export 'src/menus.dart' show UiMenu, UiMenuEntry, UiMenuSeparator, UiMenuAction;

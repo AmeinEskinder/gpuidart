@@ -21,6 +21,7 @@ fn description(revision: u64) -> Snapshot {
     Snapshot {
         revision,
         theme: None,
+        menus: Vec::new(),
         actions: Vec::new(),
         root: Node::Column {
             id: "root".into(),
@@ -619,6 +620,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
                 Snapshot {
                     revision: 3,
                     theme: None,
+                    menus: Vec::new(),
                     actions: Vec::new(),
                     root: Node::Text {
                         id: "empty".into(),
@@ -779,6 +781,7 @@ fn initial_with_ids() -> Initial {
     let table = |view: Option<TableView>| Snapshot {
         revision: 1,
         theme: None,
+        menus: Vec::new(),
         actions: Vec::new(),
         root: Node::Table {
             id: "table".into(),
@@ -826,6 +829,7 @@ fn publish_table_view(
             Snapshot {
                 revision,
                 theme: None,
+                menus: Vec::new(),
                 actions: Vec::new(),
                 root: Node::Table {
                     id: "table".into(),
@@ -1239,6 +1243,7 @@ fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
         snapshot: Snapshot {
             revision: 1,
             theme: None,
+            menus: Vec::new(),
             actions: Vec::new(),
             root: Node::Table {
                 id: "table".into(),

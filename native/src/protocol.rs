@@ -2,6 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+mod menus;
+pub use menus::{MenuEntry, MenuSpec};
 mod navigation;
 pub use navigation::ChoiceOption;
 mod semantics;
@@ -14,6 +16,8 @@ pub const MAX_MESSAGE_BYTES: usize = 16 * 1024 * 1024;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Snapshot {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub menus: Vec<MenuSpec>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub theme: Option<ThemeSpec>,
     pub revision: u64,
@@ -24,7 +28,7 @@ pub struct Snapshot {
 
 /// A key binding declared by the application: `name` fires as an `action`
 /// event when `keys` is pressed while focus is inside `context`.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ActionBinding {
     pub name: String,
@@ -93,7 +97,7 @@ impl KeystrokeSpec {
             .is_some_and(|n| (1..=12).contains(&n));
         let printable = key.len() == 1 && {
             let byte = key.as_bytes()[0];
-            byte.is_ascii_lowercase() || byte.is_ascii_digit()
+            byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b','
         };
         if !named && !printable {
             return Err(format!("Unknown key in key binding: {source}"));
@@ -859,6 +863,7 @@ impl Snapshot {
             Ok(())
         }
         validate(&self.root, 0, &mut ids)?;
+        menus::validate(&self.menus, &self.actions)?;
         self.validate_actions(&ids)
     }
 

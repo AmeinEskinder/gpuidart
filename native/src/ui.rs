@@ -224,6 +224,8 @@ pub(crate) struct DartView {
     embedded: bool,
     snapshot: Snapshot,
     applied_theme: Option<crate::protocol::ThemeSpec>,
+    applied_menus: menus::AppliedMenus,
+    menu_bar: Option<Entity<gpui_kit::component::menu::AppMenuBar>>,
     trace: Option<Arc<crate::trace::Trace>>,
     events: Events,
     inputs: HashMap<String, RetainedInput>,
@@ -378,6 +380,8 @@ impl DartView {
             trace: None,
             snapshot: initial.snapshot,
             applied_theme: None,
+            applied_menus: None,
+            menu_bar: None,
             datasets: Store::new(initial.datasets),
             events,
             inputs: HashMap::new(),
@@ -720,6 +724,7 @@ impl DartView {
 
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
         self.reconcile_theme(cx)?;
+        self.reconcile_menus(cx)?;
         self.reconcile_dialog(window, cx);
         self.reconcile_controls(window, cx);
         self.reconcile_tabs(window, cx);
@@ -934,6 +939,7 @@ impl DartView {
         for context in &chain {
             if let Some(binding) = self.snapshot.actions.iter().find(|binding| {
                 binding.context == *context
+                    && (context != "global" || self.menu_action_enabled(&binding.name))
                     && KeystrokeSpec::parse(&binding.keys).is_ok_and(|keys| keys == spec)
             }) {
                 return Some((binding.name.clone(), binding.context.clone()));
@@ -1284,6 +1290,9 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
 
 mod control_root;
 mod controls;
+mod menus;
+#[cfg(test)]
+mod menus_tests;
 mod semantics;
 #[cfg(test)]
 mod semantics_tests;
@@ -1323,6 +1332,7 @@ impl Render for DartView {
         }
         let root = div()
             .id("gpuidart")
+            .on_action(cx.listener(Self::invoke_menu))
             .role(Role::Group)
             .a11y_synthetic_children({
                 let modal = self.active_dialog.clone();
@@ -1337,6 +1347,11 @@ impl Render for DartView {
             .track_scroll(&self.scroll)
             .bg(cx.theme().background)
             .text_color(cx.theme().foreground)
+            .children(
+                self.menu_bar
+                    .as_ref()
+                    .map(|bar| div().h_8().w_full().child(bar.clone())),
+            )
             .child(div().w_full().p_5().child(content))
             .vertical_scrollbar(&self.scroll);
         #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]

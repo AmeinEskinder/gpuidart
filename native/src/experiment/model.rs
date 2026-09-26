@@ -165,6 +165,7 @@ pub(crate) fn propose(
         revision,
         actions: current.actions.clone(),
         theme: current.theme.clone(),
+        menus: current.menus.clone(),
         root,
     };
     let validation = std::time::Instant::now();

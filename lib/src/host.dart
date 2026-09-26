@@ -8,6 +8,7 @@ import 'package:ffi/ffi.dart';
 
 import 'actions.dart';
 import 'theme.dart';
+import 'menus.dart';
 import 'format.dart';
 import 'nodes.dart';
 import 'input_state.dart';
@@ -218,6 +219,7 @@ final class GpuiHost {
   final metrics = HostMetrics();
   UiNode Function()? _builder;
   UiTheme Function()? _themeBuilder;
+  List<UiMenu> Function()? _menusBuilder;
   int _request = 0;
   late final NativeCallable<_EventNative> _callback;
   late final Pointer<Void> _handle;
@@ -239,6 +241,7 @@ final class GpuiHost {
     List<TableDataset> datasets = const [],
     List<UiAction> actions = const [],
     UiTheme Function()? theme,
+    List<UiMenu> Function()? menus,
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
@@ -256,6 +259,7 @@ final class GpuiHost {
       datasets: datasets,
       actions: actions,
       theme: theme?.call(),
+      menus: menus?.call() ?? const [],
       window: window,
       requestTimeout: requestTimeout,
       shutdownTimeout: shutdownTimeout,
@@ -263,6 +267,7 @@ final class GpuiHost {
     );
     host._builder = builder;
     host._themeBuilder = theme;
+    host._menusBuilder = menus;
     host._viewActions = List.unmodifiable(actions);
     host.metrics.descriptionBuilds = 1;
     HostMetrics.sample(host.metrics.buildMicroseconds, elapsed);
@@ -279,7 +284,12 @@ final class GpuiHost {
         ? builder()
         : _trace._measure('dart.build', 'snapshot', _revision + 1, builder);
     HostMetrics.sample(metrics.buildMicroseconds, timer.elapsedMicroseconds);
-    return publish(root, actions: _viewActions, theme: _themeBuilder?.call());
+    return publish(
+      root,
+      actions: _viewActions,
+      theme: _themeBuilder?.call(),
+      menus: _menusBuilder?.call() ?? const [],
+    );
   }
 
   static Future<GpuiHost> open(
@@ -288,6 +298,7 @@ final class GpuiHost {
     List<TableDataset> datasets = const [],
     List<UiAction> actions = const [],
     UiTheme? theme,
+    List<UiMenu> menus = const [],
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
@@ -329,6 +340,7 @@ final class GpuiHost {
         'revision': 1,
         'root': root.toJson(),
         if (theme != null) 'theme': theme.toJson(),
+        if (menus.isNotEmpty) 'menus': encodeMenus(menus),
         if (actions.isNotEmpty)
           'actions': actions.map((action) => action.toJson()).toList(),
       },
@@ -522,6 +534,7 @@ final class GpuiHost {
     UiNode root, {
     List<UiAction> actions = const [],
     UiTheme? theme,
+    List<UiMenu> menus = const [],
   }) {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     final revision = ++_revision;
@@ -539,6 +552,7 @@ final class GpuiHost {
           'revision': revision,
           'root': rootDescription,
           if (theme != null) 'theme': theme.toJson(),
+          if (menus.isNotEmpty) 'menus': encodeMenus(menus),
           if (actions.isNotEmpty)
             'actions': actions.map((action) => action.toJson()).toList(),
         },

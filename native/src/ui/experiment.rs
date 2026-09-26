@@ -105,6 +105,7 @@ impl ExperimentView {
                 let snapshot = Snapshot {
                     revision: 1,
                     theme: None,
+                    menus: Vec::new(),
                     actions: Vec::new(),
                     root: node.clone(),
                 };
@@ -168,6 +169,7 @@ impl ExperimentView {
                         let snapshot = Snapshot {
                             revision,
                             theme: None,
+                            menus: Vec::new(),
                             actions: Vec::new(),
                             root: node.clone(),
                         };
@@ -177,6 +179,7 @@ impl ExperimentView {
                     let snapshot = Snapshot {
                         revision,
                         theme: None,
+                        menus: Vec::new(),
                         actions: Vec::new(),
                         root: node.clone(),
                     };

@@ -66,3 +66,37 @@ for that render-once control. Focus assertions now query the actual retained
 GPUI focus handles, with the live keyboard round trip checking the same behavior.
 The failed focus-inspection attempt was a verifier limitation, not an observed
 failure to move focus. The separate role/selected/name assertions remain.
+
+## Application menus
+
+Snapshot menus map to real GPUI Menu/MenuItem values, with Kit's in-window bar
+on Windows/Linux and the native app menu on macOS. Global action bindings supply
+the shortcuts; comma is now an allowed modified printable key. Scoped actions
+keep precedence. Disabled menu commands suppress their global shortcut when all
+entries referencing that command are disabled. Removal of a menu does not remove
+a separately declared application action. Invoke carries menu/entry/action
+identity and validates all three against the current snapshot.
+
+Windows native menu tests passed: bounded wire/round trip; real popup role and
+item; Escape focus restoration; keyboard activation; unchanged-open-menu
+publication; disabled/stale invocation; scoped shortcuts; unchanged keymap counts
+after repeated publications. Dart wire tests passed and analyzer is clean.
+The accessibility workflow now runs theme/tab/menu live FFI tests on all three
+platforms. External native-menu queries remain a terminal-fixture gate.
+
+Local DLL build attempts are retained as failures, with the live menu Dart test
+pending a new DLL or hosted run. First `rustc` exhausted allocation capacity.
+Disabling incremental compilation globally also exhausted memory while compiling
+Kit (it invalidated dependency caches). A package-only override then compiled
+the host but MSVC linking failed with LNK1102, out of memory. Windows reported
+about 2.4?3.1 GiB free commit capacity between attempts; this is build-environment
+evidence, not an application memory measurement or proof of a compiler defect.
+Logs: `build/terminal-menu-build-no-incremental.log` and
+`build/terminal-menu-build-package-only.log` (local build files, not release
+artifacts). No system-memory settings or unrelated processes were changed.
+
+The premise that changing compiler caching alone would unblock the full build
+was not supported. Hosted verification is the next independent check while local
+capacity is constrained. The headless menu tests themselves passed both before
+and after the failed DLL build attempts. A Dart lint check also caught three
+missing statement braces, corrected before this commit.

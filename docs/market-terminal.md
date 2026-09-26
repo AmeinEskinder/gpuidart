@@ -79,8 +79,8 @@ does not claim native input entities survive removal and later recreation.
 Snapshot-level `UiMenu` descriptions contain stable IDs, bounded labels, action
 names, checked/disabled flags and separators. Limit the initial contract to 8
 top-level menus and 64 entries each, with no arbitrary submenu recursion. Menu
-entry IDs are unique within their parent. Action names use the existing bounded
-action naming rules. Global key bindings and menu entries dispatch the same
+entry IDs are unique within their parent. Menu action names contain 1..256 UTF-8 bytes and reference a global
+action binding. Global key bindings and menu entries dispatch the same
 application action. Scoped text shortcuts retain their existing precedence.
 
 Use GPUI's real `Menu`/`MenuItem` and Kit's app-menu integration. Register a typed
