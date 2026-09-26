@@ -137,3 +137,17 @@ This uploads 100,000 rows, edits one cell 30 times, publishes 30 counter snapsho
 checks the resulting value and revision, and exports after shutdown. Both commands
 above use the debug native DLL; the second verifies Dart AOT tracing, not release
 performance or clean-machine packaging. The tool retains a partial trace on failure.
+
+## Recorded startup and snapshot workloads
+
+The [performance baselines](../reports/performance/baselines/README.md) record
+release-native startup stages, data-size memory slopes, OS peaks and separate
+Rust allocation-profile runs on Windows/macOS/Linux. The
+[macOS companion analysis](../reports/performance/baselines/macos-companion.md)
+includes initial transport stages and per-process controls. These are CPU-stage
+measurements; presentation remains unmeasured.
+
+The [snapshot-heavy gate](../reports/performance/snapshot-gate/README.md) correlates
+description build/encode, native parse/dispatch and content paint at 128/512/2048
+property nodes. It establishes a workload for the planned strategy experiment,
+not a production patch-protocol decision.

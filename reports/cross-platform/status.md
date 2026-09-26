@@ -38,8 +38,10 @@ complete work order is therefore still open; automated passes do not close it.
 | Ubuntu 24.04 x64, glibc 2.39, X11 | Blocking native runner isolate | GitHub runner with Xvfb; separate clean QEMU/KVM desktop with Xorg/Openbox, Mesa software Vulkan and configured Fcitx5/Mozc |
 
 Native Wayland, Intel Macs, older macOS and other Linux distributions are
-unverified. macOS uses separate application/UI processes; its extra transport
-and memory costs need separate measurements.
+unverified. macOS uses separate application/UI processes. The
+[dedicated measurements](../performance/baselines/macos-companion.md) now report
+both roles, temporary native staging and initial transport. They do not establish
+the net cost against a hypothetical macOS shared-process implementation.
 
 ## Completed host checks
 

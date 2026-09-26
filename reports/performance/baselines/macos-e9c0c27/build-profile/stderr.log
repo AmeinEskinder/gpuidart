@@ -1,0 +1,25 @@
+   Compiling gpuidart v0.1.0 (/Users/runner/work/gpuidart/gpuidart/native)
+warning: use of deprecated function `libc::mach_absolute_time`: Use the `mach2` crate instead
+  --> native/src/clock.rs:36:35
+   |
+36 |             ticks: unsafe { libc::mach_absolute_time() } as i64,
+   |                                   ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated function `libc::_dyld_image_count`: Use the `mach2` crate instead
+  --> native/src/runtime_info.rs:67:27
+   |
+67 |         for i in 0..libc::_dyld_image_count() {
+   |                           ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated function `libc::_dyld_get_image_name`: Use the `mach2` crate instead
+  --> native/src/runtime_info.rs:68:30
+   |
+68 |             let name = libc::_dyld_get_image_name(i);
+   |                              ^^^^^^^^^^^^^^^^^^^^
+
+warning: `gpuidart` (lib) generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 18.38s
+warning: the following packages contain code that will be rejected by a future version of Rust: block v0.1.6
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`

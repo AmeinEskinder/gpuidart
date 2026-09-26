@@ -61,6 +61,9 @@ the final commit, and a clean pushed tree.
   now explicit. See [instrumentation checks](../reports/performance/instrumentation/README.md).
 - Baseline harness: empty/1k/10k/100k, JIT/AOT, data/library/host controls,
   OS memory peaks and a separate Rust allocation-profile build implemented;
-  debug Windows smoke passed. Release measurement collection is in progress.
-- Snapshot-heavy gate and three-strategy experiment: not started.
+  debug Windows smoke passed. Windows/macOS/Linux release measurements and
+  dedicated companion analysis are recorded. See [baselines](../reports/performance/baselines/README.md).
+- Snapshot-heavy gate: demonstrated by 18 Windows runs / 720 retained-state
+  checks at 128/512/2048 properties. See [gate evidence](../reports/performance/snapshot-gate/README.md).
+  The three-strategy experiment has not yet been implemented.
 - Measured optimization decisions and final CI: not started.

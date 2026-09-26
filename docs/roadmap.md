@@ -69,4 +69,12 @@ Keep the current out-of-band dataset design. Shell's bridge limit explains the p
 
 Correlated input-to-present measurement remains required for comparative responsiveness claims. Its absence does not prevent profiling and improving independently measured startup, CPU, allocation or publication costs.
 
+Steps 5–6 measurement update (2026-09-26): [release baselines](../reports/performance/baselines/README.md)
+now cover empty/1k/10k/100k fixtures, JIT/AOT, application/library controls, separate
+allocation-profile builds and the macOS companion. A [snapshot-heavy inspector](../reports/performance/snapshot-gate/README.md)
+passed 18 runs / 720 state-preserving replacements and demonstrates costs that
+scale with description size for one-property changes. This opens the experiment
+gate. The three-strategy comparison and optimization keep/revert decisions are
+still pending; the production snapshot/dataset protocol remains unchanged.
+
 The [macOS/Linux work order](cross-platform.md) starts with a separate feasibility gate for the pinned backends and Dart launch mechanism. It does not establish platform support or take priority over the open Windows release checks.
