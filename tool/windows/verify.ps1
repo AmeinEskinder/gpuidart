@@ -36,6 +36,8 @@ $start.UseShellExecute = $false
 $start.CreateNoWindow = $true
 $start.RedirectStandardOutput = $true
 $start.RedirectStandardError = $true
+$start.StandardOutputEncoding = [Text.UTF8Encoding]::new($false, $true)
+$start.StandardErrorEncoding = [Text.UTF8Encoding]::new($false, $true)
 $start.EnvironmentVariables['PATH'] = "$env:SystemRoot\System32;$env:SystemRoot"
 foreach ($key in @($start.EnvironmentVariables.Keys)) {
     if ($key -match '^(DART|FLUTTER|GPUIDART|CARGO|RUSTUP)') { $start.EnvironmentVariables.Remove($key) }
@@ -67,6 +69,8 @@ try {
     if (!($modules | Where-Object { $_ -match '\\WinSxS\\.*\\comctl32\.dll$' })) { throw 'Common Controls v6 was not loaded' }
     if ($modules | Where-Object { $_ -match '\\(dart-sdk|flutter)\\' }) { throw 'An SDK module was loaded' }
     $application = $output.Result.Trim() | ConvertFrom-Json
+    $report['application'] = $application
+    $report['stderr'] = $errors.Result
     if ($application.mode -cne 'aot' -or $application.passed -isnot [bool] -or !$application.passed) {
         throw 'Application self-test must report mode aot and boolean passed true'
     }

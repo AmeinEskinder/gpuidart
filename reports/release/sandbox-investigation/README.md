@@ -39,5 +39,6 @@ not physical-GPU performance or a fix to the host's graphics driver.
 The accepted report contains garbled middle-dot separators in application
 labels. The application's UTF-8 standard output was decoded with the default
 Windows process encoding. This affects the report's text. It does not provide
-evidence about visible IME composition. A dedicated verifier fix and regression
-check follow this milestone; the original artifact and report remain intact.
+evidence about visible IME composition. [The verifier fix and regression](../encoding/README.md)
+preserve Japanese, accented text and emoji on both output streams. The original
+artifact and report remain intact; the corrected package is verified separately.

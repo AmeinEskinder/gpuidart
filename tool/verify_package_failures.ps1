@@ -1,4 +1,7 @@
-param([string]$Zip = 'build/WatchlistMvp-windows-x64.zip')
+param(
+    [string]$Zip = 'build/WatchlistMvp-windows-x64.zip',
+    [string]$ReportPath = 'reports/sdk/package-failures.json'
+)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 Push-Location $projectRoot
@@ -33,11 +36,14 @@ try {
     @'
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:gpuidart/gpuidart.dart';
 Future<void> main() async {
   final host = await GpuiHost.open(const UiText('text', 'Verifier negative case'));
   await Future<void>.delayed(const Duration(milliseconds: 1000));
-  print(jsonEncode({'mode': 'aot'}));
+  const probe = '\u65e5\u672c\u8a9e \u00b7 caf\u00e9 \u{1f600}';
+  stderr.writeln(probe);
+  print(jsonEncode({'mode': 'aot', 'unicode': probe}));
   await host.close();
 }
 '@ | Set-Content -LiteralPath $entry -Encoding UTF8
@@ -50,10 +56,15 @@ Future<void> main() async {
         throw 'Ignored custom entry source is missing from package identity'
     }
     $resultCheck = Assert-RejectedPackage (Join-Path $projectRoot 'build/MissingSelfTestResult-windows-x64') 'boolean passed true'
+    $expectedUnicode = '"\u65e5\u672c\u8a9e \u00b7 caf\u00e9 \ud83d\ude00"' | ConvertFrom-Json
+    if ($resultCheck.application.unicode -cne $expectedUnicode -or $resultCheck.stderr.Trim() -cne $expectedUnicode) {
+        throw "Verifier corrupted UTF-8 stdout/stderr. See build/MissingSelfTestResult-windows-x64/verification.json"
+    }
     [ordered]@{
         passed=$true; tampered_file_rejected=$hashResult; missing_self_test_result_rejected=$resultCheck
         stale_success_report_replaced=$true
         named_release_instructions=$true; ignored_entry_hashed=$true; ignored_entry_reported_uncommitted=$true
-    } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath 'reports/sdk/package-failures.json' -Encoding UTF8
+        unicode_stdout_and_stderr_preserved=$true
+    } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding UTF8
     Write-Output 'PASS: changed package contents and absent self-test success are rejected; failures replace stale success reports.'
 } finally { Pop-Location }

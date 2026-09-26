@@ -73,3 +73,19 @@ The new evidence cannot choose among those possibilities. The render-order fix
 removes a demonstrated weakness in the diagnostic precondition, but the original
 observation remains open. Future failures retain preparation, immediate state,
 post-render state and optional request traces.
+
+### Historical source audit, 2026-09-26
+
+The original verifier at `023eef4` required `before.state.tables.watchlist.scroll_y`
+to be negative before it changed source and requested reload. The saved failure
+occurred later at the whole-table comparison. Therefore a still-zero scroll
+offset in that `before` inspection cannot explain this specific failure.
+The comparison covered entity ID, visible row range, source row count, dataset
+ID, dataset revision and scroll offset. Neither compared object was saved.
+
+The current `bb6a894` release run passed eleven reloads, including comparisons
+after rendering. Those values and the earlier passing repetitions cannot recover
+the missing original values. Repeating the same successful workload again would
+not localize the historical failure, so no additional runtime fix or relaxed
+assertion follows from this audit. The observation remains an explicit unresolved
+release decision.

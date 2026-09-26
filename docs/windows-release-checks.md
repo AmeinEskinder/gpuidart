@@ -2,6 +2,11 @@
 
 Use the built gpuidart-windows-x64.zip. The interaction steps below exercise the supplied Market watch example; adapt them when packaging a different entry point. Record the ZIP hash, Windows build, display scale and input method with the result. Automated local verification is in reports/sdk/package.json; it does not replace these checks.
 
+A custom application's `--self-test` must write one UTF-8 JSON object to stdout,
+with `mode: "aot"` and boolean `passed: true`. Write diagnostics to UTF-8 stderr.
+The standalone verifier preserves non-ASCII text in both streams and rejects
+malformed UTF-8.
+
 ## Fresh Windows machine or VM
 
 1. Use a newly provisioned Windows x64 machine/VM without Dart, Flutter, Rust or Visual Studio. Record its image/version and installed prerequisites. Do not copy SDKs from the development machine.

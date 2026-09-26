@@ -1,0 +1,27 @@
+﻿{
+    "passed":  true,
+    "tampered_file_rejected":  {
+                                   "tested_at_utc":  "2026-09-26T02:50:05.5508051Z",
+                                   "passed":  false,
+                                   "environment_declared_by_operator":  "development_machine",
+                                   "package_path":  "D:\\Dev\\gpuidart\\.cache\\package-failures-c7bf34aec1b049669c33e4256c903cd6\\tampered",
+                                   "error":  "Package hash mismatch: README.txt"
+                               },
+    "missing_self_test_result_rejected":  {
+                                              "tested_at_utc":  "2026-09-26T02:50:17.6351788Z",
+                                              "passed":  false,
+                                              "environment_declared_by_operator":  "development_machine",
+                                              "package_path":  "D:\\Dev\\gpuidart\\build\\MissingSelfTestResult-windows-x64",
+                                              "application":  {
+                                                                  "mode":  "aot",
+                                                                  "unicode":  "日本語 · café 😀"
+                                                              },
+                                              "stderr":  "日本語 · café 😀\n",
+                                              "error":  "Application self-test must report mode aot and boolean passed true"
+                                          },
+    "stale_success_report_replaced":  true,
+    "named_release_instructions":  true,
+    "ignored_entry_hashed":  true,
+    "ignored_entry_reported_uncommitted":  true,
+    "unicode_stdout_and_stderr_preserved":  true
+}
