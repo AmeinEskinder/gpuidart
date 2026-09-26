@@ -2,8 +2,9 @@
 
 All nine local acceptance checks passed on **2026-09-26** from committed source
 `bb6a89425cfb34e03ab0f7a159836712ee921e9c`. This is a release candidate;
-clean-Windows launch, human IME and the original unlocalized reload observation
-remain open. See the [current release record](../release/README.md) for all three
+human IME and the original unlocalized reload observation remain open.
+Clean-Windows launch subsequently passed in a fresh Sandbox with vGPU disabled.
+See the [current release record](../release/README.md) for all three
 platforms and the post-restart Windows attempt.
 
 ## Run it
@@ -68,9 +69,10 @@ The current pass does not establish the cause of the original reload mismatch.
 
 The [release record](../release/README.md#gates-still-open) tracks the current
 Sandbox attempt, human IME, owner license and cross-platform desktop checks.
-Japanese typing is installed and enabled after the restart. The attempted
-Sandbox never produced a verifier report; the guest had no logged-in desktop
-session. Neither preparation result closes an external gate.
+Japanese typing is installed and enabled after the restart. The initial Sandbox
+failed before desktop logon; a fresh software-rendering configuration passed the
+package check. [Guest evidence](../release/bb6a894/clean-windows/verification.json)
+closes clean-Windows launch for this ZIP. Human IME remains unobserved.
 
 Use [Windows release checks](../../docs/windows-release-checks.md) and
 [setup instructions](../../docs/windows-test-setup.md) for the observation steps.

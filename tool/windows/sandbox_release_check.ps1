@@ -18,7 +18,9 @@ try {
     if ($hash -ne $identity.zip_sha256) { throw 'Candidate ZIP hash differs from prepared identity.' }
     $sdkCommands = @(Get-Command dart,flutter,rustc,cargo,cl -ErrorAction SilentlyContinue | Select-Object Name,Source)
     $environment = [ordered]@{
-        provisioning = 'Fresh Windows Sandbox, network disabled, virtual GPU, package and test script only'
+        provisioning = 'Fresh Windows Sandbox, network disabled, package and test script only'
+        configured_vgpu = $identity.vgpu
+        graphics_adapters = @(Get-CimInstance Win32_VideoController | Select-Object Name,DriverVersion,AdapterCompatibility)
         os = (Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,OSArchitecture)
         model = $system.Model; guest_uuid = $uuid; zip_sha256 = $hash
         developer_commands = $sdkCommands

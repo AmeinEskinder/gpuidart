@@ -13,8 +13,9 @@ runtime feature is part of this release check.
 3. All nine Windows release checks passed on committed `bb6a894`: 41 native
    tests, 41 Dart tests, 500 interaction updates, reload, development launcher,
    packaging and failure checks. The package ran at DPI 120 with PerMonitorV2.
-4. Both Unix package jobs passed on `bb6a894`. The Windows Sandbox attempt did
-   not reach interactive logon, so its package verifier did not run.
+4. Both Unix package jobs passed on `bb6a894`. The clean-Windows check also
+   passed in a fresh Sandbox with virtual GPU sharing disabled. The earlier
+   guest desktop crashes and duplicate verifier attempt are retained.
 5. Complete observed IME checks and the owner's license choice if supplied.
    Neither an installed input method nor a passing test supplies these answers.
 6. Record per-artifact results, remaining gates and a milestone commit.
@@ -30,6 +31,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 ## Current evidence
 
 - [Windows acceptance](bb6a894/windows/acceptance.json), [packaged execution](bb6a894/windows/package.json), [reload](bb6a894/windows/reload.json) and [500-update run](bb6a894/windows/stability.json).
+- [Clean-Windows verification](bb6a894/clean-windows/verification.json) passed for the same ZIP in a fresh guest without developer SDK commands, at DPI 120 with PerMonitorV2. [The investigation](sandbox-investigation/README.md) records the vGPU-enabled compositor crashes, the software-rendering configuration and the report-text encoding issue.
 - [Unix package workflow](https://github.com/AmeinEskinder/gpuidart/actions/runs/36210888777): extracted macOS/Linux packages, macOS runtime-only verification, three JIT/AOT baseline repetitions per host, X11 geometry at scales 1 and 1.25, and a fresh Ubuntu runtime container passed. [Raw records](bb6a894/unix/) retain their individual scope.
 - [Archive identities](bb6a894/artifacts.json): downloaded Unix hashes match the workflow records. Windows ZIP SHA-256 is `e4d050c7a0ca938bf49094c60598f9616bdde54cc4831b88cf3f7e81363e2323`.
 - [Post-restart inspection](bb6a894/prerequisites.json) and [Japanese readiness](bb6a894/japanese-readiness.json): no pending restart, Basic Typing installed, Japanese added after English. These are preparation records, not IME observations.
@@ -41,7 +43,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 
 | Platform | Local artifact | Verified scope |
 | --- | --- | --- |
-| Windows x64 | [WatchlistReleaseBb6a894-windows-x64.zip](../../build/WatchlistReleaseBb6a894-windows-x64.zip) | Development-machine AOT verification, isolated PATH, DLL identity, DPI |
+| Windows x64 | [WatchlistReleaseBb6a894-windows-x64.zip](../../build/WatchlistReleaseBb6a894-windows-x64.zip) | Local and fresh Sandbox AOT verification, DLL identity, DPI; vGPU disabled in the accepted guest |
 | macOS ARM64 | [Watchlist-macos-arm64.tar.gz](../../build/evaluation-bb6a894/macos/Watchlist-macos-arm64.tar.gz) | Hosted macOS 15 execution and packaging |
 | Linux x64 | [Watchlist-linux-x64.tar.gz](../../build/evaluation-bb6a894/linux/Watchlist-linux-x64.tar.gz) | Hosted Ubuntu 24.04 X11 and fresh runtime container |
 
@@ -54,7 +56,6 @@ isolate its cost or establish cross-platform performance rankings.
 
 | Gate | Required evidence / decision |
 | --- | --- |
-| Clean Windows launch | A fresh guest must reach a desktop and produce a passing package report for the recorded ZIP. The attempted guest did not reach this stage. |
 | Human IME | Observed preedit, candidate placement, commit/cancel, selection and reload, with input method/version. Installed Japanese and injected Unicode do not satisfy this. |
 | Other desktop backends | Clean Mac launch, human IME on each supported backend, Retina/fractional/mixed-monitor observations. Hosted checks retain their narrower scope. |
 | Original Windows reload mismatch | The original `attempt-023eef4` remains unlocalized. Passing current checks and the separately proved preparation-race fix do not explain the missing historical values. |
@@ -63,9 +64,8 @@ isolate its cost or establish cross-platform performance rankings.
 These records establish current automated acceptance. The stable-release goal
 remains open under `docs/mvp.md` and `docs/cross-platform.md`.
 
-The next prepared Windows configuration is
-`build/release-checks/20260926-022825-0dd0a5f5/check.wsb`.
-Keep its Sandbox desktop open until `results/status.json` says `passed` or
-`failed`. If a connection error appears before the desktop, retain that error;
-the package check has not started. The adjacent `results/ime-results.md` is the
-human observation sheet, with each outcome left pending.
+The accepted clean-Windows run is
+`build/release-checks/20260926-024355-fa3f2c88`.
+Its `results/ime-results.md` remains pending; this guest has only English input.
+Human Japanese IME checks must use the prepared host or another machine with
+the input method installed.

@@ -1,0 +1,14 @@
+﻿<Configuration>
+  <VGpu>Disable</VGpu>
+  <Networking>Disable</Networking>
+  <AudioInput>Disable</AudioInput>
+  <VideoInput>Disable</VideoInput>
+  <PrinterRedirection>Disable</PrinterRedirection>
+  <ClipboardRedirection>Disable</ClipboardRedirection>
+  <MemoryInMB>4096</MemoryInMB>
+  <MappedFolders>
+    <MappedFolder><HostFolder>D:\Dev\gpuidart\build\release-checks\20260926-024152-12dab64e\input</HostFolder><SandboxFolder>C:\GPUI-Input</SandboxFolder><ReadOnly>true</ReadOnly></MappedFolder>
+    <MappedFolder><HostFolder>D:\Dev\gpuidart\build\release-checks\20260926-024152-12dab64e\results</HostFolder><SandboxFolder>C:\GPUI-Results</SandboxFolder><ReadOnly>false</ReadOnly></MappedFolder>
+  </MappedFolders>
+  <LogonCommand><Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\GPUI-Input\sandbox_release_check.ps1</Command></LogonCommand>
+</Configuration>

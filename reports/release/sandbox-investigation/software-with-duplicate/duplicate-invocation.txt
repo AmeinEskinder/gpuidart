@@ -1,0 +1,6 @@
+﻿Manual fallback invocation overlapped the delayed automatic LogonCommand.
+wsb exec reported: Process exited with code: 1
+Its observed status at 2026-09-26T02:43:06.4313442Z was failed:
+An item with the specified name C:\Users\WDAGUtilityAccount\Desktop\GPUI Dart candidate already exists.
+The original automatic invocation started 2026-09-26T02:42:49.5079381Z and completed at 2026-09-26T02:43:12.5317537Z with passed=true, overwriting the shared status file.
+Both observations are retained here. Repeat in a fresh guest with only the automatic command before accepting the clean-VM gate.

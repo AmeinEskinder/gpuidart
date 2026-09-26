@@ -7,6 +7,18 @@ Prepare a separate, repeatable Sandbox run with its ZIP path:
 ./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistReleaseBb6a894-windows-x64.zip
 ```
 
+If the Sandbox desktop disconnects before the package test starts, preserve the
+guest and connection errors. To test software rendering in a separate fresh run:
+
+```powershell
+./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistReleaseBb6a894-windows-x64.zip -VGpu Disable
+```
+
+The default remains `-VGpu Enable`. Microsoft's [Sandbox configuration guide](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file)
+specifies WARP software rendering when GPU sharing is disabled. The generated
+identity and guest report record the selected setting. A software-rendered pass
+checks dependency closure and launch, not the host GPU driver or performance.
+
 The command prints a new directory under `build/release-checks`. Its `check.wsb`
 maps only the candidate and test script as read-only input, plus that run's empty
 results directory as writable output. The guest has network access disabled and
@@ -96,7 +108,9 @@ the AOT application and the JIT launcher. Keep screenshots of preedit and candid
 placement. The observer must supply results; the template does not infer them.
 
 Double-click `check.wsb` after Sandbox is ready. Its `results/status.json` changes
-from `running` to `passed` or `failed`. Retain `environment.json`,
+from `running` to `passed` or `failed`. Logon and script startup can take more than
+a minute. Do not manually start a second verifier while the automatic logon
+command may still be starting. Retain `environment.json`,
 `verification.json` and both verifier logs. Keep the Sandbox open until the result
 is written. Close it after the screen check. A clean launch result and the human
 IME observations are separate gates.

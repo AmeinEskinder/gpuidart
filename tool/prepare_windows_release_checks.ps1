@@ -1,5 +1,7 @@
 param(
-    [string]$Zip = 'build/WatchlistMvp-windows-x64.zip'
+    [string]$Zip = 'build/WatchlistMvp-windows-x64.zip',
+    [ValidateSet('Enable', 'Disable')]
+    [string]$VGpu = 'Enable'
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
@@ -17,13 +19,14 @@ $identity = [ordered]@{
     original_archive = $archive
     zip_sha256 = (Get-FileHash -LiteralPath $archive).Hash.ToLowerInvariant()
     host_uuid = (Get-CimInstance Win32_ComputerSystemProduct).UUID
+    vgpu = $VGpu
 }
 $identity | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $inputDirectory 'candidate.json') -Encoding UTF8
 $inputXml = [Security.SecurityElement]::Escape($inputDirectory)
 $outputXml = [Security.SecurityElement]::Escape($outputDirectory)
 @"
 <Configuration>
-  <VGpu>Enable</VGpu>
+  <VGpu>$VGpu</VGpu>
   <Networking>Disable</Networking>
   <AudioInput>Disable</AudioInput>
   <VideoInput>Disable</VideoInput>
@@ -44,7 +47,8 @@ Double-click check.wsb after enabling Windows Sandbox and completing any require
 The guest runs the existing packaged verifier automatically. Watch results/status.json.
 Keep the Sandbox open until status is passed or failed. The output remains on the host.
 Input is read-only. Only this run's results folder is writable. No SDK or network is supplied.
-The guest uses a virtual GPU. This checks packaging, not physical-GPU performance.
+Virtual GPU sharing: $VGpu. Disable uses software rendering.
+This checks packaging, not physical-GPU performance.
 Candidate SHA-256: $($identity.zip_sha256)
 
 For the manual screen check, open the extracted GPUI Dart candidate folder on the guest desktop.
