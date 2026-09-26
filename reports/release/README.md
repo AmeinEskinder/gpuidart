@@ -16,8 +16,9 @@ runtime feature is part of this release check.
 4. Both Unix package jobs passed on `bb6a894`. The clean-Windows check also
    passed in a fresh Sandbox with virtual GPU sharing disabled. The earlier
    guest desktop crashes and duplicate verifier attempt are retained.
-5. Complete observed IME checks and the owner's license choice if supplied.
-   Neither an installed input method nor a passing test supplies these answers.
+5. The owner selected MIT on 2026-09-26; [LICENSE](../../LICENSE) records the
+   terms. Complete observed IME checks when a human can perform them.
+   Neither an installed input method nor a passing test supplies that evidence.
 6. Record per-artifact results, remaining gates and a milestone commit.
 
 Success requires current-source release tests and packaging, clean-environment
@@ -60,7 +61,7 @@ isolate its cost or establish cross-platform performance rankings.
 | Human IME | Observed preedit, candidate placement, commit/cancel, selection and reload, with input method/version. Installed Japanese and injected Unicode do not satisfy this. |
 | Other desktop backends | Clean Mac launch, human IME on each supported backend, Retina/fractional/mixed-monitor observations. Hosted checks retain their narrower scope. |
 | Original Windows reload mismatch | The original `attempt-023eef4` remains unlocalized. Passing current checks and the separately proved preparation-race fix do not explain the missing historical values. |
-| Owner decisions | Project license and macOS distribution signing/notarization remain pending. |
+| macOS distribution | Developer ID signing/notarization and a quarantined clean-Mac launch remain pending. Project licensing is resolved as MIT. |
 
 These records establish current automated acceptance. The stable-release goal
 remains open under `docs/mvp.md` and `docs/cross-platform.md`.

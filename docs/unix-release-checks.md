@@ -54,7 +54,10 @@ code has ad-hoc signatures, checked by the verifier. It is not a Developer ID
 release and has not been notarized. Do not disable Gatekeeper to turn this
 into a claimed distribution pass.
 
-Before public distribution, select the project's license, sign every shipped
+GPUI-Dart uses the MIT License; the archive includes `LICENSE`. Dependencies
+retain their own terms in the accompanying license files and inventory.
+
+Before public distribution, sign every shipped
 executable/library and the app with the owner's Developer ID, enable and test
 the hardened runtime with the required entitlements, submit with `notarytool`,
 and staple/validate the ticket. Repeat the extracted-package tests on the exact

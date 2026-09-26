@@ -72,7 +72,8 @@ The current pass does not establish the cause of the original reload mismatch.
 ## Remaining release checks
 
 The [release record](../release/README.md#gates-still-open) tracks the current
-Sandbox attempt, human IME, owner license and cross-platform desktop checks.
+human IME, macOS distribution and cross-platform desktop checks. The owner
+selected the [MIT License](../../LICENSE) on 2026-09-26.
 Japanese typing is installed and enabled after the restart. The initial Sandbox
 failed before desktop logon; a fresh software-rendering configuration passed the
 package check. [Guest evidence](../release/53ea4c7/clean-windows/verification.json)

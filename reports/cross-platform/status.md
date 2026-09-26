@@ -84,14 +84,14 @@ physical fractional-scaling or mixed-monitor verification.
 
 ## Gates that remain open
 
-- Clean Windows and macOS launch without development SDKs. A clean Linux
+- Clean macOS launch without development SDKs. [Clean Windows launch passed](../release/README.md). A clean Linux
   container is a narrower automated target; clean desktop/VM checks remain.
 - Human IME composition, candidate placement/commit/cancel, selection,
   scrolling and window resizing on every declared OS/backend.
 - Retina, physical Linux fractional scaling and mixed-monitor movement. Hosted
   macOS checks cover scale 1; Linux additionally has forced-scale 1.25 geometry
   and resize checks.
-- Owner license selection and macOS public-distribution signing/notarization.
+- macOS public-distribution signing/notarization. The owner selected the [MIT License](../../LICENSE) on 2026-09-26.
 - The original Windows [reload observation](../mvp/attempt-023eef4/README.md).
   Passing later regressions does not localize that historical observation.
 - First useful display and input-to-present latency. Draw acknowledgements and

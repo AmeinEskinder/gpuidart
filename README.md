@@ -10,7 +10,7 @@ An experimental desktop SDK using Dart application code and GPUI Kit's Rust cont
 
 See [cross-platform acceptance](reports/cross-platform/status.md) for source revisions, package results and remaining gates. Native Wayland, Intel Macs, other Linux distributions and older macOS versions are unverified.
 
-The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. Its [Windows ZIP](build/WatchlistMvp-windows-x64.zip) is built from committed source. Clean-machine launch, human IME verification and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
+The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include a successful clean Windows launch in Sandbox. Human IME verification, other desktop checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
 The SDK supports row/column layouts, text, buttons, native text inputs and virtualized tables, plus initial window options and table-selection events. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
@@ -135,7 +135,7 @@ Node IDs must be nonempty and unique throughout one description. An input or tab
 
 ## Current limits
 
-The remaining clean-Windows launch and human IME checks have a [setup guide](docs/windows-test-setup.md), an automatic Sandbox runner and an observation sheet. Windows feature installation requires administrator access; neither generated test files nor installed language components count as completed verification.
+The Windows release checks have a [setup guide](docs/windows-test-setup.md), an automatic Sandbox runner and an observation sheet. Human IME checks remain pending. Windows feature installation requires administrator access; neither generated test files nor installed language components count as completed verification.
 
 The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 
@@ -146,3 +146,10 @@ The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/Q
 - The adapter has a small row/column layout API and fixed component theme. It is not a complete GPUI style binding.
 
 GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPUI dependency is `gpui-pre` 0.3.6. Both Cargo and Dart dependency lockfiles are included.
+
+## License
+
+GPUI-Dart is licensed under the [MIT License](LICENSE), selected by the owner on
+2026-09-26. Third-party dependencies retain their own licenses. The evaluation
+packages include the project license, GPUI Kit's Apache-2.0 license and the Dart
+runtime license. MIT licensing does not establish completion of the release checks.

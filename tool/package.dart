@@ -129,6 +129,7 @@ Future<void> main(List<String> args) async {
   final kitRoot = File(kit['manifest_path'] as String).parent.parent.parent;
   await File('${kitRoot.path}/LICENSE-APACHE')
       .copy('${stage.path}/GPUI-Kit-LICENSE.txt');
+  await File('LICENSE').copy('${stage.path}/LICENSE');
   await File.fromUri(
     File(Platform.resolvedExecutable).parent.parent.uri.resolve('LICENSE'),
   ).copy('${stage.path}/Dart-LICENSE.txt');
@@ -173,7 +174,8 @@ Run ./verify --report=verification.json to check hashes, dependencies, loaded li
 On a machine without developer inspection tools, use ./verify --runtime-only --report=verification.json; this uses the retained build-time dependency inspection and still checks actual loaded images.
 See RELEASE-CHECKS.md for OS prerequisites and human checks.
 ${Platform.isMacOS ? 'This app has an ad-hoc signature. Developer ID distribution and notarization are unverified.' : 'Requires Ubuntu 24.04 x64, X11 and the documented system runtime libraries.'}
-The project owner has not selected a project license. This is a private evaluation artifact.
+GPUI-Dart is MIT licensed. See LICENSE for the project's copyright and terms.
+Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, Dart-LICENSE.txt and THIRD-PARTY.json.
 ''');
   final files = await stage
       .list(recursive: true, followLinks: false)
@@ -188,6 +190,7 @@ The project owner has not selected a project license. This is a private evaluati
     '--others',
     '--exclude-standard',
     '--',
+    'LICENSE',
     'lib',
     'native',
     'launcher',
@@ -202,6 +205,7 @@ The project owner has not selected a project license. This is a private evaluati
   if (!sources.contains(entry)) sources.add(entry);
   final manifest = {
     'target': target,
+    'project_license': 'MIT',
     'native_abi': 1,
     'companion_extension': 2,
     'build_dependency_inspection': dependencyInspection,

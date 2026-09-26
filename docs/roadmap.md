@@ -56,7 +56,7 @@ The Dart FFI request buffer is freed in finally, and Rust retains parsed descrip
 
 ## Sequence and acceptance gates
 
-1. Resolve the [unlocalized reload observation](../reports/mvp/attempt-023eef4/README.md) and complete [release checks](windows-release-checks.md). Keep hosted Windows CI passing; [the first runs succeeded](../reports/ci/README.md). The owner still needs to choose the SDK license.
+1. Resolve the [unlocalized reload observation](../reports/mvp/attempt-023eef4/README.md) and complete [release checks](windows-release-checks.md). Keep hosted Windows CI passing; [the first runs succeeded](../reports/ci/README.md). The owner selected the [MIT License](../LICENSE) on 2026-09-26.
 2. Add correlated tracing and bounded inspection. Reproduce startup and publication costs with the current candidate. Instrumentation can proceed while external checks are unavailable.
 3. ~~Add typed styles, a small action/keymap API and controls required by a representative screen, using the existing snapshot contract.~~ Implemented: typed styles `e957d44`, scoped actions/keymaps `135d300`, watchlist migration `1eafed0`.
 4. ~~Add stable record identity, dataset views and declarative cell presentation. Prove selection/scroll rules through sort, filter, edits and reload at 100,000 records without republishing unchanged records.~~ Implemented: record IDs and views `e3238ca`, cell formatting `119217e`, watchlist migration `1eafed0`, 100,000-record evidence in [the feature-stack report](../reports/feature-stack/README.md).

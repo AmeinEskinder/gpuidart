@@ -39,6 +39,10 @@ try {
     $kit = $dependencies.packages | Where-Object { $_.name -eq 'gpui-kit' }
     $kitRoot = Split-Path (Split-Path (Split-Path $kit.manifest_path -Parent) -Parent) -Parent
     Copy-Item -LiteralPath (Join-Path $kitRoot 'LICENSE-APACHE') -Destination "$packageDirectory/GPUI-Kit-LICENSE.txt"
+    Copy-Item -LiteralPath "$projectRoot/LICENSE" -Destination "$packageDirectory/LICENSE"
+    $dartSdk = & dart run "$PSScriptRoot/src/dart_sdk.dart"
+    if ($LASTEXITCODE -ne 0) { throw 'Could not locate the Dart runtime license' }
+    Copy-Item -LiteralPath (Join-Path $dartSdk 'LICENSE') -Destination "$packageDirectory/Dart-LICENSE.txt"
     Copy-Item -LiteralPath "$PSScriptRoot/windows/verify.ps1" -Destination "$packageDirectory/verify.ps1"
     (Get-Content -Raw -LiteralPath "$projectRoot/docs/windows-release-checks.md").Replace('gpuidart-windows-x64.zip', "$Name-windows-x64.zip").Replace('gpuidart.exe', "$Name.exe") |
         Set-Content -LiteralPath "$packageDirectory/RELEASE-CHECKS.md" -Encoding UTF8
@@ -61,17 +65,19 @@ For a freshly provisioned Windows VM: ./verify.ps1 -Environment clean_vm
 The verification report records your environment declaration; it does not create a clean VM.
 See RELEASE-CHECKS.md for the clean-machine and manual IME checks.
 
-This private evaluation package uses GPUI Kit (Apache-2.0) and the Dart runtime.
+GPUI-Dart is MIT licensed. See LICENSE for the project's copyright and terms.
+This evaluation package also uses GPUI Kit (Apache-2.0) and the Dart runtime.
+Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt and Dart-LICENSE.txt.
 vcruntime140.dll comes from Microsoft's release x64 Visual C++ redistributable.
 See the source lockfiles for dependencies. This is an evaluation ZIP, not a signed installer.
 '@.Replace('gpuidart.exe', "$Name.exe").Replace('{{APPLICATION_NOTES}}', $applicationNotes) | Set-Content -LiteralPath "$packageDirectory/README.txt" -Encoding UTF8
 
-    $names = @("$Name.exe", 'gpuidart.dll', 'vcruntime140.dll', 'GPUI-Kit-LICENSE.txt', 'README.txt', 'verify.ps1', 'RELEASE-CHECKS.md')
+    $names = @("$Name.exe", 'gpuidart.dll', 'vcruntime140.dll', 'LICENSE', 'GPUI-Kit-LICENSE.txt', 'Dart-LICENSE.txt', 'README.txt', 'verify.ps1', 'RELEASE-CHECKS.md')
     $files = foreach ($fileName in $names) {
         $path = Join-Path $packageDirectory $fileName
         [ordered]@{name=$fileName; bytes=(Get-Item -LiteralPath $path).Length; sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()}
     }
-    $sourcePaths = @(git ls-files --cached --others --exclude-standard -- lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock | Sort-Object -Unique)
+    $sourcePaths = @(git ls-files --cached --others --exclude-standard -- LICENSE lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock | Sort-Object -Unique)
     if ($LASTEXITCODE -ne 0) { throw 'Could not identify package source files' }
     $entryAbsolute = (Resolve-Path -LiteralPath $EntryPoint).ProviderPath
     $rootPrefix = "$projectRoot\"
@@ -94,7 +100,7 @@ See the source lockfiles for dependencies. This is an evaluation ZIP, not a sign
     $hasher = [Security.Cryptography.SHA256]::Create()
     try { $sourceHash = ([BitConverter]::ToString($hasher.ComputeHash([Text.Encoding]::UTF8.GetBytes($sourceText)))).Replace('-','').ToLowerInvariant() }
     finally { $hasher.Dispose() }
-    $sourceStatus = @(git status --porcelain --untracked-files=normal -- lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock)
+    $sourceStatus = @(git status --porcelain --untracked-files=normal -- LICENSE lib native example tool pubspec.yaml pubspec.lock Cargo.toml Cargo.lock)
     $build = [ordered]@{
         git_commit = (git rev-parse HEAD).Trim(); source_dirty = ($sourceStatus.Count -gt 0 -or !$entryTracked)
         source_sha256 = $sourceHash; source_files = $sourceFiles
@@ -102,7 +108,7 @@ See the source lockfiles for dependencies. This is an evaluation ZIP, not a sign
         dart = ((& dart --version) -join ' ').Trim(); rustc = ((& rustc --version) -join ' ').Trim()
         cargo = ((& cargo --version) -join ' ').Trim(); built_at_utc = [DateTime]::UtcNow.ToString('o')
     }
-    [ordered]@{architecture='windows-x64'; executable="$Name.exe"; entry_point=$EntryPoint; dpi_awareness='PerMonitorV2'; native_abi=1; kit_revision='21622a70efd25219d26aa459164878c4da9e39f8'; build=$build; files=@($files)} |
+    [ordered]@{architecture='windows-x64'; project_license='MIT'; executable="$Name.exe"; entry_point=$EntryPoint; dpi_awareness='PerMonitorV2'; native_abi=1; kit_revision='21622a70efd25219d26aa459164878c4da9e39f8'; build=$build; files=@($files)} |
         ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "$packageDirectory/manifest.json" -Encoding UTF8
     $paths = @($names + 'manifest.json' | ForEach-Object { Join-Path $packageDirectory $_ })
     Compress-Archive -LiteralPath $paths -DestinationPath "build/$Name-windows-x64.zip" -CompressionLevel Optimal -Force
