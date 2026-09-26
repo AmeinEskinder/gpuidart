@@ -188,3 +188,11 @@ provide the separate viewport-scaling check. Before the dependency patch, Window
 steps, 100k JIT/AOT traces (zero dropped records) and 11 code reloads passed; raw
 regression captures and source hash are in `windows-regression/`. Dependency-patch
 checks are recorded separately as they complete.
+
+The first patched hosted run confirms Linux disabled metadata and all 15 Settings
+steps. Linux Watchlist then encountered the same transient stale-row read as AX:
+AT-SPI returned its missing-object path while filtering (`linux-watchlist-1.json`).
+The Linux client now reports that specific query-only failure with exit 75; the
+Dart driver retries the whole read in a fresh process (clearing AT-SPI cache), at
+most four times within one 20-second deadline. All restarts are retained; no
+actions, permission errors or unrelated failures are retried.

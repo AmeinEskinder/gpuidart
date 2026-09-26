@@ -38,21 +38,43 @@ Future<Map<String, dynamic>> platformQuery(
     ),
     _ => throw UnsupportedError('No platform accessibility probe'),
   };
-  final child = await Process.start(command, args);
-  final output = child.stdout.transform(utf8.decoder).join();
-  final errors = child.stderr.transform(utf8.decoder).join();
-  int status;
-  try {
-    status = await child.exitCode.timeout(const Duration(seconds: 20));
-  } on TimeoutException {
-    child.kill();
-    await child.exitCode;
-    throw StateError('Platform accessibility client timed out');
+  final timer = Stopwatch()..start();
+  final restarts = <String>[];
+  while (true) {
+    final remaining = const Duration(seconds: 20) - timer.elapsed;
+    if (remaining <= Duration.zero) {
+      throw StateError('Platform query deadline expired; restarts=$restarts');
+    }
+    final child = await Process.start(command, args);
+    final output = child.stdout.transform(utf8.decoder).join();
+    final errors = child.stderr.transform(utf8.decoder).join();
+    int status;
+    try {
+      status = await child.exitCode.timeout(remaining);
+    } on TimeoutException {
+      child.kill();
+      await child.exitCode;
+      throw StateError(
+        'Platform accessibility client timed out; restarts=$restarts',
+      );
+    }
+    final text = await output;
+    final error = await errors;
+    if (status == 75 &&
+        Platform.isLinux &&
+        operation == 'query' &&
+        restarts.length < 4) {
+      restarts.add(error);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      continue;
+    }
+    if (status != 0) {
+      throw StateError(
+        'Platform client exited $status: $error\n$text\nrestarts=$restarts',
+      );
+    }
+    final result = jsonDecode(text) as Map<String, dynamic>;
+    if (Platform.isLinux) result['query_restarts'] = restarts;
+    return result;
   }
-  final text = await output;
-  final error = await errors;
-  if (status != 0) {
-    throw StateError('Platform client exited $status: $error\n$text');
-  }
-  return jsonDecode(text) as Map<String, dynamic>;
 }
