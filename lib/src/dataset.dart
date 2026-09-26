@@ -8,18 +8,28 @@ final class TableDataset {
     required List<String> columns,
     required List<List<String>> rows,
     List<String>? rowIds,
+    Map<int, UiColumnFormat>? formats,
   }) : _columns = List.unmodifiable(columns),
        _rows = rows.map((row) => List<String>.unmodifiable(row)).toList(),
-       _rowIds = rowIds == null ? null : List<String>.unmodifiable(rowIds) {
+       _rowIds = rowIds == null ? null : List<String>.unmodifiable(rowIds),
+       _formats = formats == null
+           ? null
+           : Map<int, UiColumnFormat>.unmodifiable(formats) {
     if (id.isEmpty) throw ArgumentError('Dataset ID must be nonempty');
     _validateData(_columns, _rows);
     _validateIds(_rowIds, _rows.length);
+    if (_formats != null) {
+      for (final column in _formats!.keys) {
+        RangeError.checkValueInInterval(column, 0, _columns.length - 1);
+      }
+    }
   }
 
   final String id;
   List<String> _columns;
   List<List<String>> _rows;
   List<String>? _rowIds;
+  Map<int, UiColumnFormat>? _formats;
   int _revision = 0;
   GpuiHost? _owner;
   bool _busy = false;
@@ -39,6 +49,13 @@ final class TableDataset {
     'columns': _columns,
     'rows': _rows,
     'ids': ?_rowIds,
+    if (_formats != null)
+      'format': {
+        'columns': {
+          for (final MapEntry(:key, :value) in _formats!.entries)
+            '$key': value.toJson(),
+        },
+      },
   };
   Map<String, Object> _upload() => {'id': id, 'revision': 1, 'data': _data()};
 }

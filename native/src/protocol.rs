@@ -477,6 +477,111 @@ pub struct TableData {
     /// selection survives sorting, filtering and cell edits by record ID.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ids: Option<Vec<String>>,
+    /// Declarative cell formatting, evaluated for visible cells only. Set at
+    /// upload and Replace; immutable across Edit.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub format: Option<DatasetFormat>,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct DatasetFormat {
+    /// Per-column specs keyed by column index.
+    pub columns: HashMap<usize, ColumnFormat>,
+}
+
+// TableData sits inside the internally tagged `Change`, whose serde buffering
+// cannot coerce JSON object keys to integers; parse them explicitly instead.
+impl<'de> Deserialize<'de> for DatasetFormat {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Wire {
+            columns: HashMap<String, ColumnFormat>,
+        }
+        let wire = Wire::deserialize(deserializer)?;
+        let mut columns = HashMap::new();
+        for (key, spec) in wire.columns {
+            let index = key.parse::<usize>().map_err(|_| {
+                serde::de::Error::custom(format!("Format column must be an index: {key}"))
+            })?;
+            columns.insert(index, spec);
+        }
+        Ok(Self { columns })
+    }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ColumnFormat {
+    pub number: Option<NumberFormat>,
+    /// First matching rule wins.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub rules: Vec<FormatRule>,
+}
+
+/// Fixed-point rendering with 0–6 decimals, no grouping.
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct NumberFormat {
+    pub decimals: u8,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct FormatRule {
+    pub when: FormatCondition,
+    pub color: Option<Color>,
+    pub icon: Option<CellIcon>,
+}
+
+/// Same comparison set as view filters.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct FormatCondition {
+    pub op: FilterOp,
+    pub value: String,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CellIcon {
+    ArrowUp,
+    ArrowDown,
+    Dot,
+    Warning,
+}
+
+/// The formatted rendering of one cell: the text plus the first matching
+/// rule's color and icon.
+pub struct FormattedCell {
+    pub text: String,
+    pub color: Option<Color>,
+    pub icon: Option<CellIcon>,
+}
+
+impl ColumnFormat {
+    /// Formats one raw cell value. A non-numeric value in a `number` column
+    /// renders the raw string unchanged; rules still evaluate against it.
+    pub fn apply(&self, raw: &str) -> FormattedCell {
+        let text = match &self.number {
+            Some(number) => match raw.parse::<f64>() {
+                Ok(value) if value.is_finite() => {
+                    format!("{:.*}", number.decimals as usize, value)
+                }
+                _ => raw.to_owned(),
+            },
+            None => raw.to_owned(),
+        };
+        let rule = self
+            .rules
+            .iter()
+            .find(|rule| rule.when.op.matches(raw, &rule.when.value));
+        FormattedCell {
+            text,
+            color: rule.and_then(|rule| rule.color),
+            icon: rule.and_then(|rule| rule.icon),
+        }
+    }
 }
 
 impl Node {
@@ -984,6 +1089,7 @@ mod tests {
                 vec!["APEX".into(), "9".into()],
             ],
             ids: None,
+            format: None,
         };
         let view = TableView {
             sort: vec![SortKey {
@@ -1012,6 +1118,7 @@ mod tests {
             columns: vec!["v".into()],
             rows: vec![vec!["2".into()], vec!["1".into()], vec!["2".into()]],
             ids: None,
+            format: None,
         };
         let view = TableView {
             sort: vec![SortKey {
@@ -1031,6 +1138,7 @@ mod tests {
                 .map(|i| vec![format!("S{i:06}"), format!("{}", (i * 7) % 10_000)])
                 .collect(),
             ids: Some((0..100_000).map(|i| format!("S{i:06}")).collect()),
+            format: None,
         };
         let view = TableView {
             sort: vec![SortKey {
@@ -1050,6 +1158,153 @@ mod tests {
         let report = serde_json::json!({"records": 100_000, "view_rows": index.len(), "recompute_us": elapsed.as_micros() as u64});
         println!("VIEW_RECOMPUTE {report}");
         if let Ok(path) = std::env::var("GPUIDART_VIEW_RECOMPUTE_REPORT") {
+            std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
+        }
+    }
+
+    #[test]
+    fn cell_formatting_numbers_rules_and_fallback() {
+        let spec = ColumnFormat {
+            number: Some(NumberFormat { decimals: 2 }),
+            rules: vec![
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Lt,
+                        value: "0".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Danger)),
+                    icon: Some(CellIcon::ArrowDown),
+                },
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Gt,
+                        value: "0".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Success)),
+                    icon: Some(CellIcon::ArrowUp),
+                },
+                // Never wins for positive numbers: first match wins.
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Contains,
+                        value: ".".into(),
+                    },
+                    color: Some(Color::Hex(0xFFFFFFFF)),
+                    icon: None,
+                },
+            ],
+        };
+        let cell = spec.apply("10.567");
+        assert_eq!(cell.text, "10.57");
+        assert_eq!(cell.color, Some(Color::Token(ThemeToken::Success)));
+        assert_eq!(cell.icon, Some(CellIcon::ArrowUp));
+        let cell = spec.apply("-3.5");
+        assert_eq!(cell.text, "-3.50");
+        assert_eq!(cell.color, Some(Color::Token(ThemeToken::Danger)));
+        assert_eq!(cell.icon, Some(CellIcon::ArrowDown));
+        // Non-numeric values render raw; rules still evaluate against the raw
+        // string, lexically ("n/a" > "0" so the gt rule matches).
+        let cell = spec.apply("n/a");
+        assert_eq!(cell.text, "n/a");
+        assert_eq!(cell.color, Some(Color::Token(ThemeToken::Success)));
+        // A value matching no rule gets no decoration.
+        let cell = spec.apply("0");
+        assert_eq!(cell.text, "0.00");
+        assert!(cell.color.is_none());
+        assert!(cell.icon.is_none());
+
+        // First match wins even when a later rule matches more specifically.
+        let precedence = ColumnFormat {
+            number: None,
+            rules: vec![
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Contains,
+                        value: "A".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Danger)),
+                    icon: None,
+                },
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Eq,
+                        value: "ACME".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Success)),
+                    icon: None,
+                },
+            ],
+        };
+        assert_eq!(
+            precedence.apply("ACME").color,
+            Some(Color::Token(ThemeToken::Danger))
+        );
+
+        // decimals 0 rounds to the nearest integer; no grouping. Ties round
+        // to even, per Rust's float formatting.
+        let plain = ColumnFormat {
+            number: Some(NumberFormat { decimals: 0 }),
+            rules: vec![],
+        };
+        assert_eq!(plain.apply("1234.6").text, "1235");
+        assert_eq!(plain.apply("1234.4").text, "1234");
+        assert_eq!(plain.apply("2.5").text, "2");
+        assert_eq!(plain.apply("-0.6").text, "-1");
+    }
+
+    #[test]
+    fn cell_format_rejects_unknown_op_icon_color_and_fields() {
+        for format in [
+            r#"{"columns":{"1":{"rules":[{"when":{"op":"startswith","value":"x"}}]}}}"#,
+            r#"{"columns":{"1":{"rules":[{"when":{"op":"lt","value":"0"},"icon":"spin"}]}}}"#,
+            r#"{"columns":{"1":{"rules":[{"when":{"op":"lt","value":"0"},"color":"token:panel"}]}}}"#,
+            r##"{"columns":{"1":{"rules":[{"when":{"op":"lt","value":"0"},"color":"#12345"}]}}}"##,
+            r#"{"columns":{"1":{"number":{"decimals":2,"grouping":true}}}}"#,
+            r#"{"columns":{"1":{"grouped":true}}}"#,
+            r#"{"columns":{"x":{"number":{"decimals":2}}}}"#,
+        ] {
+            let data = format!(r#"{{"columns":["a","b"],"rows":[],"format":{format}}}"#);
+            assert!(
+                serde_json::from_str::<TableData>(&data).is_err(),
+                "must reject {format}"
+            );
+        }
+    }
+
+    #[test]
+    fn cell_formatter_cost_is_measured_at_100k_cells() {
+        let spec = ColumnFormat {
+            number: Some(NumberFormat { decimals: 2 }),
+            rules: vec![
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Lt,
+                        value: "0".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Danger)),
+                    icon: Some(CellIcon::ArrowDown),
+                },
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Gt,
+                        value: "0".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Success)),
+                    icon: Some(CellIcon::ArrowUp),
+                },
+            ],
+        };
+        let timer = std::time::Instant::now();
+        let mut cells = 0usize;
+        for i in 0..100_000i64 {
+            let formatted = spec.apply(&format!("{i}"));
+            std::hint::black_box(&formatted.text);
+            cells += 1;
+        }
+        let per_cell = timer.elapsed().as_nanos() as u64 / cells as u64;
+        let report = serde_json::json!({"cells": cells, "formatter_ns_per_cell": per_cell});
+        println!("CELL_FORMATTER {report}");
+        if let Ok(path) = std::env::var("GPUIDART_CELL_FORMATTER_REPORT") {
             std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
         }
     }

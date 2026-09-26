@@ -149,6 +149,15 @@ Datasets gain an optional registration-time member:
 - Malformed input values (e.g. non-numeric text in a `number` column) render the raw string unformatted; this is a documented fallback, not an error, because Dart stays authoritative for data quality.
 - Formatter cost is covered by the existing allocation/cell-construction probes: formatted rendering must keep construction counts constant across dataset sizes, and per-cell formatter CPU is measured in the 100,000-row smoke.
 
+### Formatting implementation (as shipped)
+
+- `format` is a member of `TableData`, so it is set at initial upload and may change on `Replace`; `Edit` messages cannot carry it. It is validated in `TableData::validate` (column < width, decimals 0–6, ≤16 rules; op/icon/color are closed serde types that reject at parse).
+- Rules evaluate against the raw cell string with the same numeric-or-lexical comparison as view filters — including for non-numeric values, where lexical comparison may still match `lt`/`gt` rules. The raw-string fallback applies to number rendering only.
+- Number rendering is Rust's fixed-precision float formatting: correctly rounded, ties to even, trailing zeros kept, no grouping.
+- Icons render inline via gpui-kit's `Icon` (Lucide catalog: `arrow_up`/`arrow_down`/`dot`/`warning` → `ArrowUp`/`ArrowDown`/`Dot`/`TriangleAlert`) at the cell's text size, before the text, colored with the rule color. Icon-free cells keep the previous single-div structure.
+- Diagnostics gains a `formatted_cell` op (table ID, view row, column) reporting the formatted text, color and icon — the same evaluation `render_td` paints.
+- Measured: construction counts are identical at 100 / 10,000 / 100,000 records with formats on all columns (`formatted_cells_keep_viewport_constant_construction`), and pure formatter cost is ≈1.7 µs/cell in a debug build (`cell_formatter_cost_is_measured_at_100k_cells`).
+
 ## Compatibility and verification plan
 
 - ABI stays at version 1; all additions are optional fields. An old DLL against a new Dart SDK rejects unknown fields — that is the existing `deny_unknown_fields` discipline and is acceptable because Dart and native ship pinned together.

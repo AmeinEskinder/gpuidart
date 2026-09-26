@@ -32,6 +32,12 @@ pub(crate) enum Request {
         row: usize,
         column: usize,
     },
+    FormattedCell {
+        request: u64,
+        table: String,
+        row: usize,
+        column: usize,
+    },
     Inspect {
         request: u64,
     },
@@ -55,6 +61,7 @@ impl Request {
         match self {
             Self::Runtime { request }
             | Self::Cell { request, .. }
+            | Self::FormattedCell { request, .. }
             | Self::Inspect { request }
             | Self::Repaint { request, .. }
             | Self::Prepare { request, .. } => *request,
@@ -82,6 +89,15 @@ pub(crate) fn handle(
         } => events.emit(Event::Diagnostic {
             request,
             data: view.read(cx).cell(&dataset, row, column),
+        }),
+        Request::FormattedCell {
+            request,
+            table,
+            row,
+            column,
+        } => events.emit(Event::Diagnostic {
+            request,
+            data: view.read(cx).formatted_cell(&table, row, column, cx),
         }),
         Request::Inspect { request } => reply(request, view, events, window, cx),
         Request::Repaint { request, frames } if frames <= 600 => {

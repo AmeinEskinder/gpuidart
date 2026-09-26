@@ -3,7 +3,9 @@ use crate::{
     Events,
     datasets::{Change, Initial, Update, Upload},
     protocol::{
-        Event, FilterOp, FilterTerm, Node, Snapshot, SortDirection, SortKey, TableData, TableView,
+        CellIcon, Color, ColumnFormat, DatasetFormat, Event, FilterOp, FilterTerm, FormatCondition,
+        FormatRule, Node, NumberFormat, Snapshot, SortDirection, SortKey, TableData, TableView,
+        ThemeToken,
     },
 };
 use gpui_kit::component::ActiveTheme;
@@ -56,6 +58,7 @@ fn table_data(count: usize) -> TableData {
             .map(|i| vec![i.to_string(), format!("Row {i}")])
             .collect(),
         ids: None,
+        format: None,
     }
 }
 
@@ -647,6 +650,7 @@ fn initial_with_ids() -> Initial {
                     .map(|i| vec![format!("R{i:03}"), format!("{}", 100 - i)])
                     .collect(),
                 ids: Some((0..100).map(|i| format!("R{i:03}")).collect()),
+                format: None,
             },
         }],
     }
@@ -1000,4 +1004,192 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
         assert_eq!(index[99], 0);
     })
     .unwrap();
+}
+
+fn formatted_table_data(count: usize) -> TableData {
+    let mut columns = std::collections::HashMap::new();
+    // All three columns carry formats so the cost probe exercises formatting
+    // on every constructed cell.
+    columns.insert(
+        0,
+        ColumnFormat {
+            number: None,
+            rules: vec![FormatRule {
+                when: FormatCondition {
+                    op: FilterOp::Contains,
+                    value: "R0".into(),
+                },
+                color: None,
+                icon: Some(CellIcon::Dot),
+            }],
+        },
+    );
+    columns.insert(
+        1,
+        ColumnFormat {
+            number: Some(NumberFormat { decimals: 2 }),
+            rules: vec![],
+        },
+    );
+    columns.insert(
+        2,
+        ColumnFormat {
+            number: None,
+            rules: vec![
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Lt,
+                        value: "0".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Danger)),
+                    icon: Some(CellIcon::ArrowDown),
+                },
+                FormatRule {
+                    when: FormatCondition {
+                        op: FilterOp::Gt,
+                        value: "0".into(),
+                    },
+                    color: Some(Color::Token(ThemeToken::Success)),
+                    icon: Some(CellIcon::ArrowUp),
+                },
+            ],
+        },
+    );
+    TableData {
+        columns: vec!["sym".into(), "price".into(), "change".into()],
+        rows: (0..count)
+            .map(|i| {
+                vec![
+                    format!("R{i:05}"),
+                    format!("{}.{}", i % 50, i % 10),
+                    format!("{}", if i % 2 == 0 { i as i64 } else { -(i as i64) }),
+                ]
+            })
+            .collect(),
+        ids: None,
+        format: Some(DatasetFormat { columns }),
+    }
+}
+
+#[gpui::test]
+fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let initial = Initial {
+        window: Default::default(),
+        snapshot: Snapshot {
+            revision: 1,
+            actions: Vec::new(),
+            root: Node::Table {
+                id: "table".into(),
+                style: None,
+                dataset: "records".into(),
+                view: None,
+            },
+        },
+        datasets: vec![Upload {
+            id: "records".into(),
+            revision: 1,
+            data: formatted_table_data(20),
+        }],
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial, Events(Arc::new(|_| {})), window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        // Number column: fixed decimals.
+        let cell = view.read(cx).formatted_cell("table", 0, 1, cx);
+        assert_eq!(cell["text"], "0.00");
+        let cell = view.read(cx).formatted_cell("table", 1, 1, cx);
+        assert_eq!(cell["text"], "1.10");
+        // Rule column: negative row is danger + arrow_down.
+        let cell = view.read(cx).formatted_cell("table", 1, 2, cx);
+        assert_eq!(cell["text"], "-1");
+        assert_eq!(cell["color"], "token:danger");
+        assert_eq!(cell["icon"], "arrow_down");
+        let cell = view.read(cx).formatted_cell("table", 2, 2, cx);
+        assert_eq!(cell["color"], "token:success");
+        assert_eq!(cell["icon"], "arrow_up");
+        // Zero matches neither rule.
+        let cell = view.read(cx).formatted_cell("table", 0, 2, cx);
+        assert_eq!(cell["text"], "0");
+        assert!(cell["color"].is_null());
+        // The icon-only rule column carries a dot and no color.
+        let cell = view.read(cx).formatted_cell("table", 3, 0, cx);
+        assert_eq!(cell["text"], "R00003");
+        assert_eq!(cell["icon"], "dot");
+        assert!(cell["color"].is_null());
+        // Rendering a formatted table must not fail the view.
+        assert!(view.read(cx).failure.is_none());
+    })
+    .unwrap();
+}
+
+#[gpui::test]
+fn formatted_cells_keep_viewport_constant_construction(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(
+            WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(Bounds {
+                    origin: Point::default(),
+                    size: size(px(860.), px(650.)),
+                })),
+                ..Default::default()
+            },
+            cx,
+            |window, cx| {
+                let mut data = initial(100);
+                data.datasets[0].data = formatted_table_data(100);
+                cx.new(|cx| DartView::new(data, Events(Arc::new(|_| {})), window, cx))
+            },
+        )
+        .unwrap()
+    });
+    let mut samples = Vec::new();
+    for (i, row_count) in [100, 10_000, 100_000].into_iter().enumerate() {
+        cx.update_window(handle, |_, window, cx| {
+            view.update(cx, |view, cx| {
+                view.update_dataset(Update {request:1, id:"records".into(), base_revision: i as u64 + 1, revision: i as u64 + 2, change: Change::Replace { data: formatted_table_data(row_count) }}, 0, cx);
+                view.publish(description(i as u64 + 2), window, cx);
+            });
+            for _ in 0..5 { window.render_frame(cx); }
+            let counters = view.read(cx).counters.clone();
+            let rows_before = counters.rows.get();
+            let cells_before = counters.cells.get();
+            let materializations_before = counters.materializations.get();
+            let timer = std::time::Instant::now();
+            let (allocations, bytes) = crate::allocations::measure(|| {
+                for _ in 0..10 { window.render_frame(cx); }
+            });
+            let elapsed = timer.elapsed();
+            let rows = counters.rows.get() - rows_before;
+            let cells = counters.cells.get() - cells_before;
+            let materializations = counters.materializations.get() - materializations_before;
+            assert_eq!(materializations, 10);
+            assert!(rows > 0 && rows < 1000, "constructed {rows} rows for {row_count} records");
+            assert!(cells > 0 && cells < 3000);
+            samples.push(serde_json::json!({"data_rows":row_count, "frames":10, "rows_constructed":rows, "cells_constructed":cells, "allocation_calls":allocations, "allocated_bytes":bytes, "frame_us": elapsed.as_micros() as u64 / 10, "frame_ns_per_constructed_cell": elapsed.as_nanos() as u64 / cells}));
+        }).unwrap();
+    }
+    for sample in &samples[1..] {
+        assert_eq!(sample["rows_constructed"], samples[0]["rows_constructed"]);
+        assert_eq!(sample["cells_constructed"], samples[0]["cells_constructed"]);
+        assert!(
+            sample["allocation_calls"].as_u64().unwrap()
+                < samples[0]["allocation_calls"].as_u64().unwrap() * 2
+        );
+        assert!(
+            sample["allocated_bytes"].as_u64().unwrap()
+                < samples[0]["allocated_bytes"].as_u64().unwrap() * 2
+        );
+    }
+    let report = serde_json::json!({"scope":"headless GPUI UI thread, ten warmed redraws with formats on all columns; excludes data construction, snapshot publication and GPU allocations", "window":{"width":860,"height":650}, "samples": samples});
+    println!("FORMATTING {report}");
+    if let Ok(path) = std::env::var("GPUIDART_FORMATTING_REPORT") {
+        std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
+    }
 }

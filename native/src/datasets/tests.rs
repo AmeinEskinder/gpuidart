@@ -10,6 +10,7 @@ fn upload(count: usize) -> Upload {
                 .map(|i| vec![i.to_string(), "original".into()])
                 .collect(),
             ids: None,
+            format: None,
         },
     }
 }
@@ -166,6 +167,7 @@ fn record_ids_validate_and_survive_edits() {
         columns: vec!["A".into()],
         rows: vec![vec!["x".into()], vec!["y".into()]],
         ids: Some(ids.iter().map(|id| id.to_string()).collect()),
+        format: None,
     };
     assert!(with_ids(vec!["r1"]).validate().is_err(), "length mismatch");
     assert!(with_ids(vec!["r1", "r1"]).validate().is_err(), "duplicate");
@@ -205,6 +207,7 @@ fn record_ids_validate_and_survive_edits() {
                     columns: vec!["A".into()],
                     rows: vec![vec!["z".into()]],
                     ids: Some(vec!["r9".into()]),
+                    format: None,
                 },
             },
         })
@@ -227,6 +230,7 @@ fn record_ids_validate_and_survive_edits() {
                         columns: vec!["A".into()],
                         rows: vec![vec!["z".into()]],
                         ids: Some(vec!["r9".into(), "r9".into()]),
+                        format: None,
                     },
                 },
             })
@@ -255,4 +259,63 @@ fn view_columns_must_exist_in_the_dataset() {
     };
     assert!(validate_views(&snapshot, |_| Some(2)).is_err());
     assert!(validate_views(&snapshot, |_| Some(3)).is_ok());
+}
+
+#[test]
+fn cell_format_validates_columns_decimals_and_rule_counts() {
+    let format = |column: usize, decimals: u8, rules: usize| {
+        let rules: Vec<String> = (0..rules)
+            .map(|i| format!(r#"{{"when":{{"op":"gt","value":"{i}"}},"color":"token:success"}}"#))
+            .collect();
+        format!(
+            r#"{{"columns":{{"{column}":{{"number":{{"decimals":{decimals}}},"rules":[{}]}}}}}}"#,
+            rules.join(",")
+        )
+    };
+    let data_with = |format: String| {
+        serde_json::from_str::<TableData>(&format!(
+            r#"{{"columns":["a","b"],"rows":[],"format":{format}}}"#
+        ))
+        .unwrap()
+    };
+    assert!(
+        data_with(format(2, 2, 0)).validate().is_err(),
+        "column >= width"
+    );
+    assert!(data_with(format(1, 2, 0)).validate().is_ok());
+    assert!(data_with(format(1, 7, 0)).validate().is_err(), "7 decimals");
+    assert!(data_with(format(1, 6, 0)).validate().is_ok());
+    assert!(data_with(format(1, 2, 17)).validate().is_err(), "17 rules");
+    assert!(data_with(format(1, 2, 16)).validate().is_ok());
+
+    // Replace may change the format; Edit cannot carry one.
+    let mut store = Store::new(vec![Upload {
+        id: "records".into(),
+        revision: 1,
+        data: TableData {
+            columns: vec!["A".into()],
+            rows: vec![vec!["1".into()]],
+            ids: None,
+            format: None,
+        },
+    }]);
+    store
+        .apply(Update {
+            request: 2,
+            id: "records".into(),
+            base_revision: 1,
+            revision: 2,
+            change: Change::Replace {
+                data: data_with(format(0, 3, 1)),
+            },
+        })
+        .unwrap();
+    let data = &store.entries["records"].borrow().data;
+    assert!(data.format.is_some());
+    assert!(
+        serde_json::from_str::<Edit>(
+            r#"{"kind":"cell","row":0,"column":0,"value":"x","format":null}"#
+        )
+        .is_err()
+    );
 }

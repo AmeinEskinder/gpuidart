@@ -87,6 +87,24 @@ impl TableData {
                 return Err("Dataset ids must be nonempty and unique".into());
             }
         }
+        if let Some(format) = &self.format {
+            for (column, spec) in &format.columns {
+                if *column >= self.columns.len() {
+                    return Err(format!(
+                        "Format references column {column} beyond {} columns",
+                        self.columns.len()
+                    ));
+                }
+                if let Some(number) = &spec.number {
+                    if number.decimals > 6 {
+                        return Err("Number format allows 0..6 decimals".into());
+                    }
+                }
+                if spec.rules.len() > 16 {
+                    return Err("At most 16 format rules per column".into());
+                }
+            }
+        }
         Ok(())
     }
 }

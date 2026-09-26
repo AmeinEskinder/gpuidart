@@ -7,6 +7,7 @@ import 'dart:isolate';
 import 'package:ffi/ffi.dart';
 
 import 'actions.dart';
+import 'format.dart';
 import 'nodes.dart';
 import 'metrics.dart';
 import 'window_options.dart';
@@ -476,17 +477,21 @@ final class GpuiHost {
     );
   }
 
+  /// Replaces rows, record IDs and cell formats together; `Edit` batches
+  /// never change identity or formats.
   Future<void> replaceDataset(
     TableDataset dataset, {
     required List<String> columns,
     required List<List<String>> rows,
     List<String>? rowIds,
+    Map<int, UiColumnFormat>? formats,
   }) {
     final replacement = TableDataset(
       dataset.id,
       columns: columns,
       rows: rows,
       rowIds: rowIds,
+      formats: formats,
     );
     return _transact(
       dataset,
@@ -495,6 +500,7 @@ final class GpuiHost {
         dataset._columns = replacement._columns;
         dataset._rows = replacement._rows;
         dataset._rowIds = replacement._rowIds;
+        dataset._formats = replacement._formats;
       },
     );
   }

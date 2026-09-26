@@ -155,6 +155,45 @@ void main() {
         expect(identifiedTable['view']['source_rows'], 2);
         expect(identifiedTable['view']['view_rows'], 2);
         expect(identifiedTable['view']['spec_hash'], isNotNull);
+        // Cell formats upload with the dataset and render natively.
+        final formatted = TableDataset(
+          'formatted',
+          columns: ['price'],
+          rows: [
+            ['10.5'],
+            ['-2'],
+          ],
+          formats: const {
+            0: UiColumnFormat(
+              decimals: 2,
+              rules: [
+                UiFormatRule(
+                  when: UiFormatCondition(UiFilterOp.lt, '0'),
+                  color: UiColor.token(ThemeToken.danger),
+                  icon: UiCellIcon.arrowDown,
+                ),
+              ],
+            ),
+          },
+        );
+        await host.registerDataset(formatted);
+        await host.publish(const UiTable('fmt-table', dataset: 'formatted'));
+        final cell = await host.diagnose('formatted_cell', {
+          'table': 'fmt-table',
+          'row': 1,
+          'column': 0,
+        });
+        expect(cell['text'], '-2.00');
+        expect(cell['color'], 'token:danger');
+        expect(cell['icon'], 'arrow_down');
+        expect(
+          (await host.diagnose('formatted_cell', {
+            'table': 'fmt-table',
+            'row': 0,
+            'column': 0,
+          }))['text'],
+          '10.50',
+        );
         await expectLater(
           host.publish(
             const UiTable(

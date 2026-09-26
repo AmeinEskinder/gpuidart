@@ -3,16 +3,17 @@ use crate::diagnostics::Counters;
 use crate::{
     Command, Events,
     protocol::{
-        Align as StyleAlign, Color as StyleColor, Event, FontWeight as StyleFontWeight,
+        Align as StyleAlign, CellIcon, Color as StyleColor, Event, FontWeight as StyleFontWeight,
         Justify as StyleJustify, KeystrokeSpec, Node, Size as StyleSize, Snapshot, Style,
         TableView, ThemeToken,
     },
 };
 use async_channel::Receiver;
+use gpui_kit::assets::IconName;
 use gpui_kit::base::ScrollbarHandle;
 use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
-    ActiveTheme, StyledExt,
+    ActiveTheme, Icon, StyledExt,
     button::{Button, ButtonVariants},
     input::{Input, InputEvent, InputState},
     scroll::ScrollableElement,
@@ -61,11 +62,46 @@ impl TableDelegate for Rows {
         row: usize,
         col: usize,
         _: &mut Window,
-        _: &mut Context<TableState<Self>>,
+        cx: &mut Context<TableState<Self>>,
     ) -> impl IntoElement {
         self.counters.cells.set(self.counters.cells.get() + 1);
         let source = self.source_row(row);
-        div().child(self.data.borrow().data.rows[source][col].clone())
+        let data = self.data.borrow();
+        let raw = data.data.rows[source][col].clone();
+        let Some(format) = data
+            .data
+            .format
+            .as_ref()
+            .and_then(|format| format.columns.get(&col))
+        else {
+            return div().child(raw).into_any_element();
+        };
+        let formatted = format.apply(&raw);
+        let colors = cx.theme().colors.clone();
+        let color = formatted.color.map(|color| resolve_color(color, &colors));
+        let mut cell = div().child(formatted.text);
+        if let Some(color) = color {
+            cell = cell.text_color(color);
+        }
+        let Some(icon) = formatted.icon else {
+            return cell.into_any_element();
+        };
+        let mut icon = Icon::new(match icon {
+            CellIcon::ArrowUp => IconName::ArrowUp,
+            CellIcon::ArrowDown => IconName::ArrowDown,
+            CellIcon::Dot => IconName::Dot,
+            CellIcon::Warning => IconName::TriangleAlert,
+        });
+        if let Some(color) = color {
+            icon = icon.text_color(color);
+        }
+        div()
+            .h_flex()
+            .items_center()
+            .gap_1()
+            .child(icon)
+            .child(cell)
+            .into_any_element()
     }
     fn render_tr(
         &mut self,
@@ -333,6 +369,36 @@ impl DartView {
             Some(value) => json!({"value":value, "revision":data.revision}),
             None => json!({"error":"Invalid cell"}),
         }
+    }
+
+    /// The formatted rendering of a cell at view coordinates, for tests and
+    /// diagnostics; mirrors what `render_td` paints.
+    pub(crate) fn formatted_cell(&self, table: &str, row: usize, column: usize, cx: &App) -> Value {
+        let Some(retained) = self.tables.get(table) else {
+            return json!({"error":"Unknown table"});
+        };
+        let delegate = retained.state.read(cx).delegate();
+        let Some(&source) = delegate.index.borrow().get(row) else {
+            return json!({"error":"Invalid row"});
+        };
+        let data = delegate.data.borrow();
+        let Some(raw) = data.data.rows.get(source).and_then(|row| row.get(column)) else {
+            return json!({"error":"Invalid cell"});
+        };
+        let Some(format) = data
+            .data
+            .format
+            .as_ref()
+            .and_then(|format| format.columns.get(&column))
+        else {
+            return json!({"text": raw});
+        };
+        let formatted = format.apply(raw);
+        json!({
+            "text": formatted.text,
+            "color": formatted.color,
+            "icon": formatted.icon,
+        })
     }
 
     fn update_dataset(&mut self, update: Update, parse_us: u64, cx: &mut Context<Self>) {

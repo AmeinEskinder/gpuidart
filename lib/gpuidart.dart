@@ -11,6 +11,7 @@ export 'src/host.dart'
         CellEdit,
         RowEdit;
 export 'src/actions.dart';
+export 'src/format.dart';
 export 'src/nodes.dart';
 export 'src/style.dart';
 export 'src/table_view.dart';
