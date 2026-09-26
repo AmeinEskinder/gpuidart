@@ -80,6 +80,13 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (value['checked'] is! bool) {
         throw const FormatException('Invalid checkbox checked value');
       }
+    case 'slider_change':
+      integer('revision', minimum: 1);
+      string('id');
+      final number = value['number'];
+      if (number is! num || !number.isFinite || number.abs() > 1000000) {
+        throw const FormatException('Invalid slider number');
+      }
     case 'error':
       string('message');
     default:

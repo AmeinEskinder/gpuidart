@@ -31,5 +31,36 @@ Retained attempts under `checkbox/`:
 3. `native-3`: both targeted tests passed.
 4. `full`: all 45 native tests passed after the verifier correction.
 
-Remaining controls: slider, select, confirmation dialog. Parked hardware,
+Checkbox commit `cddca71` passed all hosted workflows:
+[Windows](https://github.com/AmeinEskinder/gpuidart/actions/runs/36264217019),
+[macOS](https://github.com/AmeinEskinder/gpuidart/actions/runs/36264216991),
+[Linux](https://github.com/AmeinEskinder/gpuidart/actions/runs/36264217173), and
+[Unix lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36264217047).
+
+## Slider
+
+Windows local debug/headless checks on 2026-09-26: both slider tests passed;
+full native suite 47 passed; Dart controls suite 4 passed; analysis passed.
+Tests cover finite/bounded ranges and steps representable at both endpoints,
+pointer changes, arrows/Home/End, duplicate endpoint suppression, Tab focus,
+retained entity/focus, disabled pointer/keyboard behavior, theme styles and width.
+The native pointer rounder can overshoot an endpoint that is not a multiple of
+step; the binding clamps both its event and state, exercised with range 3..8,
+step 5, and a click at the high endpoint.
+
+Retained slider attempts:
+
+* `compile`: missing FluentBuilder import caused compile errors; fixed locally.
+* `native-1`: a wildcard test import brought GPUI's `test` macro into the
+  expansion of its own test attribute. Explicit imports fixed this harness.
+* `native-2`: wrapper bounds were not registered with Kit's test observer.
+  The wrapper now uses its existing TestSupportExt hook.
+* `native-3`: the wrapper's focus handle was not a Tab stop. This was a binding
+  bug; explicitly enabling Tab participation fixed it.
+* `native-4`: the test expected the pointer subscription callback before the
+  enclosing App update completed. Native pointer state had already changed;
+  the test now checks the event after GPUI flushes the update's effects.
+* `native-5`: targeted tests passed. `full`: 47 native tests passed.
+
+Remaining controls: select, confirmation dialog. Parked hardware,
 signing, IME and presentation limitations from the work order remain unchanged.

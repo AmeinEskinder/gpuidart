@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'style.dart';
 import 'table_view.dart';
@@ -86,6 +87,58 @@ final class UiCheckbox extends UiNode {
       if (style != null) 'style': style!.toJson(),
       'label': label,
       'checked': checked,
+      'disabled': disabled,
+    };
+  }
+}
+
+/// A single-value, linear native slider. Values use native 32-bit precision.
+/// Publish `slider_change` event.number to accept an edit. Arrows step by
+/// [step]; Home and End choose the range endpoints. Pointer values snap to
+/// multiples of [step] and clamp to the endpoints.
+final class UiSlider extends UiNode {
+  const UiSlider(
+    super.id, {
+    required this.min,
+    required this.max,
+    required this.step,
+    required this.number,
+    this.disabled = false,
+    super.style,
+  });
+  final double min;
+  final double max;
+  final double step;
+  final double number;
+  final bool disabled;
+
+  @override
+  Map<String, Object> toJson() {
+    final native = Float32List.fromList([min, max, step, number]);
+    final stepped = Float32List.fromList([
+      native[0] + native[2],
+      native[1] - native[2],
+    ]);
+    if (!native.every((v) => v.isFinite) ||
+        min.abs() > 1000000 ||
+        max.abs() > 1000000 ||
+        min >= max ||
+        step <= 0 ||
+        step > max - min ||
+        stepped[0] <= native[0] ||
+        stepped[1] >= native[1] ||
+        number < min ||
+        number > max) {
+      throw ArgumentError('Invalid slider range, step or number');
+    }
+    return {
+      'kind': 'slider',
+      'id': id,
+      if (style != null) 'style': style!.toJson(),
+      'min': min,
+      'max': max,
+      'step': step,
+      'number': number,
       'disabled': disabled,
     };
   }

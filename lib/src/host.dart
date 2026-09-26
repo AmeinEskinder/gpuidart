@@ -96,6 +96,9 @@ final class GpuiEvent {
   /// Requested checkbox state, only present on `checkbox_change` events.
   bool? get checked => data['checked'] as bool?;
 
+  /// Requested slider value, only present on `slider_change` events.
+  double? get number => (data['number'] as num?)?.toDouble();
+
   /// Native row selection, including the dataset revision used for the index.
   TableSelection? get tableSelection => type == 'table_selection'
       ? TableSelection._(

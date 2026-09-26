@@ -36,7 +36,9 @@ continue to identify retained controls; removing a node disposes its state.
   `checkbox_change` carries `revision`, `id`, and `checked`.
 * Slider: `min`, `max`, `step`, `number`, `disabled` boolean. Values must be
   finite, within +/-1,000,000, with min < max, 0 < step <= max-min, and the
-  number inside the range. `slider_change` carries `revision`, `id`, and
+  number inside the range. Steps must remain nonzero at both endpoints in
+  native 32-bit precision. Pointer values snap to multiples of step relative
+  to zero, then clamp to the endpoints. `slider_change` carries `revision`, `id`, and
   `number`. A single numeric value is supported, not a range slider.
 * Select: `options` (1..256 unique nonempty string IDs and labels), nullable
   `selected` option ID, `placeholder`, and `disabled` boolean.

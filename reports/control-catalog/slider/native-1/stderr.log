@@ -1,0 +1,11 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+error: recursion limit reached while expanding `#[test]`
+ --> native\src\ui\controls_tests.rs:5:1
+  |
+5 | #[gpui::test]
+  | ^^^^^^^^^^^^^
+  |
+  = help: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`gpuidart`)
+  = note: this error originates in the attribute macro `test` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: could not compile `gpuidart` (lib test) due to 1 previous error

@@ -1,0 +1,8 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+    Finished `test` profile [unoptimized] target(s) in 14.45s
+     Running unittests src\lib.rs (target\debug\deps\gpuidart-bc5b9e3bed0a18c4.exe)
+
+thread 'ui::controls_tests::slider_pointer_keyboard_bounds_disabled_and_retained_focus' (14024) panicked at D:\Dev\gpuidart/.tools/cargo\git\checkouts\gpui-kit-ad7eb35d851fbd28\21622a7\crates\kit\src\test.rs:54:9:
+missing ElementId Name("density") in scope []. Registered paths: [View(EntityId(3v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), Name("gpuidart"), Name("density"), Name("gpui_component::slider::Slider"), Name("gpui_base::slider::Slider"), NamedInteger("slider", 4294967298), Name("gpui_base::slider::SliderTrack"), Name("slider-bar-container"), Name("gpui_base::slider::SliderIndicator"), Name("slider-bar"), Name("gpui_base::slider::SliderThumb"), NamedInteger("slider-thumb", 0)], [View(EntityId(3v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), Name("gpuidart"), Name("density"), Name("gpui_component::slider::Slider"), Name("gpui_base::slider::Slider"), NamedInteger("slider", 4294967298), Name("gpui_base::slider::SliderTrack"), Name("slider-bar-container")], [View(EntityId(3v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), Name("gpuidart"), Name("density"), Name("gpui_component::slider::Slider"), Name("gpui_base::slider::Slider"), NamedInteger("slider", 4294967298)]. Check the ID, observation, and completed frame.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `--lib`

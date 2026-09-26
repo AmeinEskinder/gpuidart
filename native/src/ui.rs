@@ -159,6 +159,7 @@ pub(crate) struct DartView {
     trace: Option<Arc<crate::trace::Trace>>,
     events: Events,
     inputs: HashMap<String, RetainedInput>,
+    sliders: HashMap<String, controls::RetainedSlider>,
     tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
@@ -239,7 +240,7 @@ impl DartView {
         }
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
-        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels,
+        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "controls": self.inspect_controls(window, cx),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
             "draw": histogram!(frames.draw_duration_histogram),
@@ -306,6 +307,7 @@ impl DartView {
             datasets: Store::new(initial.datasets),
             events,
             inputs: HashMap::new(),
+            sliders: HashMap::new(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
@@ -639,6 +641,7 @@ impl DartView {
     }
 
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
+        self.reconcile_controls(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
         let mut changed_views = Vec::new();
@@ -833,6 +836,11 @@ impl DartView {
                 return self.context_chain(id);
             }
         }
+        for (id, slider) in &self.sliders {
+            if slider.focus == focused {
+                return self.context_chain(id);
+            }
+        }
         None
     }
 
@@ -941,6 +949,7 @@ impl DartView {
                 )
                 .into_any_element()
             }
+            Node::Slider { .. } => self.slider_element(node, colors)?,
             Node::Input { id, .. } => apply_node_style(
                 Input::new(
                     &self
@@ -1101,6 +1110,9 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     element
 }
 
+mod controls;
+#[cfg(test)]
+mod controls_tests;
 #[cfg(feature = "snapshot-experiment")]
 pub(crate) mod experiment;
 #[cfg(test)]

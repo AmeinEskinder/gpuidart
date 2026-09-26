@@ -135,6 +135,17 @@ pub enum Node {
         #[serde(default)]
         disabled: bool,
     },
+    Slider {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        min: f32,
+        max: f32,
+        step: f32,
+        number: f32,
+        #[serde(default)]
+        disabled: bool,
+    },
     Input {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -601,6 +612,7 @@ impl Node {
             | Self::Text { id, .. }
             | Self::Button { id, .. }
             | Self::Checkbox { id, .. }
+            | Self::Slider { id, .. }
             | Self::Input { id, .. }
             | Self::Table { id, .. } => id,
         }
@@ -613,6 +625,7 @@ impl Node {
             | Self::Text { style, .. }
             | Self::Button { style, .. }
             | Self::Checkbox { style, .. }
+            | Self::Slider { style, .. }
             | Self::Input { style, .. }
             | Self::Table { style, .. } => style.as_ref(),
         }
@@ -669,6 +682,27 @@ impl Snapshot {
                 }
                 Node::Checkbox { label, .. } if label.len() > 1024 => {
                     return Err("Checkbox label exceeds 1024 UTF-8 bytes".into());
+                }
+                Node::Slider {
+                    min,
+                    max,
+                    step,
+                    number,
+                    ..
+                } => {
+                    if ![min, max, step, number].iter().all(|v| v.is_finite())
+                        || min.abs() > 1_000_000.
+                        || max.abs() > 1_000_000.
+                        || min >= max
+                        || *step <= 0.
+                        || *step > max - min
+                        || min + step <= *min
+                        || max - step >= *max
+                        || number < min
+                        || number > max
+                    {
+                        return Err("Invalid slider range, step or number".into());
+                    }
                 }
                 _ => {}
             }
@@ -756,6 +790,11 @@ pub enum Event {
         id: String,
         checked: bool,
     },
+    SliderChange {
+        revision: u64,
+        id: String,
+        number: f32,
+    },
     Action {
         revision: u64,
         name: String,
@@ -803,6 +842,39 @@ mod tests {
         assert!(parse(&node).is_ok());
         node["unknown"] = serde_json::json!(true);
         assert!(parse(&node).is_err());
+    }
+
+    #[test]
+    fn slider_rejects_invalid_ranges_and_unrepresentable_steps() {
+        let parse = |min: f64, max: f64, step: f64, number: f64| {
+            Snapshot::parse(
+                &serde_json::to_vec(&serde_json::json!({"revision":1,"root":{
+                    "kind":"slider","id":"s","min":min,"max":max,"step":step,"number":number
+                }}))
+                .unwrap(),
+            )
+        };
+        assert!(parse(-100., 100., 0.5, 25.).is_ok());
+        assert!(parse(3., 8., 5., 3.).is_ok());
+        for (min, max, step, number) in [
+            (0., 0., 1., 0.),
+            (5., 1., 1., 3.),
+            (0., 10., 0., 5.),
+            (0., 10., -1., 5.),
+            (0., 10., 11., 5.),
+            (0., 10., 1., 11.),
+            (0., 10., 1., -1.),
+            (-1_000_001., 10., 1., 5.),
+            (0., 1_000_001., 1., 5.),
+            (999_990., 1_000_000., 0.00001, 999_995.),
+            (0., 10., f64::INFINITY, 5.),
+            (0., 10., 1., f64::NAN),
+        ] {
+            assert!(
+                parse(min, max, step, number).is_err(),
+                "{min} {max} {step} {number}"
+            );
+        }
     }
 
     #[test]
