@@ -1,0 +1,106 @@
+{
+  "native_source_commit": "318ba3d3509627230b62af734294b972f61749fe",
+  "dart_suite_commit": "8cca2daccef717e64f2ce564658d050f5fab72a4",
+  "scope": "Local Windows correctness; debug native DLL, JIT and freshly compiled AOT Dart. Not performance, screen-reader or presentation evidence. The subsequent Unix-only provider correction does not change the Windows binary.",
+  "files": [
+    {
+      "file": "final-windows-100k-jit.trace.json",
+      "sha256": "07692c2e4fef5c056f8d74c98aea2abb539b2ff4e581a4c69bfb4dadc3a6a257",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "final-windows-100k-jit.log",
+      "sha256": "1b37073f6ec47ad5d0484391a5e0d9291a98b4e3f71313eaa32084b98a003e54",
+      "encoding": "utf-16"
+    },
+    {
+      "file": "final-windows-100k-aot.trace.json",
+      "sha256": "51f8fd76688e718f80dfdbe7bafa833dcbf12175bf7e2fb0e76f7ae53a4bd8e4",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "final-windows-100k-aot.log",
+      "sha256": "e4152efe02247658e3d7bacf3dad8145a9884ba9d8a270e312a6b75f1d388ade",
+      "encoding": "utf-16"
+    },
+    {
+      "file": "final-windows-100k-reload.json",
+      "sha256": "3dc6fd69034bd290fc8e0ee04d77621b21613c2def978c9d216298d8caa4a29a",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "final-windows-100k-reload.json.trace.json",
+      "sha256": "a3fa15262c24069e9ecf933571b489e2202c80098de40d4380b48ae1104b0f84",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "native-final.log",
+      "sha256": "4d67b4828beb0d20fb3e11aa495901baa1bb92278e3233b8363f49e26de27d8b",
+      "encoding": "utf-16"
+    },
+    {
+      "file": "dart-headless-final.log",
+      "sha256": "322d1e17ffa03e15fd9fc1bcd359bfff588e9c2764ffbad9795f1729f2f5299f",
+      "encoding": "utf-16"
+    },
+    {
+      "file": "dart-live-final.log",
+      "sha256": "4f73eea01a59f2c509b64c88d0056fcdf8ec72f94ad572c45d36909a9c0fec0a",
+      "encoding": "utf-16"
+    },
+    {
+      "file": "windows-watchlist-focus-fixed.json",
+      "sha256": "45fa0621f602ca126c4f92ebda33cf1a068d8c13a2301cf971323501165eaf7f",
+      "encoding": "utf-8"
+    }
+  ],
+  "traces": {
+    "final-windows-100k-jit.trace.json": {
+      "records": 1040,
+      "dart_dropped": 0,
+      "native_dropped": 0,
+      "capture_complete": true
+    },
+    "final-windows-100k-aot.trace.json": {
+      "records": 1017,
+      "dart_dropped": 0,
+      "native_dropped": 0,
+      "capture_complete": true
+    },
+    "final-windows-100k-reload.json.trace.json": {
+      "records": 1078,
+      "dart_dropped": 0,
+      "native_dropped": 0,
+      "capture_complete": true
+    }
+  },
+  "suites": {
+    "native_library": 57,
+    "dart_headless": 56,
+    "dart_live_window": 6
+  },
+  "jit": {
+    "passed": true,
+    "mode": "jit",
+    "rows": 100000,
+    "cell_updates": 30,
+    "snapshot_updates": 30,
+    "trace_records": 1040
+  },
+  "aot": {
+    "passed": true,
+    "mode": "aot",
+    "rows": 100000,
+    "cell_updates": 30,
+    "snapshot_updates": 30,
+    "trace_records": 1017
+  },
+  "reload": {
+    "passed": true,
+    "rows": 100000,
+    "successful_reloads": 11,
+    "changed_code_executed": true,
+    "invalid_source_rejected": true,
+    "recovered_after_invalid_source": true
+  }
+}

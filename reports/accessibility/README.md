@@ -256,3 +256,19 @@ uses the existing bounded, query-only whole-tree restart policy. Partial trees
 are never accepted and actions are never replayed. The new monitor will determine
 whether the provider correction fixes the malformed signals; retries cannot
 mask a failed signal assertion.
+
+Run [36276761058](https://github.com/AmeinEskinder/gpuidart/actions/runs/36276761058)
+confirms the cache correction: the owned Linux process emitted 50 additions and
+47 removals with no invalid signatures (`linux-cache-signals-1.json`). Controls,
+disabled controls and Settings pass. Watchlist fails with AT-SPI APPLICATION_GONE
+while reading a filtered-out object (`linux-disposed-object-4.json`).
+[libatspi's removal handler](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/atspi/atspi-misc.c)
+disposes a removed accessible; its
+[object disposal](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/atspi/atspi-object.c)
+clears that object's application pointer. The error therefore does not by itself
+establish a process exit. The verifier now permits its existing bounded query
+restart only if the same owned application root answers a fresh AccessibleId
+property round-trip. A dead/unresponsive root still fails. It does not use cached
+PID/name as proof of liveness. Final query failures also retain an application
+inspect attempt to separate provider reads from application exits. No action
+retry or partial-tree acceptance was added.

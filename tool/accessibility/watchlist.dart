@@ -148,6 +148,13 @@ Future<void> main(List<String> args) async {
   } catch (error, stack) {
     report['error'] = '$error';
     report['stack'] = '$stack';
+    if (session != null) {
+      try {
+        report['application_after_failure'] = await session.call('inspect');
+      } catch (inspectError) {
+        report['application_after_failure_error'] = '$inspectError';
+      }
+    }
     exitCode = 1;
   } finally {
     try {

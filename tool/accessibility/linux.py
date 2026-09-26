@@ -10,6 +10,7 @@ from gi.repository import Atspi, GLib
 process = int(sys.argv[1])
 operation, name, value = sys.argv[2:5]
 identifier = sys.argv[5]
+application = None
 
 
 class StaleTree(Exception):
@@ -17,6 +18,7 @@ class StaleTree(Exception):
 
 
 def run():
+    global application
     Atspi.init()
     Atspi.set_timeout(3000, 10000)
     desktop = Atspi.get_desktop(0)
@@ -24,6 +26,7 @@ def run():
     apps = [app for app in apps if app is not None and app.get_process_id() == process]
     if len(apps) != 1:
         raise RuntimeError(f"Expected one AT-SPI app for {process}, got {len(apps)}")
+    application = apps[0]
 
     elements = []
 
@@ -106,6 +109,18 @@ except StaleTree as error:
         sys.exit(75)
     raise
 except GLib.Error as error:
+    # RemoveAccessible disposes the client object and clears its app pointer.
+    # libatspi then uses APPLICATION_GONE even when only that row disappeared.
+    # AccessibleId always performs a property round-trip (unlike cached PID/name).
+    if (operation == "query" and error.domain == "atspi_error" and error.code == 0
+            and application is not None):
+        try:
+            application.get_accessible_id()
+        except GLib.Error:
+            pass
+        else:
+            sys.stderr.write(f"Stale AT-SPI object: {error.message}; owned application root still answers AccessibleId\n")
+            sys.exit(75)
     # A concurrent frame can remove a virtual row between separate D-Bus reads.
     # Ask the Dart driver to retry the whole query in a fresh client process;
     # never reuse AT-SPI's cached subtree or retry an action.
