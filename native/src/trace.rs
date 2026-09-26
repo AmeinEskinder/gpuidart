@@ -264,6 +264,10 @@ impl crate::protocol::Event {
                 operation: "diagnostic",
                 request: *request,
             },
+            InputResult { request, .. } => Key {
+                operation: "input_control",
+                request: *request,
+            },
             Ready => Key {
                 operation: "initial",
                 request: 1,

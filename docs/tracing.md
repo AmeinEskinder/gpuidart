@@ -37,7 +37,7 @@ socket transport and both bounded queues; emit-to-receive includes return
 transport. These are complete integration intervals, not isolated FFI costs.
 
 Group records by `(operation, request)` within a capture. Snapshot requests use
-their revision; dataset and diagnostic requests use their request IDs. Initial
+their revision; dataset, diagnostic and `input_control` requests use their request IDs. Initial
 creation uses `initial/1`. Close and failure markers use request zero. Native
 messages rejected before decoding their identity also use zero; do not pair these
 with a fabricated application request.

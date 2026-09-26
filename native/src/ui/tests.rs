@@ -39,6 +39,7 @@ fn description(revision: u64) -> Snapshot {
                     id: "name".into(),
                     style: None,
                     placeholder: "Name".into(),
+                    controlled: false,
                 },
                 Node::Table {
                     id: "table".into(),
@@ -432,6 +433,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                         id: "missing-input".into(),
                         style: None,
                         placeholder: String::new(),
+                        controlled: false,
                     },
                     &cx.theme().colors.clone(),
                 )

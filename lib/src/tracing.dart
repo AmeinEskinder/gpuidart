@@ -153,6 +153,7 @@ final class GpuiTrace {
     'dataset_applied' ||
     'dataset_rejected' => ('dataset', data['request'] as int),
     'diagnostic' => ('diagnostic', data['request'] as int),
+    'input_result' => ('input_control', data['request'] as int),
     'closed' => ('close', 0),
     'error' => ('failure', 0),
     _ => null,
@@ -173,7 +174,13 @@ final class GpuiTrace {
       key.$1,
       key.$2,
       status:
-          const ['rejected', 'dataset_rejected', 'error'].contains(data['type'])
+          (const [
+                'rejected',
+                'dataset_rejected',
+                'error',
+              ].contains(data['type']) ||
+              (data['type'] == 'input_result' &&
+                  !const ['read', 'applied'].contains(data['status'])))
           ? 1
           : 0,
       nativeApplyUs: (data['native_apply_us'] ?? data['apply_us']) as int?,
@@ -293,6 +300,7 @@ final class _TraceRecord {
           'snapshot',
           'dataset',
           'diagnostic',
+          'input_control',
           'initial',
           'close',
           'failure',

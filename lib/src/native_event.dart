@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'input_state.dart';
+
 /// Validates the native wire format before host state or completers are touched.
 Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
   if (bytes.isEmpty || bytes.length > 16 * 1024 * 1024) {
@@ -57,7 +59,18 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
     case 'click' || 'input' || 'table_selection':
       integer('revision', minimum: 1);
       string('id');
-      if (value['type'] == 'input') string('value');
+      if (value['type'] == 'input') {
+        string('value');
+        if (value.containsKey('input_state')) {
+          final state = decodeInputState(
+            value['id'] as String,
+            value['input_state'],
+          );
+          if (!state.controlled || state.value != value['value']) {
+            throw const FormatException('Inconsistent controlled input event');
+          }
+        }
+      }
       if (value['type'] == 'table_selection') {
         string('dataset');
         integer('dataset_revision', minimum: 1);
@@ -99,6 +112,28 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       string('id');
       if (value['confirmed'] is! bool) {
         throw const FormatException('Invalid dialog confirmed value');
+      }
+    case 'input_result':
+      integer('request', minimum: 1);
+      string('id');
+      const statuses = [
+        'read',
+        'applied',
+        'missing',
+        'not_controlled',
+        'composing',
+        'stale',
+        'invalid_selection',
+      ];
+      if (!statuses.contains(value['status']) || !value.containsKey('state')) {
+        throw const FormatException('Invalid input acknowledgement');
+      }
+      if (value['status'] == 'missing') {
+        if (value['state'] != null) {
+          throw const FormatException('Missing input has state');
+        }
+      } else {
+        decodeInputState(value['id'] as String, value['state']);
       }
     case 'error':
       string('message');

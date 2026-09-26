@@ -174,6 +174,8 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
         placeholder: String,
+        #[serde(default, skip_serializing_if = "is_false")]
+        controlled: bool,
     },
     Table {
         id: String,
@@ -190,6 +192,10 @@ pub enum Node {
 pub struct SelectOption {
     pub id: String,
     pub label: String,
+}
+
+fn is_false(value: &bool) -> bool {
+    !value
 }
 
 /// Presentation-only view of a table's dataset: filter, then sort. The
@@ -861,6 +867,14 @@ pub enum Event {
         revision: u64,
         id: String,
         value: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        input_state: Option<crate::input_control::State>,
+    },
+    InputResult {
+        request: u64,
+        id: String,
+        status: crate::input_control::Status,
+        state: Option<crate::input_control::State>,
     },
     CheckboxChange {
         revision: u64,

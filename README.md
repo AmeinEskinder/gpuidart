@@ -129,7 +129,7 @@ host.events.listen((event) {
 await host.done;
 ```
 
-Node IDs must be nonempty and unique throughout one description. An input or table keeps its native entity when the same ID and control kind appear in the next description. Removing it drops the retained entity and subscription. Inputs are currently uncontrolled; Dart receives changes, and the native input owns its text, cursor, selection and undo history.
+Node IDs must be nonempty and unique throughout one description. An input or table keeps its native entity when the same ID and control kind appear in the next description. Removing it drops the retained entity and subscription. Inputs are native-retained by default; [controlled inputs](docs/controlled-inputs.md) opt into acknowledged text/selection writes with composition and stale-state guards.
 
 `publish` completes when Rust applies the description. It does not measure when the GPU presents the frame. The native queue holds up to 64 commands and rejects submissions when full. Callers must await or handle publication failures.
 

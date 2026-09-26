@@ -132,6 +132,42 @@ pub unsafe extern "C" fn gd_diagnostic(host: *mut Host, _: *const u8, _: usize) 
         0
     }
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_input(host: *mut Host, bytes: *const u8, length: usize) -> i32 {
+    let host = unsafe { &*host };
+    if host.mode.contains("submit_panic") {
+        return -4;
+    }
+    if host.mode.contains("mismatch_input")
+        || host.mode.contains("wrong_input_operation")
+        || host.mode.contains("malformed_input")
+    {
+        let request = number(unsafe { message(bytes, length) }, "request");
+        let id = if host.mode.contains("mismatch_input") {
+            "wrong"
+        } else {
+            "input"
+        };
+        let status = if host.mode.contains("wrong_input_operation") {
+            "applied"
+        } else {
+            "read"
+        };
+        let generation = if host.mode.contains("malformed_input") {
+            0
+        } else {
+            1
+        };
+        send(
+            host,
+            &format!(
+                r#"{{"type":"input_result","request":{request},"id":"{id}","status":"{status}","state":{{"generation":{generation},"edit_revision":0,"controlled":true,"value":"","selection":{{"start":0,"end":0}},"composing":false}}}}"#
+            ),
+        );
+    }
+    0
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_close(host: *mut Host) {
     unsafe { &*host }.closing.store(true, SeqCst);

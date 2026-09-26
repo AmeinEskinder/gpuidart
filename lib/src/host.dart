@@ -9,6 +9,7 @@ import 'package:ffi/ffi.dart';
 import 'actions.dart';
 import 'format.dart';
 import 'nodes.dart';
+import 'input_state.dart';
 import 'metrics.dart';
 import 'window_options.dart';
 import 'windows.dart';
@@ -19,6 +20,7 @@ import 'native_event.dart';
 part 'dataset.dart';
 part 'tracing.dart';
 part 'companion.dart';
+part 'input_commands.dart';
 
 final _jsonUtf8 = JsonUtf8Encoder();
 
@@ -74,6 +76,17 @@ final class _Bindings {
   late final diagnostic = library.lookupFunction<_PublishNative, _PublishDart>(
     'gd_diagnostic',
   );
+  late final input = _inputBinding();
+  _PublishDart _inputBinding() {
+    try {
+      return library.lookupFunction<_PublishNative, _PublishDart>('gd_input');
+    } on ArgumentError {
+      throw StateError(
+        'Native library does not support controlled inputs; rebuild it with this SDK',
+      );
+    }
+  }
+
   late final close = library.lookupFunction<_HostNative, _HostDart>('gd_close');
   late final destroy = library.lookupFunction<_HostNative, _HostDart>(
     'gd_destroy',
@@ -104,6 +117,11 @@ final class GpuiEvent {
 
   /// Whether the user confirmed a `dialog_result`; false means cancelled.
   bool? get confirmed => data['confirmed'] as bool?;
+
+  /// Value/selection/composition state accompanying a controlled native edit.
+  UiInputState? get inputState => data['input_state'] == null
+      ? null
+      : decodeInputState(id!, data['input_state']);
 
   /// Native row selection, including the dataset revision used for the index.
   TableSelection? get tableSelection => type == 'table_selection'
@@ -186,6 +204,11 @@ final class GpuiHost {
   final _pending = <int, Completer<void>>{};
   final _publishTimers = <int, Stopwatch>{};
   final _diagnostics = <int, Completer<Map<String, dynamic>>>{};
+  final _inputPending =
+      <
+        int,
+        ({String id, String expected, Completer<UiInputState> completion})
+      >{};
   final _datasets = <String, TableDataset>{};
   List<UiAction> _viewActions = const [];
   final _dataPending =
@@ -656,6 +679,10 @@ final class GpuiHost {
       pending.completeError(error, stack);
     }
     _diagnostics.clear();
+    for (final pending in _inputPending.values) {
+      pending.completion.completeError(error, stack);
+    }
+    _inputPending.clear();
   }
 
   /// Opt-in native inspection and test control; no commands run during repaint.
@@ -762,6 +789,32 @@ final class GpuiHost {
           _diagnostics
               .remove(event.data['request'])
               ?.complete(event.data['data'] as Map<String, dynamic>);
+        case 'input_result':
+          final pending = _inputPending[event.data['request']];
+          if (pending != null) {
+            if (pending.id != event.id) {
+              throw const FormatException('Input acknowledgement ID mismatch');
+            }
+            final status = event.data['status'];
+            if ((status == 'read' || status == 'applied') &&
+                status != pending.expected) {
+              throw const FormatException(
+                'Input acknowledgement operation mismatch',
+              );
+            }
+            final state = event.data['state'] == null
+                ? null
+                : decodeInputState(event.id!, event.data['state']);
+            _inputPending.remove(event.data['request']);
+            if (event.data['status'] == 'read' ||
+                event.data['status'] == 'applied') {
+              pending.completion.complete(state!);
+            } else {
+              pending.completion.completeError(
+                InputWriteException(event.data['status'] as String, state),
+              );
+            }
+          }
         case 'closed':
           _beginClose();
           _closing = true;

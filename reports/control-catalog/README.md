@@ -100,7 +100,37 @@ Replacing it with actual GPUI Tab dispatch tests the native focus trap;
 `full-2` passed all 51 tests. New control events also count toward the existing
 UI-callback metric.
 
-All four planned controls are implemented. Controlled inputs, the settings
+## Controlled inputs
+
+Local Windows `tool/check.dart` passed: 53 native tests, 3 strategy tests, 59
+Dart tests including the new live-window input test, formatting, analysis and
+native/launcher builds. `input/all/` contains the complete gate logs.
+
+The native input test exercises real handler operations: Unicode text and
+UTF-16 selection, invalid surrogate boundaries, native typing, selection-only
+conflicts before notifications flush, marked composition, a rejected write
+preserving text/selection/focus/marked range, commit and unmark, mode changes,
+and generation invalidation after removal/recreation. Programmatic writes do
+not echo input events. FFI tests include input command bounds/backpressure;
+fault-peer tests cover missing, malformed and mismatched acknowledgements and
+submission panic settlement. The live window proves command acknowledgements
+and trace correlation; it is not OS IME verification.
+
+Retained input attempts:
+
+* `compile`: initial Rust compile and existing input tests passed.
+* `native-1`: behavior test passed, strict wire test failed because serde's
+  internally tagged unit Read variant accepted extra fields. Using an empty
+  struct variant enforces the intended unknown-field rejection.
+* `headless`: full headless gate passed after that correction (53 Dart tests).
+* `live`: verifier failed to compile due to an incorrect tracing import.
+* `live-2`: input interactions passed, trace assertion failed. The Dart native
+  trace decoder's allowed operation list omitted `input_control`.
+* `live-3`: targeted live-window test passed after adding the operation.
+* `all`: complete gate passed; final trace checks occur after host close so the
+  macOS companion's trace can be collected as well.
+
+All four planned controls and controlled inputs are implemented. The settings
 application/verifier, schema decision and final evidence are still pending.
 Parked hardware,
 signing, IME and presentation limitations from the work order remain unchanged.

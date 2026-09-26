@@ -63,12 +63,14 @@ void main() {
         host.diagnose('inspect'),
         throwsFormatException,
       );
+      final input = expectLater(host.readInput('input'), throwsFormatException);
       final done = expectLater(host.done, throwsFormatException);
       await expectLater(
         host.publish(const UiText('label', 'update')),
         throwsFormatException,
       );
       await diagnostic;
+      await input;
       await done;
       expect(
         () => host.publish(const UiText('label', 'late')),
@@ -77,7 +79,12 @@ void main() {
     },
   );
 
-  for (final mode in ['drop_snapshot', 'drop_dataset', 'drop_diagnostic']) {
+  for (final mode in [
+    'drop_snapshot',
+    'drop_dataset',
+    'drop_diagnostic',
+    'drop_input',
+  ]) {
     test('$mode reports a deadline and stops further transactions', () async {
       final dataset = records();
       final host = await open(mode, datasets: [dataset]);
@@ -87,12 +94,26 @@ void main() {
         'drop_dataset' => host.editDataset(dataset, [
           const CellEdit(0, 0, 'after'),
         ]),
+        'drop_input' => host.readInput('input'),
         _ => host.diagnose('inspect'),
       };
       await expectLater(pending, throwsA(isA<TimeoutException>()));
       await done;
       expect(dataset.cell(0, 0), 'before');
       expect(dataset.revision, 1);
+    });
+  }
+
+  for (final mode in [
+    'mismatch_input',
+    'wrong_input_operation',
+    'malformed_input',
+  ]) {
+    test('$mode settles input requests and closes the host', () async {
+      final host = await open(mode);
+      final done = expectLater(host.done, throwsFormatException);
+      await expectLater(host.readInput('input'), throwsFormatException);
+      await done;
     });
   }
 
@@ -126,7 +147,7 @@ void main() {
     },
   );
 
-  for (final operation in ['snapshot', 'dataset', 'diagnostic']) {
+  for (final operation in ['snapshot', 'dataset', 'diagnostic', 'input']) {
     test('caught panic during $operation submission closes the host', () async {
       final dataset = records();
       final host = await open('submit_panic', datasets: [dataset]);
@@ -137,6 +158,7 @@ void main() {
           'dataset' => host.editDataset(dataset, [
             const CellEdit(0, 0, 'after'),
           ]),
+          'input' => host.readInput('input'),
           _ => host.diagnose('inspect'),
         },
         throwsStateError,

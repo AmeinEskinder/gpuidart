@@ -3,6 +3,7 @@ library;
 export 'src/host.dart'
     show
         GpuiHost,
+        InputCommands,
         GpuiEvent,
         ActionEvent,
         TableSelection,
@@ -13,6 +14,8 @@ export 'src/host.dart'
 export 'src/actions.dart';
 export 'src/format.dart';
 export 'src/nodes.dart';
+export 'src/input_state.dart'
+    show UiInputState, UiTextSelection, InputWriteException;
 export 'src/style.dart';
 export 'src/table_view.dart';
 export 'src/window_options.dart';

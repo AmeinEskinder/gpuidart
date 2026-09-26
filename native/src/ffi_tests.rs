@@ -33,11 +33,16 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
         );
         assert_eq!(gd_dataset(host, b"{".as_ptr(), 1), -2);
         assert_eq!(gd_diagnostic(host, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_input(host, null(), 0), -1);
+        assert_eq!(gd_input(host, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_input(host, initial.as_ptr(), MAX_MESSAGE_BYTES + 1), -1);
         let snapshot = br#"{"revision":2,"root":{"kind":"text","id":"a","text":"b"}}"#;
         for _ in 0..64 {
             assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), 0);
         }
         assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), -3);
+        let input_read = br#"{"request":1,"id":"a","operation":{"op":"read"}}"#;
+        assert_eq!(gd_input(host, input_read.as_ptr(), input_read.len()), -3);
         let mut length = 0;
         assert!(trace::gd_trace_read(host, std::ptr::null_mut()).is_null());
         assert!(trace::gd_trace_read(null(), &mut length).is_null());

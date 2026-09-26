@@ -1,0 +1,16 @@
+00:00 +0: loading test/controlled_input_test.dart
+00:00 +0: real host acknowledges guarded Unicode writes without input echoes
+00:00 +0 -1: real host acknowledges guarded Unicode writes without input echoes [E]
+  Expected: <true>
+    Actual: <false>
+  
+  package:matcher                        expect
+  test\controlled_input_test.dart 104:9  main.<fn>
+  
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  test/controlled_input_test.dart: real host acknowledges guarded Unicode writes without input echoes
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

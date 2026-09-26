@@ -253,14 +253,21 @@ final class UiConfirmDialog extends UiNode {
 
 /// Native text, cursor, selection and undo state survive snapshots with this ID.
 final class UiInput extends UiNode {
-  const UiInput(super.id, {super.style, this.placeholder = ''});
+  const UiInput(
+    super.id, {
+    super.style,
+    this.placeholder = '',
+    this.controlled = false,
+  });
   final String placeholder;
+  final bool controlled;
   @override
   Map<String, Object> toJson() => {
     'kind': 'input',
     'id': id,
     if (style != null) 'style': style!.toJson(),
     'placeholder': placeholder,
+    if (controlled) 'controlled': true,
   };
 }
 

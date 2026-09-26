@@ -1,0 +1,13 @@
+00:00 +0: loading test/controlled_input_test.dart
+00:00 +0 -1: loading test/controlled_input_test.dart [E]
+  Failed to load "test/controlled_input_test.dart":
+  test/controlled_input_test.dart:6:8: Error: Error when reading 'lib/diagnostics.dart': The system cannot find the file specified
+  import 'package:gpuidart/diagnostics.dart';
+         ^
+  test/controlled_input_test.dart:13:23: Error: Method not found: 'GpuiTrace'.
+        final tracing = GpuiTrace(capacity: 2048);
+                        ^^^^^^^^^
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  test/controlled_input_test.dart: loading test/controlled_input_test.dart

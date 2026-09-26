@@ -124,6 +124,8 @@ struct RetainedInput {
     state: Entity<InputState>,
     placeholder: String,
     _subscription: Subscription,
+    _observer: Subscription,
+    version: crate::input_control::State,
 }
 
 struct RetainedTable {
@@ -159,6 +161,7 @@ pub(crate) struct DartView {
     trace: Option<Arc<crate::trace::Trace>>,
     events: Events,
     inputs: HashMap<String, RetainedInput>,
+    next_input_generation: u64,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
@@ -309,6 +312,7 @@ impl DartView {
             datasets: Store::new(initial.datasets),
             events,
             inputs: HashMap::new(),
+            next_input_generation: 0,
             sliders: HashMap::new(),
             selects: HashMap::new(),
             active_dialog: Default::default(),
@@ -653,10 +657,23 @@ impl DartView {
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
             Node::Input {
-                id, placeholder, ..
+                id,
+                placeholder,
+                controlled,
+                ..
             } => {
                 input_ids.insert(id.clone());
                 if let Some(input) = self.inputs.get_mut(id) {
+                    if input.version.controlled != *controlled {
+                        self.next_input_generation += 1;
+                        input.version = inputs::capture(
+                            &input.state,
+                            self.next_input_generation,
+                            *controlled,
+                            window,
+                            cx,
+                        );
+                    }
                     if input.placeholder != *placeholder {
                         input.state.update(cx, |state, cx| {
                             state.set_placeholder(placeholder.clone(), window, cx)
@@ -666,23 +683,49 @@ impl DartView {
                 } else {
                     let state =
                         cx.new(|cx| InputState::new(window, cx).placeholder(placeholder.clone()));
+                    self.next_input_generation += 1;
+                    let version = inputs::capture(
+                        &state,
+                        self.next_input_generation,
+                        *controlled,
+                        window,
+                        cx,
+                    );
                     let event_id = id.clone();
                     let subscription =
                         cx.subscribe_in(&state, window, move |this, input, event, _, cx| {
-                            if matches!(event, InputEvent::Change) {
+                            if matches!(event, InputEvent::Change)
+                                && this
+                                    .inputs
+                                    .get(&event_id)
+                                    .is_some_and(|input| !input.version.controlled)
+                            {
                                 this.events.emit(Event::Input {
                                     revision: this.snapshot.revision,
                                     id: event_id.clone(),
                                     value: input.read(cx).value().to_string(),
+                                    input_state: None,
                                 });
                             }
                         });
+                    let event_id = id.clone();
+                    let observer = cx.observe_in(&state, window, move |this, _, window, cx| {
+                        if this
+                            .inputs
+                            .get(&event_id)
+                            .is_some_and(|input| input.version.controlled)
+                        {
+                            this.refresh_input(&event_id, true, window, cx);
+                        }
+                    });
                     self.inputs.insert(
                         id.clone(),
                         RetainedInput {
                             state,
                             placeholder: placeholder.clone(),
                             _subscription: subscription,
+                            _observer: observer,
+                            version,
                         },
                     );
                 }
@@ -1129,6 +1172,9 @@ mod dialogs;
 #[cfg(feature = "snapshot-experiment")]
 pub(crate) mod experiment;
 #[cfg(test)]
+mod input_tests;
+mod inputs;
+#[cfg(test)]
 mod tests;
 
 impl Render for DartView {
@@ -1308,6 +1354,18 @@ pub(crate) fn run(
                             if handle
                                 .update(cx, |_, window, cx| {
                                     crate::diagnostics::handle(request, &view, &events, window, cx)
+                                })
+                                .is_err()
+                            {
+                                break;
+                            }
+                        }
+                        Command::Input(request) => {
+                            if handle
+                                .update(cx, |_, window, cx| {
+                                    view.update(cx, |view, cx| {
+                                        view.input_command(request, window, cx)
+                                    })
                                 })
                                 .is_err()
                             {

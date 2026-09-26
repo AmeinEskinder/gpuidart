@@ -8,6 +8,7 @@ mod datasets;
 mod diagnostics;
 #[cfg(feature = "snapshot-experiment")]
 mod experiment;
+mod input_control;
 #[cfg(feature = "snapshot-experiment")]
 pub use experiment::run as run_snapshot_experiment;
 #[cfg(all(feature = "allocation-profile", not(test)))]
@@ -44,6 +45,7 @@ pub(crate) enum Command {
     Publish(Snapshot),
     Dataset(datasets::Update, u64),
     Diagnostic(diagnostics::Request),
+    Input(input_control::Request),
     Close,
 }
 
@@ -62,12 +64,45 @@ impl Command {
                 operation: "diagnostic",
                 request: request.id(),
             },
+            Self::Input(request) => trace::Key {
+                operation: "input_control",
+                request: request.request,
+            },
             Self::Close => trace::Key {
                 operation: "close",
                 request: 0,
             },
         }
     }
+}
+
+/// Queues a controlled-input read/write. Bytes are copied before returning.
+/// The host and readable input buffer must be live for the duration of the call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_input(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    boundary::call(-4, || {
+        if host.is_null() || bytes.is_null() || len == 0 || len > MAX_MESSAGE_BYTES {
+            return -1;
+        }
+        let host = unsafe { &*host };
+        let started = host.trace.start();
+        match input_control::Request::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
+            Ok(request) => submit(host, Command::Input(request), len, started),
+            Err(_) => {
+                host.trace.complete(
+                    "native.parse",
+                    trace::Key {
+                        operation: "input_control",
+                        request: 0,
+                    },
+                    started,
+                    Some(len),
+                    Some(-2),
+                );
+                -2
+            }
+        }
+    })
 }
 
 fn submit(host: &Host, command: Command, len: usize, started: Option<clock::Stamp>) -> i32 {
