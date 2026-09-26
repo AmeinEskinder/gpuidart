@@ -209,6 +209,7 @@ impl DartView {
                         "scroll_y": f32::from(offset.y),
                         "view": {"source_rows": source_rows, "view_rows": view_rows, "spec_hash": spec_hash},
                         "selection": {"row": table.selected_row(), "record": retained.selected_record},
+                        "focused": table.focus_handle(cx).is_focused(window),
                     }),
                 )
             })
@@ -369,6 +370,19 @@ impl DartView {
             Some(value) => json!({"value":value, "revision":data.revision}),
             None => json!({"error":"Invalid cell"}),
         }
+    }
+
+    /// Focuses a retained input without touching value, selection or scroll.
+    pub(crate) fn focus_input(
+        &mut self,
+        input: &str,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Result<(), String> {
+        let input = self.inputs.get(input).ok_or("Unknown input")?;
+        input.state.update(cx, |input, cx| input.focus(window, cx));
+        cx.notify();
+        Ok(())
     }
 
     /// The formatted rendering of a cell at view coordinates, for tests and

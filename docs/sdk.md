@@ -15,7 +15,7 @@ dart run tool/dev.dart
 
 On macOS/Linux, use `dart run tool/build.dart` in place of the PowerShell build command. Linux currently requires X11; see [Unix prerequisites and packaging](unix-release-checks.md). The application API and development entry point are the same on all three targets.
 
-The default entry point is [Market watch](../example/watchlist/main.dart). It contains 1,000 fictitious instruments, search, row selection, a shortlist and sample price updates. Search replaces the displayed dataset deliberately; updating a price or shortlist entry sends one cell edit. There is no live feed or trading connection. Application data is in memory and resets when the process exits.
+The default entry point is [Market watch](../example/watchlist/main.dart). It contains 1,000 fictitious instruments, search, row selection, a shortlist, price sorting and sample price updates. Search and the shortlist toggle are a native view over the dataset; updating a price or shortlist entry sends one cell edit. There is no live feed or trading connection. Application data is in memory and resets when the process exits.
 
 Select a row, add it to the shortlist, simulate a price update, and switch to the shortlist. Editing the search preserves the native input and replaces the table records. Dataset replacement clears selection and resets scrolling. Ordinary view rebuilds and code reload preserve those native entities.
 

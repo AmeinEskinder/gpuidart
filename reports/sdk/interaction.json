@@ -4,7 +4,8 @@
   "limit": "Functional UI check, not physical-input latency or IME composition",
   "searched": {
     "state": {
-      "revision": 3,
+      "revision": 2,
+      "native_process_id": 26444,
       "inputs": {
         "search": {
           "entity": 4294967298,
@@ -23,10 +24,20 @@
             "start": 0,
             "end": 8
           },
-          "row_count": 1,
+          "row_count": 1000,
           "dataset": "instruments",
-          "dataset_revision": 2,
-          "scroll_y": 0.0
+          "dataset_revision": 1,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1,
+            "spec_hash": 7639496448331257716
+          },
+          "selection": {
+            "row": null,
+            "record": null
+          },
+          "focused": false
         }
       },
       "labels": {
@@ -43,23 +54,24 @@
         "scroll_y": 0.0
       },
       "native": {
-        "materializations": 14,
-        "rows_constructed": 152,
-        "cells_constructed": 578,
-        "data_records_checked": 1,
-        "data_cells_written": 4
+        "materializations": 15,
+        "rows_constructed": 163,
+        "cells_constructed": 744,
+        "data_records_checked": 0,
+        "data_cells_written": 0,
+        "view_recomputes": 1
       },
       "draw": {
-        "samples": 14,
-        "p50_us": 18776.063,
-        "p95_us": 32571.391,
-        "p99_us": 32571.391
+        "samples": 15,
+        "p50_us": 38699.007,
+        "p95_us": 59539.455,
+        "p99_us": 59539.455
       },
       "dirty_to_present_submit": {
-        "samples": 11,
-        "p50_us": 25624.575,
-        "p95_us": 43122.687,
-        "p99_us": 43122.687
+        "samples": 13,
+        "p50_us": 43909.119,
+        "p95_us": 48496.639,
+        "p99_us": 48496.639
       },
       "present_interval": {
         "samples": 0,
@@ -69,83 +81,96 @@
       },
       "input_to_frame": {
         "samples": 3,
-        "p50_us": 37421.055,
-        "p95_us": 58687.487,
-        "p99_us": 58687.487
+        "p50_us": 47972.351,
+        "p95_us": 92274.687,
+        "p99_us": 92274.687
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
       }
     },
     "query": "ALP0000",
     "selected": null,
     "ticks": 0,
-    "dataset_revision": 2,
+    "dataset_revision": 1,
     "metrics": {
-      "description_builds": 3,
-      "encoded_snapshots": 2,
-      "encoded_bytes": 1672,
-      "ffi_callbacks": 18,
-      "ui_callbacks": 10,
-      "diagnostic_callbacks": 3,
+      "description_builds": 2,
+      "encoded_snapshots": 1,
+      "encoded_bytes": 1396,
+      "ffi_callbacks": 21,
+      "ui_callbacks": 9,
+      "diagnostic_callbacks": 9,
       "description_build": {
-        "samples": 3,
-        "p50_us": 266,
-        "p95_us": 2238,
-        "p99_us": 2238
+        "samples": 2,
+        "p50_us": 3815,
+        "p95_us": 3815,
+        "p99_us": 3815
       },
       "encode": {
-        "samples": 2,
-        "p50_us": 139,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 1,
+        "p50_us": 154,
+        "p95_us": 154,
+        "p99_us": 154
       },
       "publish_to_applied": {
-        "samples": 2,
-        "p50_us": 2390,
-        "p95_us": 2390,
-        "p99_us": 2390
+        "samples": 1,
+        "p50_us": 2389,
+        "p95_us": 2389,
+        "p99_us": 2389
       },
       "initial": {
-        "bytes": 40789,
-        "encode_us": 18256
+        "bytes": 63033,
+        "encode_us": 21312
       },
-      "data_messages": 1,
-      "data_bytes": 207,
-      "data_records_checked": 1,
-      "data_cells_written": 4,
+      "data_messages": 0,
+      "data_bytes": 0,
+      "data_records_checked": 0,
+      "data_cells_written": 0,
       "data_encode": {
-        "samples": 1,
-        "p50_us": 348,
-        "p95_us": 348,
-        "p99_us": 348
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "data_publish_to_applied": {
-        "samples": 1,
-        "p50_us": 3301,
-        "p95_us": 3301,
-        "p99_us": 3301
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "native_data_parse": {
-        "samples": 1,
-        "p50_us": 139,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "native_data_apply": {
-        "samples": 1,
-        "p50_us": 413,
-        "p95_us": 413,
-        "p99_us": 413
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "native_snapshot_apply": {
-        "samples": 2,
-        "p50_us": 89,
-        "p95_us": 89,
-        "p99_us": 89
+        "samples": 1,
+        "p50_us": 368,
+        "p95_us": 368,
+        "p99_us": 368
       }
     }
   },
   "selected": {
     "state": {
-      "revision": 4,
+      "revision": 3,
+      "native_process_id": 26444,
       "inputs": {
         "search": {
           "entity": 4294967298,
@@ -164,10 +189,20 @@
             "start": 0,
             "end": 8
           },
-          "row_count": 1,
+          "row_count": 1000,
           "dataset": "instruments",
-          "dataset_revision": 2,
-          "scroll_y": 0.0
+          "dataset_revision": 1,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1,
+            "spec_hash": 7639496448331257716
+          },
+          "selection": {
+            "row": 0,
+            "record": "ALP0000"
+          },
+          "focused": true
         }
       },
       "labels": {
@@ -184,23 +219,24 @@
         "scroll_y": 0.0
       },
       "native": {
-        "materializations": 16,
-        "rows_constructed": 172,
-        "cells_constructed": 592,
-        "data_records_checked": 1,
-        "data_cells_written": 4
+        "materializations": 19,
+        "rows_constructed": 203,
+        "cells_constructed": 776,
+        "data_records_checked": 0,
+        "data_cells_written": 0,
+        "view_recomputes": 1
       },
       "draw": {
-        "samples": 16,
-        "p50_us": 18759.679,
-        "p95_us": 32571.391,
-        "p99_us": 32571.391
+        "samples": 19,
+        "p50_us": 35520.511,
+        "p95_us": 59539.455,
+        "p99_us": 59539.455
       },
       "dirty_to_present_submit": {
-        "samples": 13,
-        "p50_us": 25624.575,
-        "p95_us": 43122.687,
-        "p99_us": 43122.687
+        "samples": 17,
+        "p50_us": 42762.239,
+        "p95_us": 48496.639,
+        "p99_us": 48496.639
       },
       "present_interval": {
         "samples": 0,
@@ -210,83 +246,96 @@
       },
       "input_to_frame": {
         "samples": 4,
-        "p50_us": 29720.575,
-        "p95_us": 58687.487,
-        "p99_us": 58687.487
+        "p50_us": 44630.015,
+        "p95_us": 92274.687,
+        "p99_us": 92274.687
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
       }
     },
     "query": "ALP0000",
     "selected": "ALP0000",
     "ticks": 0,
-    "dataset_revision": 2,
+    "dataset_revision": 1,
     "metrics": {
-      "description_builds": 4,
-      "encoded_snapshots": 3,
-      "encoded_bytes": 2522,
-      "ffi_callbacks": 21,
-      "ui_callbacks": 11,
-      "diagnostic_callbacks": 4,
+      "description_builds": 3,
+      "encoded_snapshots": 2,
+      "encoded_bytes": 2806,
+      "ffi_callbacks": 26,
+      "ui_callbacks": 10,
+      "diagnostic_callbacks": 12,
       "description_build": {
-        "samples": 4,
-        "p50_us": 266,
-        "p95_us": 2238,
-        "p99_us": 2238
+        "samples": 3,
+        "p50_us": 2053,
+        "p95_us": 3815,
+        "p99_us": 3815
       },
       "encode": {
-        "samples": 3,
-        "p50_us": 114,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 2,
+        "p50_us": 218,
+        "p95_us": 218,
+        "p99_us": 218
       },
       "publish_to_applied": {
-        "samples": 3,
-        "p50_us": 848,
-        "p95_us": 2390,
-        "p99_us": 2390
+        "samples": 2,
+        "p50_us": 22452,
+        "p95_us": 22452,
+        "p99_us": 22452
       },
       "initial": {
-        "bytes": 40789,
-        "encode_us": 18256
+        "bytes": 63033,
+        "encode_us": 21312
       },
-      "data_messages": 1,
-      "data_bytes": 207,
-      "data_records_checked": 1,
-      "data_cells_written": 4,
+      "data_messages": 0,
+      "data_bytes": 0,
+      "data_records_checked": 0,
+      "data_cells_written": 0,
       "data_encode": {
-        "samples": 1,
-        "p50_us": 348,
-        "p95_us": 348,
-        "p99_us": 348
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "data_publish_to_applied": {
-        "samples": 1,
-        "p50_us": 3301,
-        "p95_us": 3301,
-        "p99_us": 3301
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "native_data_parse": {
-        "samples": 1,
-        "p50_us": 139,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "native_data_apply": {
-        "samples": 1,
-        "p50_us": 413,
-        "p95_us": 413,
-        "p99_us": 413
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
       },
       "native_snapshot_apply": {
-        "samples": 3,
-        "p50_us": 51,
-        "p95_us": 89,
-        "p99_us": 89
+        "samples": 2,
+        "p50_us": 368,
+        "p95_us": 368,
+        "p99_us": 368
       }
     }
   },
   "saved": {
     "state": {
-      "revision": 5,
+      "revision": 4,
+      "native_process_id": 26444,
       "inputs": {
         "search": {
           "entity": 4294967298,
@@ -305,10 +354,20 @@
             "start": 0,
             "end": 8
           },
-          "row_count": 1,
+          "row_count": 1000,
           "dataset": "instruments",
-          "dataset_revision": 3,
-          "scroll_y": 0.0
+          "dataset_revision": 2,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1,
+            "spec_hash": 7639496448331257716
+          },
+          "selection": {
+            "row": 0,
+            "record": "ALP0000"
+          },
+          "focused": true
         }
       },
       "labels": {
@@ -325,23 +384,24 @@
         "scroll_y": 0.0
       },
       "native": {
-        "materializations": 17,
-        "rows_constructed": 182,
-        "cells_constructed": 599,
-        "data_records_checked": 2,
-        "data_cells_written": 5
+        "materializations": 20,
+        "rows_constructed": 213,
+        "cells_constructed": 784,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 1
       },
       "draw": {
-        "samples": 17,
-        "p50_us": 18759.679,
-        "p95_us": 32571.391,
-        "p99_us": 32571.391
+        "samples": 20,
+        "p50_us": 35323.903,
+        "p95_us": 42532.863,
+        "p99_us": 59539.455
       },
       "dirty_to_present_submit": {
-        "samples": 14,
-        "p50_us": 23756.799,
-        "p95_us": 43122.687,
-        "p99_us": 43122.687
+        "samples": 18,
+        "p50_us": 42041.343,
+        "p95_us": 48496.639,
+        "p99_us": 48496.639
       },
       "present_interval": {
         "samples": 0,
@@ -351,83 +411,96 @@
       },
       "input_to_frame": {
         "samples": 5,
-        "p50_us": 29720.575,
-        "p95_us": 58687.487,
-        "p99_us": 58687.487
+        "p50_us": 44630.015,
+        "p95_us": 92274.687,
+        "p99_us": 92274.687
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
       }
     },
     "query": "ALP0000",
     "selected": "ALP0000",
     "ticks": 0,
-    "dataset_revision": 3,
+    "dataset_revision": 2,
     "metrics": {
-      "description_builds": 5,
-      "encoded_snapshots": 4,
-      "encoded_bytes": 3335,
-      "ffi_callbacks": 25,
-      "ui_callbacks": 12,
-      "diagnostic_callbacks": 5,
+      "description_builds": 4,
+      "encoded_snapshots": 3,
+      "encoded_bytes": 4179,
+      "ffi_callbacks": 32,
+      "ui_callbacks": 11,
+      "diagnostic_callbacks": 15,
       "description_build": {
-        "samples": 5,
-        "p50_us": 225,
-        "p95_us": 2238,
-        "p99_us": 2238
+        "samples": 4,
+        "p50_us": 2053,
+        "p95_us": 3815,
+        "p99_us": 3815
       },
       "encode": {
-        "samples": 4,
-        "p50_us": 114,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 3,
+        "p50_us": 218,
+        "p95_us": 218,
+        "p99_us": 218
       },
       "publish_to_applied": {
-        "samples": 4,
-        "p50_us": 848,
-        "p95_us": 2390,
-        "p99_us": 2390
+        "samples": 3,
+        "p50_us": 2389,
+        "p95_us": 22452,
+        "p99_us": 22452
       },
       "initial": {
-        "bytes": 40789,
-        "encode_us": 18256
+        "bytes": 63033,
+        "encode_us": 21312
       },
-      "data_messages": 2,
-      "data_bytes": 354,
-      "data_records_checked": 2,
-      "data_cells_written": 5,
+      "data_messages": 1,
+      "data_bytes": 148,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
       "data_encode": {
-        "samples": 2,
-        "p50_us": 348,
-        "p95_us": 348,
-        "p99_us": 348
+        "samples": 1,
+        "p50_us": 76,
+        "p95_us": 76,
+        "p99_us": 76
       },
       "data_publish_to_applied": {
-        "samples": 2,
-        "p50_us": 3301,
-        "p95_us": 3301,
-        "p99_us": 3301
+        "samples": 1,
+        "p50_us": 1253,
+        "p95_us": 1253,
+        "p99_us": 1253
       },
       "native_data_parse": {
-        "samples": 2,
-        "p50_us": 139,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 1,
+        "p50_us": 103,
+        "p95_us": 103,
+        "p99_us": 103
       },
       "native_data_apply": {
-        "samples": 2,
-        "p50_us": 413,
-        "p95_us": 413,
-        "p99_us": 413
+        "samples": 1,
+        "p50_us": 118,
+        "p95_us": 118,
+        "p99_us": 118
       },
       "native_snapshot_apply": {
-        "samples": 4,
-        "p50_us": 51,
-        "p95_us": 89,
-        "p99_us": 89
+        "samples": 3,
+        "p50_us": 137,
+        "p95_us": 368,
+        "p99_us": 368
       }
     }
   },
   "updated": {
     "state": {
-      "revision": 6,
+      "revision": 5,
+      "native_process_id": 26444,
       "inputs": {
         "search": {
           "entity": 4294967298,
@@ -446,10 +519,20 @@
             "start": 0,
             "end": 8
           },
-          "row_count": 1,
+          "row_count": 1000,
           "dataset": "instruments",
-          "dataset_revision": 4,
-          "scroll_y": 0.0
+          "dataset_revision": 3,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1,
+            "spec_hash": 7639496448331257716
+          },
+          "selection": {
+            "row": 0,
+            "record": "ALP0000"
+          },
+          "focused": true
         }
       },
       "labels": {
@@ -466,23 +549,24 @@
         "scroll_y": 0.0
       },
       "native": {
-        "materializations": 18,
-        "rows_constructed": 192,
-        "cells_constructed": 606,
-        "data_records_checked": 3,
-        "data_cells_written": 6
+        "materializations": 21,
+        "rows_constructed": 223,
+        "cells_constructed": 792,
+        "data_records_checked": 2,
+        "data_cells_written": 2,
+        "view_recomputes": 1
       },
       "draw": {
-        "samples": 18,
-        "p50_us": 18268.159,
-        "p95_us": 32571.391,
-        "p99_us": 32571.391
+        "samples": 21,
+        "p50_us": 35520.511,
+        "p95_us": 48627.711,
+        "p99_us": 59539.455
       },
       "dirty_to_present_submit": {
-        "samples": 15,
-        "p50_us": 25624.575,
-        "p95_us": 43122.687,
-        "p99_us": 43122.687
+        "samples": 19,
+        "p50_us": 42762.239,
+        "p95_us": 60358.655,
+        "p99_us": 60358.655
       },
       "present_interval": {
         "samples": 0,
@@ -492,83 +576,96 @@
       },
       "input_to_frame": {
         "samples": 6,
-        "p50_us": 26689.535,
-        "p95_us": 58687.487,
-        "p99_us": 58687.487
+        "p50_us": 44630.015,
+        "p95_us": 92274.687,
+        "p99_us": 92274.687
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.07",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
       }
     },
     "query": "ALP0000",
     "selected": "ALP0000",
     "ticks": 1,
-    "dataset_revision": 4,
+    "dataset_revision": 3,
     "metrics": {
-      "description_builds": 6,
-      "encoded_snapshots": 5,
-      "encoded_bytes": 4147,
-      "ffi_callbacks": 29,
-      "ui_callbacks": 13,
-      "diagnostic_callbacks": 6,
+      "description_builds": 5,
+      "encoded_snapshots": 4,
+      "encoded_bytes": 5551,
+      "ffi_callbacks": 38,
+      "ui_callbacks": 12,
+      "diagnostic_callbacks": 18,
       "description_build": {
-        "samples": 6,
-        "p50_us": 225,
-        "p95_us": 2238,
-        "p99_us": 2238
+        "samples": 5,
+        "p50_us": 1124,
+        "p95_us": 3815,
+        "p99_us": 3815
       },
       "encode": {
-        "samples": 5,
-        "p50_us": 108,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 4,
+        "p50_us": 218,
+        "p95_us": 228,
+        "p99_us": 228
       },
       "publish_to_applied": {
-        "samples": 5,
-        "p50_us": 619,
-        "p95_us": 2390,
-        "p99_us": 2390
+        "samples": 4,
+        "p50_us": 2389,
+        "p95_us": 22452,
+        "p99_us": 22452
       },
       "initial": {
-        "bytes": 40789,
-        "encode_us": 18256
+        "bytes": 63033,
+        "encode_us": 21312
       },
-      "data_messages": 3,
-      "data_bytes": 502,
-      "data_records_checked": 3,
-      "data_cells_written": 6,
+      "data_messages": 2,
+      "data_bytes": 299,
+      "data_records_checked": 2,
+      "data_cells_written": 2,
       "data_encode": {
-        "samples": 3,
-        "p50_us": 63,
-        "p95_us": 348,
-        "p99_us": 348
+        "samples": 2,
+        "p50_us": 101,
+        "p95_us": 101,
+        "p99_us": 101
       },
       "data_publish_to_applied": {
-        "samples": 3,
-        "p50_us": 469,
-        "p95_us": 3301,
-        "p99_us": 3301
+        "samples": 2,
+        "p50_us": 1253,
+        "p95_us": 1253,
+        "p99_us": 1253
       },
       "native_data_parse": {
-        "samples": 3,
-        "p50_us": 68,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 2,
+        "p50_us": 124,
+        "p95_us": 124,
+        "p99_us": 124
       },
       "native_data_apply": {
-        "samples": 3,
-        "p50_us": 30,
-        "p95_us": 413,
-        "p99_us": 413
+        "samples": 2,
+        "p50_us": 118,
+        "p95_us": 118,
+        "p99_us": 118
       },
       "native_snapshot_apply": {
-        "samples": 5,
-        "p50_us": 44,
-        "p95_us": 89,
-        "p99_us": 89
+        "samples": 4,
+        "p50_us": 137,
+        "p95_us": 368,
+        "p99_us": 368
       }
     }
   },
   "filtered": {
     "state": {
-      "revision": 8,
+      "revision": 6,
+      "native_process_id": 26444,
       "inputs": {
         "search": {
           "entity": 4294967298,
@@ -587,17 +684,27 @@
             "start": 0,
             "end": 8
           },
-          "row_count": 1,
+          "row_count": 1000,
           "dataset": "instruments",
-          "dataset_revision": 5,
-          "scroll_y": 0.0
+          "dataset_revision": 3,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1,
+            "spec_hash": 3207181374279285302
+          },
+          "selection": {
+            "row": 0,
+            "record": "ALP0000"
+          },
+          "focused": true
         }
       },
       "labels": {
         "title": "Market watch",
         "source": "Sample instruments and prices. No live market feed.",
         "summary": "1 instrument shown · 1 saved",
-        "selection": "No instrument selected",
+        "selection": "ALP0000 · Alpine Research · 100.07",
         "status": "Updated ALP0000 to 100.07."
       },
       "window": {
@@ -607,23 +714,24 @@
         "scroll_y": 0.0
       },
       "native": {
-        "materializations": 19,
-        "rows_constructed": 202,
-        "cells_constructed": 613,
-        "data_records_checked": 4,
-        "data_cells_written": 10
+        "materializations": 22,
+        "rows_constructed": 233,
+        "cells_constructed": 800,
+        "data_records_checked": 2,
+        "data_cells_written": 2,
+        "view_recomputes": 2
       },
       "draw": {
-        "samples": 19,
-        "p50_us": 18268.159,
-        "p95_us": 32571.391,
-        "p99_us": 32571.391
+        "samples": 22,
+        "p50_us": 35323.903,
+        "p95_us": 48627.711,
+        "p99_us": 59539.455
       },
       "dirty_to_present_submit": {
-        "samples": 16,
-        "p50_us": 25624.575,
-        "p95_us": 43122.687,
-        "p99_us": 43122.687
+        "samples": 20,
+        "p50_us": 42041.343,
+        "p95_us": 48496.639,
+        "p99_us": 60358.655
       },
       "present_interval": {
         "samples": 0,
@@ -633,77 +741,584 @@
       },
       "input_to_frame": {
         "samples": 7,
-        "p50_us": 29720.575,
-        "p95_us": 58687.487,
-        "p99_us": 58687.487
+        "p50_us": 44630.015,
+        "p95_us": 92274.687,
+        "p99_us": 92274.687
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.07",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
       }
     },
     "query": "ALP0000",
-    "selected": null,
+    "selected": "ALP0000",
     "ticks": 1,
-    "dataset_revision": 5,
+    "dataset_revision": 3,
     "metrics": {
-      "description_builds": 8,
-      "encoded_snapshots": 7,
-      "encoded_bytes": 5745,
-      "ffi_callbacks": 36,
-      "ui_callbacks": 15,
-      "diagnostic_callbacks": 8,
+      "description_builds": 6,
+      "encoded_snapshots": 5,
+      "encoded_bytes": 6968,
+      "ffi_callbacks": 46,
+      "ui_callbacks": 13,
+      "diagnostic_callbacks": 24,
       "description_build": {
-        "samples": 8,
-        "p50_us": 214,
-        "p95_us": 2238,
-        "p99_us": 2238
+        "samples": 6,
+        "p50_us": 1124,
+        "p95_us": 3815,
+        "p99_us": 3815
       },
       "encode": {
-        "samples": 7,
-        "p50_us": 85,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 5,
+        "p50_us": 218,
+        "p95_us": 228,
+        "p99_us": 228
       },
       "publish_to_applied": {
-        "samples": 7,
-        "p50_us": 477,
-        "p95_us": 2390,
-        "p99_us": 2390
+        "samples": 5,
+        "p50_us": 1363,
+        "p95_us": 22452,
+        "p99_us": 22452
       },
       "initial": {
-        "bytes": 40789,
-        "encode_us": 18256
+        "bytes": 63033,
+        "encode_us": 21312
       },
-      "data_messages": 4,
-      "data_bytes": 715,
-      "data_records_checked": 4,
-      "data_cells_written": 10,
+      "data_messages": 2,
+      "data_bytes": 299,
+      "data_records_checked": 2,
+      "data_cells_written": 2,
       "data_encode": {
-        "samples": 4,
-        "p50_us": 79,
-        "p95_us": 348,
-        "p99_us": 348
+        "samples": 2,
+        "p50_us": 101,
+        "p95_us": 101,
+        "p99_us": 101
       },
       "data_publish_to_applied": {
-        "samples": 4,
-        "p50_us": 595,
-        "p95_us": 3301,
-        "p99_us": 3301
+        "samples": 2,
+        "p50_us": 1253,
+        "p95_us": 1253,
+        "p99_us": 1253
       },
       "native_data_parse": {
-        "samples": 4,
-        "p50_us": 68,
-        "p95_us": 139,
-        "p99_us": 139
+        "samples": 2,
+        "p50_us": 124,
+        "p95_us": 124,
+        "p99_us": 124
       },
       "native_data_apply": {
-        "samples": 4,
-        "p50_us": 83,
-        "p95_us": 413,
-        "p99_us": 413
+        "samples": 2,
+        "p50_us": 118,
+        "p95_us": 118,
+        "p99_us": 118
       },
       "native_snapshot_apply": {
-        "samples": 7,
-        "p50_us": 43,
-        "p95_us": 89,
-        "p99_us": 89
+        "samples": 5,
+        "p50_us": 137,
+        "p95_us": 368,
+        "p99_us": 368
+      }
+    }
+  },
+  "sorted": {
+    "state": {
+      "revision": 10,
+      "native_process_id": 26444,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "ALP",
+          "selection": {
+            "start": 3,
+            "end": 3
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 116,
+            "end": 125
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 3,
+          "scroll_y": -3715.199951171875,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 125,
+            "spec_hash": 2428760870097551243
+          },
+          "selection": {
+            "row": 124,
+            "record": "ALP0000"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "125 instruments shown · 1 saved",
+        "selection": "ALP0000 · Alpine Research · 100.07",
+        "status": "Updated ALP0000 to 100.07."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.25,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 50,
+        "rows_constructed": 529,
+        "cells_constructed": 1792,
+        "data_records_checked": 2,
+        "data_cells_written": 2,
+        "view_recomputes": 5
+      },
+      "draw": {
+        "samples": 50,
+        "p50_us": 30146.559,
+        "p95_us": 48627.711,
+        "p99_us": 59539.455
+      },
+      "dirty_to_present_submit": {
+        "samples": 44,
+        "p50_us": 32686.079,
+        "p95_us": 48496.639,
+        "p99_us": 65929.215
+      },
+      "present_interval": {
+        "samples": 10,
+        "p50_us": 32555.007,
+        "p95_us": 35520.511,
+        "p99_us": 35520.511
+      },
+      "input_to_frame": {
+        "samples": 11,
+        "p50_us": 44630.015,
+        "p95_us": 93650.943,
+        "p99_us": 93650.943
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "169.44",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "0.02",
+        "color": "token:success",
+        "icon": "arrow_up"
+      }
+    },
+    "query": "ALP",
+    "selected": "ALP0000",
+    "ticks": 1,
+    "dataset_revision": 3,
+    "metrics": {
+      "description_builds": 10,
+      "encoded_snapshots": 9,
+      "encoded_bytes": 12587,
+      "ffi_callbacks": 69,
+      "ui_callbacks": 20,
+      "diagnostic_callbacks": 36,
+      "description_build": {
+        "samples": 10,
+        "p50_us": 630,
+        "p95_us": 3815,
+        "p99_us": 3815
+      },
+      "encode": {
+        "samples": 9,
+        "p50_us": 218,
+        "p95_us": 2119,
+        "p99_us": 2119
+      },
+      "publish_to_applied": {
+        "samples": 9,
+        "p50_us": 1652,
+        "p95_us": 33840,
+        "p99_us": 33840
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 21312
+      },
+      "data_messages": 2,
+      "data_bytes": 299,
+      "data_records_checked": 2,
+      "data_cells_written": 2,
+      "data_encode": {
+        "samples": 2,
+        "p50_us": 101,
+        "p95_us": 101,
+        "p99_us": 101
+      },
+      "data_publish_to_applied": {
+        "samples": 2,
+        "p50_us": 1253,
+        "p95_us": 1253,
+        "p99_us": 1253
+      },
+      "native_data_parse": {
+        "samples": 2,
+        "p50_us": 124,
+        "p95_us": 124,
+        "p99_us": 124
+      },
+      "native_data_apply": {
+        "samples": 2,
+        "p50_us": 118,
+        "p95_us": 118,
+        "p99_us": 118
+      },
+      "native_snapshot_apply": {
+        "samples": 9,
+        "p50_us": 319,
+        "p95_us": 629,
+        "p99_us": 629
+      }
+    }
+  },
+  "added": {
+    "state": {
+      "revision": 12,
+      "native_process_id": 26444,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "ALP",
+          "selection": {
+            "start": 3,
+            "end": 3
+          },
+          "focused": false
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 116,
+            "end": 125
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 4,
+          "scroll_y": -3715.199951171875,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 125,
+            "spec_hash": 2428760870097551243
+          },
+          "selection": {
+            "row": 117,
+            "record": "ALP0056"
+          },
+          "focused": true
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "125 instruments shown · 2 saved",
+        "selection": "ALP0056 · Alpine Research · 103.92",
+        "status": "ALP0056 added to shortlist."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.25,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 74,
+        "rows_constructed": 793,
+        "cells_constructed": 3136,
+        "data_records_checked": 3,
+        "data_cells_written": 3,
+        "view_recomputes": 5
+      },
+      "draw": {
+        "samples": 74,
+        "p50_us": 27000.831,
+        "p95_us": 42532.863,
+        "p99_us": 59539.455
+      },
+      "dirty_to_present_submit": {
+        "samples": 67,
+        "p50_us": 30736.383,
+        "p95_us": 47710.207,
+        "p99_us": 65929.215
+      },
+      "present_interval": {
+        "samples": 28,
+        "p50_us": 29704.191,
+        "p95_us": 35520.511,
+        "p99_us": 51347.455
+      },
+      "input_to_frame": {
+        "samples": 13,
+        "p50_us": 44630.015,
+        "p95_us": 93650.943,
+        "p99_us": 93650.943
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "169.44",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "0.02",
+        "color": "token:success",
+        "icon": "arrow_up"
+      }
+    },
+    "query": "ALP",
+    "selected": "ALP0056",
+    "ticks": 1,
+    "dataset_revision": 4,
+    "metrics": {
+      "description_builds": 12,
+      "encoded_snapshots": 11,
+      "encoded_bytes": 15419,
+      "ffi_callbacks": 80,
+      "ui_callbacks": 22,
+      "diagnostic_callbacks": 42,
+      "description_build": {
+        "samples": 12,
+        "p50_us": 624,
+        "p95_us": 2053,
+        "p99_us": 3815
+      },
+      "encode": {
+        "samples": 11,
+        "p50_us": 218,
+        "p95_us": 2119,
+        "p99_us": 2119
+      },
+      "publish_to_applied": {
+        "samples": 11,
+        "p50_us": 2389,
+        "p95_us": 33840,
+        "p99_us": 33840
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 21312
+      },
+      "data_messages": 3,
+      "data_bytes": 448,
+      "data_records_checked": 3,
+      "data_cells_written": 3,
+      "data_encode": {
+        "samples": 3,
+        "p50_us": 101,
+        "p95_us": 106,
+        "p99_us": 106
+      },
+      "data_publish_to_applied": {
+        "samples": 3,
+        "p50_us": 1253,
+        "p95_us": 24048,
+        "p99_us": 24048
+      },
+      "native_data_parse": {
+        "samples": 3,
+        "p50_us": 103,
+        "p95_us": 124,
+        "p99_us": 124
+      },
+      "native_data_apply": {
+        "samples": 3,
+        "p50_us": 106,
+        "p95_us": 118,
+        "p99_us": 118
+      },
+      "native_snapshot_apply": {
+        "samples": 11,
+        "p50_us": 137,
+        "p95_us": 629,
+        "p99_us": 629
+      }
+    }
+  },
+  "focused": {
+    "state": {
+      "revision": 12,
+      "native_process_id": 26444,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "ALP",
+          "selection": {
+            "start": 3,
+            "end": 3
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 116,
+            "end": 125
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 4,
+          "scroll_y": -3715.199951171875,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 125,
+            "spec_hash": 2428760870097551243
+          },
+          "selection": {
+            "row": 117,
+            "record": "ALP0056"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "125 instruments shown · 2 saved",
+        "selection": "ALP0056 · Alpine Research · 103.92",
+        "status": "ALP0056 added to shortlist."
+      },
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.25,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 76,
+        "rows_constructed": 815,
+        "cells_constructed": 3248,
+        "data_records_checked": 3,
+        "data_cells_written": 3,
+        "view_recomputes": 5
+      },
+      "draw": {
+        "samples": 76,
+        "p50_us": 27656.191,
+        "p95_us": 42532.863,
+        "p99_us": 59539.455
+      },
+      "dirty_to_present_submit": {
+        "samples": 69,
+        "p50_us": 30736.383,
+        "p95_us": 47710.207,
+        "p99_us": 65929.215
+      },
+      "present_interval": {
+        "samples": 28,
+        "p50_us": 29704.191,
+        "p95_us": 35520.511,
+        "p99_us": 51347.455
+      },
+      "input_to_frame": {
+        "samples": 13,
+        "p50_us": 44630.015,
+        "p95_us": 93650.943,
+        "p99_us": 93650.943
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "169.44",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "0.02",
+        "color": "token:success",
+        "icon": "arrow_up"
+      }
+    },
+    "query": "ALP",
+    "selected": "ALP0056",
+    "ticks": 1,
+    "dataset_revision": 4,
+    "metrics": {
+      "description_builds": 12,
+      "encoded_snapshots": 11,
+      "encoded_bytes": 15419,
+      "ffi_callbacks": 85,
+      "ui_callbacks": 23,
+      "diagnostic_callbacks": 46,
+      "description_build": {
+        "samples": 12,
+        "p50_us": 624,
+        "p95_us": 2053,
+        "p99_us": 3815
+      },
+      "encode": {
+        "samples": 11,
+        "p50_us": 218,
+        "p95_us": 2119,
+        "p99_us": 2119
+      },
+      "publish_to_applied": {
+        "samples": 11,
+        "p50_us": 2389,
+        "p95_us": 33840,
+        "p99_us": 33840
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 21312
+      },
+      "data_messages": 3,
+      "data_bytes": 448,
+      "data_records_checked": 3,
+      "data_cells_written": 3,
+      "data_encode": {
+        "samples": 3,
+        "p50_us": 101,
+        "p95_us": 106,
+        "p99_us": 106
+      },
+      "data_publish_to_applied": {
+        "samples": 3,
+        "p50_us": 1253,
+        "p95_us": 24048,
+        "p99_us": 24048
+      },
+      "native_data_parse": {
+        "samples": 3,
+        "p50_us": 103,
+        "p95_us": 124,
+        "p99_us": 124
+      },
+      "native_data_apply": {
+        "samples": 3,
+        "p50_us": 106,
+        "p95_us": 118,
+        "p99_us": 118
+      },
+      "native_snapshot_apply": {
+        "samples": 11,
+        "p50_us": 137,
+        "p95_us": 629,
+        "p99_us": 629
       }
     }
   }

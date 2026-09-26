@@ -4,7 +4,7 @@ Recorded on 2026-09-25 in the working tree. GPUI-Dart 0.1 now has a documented a
 
 ## Delivered
 
-- [Market watch](../../example/watchlist/main.dart) displays 1,000 fictitious instruments with search, row selection, a shortlist and sample price edits. A price or shortlist edit publishes one cell; filtering deliberately replaces the displayed dataset. Application state is in memory.
+- [Market watch](../../example/watchlist/main.dart) displays 1,000 fictitious instruments with search, row selection, a shortlist, price sorting and sample price edits. A price or shortlist edit publishes one cell; search and filtering are a native view that never republishes records, and selection survives view changes by record ID. Application state is in memory.
 - [The SDK guide](../../docs/sdk.md) documents lifecycle, IDs, dataset revisions, errors, reload and packaging. New public APIs cover row layout, initial window options, typed table-selection events and shared development reload registration.
 - The development launcher accepts an entry point and application arguments, watches that entry point's directory and lib, applies saved code changes, and exits after the window closes.
 - The shared Windows host selects or verifies PerMonitorV2 awareness. The AOT executable also embeds that setting in its application manifest.

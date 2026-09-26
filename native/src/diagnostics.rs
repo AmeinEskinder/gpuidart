@@ -38,6 +38,10 @@ pub(crate) enum Request {
         row: usize,
         column: usize,
     },
+    Focus {
+        request: u64,
+        input: String,
+    },
     Inspect {
         request: u64,
     },
@@ -62,6 +66,7 @@ impl Request {
             Self::Runtime { request }
             | Self::Cell { request, .. }
             | Self::FormattedCell { request, .. }
+            | Self::Focus { request, .. }
             | Self::Inspect { request }
             | Self::Repaint { request, .. }
             | Self::Prepare { request, .. } => *request,
@@ -99,6 +104,16 @@ pub(crate) fn handle(
             request,
             data: view.read(cx).formatted_cell(&table, row, column, cx),
         }),
+        Request::Focus { request, input } => {
+            let outcome = view.update(cx, |view, cx| view.focus_input(&input, window, cx));
+            events.emit(Event::Diagnostic {
+                request,
+                data: match outcome {
+                    Ok(()) => json!({"focused": input}),
+                    Err(error) => json!({"error": error}),
+                },
+            });
+        }
         Request::Inspect { request } => reply(request, view, events, window, cx),
         Request::Repaint { request, frames } if frames <= 600 => {
             let target = view.read(cx).materialization_count() + u64::from(frames);

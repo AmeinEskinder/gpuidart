@@ -29,7 +29,7 @@ From this directory in PowerShell:
 dart run tool/dev.dart
 ```
 
-Market watch opens a native GPUI window with 1,000 fictitious instruments. Search, select a row, add it to your shortlist and simulate a price update. Input text, focus, selection and scroll state survive ordinary description replacement. Filtering deliberately replaces the table dataset and resets table selection/scroll. State is in memory. The earlier counter and 10,000-row measurement example remains in example/main.dart.
+Market watch opens a native GPUI window with 1,000 fictitious instruments. Search by symbol, select a row, add it to your shortlist, sort by price and simulate a price update. Search and the shortlist toggle are a native view over the dataset: filtering and sorting never move or republish records, selection survives them by stable record ID, and prices/changes render through declarative number formats with color and icon rules. Ctrl+F focuses search and Ctrl+Enter saves the selected record as scoped key actions. Input text, focus, selection and scroll state survive ordinary description replacement. State is in memory. The earlier counter and 10,000-row measurement example remains in example/main.dart.
 
 For a release build:
 

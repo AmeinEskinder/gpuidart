@@ -62,11 +62,11 @@ Future<void> main(List<String> args) async {
       'Native process ID was not reported',
     );
     require(
-      before['query'] == 'ALP' && before['ticks'] == 1,
+      before['query'] == '0' && before['ticks'] == 1,
       'Watchlist application state was not prepared',
     );
     require(
-      before['selected'] == 'ALP0200',
+      before['selected'] == 'BRK0025',
       'Stable instrument selection was not prepared',
     );
     require(

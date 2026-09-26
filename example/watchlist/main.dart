@@ -21,6 +21,7 @@ Future<void> main(List<String> args) async {
   final host = await GpuiHost.openView(
     app.build,
     datasets: [app.dataset],
+    actions: WatchlistApplication.actions,
     trace: trace,
     window: const GpuiWindowOptions(
       title: 'Market watch',
@@ -78,9 +79,17 @@ Future<void> main(List<String> args) async {
       enqueue(() async {
         if (selection.dataset == app.dataset.id &&
             selection.datasetRevision == app.dataset.revision) {
-          await app.select(host, selection.row);
+          // Selection is keyed by record ID; the view row is for debugging.
+          await app.select(host, selection.record);
         }
       });
+    } else if (event.action case final action?) {
+      switch (action.name) {
+        case 'app.search':
+          enqueue(() => app.focusSearch(host));
+        case 'watchlist.add':
+          enqueue(() => app.addSelectedToShortlist(host));
+      }
     } else if (event.type == 'click') {
       switch (event.id) {
         case 'tick':
@@ -89,6 +98,8 @@ Future<void> main(List<String> args) async {
           enqueue(() => app.toggleShortlist(host));
         case 'shortlist-filter':
           enqueue(() => app.filter(host, shortlistOnly: !app.shortlistOnly));
+        case 'sort-price':
+          enqueue(() => app.cycleSort(host));
       }
     }
   });
@@ -105,6 +116,19 @@ Future<void> main(List<String> args) async {
       return ServiceExtensionResponse.result(
         jsonEncode({
           'state': await host.diagnose('inspect'),
+          'formatted': {
+            // Row 0 of the current view: the formatting of what is on screen.
+            'price': await host.diagnose('formatted_cell', {
+              'table': 'watchlist',
+              'row': 0,
+              'column': 2,
+            }),
+            'change': await host.diagnose('formatted_cell', {
+              'table': 'watchlist',
+              'row': 0,
+              'column': 3,
+            }),
+          },
           'query': app.query,
           'selected': app.selectedSymbol,
           'ticks': app.ticks,
@@ -114,14 +138,16 @@ Future<void> main(List<String> args) async {
       );
     });
     registerExtension('ext.gpuidart.prepare', (_, _) async {
-      await app.filter(host, query: 'ALP');
-      await app.select(host, 25);
+      // '0' matches every symbol (all are zero-padded), so the view keeps all
+      // 1,000 records and scrolling to the selected record is meaningful.
+      await app.filter(host, query: '0');
+      await app.select(host, 'BRK0025');
       await app.tick(host);
       final state = await host.diagnose('prepare', {
         'input': 'search',
-        'text': 'ALP',
+        'text': '0',
         'start': 0,
-        'end': 3,
+        'end': 1,
         'table': 'watchlist',
         'row': 25,
       });
@@ -136,34 +162,70 @@ Future<void> main(List<String> args) async {
         if (!condition) throw StateError(message);
       }
 
+      Future<Map<String, dynamic>> table() async {
+        final state = await host.diagnose('inspect');
+        return state['tables']['watchlist'] as Map<String, dynamic>;
+      }
+
+      // Search publishes a view; the dataset keeps all 1,000 records.
       await app.filter(host, query: 'ALP0000');
-      require(app.dataset.rowCount == 1, 'Search did not filter the dataset');
-      await app.select(host, 0);
+      var watchlist = await table();
+      require(
+        watchlist['view']['view_rows'] == 1 && watchlist['row_count'] == 1000,
+        'Search did not drive the native view',
+      );
+      await app.select(host, 'ALP0000');
       final messages = host.metrics.read()['data_messages'] as int;
       await app.tick(host);
-      require(app.dataset.cell(0, 2) == '100.07', 'Price edit failed');
+      require(app.dataset.cell(0, 2) == '100.0700', 'Price edit failed');
       require(
         (host.metrics.read()['data_messages'] as int) == messages + 1,
         'Price edit did not use one dataset transaction',
       );
+      final price = await host.diagnose('formatted_cell', {
+        'table': 'watchlist',
+        'row': 0,
+        'column': 2,
+      });
+      require(price['text'] == '100.07', 'Price format did not render');
+      final change = await host.diagnose('formatted_cell', {
+        'table': 'watchlist',
+        'row': 0,
+        'column': 3,
+      });
+      require(
+        change['color'] == 'token:danger' && change['icon'] == 'arrow_down',
+        'Change rules did not render',
+      );
+      // Note: self-test drives app methods directly, so native pointer
+      // selection is covered by the live UI verifier instead.
       await app.toggleShortlist(host);
       await app.filter(host, query: '', shortlistOnly: true);
+      watchlist = await table();
       require(
-        app.dataset.rowCount == 1 && app.dataset.cell(0, 3) == 'Saved',
-        'Shortlist filter failed',
+        watchlist['view']['view_rows'] == 1 &&
+            app.dataset.cell(0, 4) == 'Saved',
+        'Shortlist view lost the saved record',
       );
-      await app.select(host, 0);
       await app.toggleShortlist(host);
-      require(app.dataset.rowCount == 0, 'Removing a saved instrument failed');
+      watchlist = await table();
+      require(
+        watchlist['view']['view_rows'] == 0,
+        'Removing a saved instrument failed',
+      );
       await app.filter(host, query: '', shortlistOnly: false);
-      require(app.dataset.rowCount == 1000, 'Full list did not return');
+      watchlist = await table();
+      require(
+        watchlist['view']['view_rows'] == 1000 && app.dataset.rowCount == 1000,
+        'Full list did not return',
+      );
       final cell = await host.diagnose('cell', {
         'dataset': 'instruments',
         'row': 0,
         'column': 2,
       });
       require(
-        cell['value'] == '100.07',
+        cell['value'] == '100.0700',
         'Native price was lost during filtering',
       );
       final state = await host.diagnose('inspect');
