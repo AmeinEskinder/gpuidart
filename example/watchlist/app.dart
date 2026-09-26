@@ -25,7 +25,7 @@ class Instrument {
 /// The dataset always holds all instruments; search, shortlist filtering and
 /// sorting are a native view over it, so record selection survives them.
 class WatchlistApplication {
-  WatchlistApplication() {
+  WatchlistApplication({this.count = 1000}) {
     const companies = [
       ('ALP', 'Alpine Research'),
       ('BRK', 'Brookfield Labs'),
@@ -36,7 +36,7 @@ class WatchlistApplication {
       ('GLN', 'Glen Robotics'),
       ('HBR', 'Harbor Design'),
     ];
-    instruments = List.generate(1000, (index) {
+    instruments = List.generate(count, (index) {
       final company = companies[index % companies.length];
       return Instrument(
         '${company.$1}${index.toString().padLeft(4, '0')}',
@@ -72,6 +72,7 @@ class WatchlistApplication {
   }
 
   static const columns = ['Symbol', 'Company', 'Price', 'Change', 'Shortlist'];
+  final int count;
   late final List<Instrument> instruments;
   late final TableDataset dataset;
   String query = '';

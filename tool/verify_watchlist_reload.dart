@@ -7,6 +7,7 @@ Future<void> main(List<String> args) async {
   var reportPath = 'reports/sdk/reload.json';
   var prepareDelayMs = 300;
   var tracing = false;
+  var rows = 1000;
   for (final arg in args) {
     if (arg.startsWith('--report=')) {
       reportPath = arg.substring(9);
@@ -14,6 +15,11 @@ Future<void> main(List<String> args) async {
       prepareDelayMs = int.parse(arg.substring(19));
       if (prepareDelayMs < 0 || prepareDelayMs > 5000) {
         throw ArgumentError('Preparation delay must be 0..5000 ms');
+      }
+    } else if (arg.startsWith('--rows=')) {
+      rows = int.parse(arg.substring(7));
+      if (rows < 26 || rows > 100000) {
+        throw ArgumentError('Rows must be 26..100000');
       }
     } else if (arg == '--trace') {
       tracing = true;
@@ -31,7 +37,7 @@ Future<void> main(List<String> args) async {
       .copy('${fixture.path}/main.dart');
   final session = await DevSession.start(
     entry: entry.absolute.path,
-    arguments: [if (tracing) '--trace=$tracePath'],
+    arguments: ['--rows=$rows', if (tracing) '--trace=$tracePath'],
   );
   void require(bool condition, String message) {
     if (!condition) throw StateError(message);
@@ -41,6 +47,7 @@ Future<void> main(List<String> args) async {
     'passed': false,
     'prepare_delay_ms': prepareDelayMs,
     'tracing': tracing,
+    'rows': rows,
   };
 
   try {
@@ -49,9 +56,10 @@ Future<void> main(List<String> args) async {
     report['prepared'] = await session.call('prepare');
     final prepared = report['prepared'] as Map<String, dynamic>;
     require(
-      prepared['tables']['watchlist']['visible_rows']['start'] == 25 &&
+      prepared['tables']['watchlist']['visible_rows']['start'] <= 25 &&
+          prepared['tables']['watchlist']['visible_rows']['end'] > 25 &&
           prepared['tables']['watchlist']['scroll_y'] < 0,
-      'Preparation acknowledged before the requested scroll was rendered',
+      'Preparation acknowledged before the requested scroll was rendered: ${prepared['tables']['watchlist']}',
     );
     await Future<void>.delayed(Duration(milliseconds: prepareDelayMs));
     final before = await session.call('inspect');
@@ -72,6 +80,13 @@ Future<void> main(List<String> args) async {
     require(
       before['state']['inputs']['search']['focused'] == true,
       'Search did not retain focus',
+    );
+    require(
+      before['state']['tables']['watchlist']['view']['source_rows'] == rows &&
+          before['state']['tables']['watchlist']['view']['view_rows'] > 25 &&
+          before['state']['tables']['watchlist']['selection']['record'] ==
+              'BRK0025',
+      'Preparation did not produce the expected view and record selection',
     );
     require(
       before['state']['tables']['watchlist']['scroll_y'] < 0,
@@ -191,7 +206,7 @@ Future<void> main(List<String> args) async {
       'recovered_after_invalid_source': true,
     });
     stdout.writeln(
-      'PASS: watchlist code reload preserved application state, input text/focus/selection, table identity and scroll without republishing data.',
+      'PASS: watchlist code reload preserved application state, input text/focus/selection, table identity and scroll without republishing data ($rows records).',
     );
   } catch (error) {
     report['error'] = '$error';

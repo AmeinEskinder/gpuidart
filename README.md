@@ -142,7 +142,7 @@ The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/Q
 - One application host with one window. Windows and Linux X11 use a blocking native runner isolate; macOS uses a native companion process whose main thread owns GPUI.
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
-- Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks, sorting and stable row identity are not implemented. Table selection follows row indices.
+- Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks are not implemented. Sorting and filtering are native views over the dataset; stable record identity is supported through optional `rowIds`, and table selection follows the record ID when present (row indices otherwise).
 - The adapter has a small row/column layout API and fixed component theme. It is not a complete GPUI style binding.
 
 GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPUI dependency is `gpui-pre` 0.3.6. Both Cargo and Dart dependency lockfiles are included.

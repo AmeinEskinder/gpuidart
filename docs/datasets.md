@@ -61,6 +61,77 @@ Released IDs cannot be reused within the same host, preventing delayed commands 
 
 Edits preserve table identity, selection and scroll position. Explicit replacement or binding an existing table to another dataset clears its selection and resets scrolling. Input controls retain their own state. Rows use indices; inserting, deleting or reordering records requires replacement.
 
+## Stable record IDs
+
+Pass `rowIds` to give each record a stable ID for its lifetime in one dataset. IDs must parallel the rows (same length, nonempty, unique).
+
+```dart
+final quotes = TableDataset(
+  'quotes-data',
+  columns: ['Symbol', 'Price'],
+  rows: [['ACME', '100.0000'], ['BETA', '99.5000']],
+  rowIds: ['ACME', 'BETA'],
+);
+```
+
+With IDs present, native selection is stored as a record ID and survives sorting, filtering and cell edits; `TableSelection.record` carries it alongside the view `row` index (key on `record`; `row` is for debugging). If the selected record leaves the view — filtered out or removed by `replaceDataset` — selection clears and a selection event with both fields null is emitted; selection is never transferred to a neighbor. Row edits cannot change a record's ID; replacement may supply a new ID set. Without `rowIds`, index-based behavior is unchanged.
+
+## Table views
+
+`UiTable` accepts an optional `view` — a presentation-only filter/sort over the retained dataset. Views belong to tables, so two tables can view one dataset differently, and views never reorder the authoritative Dart records.
+
+```dart
+UiTable(
+  'quotes',
+  dataset: 'quotes-data',
+  view: const UiTableView(
+    sort: [UiSort(1, direction: UiSortDirection.desc)],
+    filter: [UiFilter(0, UiFilterOp.contains, 'AC')],
+  ),
+)
+```
+
+- Filter ops: `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `contains`. `contains` is a case-sensitive substring match; the rest compare numerically when both the cell and the filter value parse as finite doubles, lexically otherwise. All terms must match (AND).
+- At most 8 filter terms and 4 sort keys per table; column indices must be below 64 and within the dataset's width (the host rejects wider references at publish). Sorting is stable.
+- Rust keeps a view index per table and recomputes it when the view spec changes, on `replaceDataset`, or when an edit touches a sort/filter column; edits to unreferenced columns do not recompute it. Rendering and navigation follow the view order.
+- Selection by record ID follows the view; the scroll keeps the first visible record anchored across view changes when it remains in the view, and resets to the top otherwise. `replaceDataset` resets scroll unconditionally.
+- Diagnostics report per-table source/view row counts, a spec hash, and the current selection.
+
+## Declarative cell formatting
+
+Datasets accept optional per-column formats at construction and on `replaceDataset` (edits cannot change them).
+
+```dart
+TableDataset(
+  'quotes-data',
+  columns: ['Symbol', 'Price', 'Change'],
+  rows: rows,
+  rowIds: ids,
+  formats: const {
+    1: UiColumnFormat(decimals: 2),
+    2: UiColumnFormat(
+      decimals: 2,
+      rules: [
+        UiFormatRule(
+          when: UiFormatCondition(UiFilterOp.lt, '0'),
+          color: UiColor.token(ThemeToken.danger),
+          icon: UiCellIcon.arrowDown,
+        ),
+        UiFormatRule(
+          when: UiFormatCondition(UiFilterOp.gt, '0'),
+          color: UiColor.token(ThemeToken.success),
+          icon: UiCellIcon.arrowUp,
+        ),
+      ],
+    ),
+  },
+)
+```
+
+- `decimals` is fixed-point rendering with 0–6 decimals, no grouping, correctly rounded (ties to even). A non-numeric value in a number column renders the raw string unchanged.
+- Rules use the same ops as view filters and evaluate against the raw cell string; the first matching rule wins, at most 16 per column. Rule colors are style colors (theme token or `#RRGGBB`/`#RRGGBBAA`); icons are `arrowUp`, `arrowDown`, `dot` and `warning`, rendered inline by the native toolkit.
+- Formatting is evaluated for visible cells only, with no Dart callbacks in layout or paint.
+
 ## Transactions
 
 Each message carries a request ID, dataset ID, expected base revision and next revision. Revisions start at 1 and advance by exactly one. Data commands and view snapshots share the native FIFO queue.

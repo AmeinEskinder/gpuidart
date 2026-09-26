@@ -1,6 +1,6 @@
 # Feature stack design: styles, actions, record identity, cell formatting
 
-This specifies roadmap steps 3–4 as concrete wire types and semantics. It is a design contract for implementation, not evidence of shipped behavior. Every new field is optional; existing snapshots, datasets and ABI 1 behavior are unchanged when they are absent. All types use `deny_unknown_fields` on the Rust side, matching `native/src/protocol.rs`.
+This specifies roadmap steps 3–4 as concrete wire types and semantics. Sections 1–4 are **implemented** (styles `e957d44`, actions `135d300`, record IDs and views `e3238ca`, cell formatting `119217e`, watchlist migration `1eafed0`); each section's "implementation (as shipped)" notes and [reports/feature-stack](../reports/feature-stack/README.md) record where the shipped behavior differs from the original design. Every new field is optional; existing snapshots, datasets and ABI 1 behavior are unchanged when they are absent. All types use `deny_unknown_fields` on the Rust side, matching `native/src/protocol.rs`.
 
 ## 1. Typed styles
 
@@ -158,9 +158,9 @@ Datasets gain an optional registration-time member:
 - Diagnostics gains a `formatted_cell` op (table ID, view row, column) reporting the formatted text, color and icon — the same evaluation `render_td` paints.
 - Measured: construction counts are identical at 100 / 10,000 / 100,000 records with formats on all columns (`formatted_cells_keep_viewport_constant_construction`), and pure formatter cost is ≈1.7 µs/cell in a debug build (`cell_formatter_cost_is_measured_at_100k_cells`).
 
-## Compatibility and verification plan
+## Compatibility and verification record
 
-- ABI stays at version 1; all additions are optional fields. An old DLL against a new Dart SDK rejects unknown fields — that is the existing `deny_unknown_fields` discipline and is acceptable because Dart and native ship pinned together.
-- New tests: style validation bounds and type mismatches; keymap conflict/context resolution and printable-key rejection; record-identity selection through sort/filter/edit/reload at 100,000 records asserting no unchanged records are republished (existing `Work` counters); disappearance and scroll-anchor rules; formatter bounds, fallback and rule precedence; cell-construction constancy under formatting.
-- The watchlist example migrates: search box drives a native `contains` filter view, price column uses number format + up/down color rules, columns sortable via header actions, `ctrl+f` focuses search, and selection survives re-sorting — demonstrated by the live-window test suite, not by inspection.
-- `docs/sdk.md` and `docs/datasets.md` are updated with the shipped types and bounds; this design doc records intent where implementation differs.
+- ABI stayed at version 1; all additions are optional fields. An old DLL against a new Dart SDK rejects unknown fields — that is the existing `deny_unknown_fields` discipline and is acceptable because Dart and native ship pinned together.
+- Shipped tests: style validation bounds and type mismatches; keymap conflict/context resolution and printable-key rejection; record-identity selection through sort/filter/edit at native-headless level and through reload at 1,000 and 100,000 records without republishing (data-byte metrics in the reload verifier); disappearance and scroll-anchor rules; formatter bounds, fallback and rule precedence; cell-construction constancy under formatting at 100,000 records.
+- The watchlist example migrated: the search box drives a native `contains` filter view, price/change columns use number format + up/down color rules, a button sorts by price, `ctrl+f` focuses search, `ctrl+enter` saves the selected record, and selection survives re-sorting — demonstrated by the live-window verifier, not by inspection.
+- `docs/sdk.md` and `docs/datasets.md` document the shipped types and bounds; the "implementation (as shipped)" notes above record where implementation differs from the original design.

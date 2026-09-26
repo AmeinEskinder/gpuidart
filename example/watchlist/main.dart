@@ -17,7 +17,15 @@ Future<void> main(List<String> args) async {
       .firstOrNull
       ?.substring(8);
   final trace = tracePath == null ? null : GpuiTrace(capacity: 8192);
-  final app = WatchlistApplication();
+  final rowCountArg = args
+      .where((arg) => arg.startsWith('--rows='))
+      .firstOrNull
+      ?.substring(7);
+  final rowCount = rowCountArg == null ? 1000 : int.parse(rowCountArg);
+  if (rowCount < 26 || rowCount > 100000) {
+    throw ArgumentError('--rows must be 26..100000');
+  }
+  final app = WatchlistApplication(count: rowCount);
   final host = await GpuiHost.openView(
     app.build,
     datasets: [app.dataset],
@@ -139,8 +147,10 @@ Future<void> main(List<String> args) async {
     });
     registerExtension('ext.gpuidart.prepare', (_, _) async {
       // '0' matches every symbol (all are zero-padded), so the view keeps all
-      // 1,000 records and scrolling to the selected record is meaningful.
+      // records and scrolling to the selected record is meaningful. The
+      // select_row diagnostic performs the native selection a pointer would.
       await app.filter(host, query: '0');
+      await host.diagnose('select_row', {'table': 'watchlist', 'row': 25});
       await app.select(host, 'BRK0025');
       await app.tick(host);
       final state = await host.diagnose('prepare', {

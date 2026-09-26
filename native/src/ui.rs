@@ -372,6 +372,24 @@ impl DartView {
         }
     }
 
+    /// Selects a view row as if clicked; emits the usual selection event.
+    pub(crate) fn select_table_row(
+        &mut self,
+        table: &str,
+        row: usize,
+        cx: &mut Context<Self>,
+    ) -> Result<(), String> {
+        let table = self.tables.get(table).ok_or("Unknown table")?;
+        if row >= table.state.read(cx).delegate().rows_count(cx) {
+            return Err("Invalid row".into());
+        }
+        table.state.update(cx, |table, cx| {
+            table.set_selected_row(row, cx);
+            cx.notify();
+        });
+        Ok(())
+    }
+
     /// Focuses a retained input without touching value, selection or scroll.
     pub(crate) fn focus_input(
         &mut self,

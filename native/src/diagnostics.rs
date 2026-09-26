@@ -42,6 +42,11 @@ pub(crate) enum Request {
         request: u64,
         input: String,
     },
+    SelectRow {
+        request: u64,
+        table: String,
+        row: usize,
+    },
     Inspect {
         request: u64,
     },
@@ -67,6 +72,7 @@ impl Request {
             | Self::Cell { request, .. }
             | Self::FormattedCell { request, .. }
             | Self::Focus { request, .. }
+            | Self::SelectRow { request, .. }
             | Self::Inspect { request }
             | Self::Repaint { request, .. }
             | Self::Prepare { request, .. } => *request,
@@ -104,6 +110,20 @@ pub(crate) fn handle(
             request,
             data: view.read(cx).formatted_cell(&table, row, column, cx),
         }),
+        Request::SelectRow {
+            request,
+            table,
+            row,
+        } => {
+            let outcome = view.update(cx, |view, cx| view.select_table_row(&table, row, cx));
+            events.emit(Event::Diagnostic {
+                request,
+                data: match outcome {
+                    Ok(()) => json!({"selected": row}),
+                    Err(error) => json!({"error": error}),
+                },
+            });
+        }
         Request::Focus { request, input } => {
             let outcome = view.update(cx, |view, cx| view.focus_input(&input, window, cx));
             events.emit(Event::Diagnostic {
