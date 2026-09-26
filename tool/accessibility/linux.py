@@ -12,12 +12,16 @@ operation, name, value = sys.argv[2:5]
 identifier = sys.argv[5]
 
 
+class StaleTree(Exception):
+    pass
+
+
 def run():
     Atspi.init()
     Atspi.set_timeout(3000, 10000)
     desktop = Atspi.get_desktop(0)
     apps = [desktop.get_child_at_index(i) for i in range(desktop.get_child_count())]
-    apps = [app for app in apps if app.get_process_id() == process]
+    apps = [app for app in apps if app is not None and app.get_process_id() == process]
     if len(apps) != 1:
         raise RuntimeError(f"Expected one AT-SPI app for {process}, got {len(apps)}")
 
@@ -25,6 +29,8 @@ def run():
 
 
     def visit(element, parent=None):
+        if element is None:
+            raise StaleTree("Child disappeared after its parent child-count read")
         if len(elements) >= 4096:
             raise RuntimeError("AT-SPI tree exceeds probe bound")
         index = len(elements)
@@ -94,6 +100,11 @@ def run():
 
 try:
     run()
+except StaleTree as error:
+    if operation == "query":
+        sys.stderr.write(f"Stale AT-SPI tree: {error}\n")
+        sys.exit(75)
+    raise
 except GLib.Error as error:
     # A concurrent frame can remove a virtual row between separate D-Bus reads.
     # Ask the Dart driver to retry the whole query in a fresh client process;

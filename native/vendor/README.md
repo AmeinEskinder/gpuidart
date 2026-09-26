@@ -1,6 +1,6 @@
 # Pinned accessibility dependency corrections
 
-The three AccessKit crates come from the existing lockfile, upstream commit
+The four AccessKit crates come from the existing lockfile, upstream commit
 `c88605b96d04431f9c3c792464a0f2f253480e94`. They are path overrides in the workspace
 Cargo.toml; dependency versions and feature sets stay the same. GPUI Kit keeps
 its original git revision. GPUI 0.3.6 additionally has the focus hook below. Each UPSTREAM.json records the original registry archive checksum (verified
@@ -18,6 +18,15 @@ and included with evaluation packages; original source copyright headers remain.
   Click action mapping. Grid/Table coordinate patterns are still unavailable.
 - AT-SPI: a disabled role without read-only support (Button) must not gain Enabled
   and Sensitive. This preserves the original read-only handling.
+
+[cache-signals.patch](cache-signals.patch) corrects the Unix adapter's cache
+signals. Each signal must carry **one struct argument**, as specified in the
+[AT-SPI Cache interface](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/xml/Cache.xml).
+The original calls serialized the struct fields as separate arguments. A
+single-element tuple keeps the struct intact. The external Linux D-Bus monitor
+checks both AddAccessible and RemoveAccessible argument signatures from the owned
+application PID during the Settings control sequence. It requires both signal
+kinds and rejects malformed messages; query success alone is insufficient.
 
 The real Settings/disabled/Watchlist platform probes are regression gates. Original
 failures are retained under reports/accessibility. Do not remove these overrides

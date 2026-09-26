@@ -233,3 +233,26 @@ and other control roles are now asserted explicitly in platform responses. The
 GPUI source import is 99 files / about 2.96 MB, with one 16-line Window method
 addition; its complete source delta is separate from copied upstream code. This
 is a maintained local framework extension, not an upstream GPUI API claim.
+
+## Linux cache-signal premise audit
+
+The initial premise was that the Linux read failures were solely concurrent
+traversal invalidation. Run 36275977185 passes controls, disabled controls and all
+15 Settings steps, including native/platform focus agreement, but Watchlist
+receives a null child after reading its parent count (`linux-stale-child-3.json`).
+The repeated captures also retain malformed cache-signal warnings. Source review
+found a provider defect: accesskit_unix passes the fields of each cache record as
+separate D-Bus arguments. The
+[AT-SPI Cache specification](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/xml/Cache.xml)
+requires a single struct argument for each AddAccessible and RemoveAccessible.
+
+The two-line Unix adapter correction wraps each record in a single-element tuple.
+An external bus observer now validates argument count and type for both signal
+kinds, scoped to the native process PID, during the control verifier. Its result
+is recorded separately from platform queries. This is a test of wire delivery,
+not a screen-reader claim. Hosted validation is pending at this checkpoint.
+Disappearing children still invalidate a multi-call read; that explicit case now
+uses the existing bounded, query-only whole-tree restart policy. Partial trees
+are never accepted and actions are never replayed. The new monitor will determine
+whether the provider correction fixes the malformed signals; retries cannot
+mask a failed signal assertion.

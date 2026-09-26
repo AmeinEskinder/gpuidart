@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import '../../example/settings/app.dart';
+import 'cache_events.dart';
 import 'client.dart';
 
 Future<void> main(List<String> args) async {
@@ -17,11 +18,18 @@ Future<void> main(List<String> args) async {
     'passed': false,
   };
   SettingsApplication? app;
+  CacheEvents? cache;
   try {
     app = await SettingsApplication.open();
     final settings = app;
     final process =
         (await app.host.diagnose('inspect'))['native_process_id'] as int;
+    if (Platform.isLinux) {
+      cache = await CacheEvents.start(
+        process,
+        '${file.path}.cache-events.json',
+      );
+    }
     Future<Map<String, dynamic>> capture(
       String step,
       bool Function(List<dynamic>) ready,
@@ -183,6 +191,15 @@ Future<void> main(List<String> args) async {
     report['stack'] = '$stack';
     exitCode = 1;
   } finally {
+    if (cache != null) {
+      try {
+        report['cache_events'] = await cache.finish();
+      } catch (error) {
+        report['cache_error'] = '$error';
+        report['passed'] = false;
+        exitCode = 1;
+      }
+    }
     try {
       await app?.close();
     } catch (error) {

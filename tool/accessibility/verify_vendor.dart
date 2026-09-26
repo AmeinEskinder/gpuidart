@@ -12,6 +12,7 @@ void main() {
     'accesskit_consumer-0.38.0',
     'accesskit_windows-0.34.0',
     'gpui-pre-0.3.6',
+    'accesskit_unix-0.22.1',
   ]) {
     final directory = Directory('native/vendor/$name');
     final manifest = jsonDecode(
