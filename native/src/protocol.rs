@@ -137,7 +137,137 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
         dataset: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        view: Option<TableView>,
     },
+}
+
+/// Presentation-only view of a table's dataset: filter, then sort. The
+/// dataset itself is never reordered.
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct TableView {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sort: Vec<SortKey>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub filter: Vec<FilterTerm>,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SortKey {
+    pub column: usize,
+    pub direction: SortDirection,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SortDirection {
+    Asc,
+    Desc,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct FilterTerm {
+    pub column: usize,
+    pub op: FilterOp,
+    pub value: String,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FilterOp {
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    Contains,
+}
+
+impl TableView {
+    fn validate(&self) -> Result<(), String> {
+        if self.sort.len() > 4 || self.filter.len() > 8 {
+            return Err("Table views allow at most 4 sort keys and 8 filter terms".into());
+        }
+        if self.sort.iter().any(|key| key.column >= 64)
+            || self.filter.iter().any(|term| term.column >= 64)
+        {
+            return Err("Table view column must be below 64".into());
+        }
+        Ok(())
+    }
+
+    /// Columns whose edits can change the view.
+    pub fn referenced_columns(&self) -> HashSet<usize> {
+        self.sort
+            .iter()
+            .map(|key| key.column)
+            .chain(self.filter.iter().map(|term| term.column))
+            .collect()
+    }
+
+    /// View row -> source row, filtered then stably sorted. The dataset is
+    /// never reordered.
+    pub fn compute_index(&self, data: &TableData) -> Vec<usize> {
+        let mut index: Vec<usize> = (0..data.rows.len())
+            .filter(|&row| {
+                self.filter
+                    .iter()
+                    .all(|term| term.op.matches(&data.rows[row][term.column], &term.value))
+            })
+            .collect();
+        if !self.sort.is_empty() {
+            index.sort_by(|&a, &b| {
+                for key in &self.sort {
+                    let ordering =
+                        compare_cells(&data.rows[a][key.column], &data.rows[b][key.column]);
+                    let ordering = match key.direction {
+                        SortDirection::Asc => ordering,
+                        SortDirection::Desc => ordering.reverse(),
+                    };
+                    if ordering != std::cmp::Ordering::Equal {
+                        return ordering;
+                    }
+                }
+                std::cmp::Ordering::Equal
+            });
+        }
+        index
+    }
+}
+
+/// Compares two cell strings: numerically when both parse as finite `f64`,
+/// lexically otherwise.
+pub fn compare_cells(a: &str, b: &str) -> std::cmp::Ordering {
+    let numeric = match (a.parse::<f64>(), b.parse::<f64>()) {
+        (Ok(a), Ok(b)) if a.is_finite() && b.is_finite() => Some((a, b)),
+        _ => None,
+    };
+    match numeric {
+        Some((a, b)) => a.partial_cmp(&b).unwrap_or(std::cmp::Ordering::Equal),
+        None => a.cmp(b),
+    }
+}
+
+impl FilterOp {
+    pub fn matches(self, cell: &str, value: &str) -> bool {
+        match self {
+            Self::Contains => return cell.contains(value),
+            _ => {}
+        }
+        match compare_cells(cell, value) {
+            std::cmp::Ordering::Less => {
+                matches!(self, Self::Ne | Self::Lt | Self::Le)
+            }
+            std::cmp::Ordering::Equal => matches!(self, Self::Eq | Self::Le | Self::Ge),
+            std::cmp::Ordering::Greater => {
+                matches!(self, Self::Ne | Self::Gt | Self::Ge)
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -343,6 +473,10 @@ impl Style {
 pub struct TableData {
     pub columns: Vec<String>,
     pub rows: Vec<Vec<String>>,
+    /// Stable record IDs parallel to `rows`. Present selects identity mode:
+    /// selection survives sorting, filtering and cell edits by record ID.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ids: Option<Vec<String>>,
 }
 
 impl Node {
@@ -409,8 +543,13 @@ impl Snapshot {
                         validate(child, depth + 1, ids)?;
                     }
                 }
-                Node::Table { dataset, .. } if dataset.is_empty() => {
-                    return Err("Table dataset ID must be nonempty".into());
+                Node::Table { dataset, view, .. } => {
+                    if dataset.is_empty() {
+                        return Err("Table dataset ID must be nonempty".into());
+                    }
+                    if let Some(view) = view {
+                        view.validate()?;
+                    }
                 }
                 _ => {}
             }
@@ -503,7 +642,11 @@ pub enum Event {
         id: String,
         dataset: String,
         dataset_revision: u64,
+        /// View row index, for debugging; consumers key on `record`.
         row: Option<usize>,
+        /// The selected record's stable ID; null when the dataset has no ids
+        /// or the selection cleared.
+        record: Option<String>,
     },
     Error {
         message: String,
@@ -794,6 +937,121 @@ mod tests {
             {"name":"a","keys":"ctrl+f","context":"global","command":"x"}
         ],"root":{"kind":"text","id":"t","text":"x"}}"#;
         assert!(Snapshot::parse(bytes).is_err());
+    }
+
+    #[test]
+    fn parses_and_validates_table_views() {
+        let bytes = br#"{"revision":1,"root":{"kind":"table","id":"t","dataset":"d",
+            "view":{"sort":[{"column":1,"direction":"desc"}],"filter":[{"column":0,"op":"contains","value":"AC"}]}}}"#;
+        let snapshot = Snapshot::parse(bytes).unwrap();
+        let Node::Table { view, .. } = &snapshot.root else {
+            unreachable!()
+        };
+        let view = view.as_ref().unwrap();
+        assert_eq!(view.sort.len(), 1);
+        assert_eq!(view.filter.len(), 1);
+
+        for view in [
+            // 5 sort keys
+            r#""view":{"sort":[{"column":0,"direction":"asc"},{"column":1,"direction":"asc"},{"column":2,"direction":"asc"},{"column":3,"direction":"asc"},{"column":0,"direction":"desc"}]}"#,
+            // 9 filter terms
+            r#""view":{"filter":[{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"},{"column":0,"op":"eq","value":"1"}]}"#,
+            r#""view":{"sort":[{"column":64,"direction":"asc"}]}"#,
+            r#""view":{"filter":[{"column":64,"op":"eq","value":"x"}]}"#,
+            r#""view":{"sort":[{"column":0,"direction":"up"}]}"#,
+            r#""view":{"filter":[{"column":0,"op":"startswith","value":"x"}]}"#,
+            r#""view":{"limit":10}"#,
+            r#""view":{"sort":[{"column":0,"direction":"asc","nulls":"last"}]}"#,
+        ] {
+            let bytes = format!(
+                r#"{{"revision":1,"root":{{"kind":"table","id":"t","dataset":"d",{view}}}}}"#
+            );
+            assert!(
+                Snapshot::parse(bytes.as_bytes()).is_err(),
+                "must reject {view}"
+            );
+        }
+    }
+
+    #[test]
+    fn view_index_filters_then_stably_sorts() {
+        let data = TableData {
+            columns: vec!["sym".into(), "price".into()],
+            rows: vec![
+                vec!["ACME".into(), "10.5".into()],
+                vec!["BETO".into(), "3.2".into()],
+                vec!["ALPHA".into(), "7".into()],
+                vec!["APEX".into(), "9".into()],
+            ],
+            ids: None,
+        };
+        let view = TableView {
+            sort: vec![SortKey {
+                column: 1,
+                direction: SortDirection::Desc,
+            }],
+            filter: vec![FilterTerm {
+                column: 0,
+                op: FilterOp::Contains,
+                value: "A".into(),
+            }],
+        };
+        // BETO (row 1) is filtered out; numeric sort: 10.5 > 9 > 7.
+        assert_eq!(view.compute_index(&data), vec![0, 3, 2]);
+        // Numeric comparison: lexically "10" < "9", numerically 9 < 10.
+        assert_eq!(compare_cells("10", "9"), std::cmp::Ordering::Greater);
+        assert_eq!(compare_cells("x", "9"), std::cmp::Ordering::Greater);
+        assert!(FilterOp::Lt.matches("9", "10"));
+        assert!(!FilterOp::Lt.matches("x", "9"));
+        assert!(FilterOp::Eq.matches("10", "10.0"));
+        assert!(FilterOp::Ne.matches("a", "b"));
+        assert!(FilterOp::Ge.matches("10", "10"));
+
+        // Equal sort keys keep source order (stable).
+        let ties = TableData {
+            columns: vec!["v".into()],
+            rows: vec![vec!["2".into()], vec!["1".into()], vec!["2".into()]],
+            ids: None,
+        };
+        let view = TableView {
+            sort: vec![SortKey {
+                column: 0,
+                direction: SortDirection::Asc,
+            }],
+            filter: vec![],
+        };
+        assert_eq!(view.compute_index(&ties), vec![1, 0, 2]);
+    }
+
+    #[test]
+    fn view_recompute_at_100k_records_is_measured() {
+        let data = TableData {
+            columns: vec!["sym".into(), "price".into()],
+            rows: (0..100_000)
+                .map(|i| vec![format!("S{i:06}"), format!("{}", (i * 7) % 10_000)])
+                .collect(),
+            ids: Some((0..100_000).map(|i| format!("S{i:06}")).collect()),
+        };
+        let view = TableView {
+            sort: vec![SortKey {
+                column: 1,
+                direction: SortDirection::Desc,
+            }],
+            filter: vec![FilterTerm {
+                column: 0,
+                op: FilterOp::Contains,
+                value: "3".into(),
+            }],
+        };
+        let timer = std::time::Instant::now();
+        let index = view.compute_index(&data);
+        let elapsed = timer.elapsed();
+        assert!(index.len() < 100_000 && !index.is_empty());
+        let report = serde_json::json!({"records": 100_000, "view_rows": index.len(), "recompute_us": elapsed.as_micros() as u64});
+        println!("VIEW_RECOMPUTE {report}");
+        if let Ok(path) = std::env::var("GPUIDART_VIEW_RECOMPUTE_REPORT") {
+            std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
+        }
     }
 
     #[test]

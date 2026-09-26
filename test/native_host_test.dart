@@ -129,6 +129,42 @@ void main() {
         );
         await host.registerDataset(later);
         await host.publish(const UiTable('later-table', dataset: 'later'));
+        // Record IDs and a view publish through FFI and report in inspect.
+        final identified = TableDataset(
+          'identified',
+          columns: ['sym', 'price'],
+          rows: [
+            ['ACME', '10.5'],
+            ['BETA', '3.2'],
+          ],
+          rowIds: ['ACME', 'BETA'],
+        );
+        await host.registerDataset(identified);
+        await host.publish(
+          const UiTable(
+            'identified-table',
+            dataset: 'identified',
+            view: UiTableView(
+              sort: [UiSort(1, direction: UiSortDirection.asc)],
+            ),
+          ),
+        );
+        final inspected = await host.diagnose('inspect');
+        final identifiedTable =
+            inspected['tables']['identified-table'] as Map<String, dynamic>;
+        expect(identifiedTable['view']['source_rows'], 2);
+        expect(identifiedTable['view']['view_rows'], 2);
+        expect(identifiedTable['view']['spec_hash'], isNotNull);
+        await expectLater(
+          host.publish(
+            const UiTable(
+              'bad-view',
+              dataset: 'identified',
+              view: UiTableView(sort: [UiSort(5)]),
+            ),
+          ),
+          throwsStateError,
+        );
         await Future<void>.delayed(const Duration(milliseconds: 100));
         expect(
           events.where((e) => e.type == 'applied').map((e) => e.revision),

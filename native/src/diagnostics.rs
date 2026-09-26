@@ -11,11 +11,12 @@ pub(crate) struct Counters {
     pub cells: Cell<u64>,
     pub data_records_checked: Cell<u64>,
     pub data_cells_written: Cell<u64>,
+    pub view_recomputes: Cell<u64>,
 }
 
 impl Counters {
     pub fn read(&self) -> Value {
-        json!({"materializations": self.materializations.get(), "rows_constructed": self.rows.get(), "cells_constructed": self.cells.get(), "data_records_checked": self.data_records_checked.get(), "data_cells_written": self.data_cells_written.get()})
+        json!({"materializations": self.materializations.get(), "rows_constructed": self.rows.get(), "cells_constructed": self.cells.get(), "data_records_checked": self.data_records_checked.get(), "data_cells_written": self.data_cells_written.get(), "view_recomputes": self.view_recomputes.get()})
     }
 }
 

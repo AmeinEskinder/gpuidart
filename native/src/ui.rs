@@ -1,11 +1,11 @@
-use crate::datasets::{self, Change, Initial, SharedDataset, Store, Update};
+use crate::datasets::{self, Change, Edit, Initial, SharedDataset, Store, Update};
 use crate::diagnostics::Counters;
 use crate::{
     Command, Events,
     protocol::{
         Align as StyleAlign, Color as StyleColor, Event, FontWeight as StyleFontWeight,
         Justify as StyleJustify, KeystrokeSpec, Node, Size as StyleSize, Snapshot, Style,
-        ThemeToken,
+        TableView, ThemeToken,
     },
 };
 use async_channel::Receiver;
@@ -21,25 +21,38 @@ use gpui_kit::component::{
 use gpui_kit::*;
 use serde_json::{Value, json};
 use std::{
+    cell::RefCell,
     collections::{HashMap, HashSet},
     rc::Rc,
     sync::Arc,
     time::Instant,
 };
 
-struct Rows(SharedDataset, Rc<Counters>);
+struct Rows {
+    data: SharedDataset,
+    /// View index: view row -> source row. Identity mapping when the table
+    /// has no view.
+    index: Rc<RefCell<Vec<usize>>>,
+    counters: Rc<Counters>,
+}
+
+impl Rows {
+    fn source_row(&self, view_row: usize) -> usize {
+        self.index.borrow()[view_row]
+    }
+}
 
 impl TableDelegate for Rows {
     fn columns_count(&self, _: &App) -> usize {
-        self.0.borrow().data.columns.len()
+        self.data.borrow().data.columns.len()
     }
     fn rows_count(&self, _: &App) -> usize {
-        self.0.borrow().data.rows.len()
+        self.index.borrow().len()
     }
     fn column(&self, index: usize, _: &App) -> Column {
         Column::new(
             format!("column-{index}"),
-            self.0.borrow().data.columns[index].clone(),
+            self.data.borrow().data.columns[index].clone(),
         )
         .width(px(200.))
     }
@@ -50,8 +63,9 @@ impl TableDelegate for Rows {
         _: &mut Window,
         _: &mut Context<TableState<Self>>,
     ) -> impl IntoElement {
-        self.1.cells.set(self.1.cells.get() + 1);
-        div().child(self.0.borrow().data.rows[row][col].clone())
+        self.counters.cells.set(self.counters.cells.get() + 1);
+        let source = self.source_row(row);
+        div().child(self.data.borrow().data.rows[source][col].clone())
     }
     fn render_tr(
         &mut self,
@@ -59,8 +73,13 @@ impl TableDelegate for Rows {
         _: &mut Window,
         _: &mut Context<TableState<Self>>,
     ) -> Stateful<Div> {
-        self.1.rows.set(self.1.rows.get() + 1);
-        div().id(("row", row))
+        self.counters.rows.set(self.counters.rows.get() + 1);
+        // Key real rows by source record so element identity survives view
+        // changes; the table also asks for filler rows past the view's end.
+        match self.index.borrow().get(row) {
+            Some(&source) => div().id(("row", source)),
+            None => div().id(("row-filler", row)),
+        }
     }
 }
 
@@ -70,11 +89,35 @@ struct RetainedInput {
     _subscription: Subscription,
 }
 
+struct RetainedTable {
+    state: Entity<TableState<Rows>>,
+    view: Option<TableView>,
+    /// Selection anchor in identity mode: the record ID. Index-mode
+    /// selection lives only in `TableState` as a view row, as before.
+    selected_record: Option<String>,
+    /// Last emitted (row, record), so programmatic re-resolution and
+    /// redundant clears do not emit duplicate selection events. Events are
+    /// delivered deferred, after the table state has settled.
+    selection_notified: Option<(Option<usize>, Option<String>)>,
+}
+
+/// Selection decision for a view recompute.
+enum ViewSelection {
+    /// Keep the selected record at this view row.
+    Keep(usize),
+    /// The selected record left the view: clear and emit the null event.
+    Gone,
+    /// Unconditional clear (Replace without identity).
+    Clear,
+    /// Keep the view-row index, clamped into range (index mode, edits).
+    Clamp,
+}
+
 pub(crate) struct DartView {
     snapshot: Snapshot,
     events: Events,
     inputs: HashMap<String, RetainedInput>,
-    tables: HashMap<String, Entity<TableState<Rows>>>,
+    tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
     datasets: Store,
@@ -108,18 +151,28 @@ impl DartView {
         let tables = self
             .tables
             .iter()
-            .map(|(id, entity)| {
-                let table = entity.read(cx);
+            .map(|(id, retained)| {
+                let table = retained.state.read(cx);
                 let offset = table.vertical_scroll_handle.offset();
+                let source_rows = table.delegate().data.borrow().data.rows.len();
+                let view_rows = table.delegate().index.borrow().len();
+                let spec_hash = retained.view.as_ref().map(|view| {
+                    use std::hash::{Hash, Hasher};
+                    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+                    serde_json::to_string(view).unwrap_or_default().hash(&mut hasher);
+                    hasher.finish()
+                });
                 (
                     id.clone(),
                     json!({
-                        "entity": entity.entity_id().as_u64(),
+                        "entity": retained.state.entity_id().as_u64(),
                         "visible_rows": table.visible_range().rows(),
-                        "row_count": table.delegate().0.borrow().data.rows.len(),
-                        "dataset": table.delegate().0.borrow().id,
-                        "dataset_revision": table.delegate().0.borrow().revision,
+                        "row_count": source_rows,
+                        "dataset": table.delegate().data.borrow().id,
+                        "dataset_revision": table.delegate().data.borrow().revision,
                         "scroll_y": f32::from(offset.y),
+                        "view": {"source_rows": source_rows, "view_rows": view_rows, "spec_hash": spec_hash},
+                        "selection": {"row": table.selected_row(), "record": retained.selected_record},
                     }),
                 )
             })
@@ -169,7 +222,7 @@ impl DartView {
             || selection.end > text.len()
             || !text.is_char_boundary(selection.start)
             || !text.is_char_boundary(selection.end)
-            || row >= table.read(cx).delegate().0.borrow().data.rows.len()
+            || row >= table.state.read(cx).delegate().rows_count(cx)
         {
             return Err("Invalid selection or row".into());
         }
@@ -178,7 +231,9 @@ impl DartView {
             input.set_selected_range(selection, cx);
             input.focus(window, cx);
         });
-        table.update(cx, |table, cx| table.scroll_to_row(row, cx));
+        table
+            .state
+            .update(cx, |table, cx| table.scroll_to_row(row, cx));
         cx.notify();
         Ok(())
     }
@@ -235,9 +290,22 @@ impl DartView {
             });
             return;
         }
-        if let Err(message) = snapshot.validate().and_then(|_| {
-            datasets::validate_references(&snapshot, |id| self.datasets.entries.contains_key(id))
-        }) {
+        if let Err(message) = snapshot
+            .validate()
+            .and_then(|_| {
+                datasets::validate_references(&snapshot, |id| {
+                    self.datasets.entries.contains_key(id)
+                })
+            })
+            .and_then(|_| {
+                datasets::validate_views(&snapshot, |id| {
+                    self.datasets
+                        .entries
+                        .get(id)
+                        .map(|data| data.borrow().data.columns.len())
+                })
+            })
+        {
             self.events.emit(Event::Rejected {
                 revision: snapshot.revision,
                 message,
@@ -273,6 +341,28 @@ impl DartView {
         let id = update.id.clone();
         let revision = update.revision;
         let replace = matches!(&update.change, Change::Replace { .. });
+        // Columns an edit touches, for the view-recompute check. Row edits
+        // touch every column; Replace is handled separately.
+        let touched: Option<HashSet<usize>> = match &update.change {
+            Change::Edit { edits } => {
+                let width = self
+                    .datasets
+                    .entries
+                    .get(&update.id)
+                    .map(|data| data.borrow().data.columns.len())
+                    .unwrap_or(0);
+                Some(
+                    edits
+                        .iter()
+                        .flat_map(|edit| match edit {
+                            Edit::Cell { column, .. } => vec![*column],
+                            Edit::Row { .. } => (0..width).collect(),
+                        })
+                        .collect(),
+                )
+            }
+            _ => None,
+        };
         if matches!(&update.change, Change::Release) {
             let mut referenced = false;
             self.snapshot.root.visit(&mut |node| {
@@ -290,21 +380,30 @@ impl DartView {
         }
         match self.datasets.apply(update) {
             Ok(work) => {
-                for table in self.tables.values() {
-                    if table.read(cx).delegate().0.borrow().id == id {
-                        table.update(cx, |table, cx| {
-                            if replace {
-                                table.clear_selection(cx);
-                                table
-                                    .vertical_scroll_handle
-                                    .set_offset(point(px(0.), px(0.)));
-                                table
-                                    .horizontal_scroll_handle
-                                    .set_offset(point(px(0.), px(0.)));
-                                table.refresh(cx);
-                            }
-                            cx.notify();
-                        });
+                let table_ids: Vec<String> = self
+                    .tables
+                    .iter()
+                    .filter(|(_, retained)| {
+                        retained.state.read(cx).delegate().data.borrow().id == id
+                    })
+                    .map(|(table_id, _)| table_id.clone())
+                    .collect();
+                for table_id in table_ids {
+                    // A cell edit only triggers a view recompute when it
+                    // touches a column the view sorts or filters on.
+                    let recompute = replace
+                        || match (&self.tables[&table_id].view, &touched) {
+                            (Some(view), Some(touched)) => view
+                                .referenced_columns()
+                                .iter()
+                                .any(|column| touched.contains(column)),
+                            _ => false,
+                        };
+                    if recompute {
+                        self.recompute_table_view(&table_id, replace, cx);
+                    } else {
+                        let state = self.tables[&table_id].state.clone();
+                        state.update(cx, |_, cx| cx.notify());
                     }
                 }
                 self.counters
@@ -334,9 +433,106 @@ impl DartView {
         }
     }
 
+    /// Recomputes a table's view index after its spec or dataset changed.
+    ///
+    /// Selection: in identity mode the selected record ID is re-resolved to
+    /// its new view row; if it left the view the selection clears and the
+    /// subscription emits the null `TableSelection`. `reset_scroll` (Replace)
+    /// keeps the historic unconditional scroll reset; otherwise the first
+    /// visible record stays anchored if it remains in the view, else the
+    /// scroll resets to the top.
+    fn recompute_table_view(&mut self, id: &str, reset_scroll: bool, cx: &mut Context<Self>) {
+        let Some(retained) = self.tables.get(id) else {
+            return;
+        };
+        let table = retained.state.clone();
+        let spec = retained.view.clone();
+        let selected_record = retained.selected_record.clone();
+        let (index, data, anchor_source) = {
+            let state = table.read(cx);
+            let anchor = state.visible_range().rows().start;
+            let anchor_source = state.delegate().index.borrow().get(anchor).copied();
+            (
+                state.delegate().index.clone(),
+                state.delegate().data.clone(),
+                anchor_source,
+            )
+        };
+        let (new_index, selection, anchor_view) = {
+            let data = data.borrow();
+            let new_index = match &spec {
+                Some(spec) => spec.compute_index(&data.data),
+                None => (0..data.data.rows.len()).collect::<Vec<_>>(),
+            };
+            let selection = match (&selected_record, &data.data.ids) {
+                (Some(record), Some(ids)) => ids
+                    .iter()
+                    .position(|id| id == record)
+                    .and_then(|source| new_index.iter().position(|&row| row == source))
+                    .map_or(ViewSelection::Gone, ViewSelection::Keep),
+                _ if reset_scroll => ViewSelection::Clear,
+                _ => ViewSelection::Clamp,
+            };
+            let anchor_view =
+                anchor_source.and_then(|source| new_index.iter().position(|&row| row == source));
+            (new_index, selection, anchor_view)
+        };
+        let view_len = new_index.len();
+        *index.borrow_mut() = new_index;
+        self.counters
+            .view_recomputes
+            .set(self.counters.view_recomputes.get() + 1);
+        table.update(cx, |table, cx| {
+            match selection {
+                ViewSelection::Keep(view_row) => {
+                    if table.selected_row() != Some(view_row) {
+                        table.set_selected_row(view_row, cx);
+                    }
+                }
+                ViewSelection::Gone | ViewSelection::Clear => {
+                    table.clear_selection(cx);
+                }
+                ViewSelection::Clamp => {
+                    if table.selected_row().is_some_and(|row| row >= view_len) {
+                        table.clear_selection(cx);
+                    }
+                }
+            }
+            // set_selected_row defers a scroll-to-selection; the anchor and
+            // reset rules below take precedence over it.
+            table
+                .vertical_scroll_handle
+                .0
+                .borrow_mut()
+                .deferred_scroll_to_item = None;
+            if reset_scroll {
+                table
+                    .vertical_scroll_handle
+                    .set_offset(point(px(0.), px(0.)));
+                table
+                    .horizontal_scroll_handle
+                    .set_offset(point(px(0.), px(0.)));
+                table.refresh(cx);
+            } else if let Some(view_row) = anchor_view {
+                table.scroll_to_row(view_row, cx);
+            } else {
+                table
+                    .vertical_scroll_handle
+                    .set_offset(point(px(0.), px(0.)));
+            }
+            cx.notify();
+        });
+        if matches!(selection, ViewSelection::Gone | ViewSelection::Clear) {
+            if let Some(retained) = self.tables.get_mut(id) {
+                retained.selected_record = None;
+            }
+        }
+    }
+
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
+        let mut changed_views = Vec::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
             Node::Input {
@@ -374,16 +570,24 @@ impl DartView {
                     );
                 }
             }
-            Node::Table { id, dataset, .. } => {
+            Node::Table {
+                id, dataset, view, ..
+            } => {
                 let Some(data) = self.datasets.entries.get(dataset).cloned() else {
                     failure = Some(format!("Missing retained dataset: {dataset}"));
                     return;
                 };
                 table_ids.insert(id.clone());
-                if let Some(table) = self.tables.get(id) {
-                    table.update(cx, |table, cx| {
-                        if !Rc::ptr_eq(&table.delegate().0, &data) {
-                            table.delegate_mut().0 = data.clone();
+                if let Some(retained) = self.tables.get_mut(id) {
+                    let swapped = !Rc::ptr_eq(&retained.state.read(cx).delegate().data, &data);
+                    if swapped {
+                        let index = retained.state.read(cx).delegate().index.clone();
+                        *index.borrow_mut() = match view {
+                            Some(view) => view.compute_index(&data.borrow().data),
+                            None => (0..data.borrow().data.rows.len()).collect(),
+                        };
+                        retained.state.update(cx, |table, cx| {
+                            table.delegate_mut().data = data.clone();
                             table.clear_selection(cx);
                             table
                                 .vertical_scroll_handle
@@ -393,30 +597,76 @@ impl DartView {
                                 .set_offset(point(px(0.), px(0.)));
                             table.refresh(cx);
                             cx.notify();
-                        }
-                    });
+                        });
+                        retained.selected_record = None;
+                        retained.view = view.clone();
+                    } else if retained.view != *view {
+                        retained.view = view.clone();
+                        changed_views.push(id.clone());
+                    }
                 } else {
+                    let index = Rc::new(RefCell::new(match view {
+                        Some(view) => view.compute_index(&data.borrow().data),
+                        None => (0..data.borrow().data.rows.len()).collect(),
+                    }));
                     let table = cx.new(|cx| {
-                        TableState::new(Rows(data.clone(), self.counters.clone()), window, cx)
+                        TableState::new(
+                            Rows {
+                                data: data.clone(),
+                                index,
+                                counters: self.counters.clone(),
+                            },
+                            window,
+                            cx,
+                        )
                     });
                     let event_id = id.clone();
                     let subscription = cx.subscribe(&table, move |this, table, event, cx| {
-                        let row = match event {
-                            TableEvent::SelectRow(row) => Some(*row),
-                            TableEvent::ClearSelection => None,
+                        let (row, record) = match event {
+                            TableEvent::SelectRow(row) => {
+                                let delegate = table.read(cx).delegate();
+                                let source = delegate.index.borrow()[*row];
+                                let record = delegate
+                                    .data
+                                    .borrow()
+                                    .data
+                                    .ids
+                                    .as_ref()
+                                    .map(|ids| ids[source].clone());
+                                (Some(*row), record)
+                            }
+                            TableEvent::ClearSelection => (None, None),
                             _ => return,
                         };
-                        let data = table.read(cx).delegate().0.borrow();
+                        let Some(retained) = this.tables.get_mut(&event_id) else {
+                            return;
+                        };
+                        retained.selected_record = record.clone();
+                        let notified = (row, record);
+                        if retained.selection_notified.as_ref() == Some(&notified) {
+                            return;
+                        }
+                        retained.selection_notified = Some(notified.clone());
+                        let data = table.read(cx).delegate().data.borrow();
                         this.events.emit(Event::TableSelection {
                             revision: this.snapshot.revision,
                             id: event_id.clone(),
                             dataset: data.id.clone(),
                             dataset_revision: data.revision,
-                            row,
+                            row: notified.0,
+                            record: notified.1,
                         });
                     });
                     self.table_subscriptions.insert(id.clone(), subscription);
-                    self.tables.insert(id.clone(), table);
+                    self.tables.insert(
+                        id.clone(),
+                        RetainedTable {
+                            state: table,
+                            view: view.clone(),
+                            selected_record: None,
+                            selection_notified: None,
+                        },
+                    );
                 }
             }
             _ => {}
@@ -428,6 +678,9 @@ impl DartView {
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
+        for id in changed_views {
+            self.recompute_table_view(&id, false, cx);
+        }
         Ok(())
     }
 
@@ -467,7 +720,7 @@ impl DartView {
             }
         }
         for (id, table) in &self.tables {
-            if table.read(cx).focus_handle(cx) == focused {
+            if table.state.read(cx).focus_handle(cx) == focused {
                 return self.context_chain(id);
             }
         }
@@ -573,9 +826,11 @@ impl DartView {
                     .h(px(320.))
                     .child(
                         DataTable::new(
-                            self.tables
+                            &self
+                                .tables
                                 .get(id)
-                                .ok_or_else(|| format!("Missing retained table: {id}"))?,
+                                .ok_or_else(|| format!("Missing retained table: {id}"))?
+                                .state,
                         )
                         .stripe(true)
                         .bordered(true),

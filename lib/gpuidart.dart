@@ -13,4 +13,5 @@ export 'src/host.dart'
 export 'src/actions.dart';
 export 'src/nodes.dart';
 export 'src/style.dart';
+export 'src/table_view.dart';
 export 'src/window_options.dart';

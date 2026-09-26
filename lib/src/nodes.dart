@@ -1,4 +1,5 @@
 import 'style.dart';
+import 'table_view.dart';
 
 sealed class UiNode {
   const UiNode(this.id, {this.style});
@@ -73,13 +74,17 @@ final class UiInput extends UiNode {
 
 /// References a dataset registered with this host. Snapshots contain no records.
 final class UiTable extends UiNode {
-  const UiTable(super.id, {super.style, required this.dataset});
+  const UiTable(super.id, {super.style, required this.dataset, this.view});
   final String dataset;
+
+  /// Presentation-only sort/filter view over the dataset.
+  final UiTableView? view;
   @override
   Map<String, Object> toJson() => {
     'kind': 'table',
     'id': id,
     if (style != null) 'style': style!.toJson(),
     'dataset': dataset,
+    if (view != null) 'view': view!.toJson(),
   };
 }

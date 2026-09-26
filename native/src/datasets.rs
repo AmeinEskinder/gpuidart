@@ -59,6 +59,13 @@ impl Initial {
             upload.data.validate()?;
         }
         validate_references(&initial.snapshot, |id| ids.contains(id))?;
+        validate_views(&initial.snapshot, |id| {
+            initial
+                .datasets
+                .iter()
+                .find(|upload| upload.id == id)
+                .map(|upload| upload.data.columns.len())
+        })?;
         Ok(initial)
     }
 }
@@ -71,8 +78,48 @@ impl TableData {
         if self.rows.iter().any(|row| row.len() != self.columns.len()) {
             return Err("Dataset row width does not match its columns".into());
         }
+        if let Some(ids) = &self.ids {
+            if ids.len() != self.rows.len() {
+                return Err("Dataset ids must parallel its rows".into());
+            }
+            let mut seen = HashSet::new();
+            if ids.iter().any(|id| id.is_empty() || !seen.insert(id)) {
+                return Err("Dataset ids must be nonempty and unique".into());
+            }
+        }
         Ok(())
     }
+}
+
+/// View column indices are checked against the dataset's width here, where
+/// the shape is known; `Snapshot::validate` only bounds them below 64.
+pub fn validate_views(
+    snapshot: &Snapshot,
+    columns: impl Fn(&str) -> Option<usize>,
+) -> Result<(), String> {
+    let mut error = None;
+    snapshot.root.visit(&mut |node| {
+        if let Node::Table {
+            dataset,
+            view: Some(view),
+            ..
+        } = node
+        {
+            let width = columns(dataset).unwrap_or(0);
+            let column = view
+                .sort
+                .iter()
+                .map(|key| key.column)
+                .chain(view.filter.iter().map(|term| term.column))
+                .find(|column| *column >= width);
+            if let Some(column) = column {
+                error = Some(format!(
+                    "Table view references column {column} beyond dataset {dataset}'s {width} columns"
+                ));
+            }
+        }
+    });
+    error.map_or(Ok(()), Err)
 }
 
 pub fn validate_references(

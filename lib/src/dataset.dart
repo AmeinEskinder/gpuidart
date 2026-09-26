@@ -7,15 +7,19 @@ final class TableDataset {
     this.id, {
     required List<String> columns,
     required List<List<String>> rows,
+    List<String>? rowIds,
   }) : _columns = List.unmodifiable(columns),
-       _rows = rows.map((row) => List<String>.unmodifiable(row)).toList() {
+       _rows = rows.map((row) => List<String>.unmodifiable(row)).toList(),
+       _rowIds = rowIds == null ? null : List<String>.unmodifiable(rowIds) {
     if (id.isEmpty) throw ArgumentError('Dataset ID must be nonempty');
     _validateData(_columns, _rows);
+    _validateIds(_rowIds, _rows.length);
   }
 
   final String id;
   List<String> _columns;
   List<List<String>> _rows;
+  List<String>? _rowIds;
   int _revision = 0;
   GpuiHost? _owner;
   bool _busy = false;
@@ -26,8 +30,30 @@ final class TableDataset {
   List<String> row(int index) => _rows[index];
   String cell(int row, int column) => _rows[row][column];
 
-  Map<String, Object> _data() => {'columns': _columns, 'rows': _rows};
+  /// The stable record ID for [index], when this dataset has record IDs.
+  /// Row edits never change a record's ID; `replaceDataset` may supply a new
+  /// ID set.
+  String? rowId(int index) => _rowIds?[index];
+
+  Map<String, Object> _data() => {
+    'columns': _columns,
+    'rows': _rows,
+    'ids': ?_rowIds,
+  };
   Map<String, Object> _upload() => {'id': id, 'revision': 1, 'data': _data()};
+}
+
+void _validateIds(List<String>? rowIds, int rowCount) {
+  if (rowIds == null) return;
+  if (rowIds.length != rowCount) {
+    throw ArgumentError('Record IDs must parallel the rows');
+  }
+  final seen = <String>{};
+  for (final id in rowIds) {
+    if (id.isEmpty || !seen.add(id)) {
+      throw ArgumentError('Record IDs must be nonempty and unique');
+    }
+  }
 }
 
 void _validateData(List<String> columns, List<List<String>> rows) {

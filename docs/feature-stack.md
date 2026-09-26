@@ -114,6 +114,15 @@ The `table` node gains an optional member — views belong to tables, not datase
 - **Scroll anchor rule:** across view changes, the first fully visible record is kept anchored if it remains in the view; otherwise scroll resets to the top. `Replace` keeps its current unconditional reset (documented behavior, unchanged).
 - `visible_rows` in diagnostics reports view coordinates; a new `view` field in the inspect payload reports source-row count, view-row count and the active spec hash.
 
+### Views implementation (as shipped)
+
+- The view index lives in the `Rows` delegate as `Rc<RefCell<Vec<usize>>>` (view row → source row), shared with `DartView`, which owns the spec per table. `render_td` maps through it; `render_tr` keys row elements by source row so element identity survives reorders (filler rows past the view's end get a separate element ID namespace — gpui-kit renders them for short tables).
+- **Recompute policy:** a spec change or a `Replace` always recomputes; an `Edit` recomputes only when its touched columns intersect the view's sort/filter columns (`Edit::Cell` carries the column; `Edit::Row` touches all columns). Measured at 100,000 records: filter+sort recompute ≈43 ms in a debug build (`view_recompute_at_100k_records_is_measured` prints/records it). A `view_recomputes` counter in diagnostics proves unreferenced edits skip recomputation.
+- **Selection by ID:** `DartView` stores the selected record ID per table; `TableState` keeps its view-row index. The `TableEvent::SelectRow` subscription maps view row → source row → record ID through the view index. GPUI delivers emitted events deferred, so instead of a suppression flag the subscription dedupes against the last notified (row, record) pair: programmatic re-resolution to the same record does not re-emit, and the disappearance rule's null event fires exactly once.
+- **Disappearance rule** applies as specified; in index mode there is one addition: a filter that shrinks the view below the selected view-row index clears the selection (with event) instead of leaving a dangling index — prior behavior never shrank row counts, so there is no behavior to preserve.
+- **Scroll anchor:** the first visible view row's record (source row in index mode) is captured before recompute; if it remains in the view the table scrolls it to the top (`scroll_to_row`, non-strict: no-op when already visible), else the scroll offset resets to the top. The selection's deferred scroll-to-selection is cleared so the anchor/reset rule wins. `Replace` keeps its unconditional reset.
+- View column indices are validated against the dataset's actual width at publish/creation time (`validate_views`), rejecting the publish; `Snapshot::validate` only bounds them below 64.
+
 ## 4. Declarative cell formatting
 
 Datasets gain an optional registration-time member:

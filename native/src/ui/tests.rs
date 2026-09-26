@@ -2,7 +2,9 @@ use super::DartView;
 use crate::{
     Events,
     datasets::{Change, Initial, Update, Upload},
-    protocol::{Event, Node, Snapshot, TableData},
+    protocol::{
+        Event, FilterOp, FilterTerm, Node, Snapshot, SortDirection, SortKey, TableData, TableView,
+    },
 };
 use gpui_kit::component::ActiveTheme;
 use gpui_kit::gpui;
@@ -40,6 +42,7 @@ fn description(revision: u64) -> Snapshot {
                     id: "table".into(),
                     style: None,
                     dataset: "records".into(),
+                    view: None,
                 },
             ],
         },
@@ -52,6 +55,7 @@ fn table_data(count: usize) -> TableData {
         rows: (0..count)
             .map(|i| vec![i.to_string(), format!("Row {i}")])
             .collect(),
+        ids: None,
     }
 }
 
@@ -299,6 +303,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                         id: "missing-table".into(),
                         style: None,
                         dataset: "records".into(),
+                        view: None,
                     },
                     &cx.theme().colors.clone(),
                 )
@@ -375,8 +380,9 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
 
     cx.update_window(handle, |_, window, cx| {
         let input_before = view.read(cx).inputs["name"].state.entity_id();
-        let table_before = view.read(cx).tables["table"].entity_id();
+        let table_before = view.read(cx).tables["table"].state.entity_id();
         let range = view.read(cx).tables["table"]
+            .state
             .read(cx)
             .visible_range()
             .rows()
@@ -389,7 +395,10 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
         view.update(cx, |view, cx| view.publish(description(2), window, cx));
         window.render_frame(cx);
         assert_eq!(view.read(cx).inputs["name"].state.entity_id(), input_before);
-        assert_eq!(view.read(cx).tables["table"].entity_id(), table_before);
+        assert_eq!(
+            view.read(cx).tables["table"].state.entity_id(),
+            table_before
+        );
         assert_eq!(window.find("name").value(), Some("Dart 🦀"));
         assert_eq!(window.find("name").focused(), Some(true));
         assert_eq!(
@@ -399,6 +408,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
 
         window.scroll("table", ScrollDelta::Pixels(point(px(0.), px(-640.))), cx);
         let scrolled = view.read(cx).tables["table"]
+            .state
             .read(cx)
             .visible_range()
             .rows()
@@ -408,9 +418,9 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
             "Wheel input must move the visible rows"
         );
         window.click("table", cx);
-        let selected = view.read(cx).tables["table"].read(cx).selected_row();
+        let selected = view.read(cx).tables["table"].state.read(cx).selected_row();
         window.press("down", cx);
-        let next = view.read(cx).tables["table"].read(cx).selected_row();
+        let next = view.read(cx).tables["table"].state.read(cx).selected_row();
         assert!(
             next.is_some() && next != selected,
             "Keyboard navigation must change row selection"
@@ -441,6 +451,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
         assert!(window.find("name").bounds().right() <= px(620.));
         assert!(
             !view.read(cx).tables["table"]
+                .state
                 .read(cx)
                 .visible_range()
                 .rows()
@@ -601,6 +612,392 @@ fn scoped_actions_dispatch_by_focus_and_unmatched_keys_type(cx: &mut TestAppCont
             "unbound keys do not emit action events"
         );
         assert_eq!(window.find("name").value(), Some("a"));
+    })
+    .unwrap();
+}
+
+fn initial_with_ids() -> Initial {
+    let table = |view: Option<TableView>| Snapshot {
+        revision: 1,
+        actions: Vec::new(),
+        root: Node::Table {
+            id: "table".into(),
+            style: None,
+            dataset: "records".into(),
+            view,
+        },
+    };
+    Initial {
+        window: Default::default(),
+        snapshot: table(Some(TableView {
+            sort: vec![SortKey {
+                column: 1,
+                direction: SortDirection::Desc,
+            }],
+            filter: vec![],
+        })),
+        datasets: vec![Upload {
+            id: "records".into(),
+            revision: 1,
+            data: TableData {
+                columns: vec!["sym".into(), "price".into()],
+                // R000 has price 100, R099 has price 1: descending sort is the
+                // identity order, ascending reverses it.
+                rows: (0..100)
+                    .map(|i| vec![format!("R{i:03}"), format!("{}", 100 - i)])
+                    .collect(),
+                ids: Some((0..100).map(|i| format!("R{i:03}")).collect()),
+            },
+        }],
+    }
+}
+
+fn publish_table_view(
+    view: &gpui_kit::Entity<DartView>,
+    revision: u64,
+    table_view: TableView,
+    window: &mut gpui_kit::Window,
+    cx: &mut gpui_kit::App,
+) {
+    view.update(cx, |view, cx| {
+        view.publish(
+            Snapshot {
+                revision,
+                actions: Vec::new(),
+                root: Node::Table {
+                    id: "table".into(),
+                    style: None,
+                    dataset: "records".into(),
+                    view: Some(table_view),
+                },
+            },
+            window,
+            cx,
+        )
+    });
+}
+
+fn edit_cell(
+    view: &gpui_kit::Entity<DartView>,
+    base_revision: u64,
+    row: usize,
+    column: usize,
+    value: &str,
+    cx: &mut gpui_kit::App,
+) {
+    view.update(cx, |view, cx| {
+        view.update_dataset(
+            Update {
+                request: 1,
+                id: "records".into(),
+                base_revision,
+                revision: base_revision + 1,
+                change: Change::Edit {
+                    edits: vec![crate::datasets::Edit::Cell {
+                        row,
+                        column,
+                        value: value.into(),
+                    }],
+                },
+            },
+            0,
+            cx,
+        )
+    });
+}
+
+#[gpui::test]
+fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let sink = Events(Arc::new(move |event| collected.lock().unwrap().push(event)));
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial_with_ids(), sink, window, cx))
+        })
+        .unwrap()
+    });
+
+    // (a) Sort order drives the delegate index. Descending price is identity.
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let index = view.read(cx).tables["table"]
+            .state
+            .read(cx)
+            .delegate()
+            .index
+            .borrow()
+            .clone();
+        assert_eq!(index.len(), 100);
+        assert_eq!(index[0], 0, "descending price keeps source order");
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], 100);
+        assert_eq!(inspect["tables"]["table"]["view"]["source_rows"], 100);
+        assert!(inspect["tables"]["table"]["view"]["spec_hash"].is_u64());
+    })
+    .unwrap();
+
+    // Select a row (descending price is identity order, so view row i is
+    // record R00i). Effects flush between blocks.
+    let mut selected = String::new();
+    let mut selected_row = usize::MAX;
+    cx.update_window(handle, |_, window, cx| {
+        window.click("table", cx);
+        window.press("down", cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        let inspect = view.read(cx).inspect(window, cx);
+        selected = inspect["tables"]["table"]["selection"]["record"]
+            .as_str()
+            .expect("a record must be selected")
+            .to_owned();
+        selected_row = inspect["tables"]["table"]["selection"]["row"]
+            .as_u64()
+            .unwrap() as usize;
+        assert!(selected_row < 10, "test setup selects a row in R000..R009");
+    })
+    .unwrap();
+
+    // (b) Reversing the sort keeps the same record selected at its new row.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            2,
+            TableView {
+                sort: vec![SortKey {
+                    column: 1,
+                    direction: SortDirection::Asc,
+                }],
+                filter: vec![],
+            },
+            window,
+            cx,
+        );
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(
+            inspect["tables"]["table"]["selection"]["record"],
+            selected.as_str()
+        );
+        assert_eq!(
+            inspect["tables"]["table"]["selection"]["row"],
+            99 - selected_row
+        );
+        let index = view.read(cx).tables["table"]
+            .state
+            .read(cx)
+            .delegate()
+            .index
+            .borrow()
+            .clone();
+        assert_eq!(index[0], 99, "ascending price reverses the order");
+    })
+    .unwrap();
+
+    // Filtering to R000..R009 keeps the selection; the record moves rows.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            3,
+            TableView {
+                sort: vec![SortKey {
+                    column: 1,
+                    direction: SortDirection::Asc,
+                }],
+                filter: vec![FilterTerm {
+                    column: 0,
+                    op: FilterOp::Contains,
+                    value: "R00".into(),
+                }],
+            },
+            window,
+            cx,
+        );
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], 10);
+        assert_eq!(
+            inspect["tables"]["table"]["selection"]["record"],
+            selected.as_str()
+        );
+        assert_eq!(
+            inspect["tables"]["table"]["selection"]["row"],
+            9 - selected_row
+        );
+    })
+    .unwrap();
+
+    // (c) Filtering out the selected record clears it with a null event.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            4,
+            TableView {
+                sort: vec![],
+                filter: vec![FilterTerm {
+                    column: 0,
+                    op: FilterOp::Contains,
+                    value: "R01".into(),
+                }],
+            },
+            window,
+            cx,
+        );
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(
+            inspect["tables"]["table"]["selection"]["record"],
+            serde_json::Value::Null
+        );
+        assert_eq!(
+            inspect["tables"]["table"]["selection"]["row"],
+            serde_json::Value::Null
+        );
+        let events = events.lock().unwrap();
+        assert!(
+            events.iter().any(|event| matches!(
+                event,
+                Event::TableSelection {
+                    row: None,
+                    record: None,
+                    ..
+                }
+            )),
+            "the disappearance rule must emit a null selection event"
+        );
+        assert!(
+            events.iter().any(|event| matches!(
+                event,
+                Event::TableSelection { record: Some(record), .. } if record == &selected
+            )),
+            "selection events carry the record ID"
+        );
+    })
+    .unwrap();
+
+    // (d) Scroll anchor: restore the full descending view and scroll to row 25.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            5,
+            TableView {
+                sort: vec![SortKey {
+                    column: 1,
+                    direction: SortDirection::Desc,
+                }],
+                filter: vec![],
+            },
+            window,
+            cx,
+        );
+        let table = view.read(cx).tables["table"].state.clone();
+        table.update(cx, |table, cx| table.scroll_to_row(25, cx));
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["visible_rows"]["start"], 25);
+    })
+    .unwrap();
+
+    // Anchor R025 survives a view change that keeps it: the scroll follows
+    // the record (ascending order moves R025 to view row 74), instead of
+    // keeping the raw pixel offset.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            6,
+            TableView {
+                sort: vec![SortKey {
+                    column: 1,
+                    direction: SortDirection::Asc,
+                }],
+                filter: vec![FilterTerm {
+                    column: 0,
+                    op: FilterOp::Contains,
+                    value: "R0".into(),
+                }],
+            },
+            window,
+            cx,
+        );
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], 100);
+        assert_eq!(
+            inspect["tables"]["table"]["visible_rows"]["start"], 74,
+            "anchor record R025 stays at the top of the viewport"
+        );
+    })
+    .unwrap();
+
+    // A filter that removes the anchor resets the scroll to the top.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            7,
+            TableView {
+                sort: vec![],
+                filter: vec![FilterTerm {
+                    column: 0,
+                    op: FilterOp::Contains,
+                    value: "R03".into(),
+                }],
+            },
+            window,
+            cx,
+        );
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["visible_rows"]["start"], 0);
+        assert_eq!(inspect["tables"]["table"]["scroll_y"], 0.0);
+    })
+    .unwrap();
+
+    // (e) Only edits to view-referenced columns recompute the index.
+    cx.update_window(handle, |_, window, cx| {
+        publish_table_view(
+            &view,
+            8,
+            TableView {
+                sort: vec![SortKey {
+                    column: 1,
+                    direction: SortDirection::Desc,
+                }],
+                filter: vec![],
+            },
+            window,
+            cx,
+        );
+        window.render_frame(cx);
+        let baseline = view.read(cx).counters.view_recomputes.get();
+        edit_cell(&view, 1, 0, 0, "RENAMED", cx);
+        window.render_frame(cx);
+        assert_eq!(
+            view.read(cx).counters.view_recomputes.get(),
+            baseline,
+            "an edit to an unreferenced column must not recompute the view"
+        );
+        edit_cell(&view, 2, 0, 1, "0", cx);
+        window.render_frame(cx);
+        assert_eq!(
+            view.read(cx).counters.view_recomputes.get(),
+            baseline + 1,
+            "an edit to the sort column recomputes the view"
+        );
+        let index = view.read(cx).tables["table"]
+            .state
+            .read(cx)
+            .delegate()
+            .index
+            .borrow()
+            .clone();
+        assert_eq!(index[0], 1, "R000 sank to the bottom after its price edit");
+        assert_eq!(index[99], 0);
     })
     .unwrap();
 }

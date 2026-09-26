@@ -65,6 +65,10 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
           throw const FormatException('Missing table selection row');
         }
         if (value['row'] != null) integer('row');
+        if (!value.containsKey('record')) {
+          throw const FormatException('Missing table selection record');
+        }
+        if (value['record'] != null) string('record');
       }
     case 'action':
       integer('revision', minimum: 1);

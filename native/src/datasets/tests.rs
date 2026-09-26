@@ -9,6 +9,7 @@ fn upload(count: usize) -> Upload {
             rows: (0..count)
                 .map(|i| vec![i.to_string(), "original".into()])
                 .collect(),
+            ids: None,
         },
     }
 }
@@ -157,4 +158,101 @@ fn one_cell_decode_and_apply_allocations_are_independent_of_dataset_size() {
     if let Ok(path) = std::env::var("GPUIDART_DATA_ALLOCATION_REPORT") {
         std::fs::write(path, serde_json::to_string_pretty(&serde_json::json!({"scope":"Rust JSON decode and dataset transaction; excludes renderer", "samples":results})).unwrap()).unwrap();
     }
+}
+
+#[test]
+fn record_ids_validate_and_survive_edits() {
+    let with_ids = |ids: Vec<&str>| TableData {
+        columns: vec!["A".into()],
+        rows: vec![vec!["x".into()], vec!["y".into()]],
+        ids: Some(ids.iter().map(|id| id.to_string()).collect()),
+    };
+    assert!(with_ids(vec!["r1"]).validate().is_err(), "length mismatch");
+    assert!(with_ids(vec!["r1", "r1"]).validate().is_err(), "duplicate");
+    assert!(with_ids(vec!["r1", ""]).validate().is_err(), "empty");
+    assert!(with_ids(vec!["r1", "r2"]).validate().is_ok());
+
+    let mut store = Store::new(vec![Upload {
+        id: "records".into(),
+        revision: 1,
+        data: with_ids(vec!["r1", "r2"]),
+    }]);
+    // Edits keep identity: rows change, ids do not.
+    store
+        .apply(edit(
+            1,
+            vec![Edit::Row {
+                row: 0,
+                values: vec!["changed".into()],
+            }],
+        ))
+        .unwrap();
+    {
+        let data = &store.entries["records"].borrow().data;
+        assert_eq!(data.rows[0][0], "changed");
+        assert_eq!(data.ids.as_ref().unwrap(), &["r1", "r2"]);
+    }
+
+    // Replace may supply a new ID set.
+    store
+        .apply(Update {
+            request: 2,
+            id: "records".into(),
+            base_revision: 2,
+            revision: 3,
+            change: Change::Replace {
+                data: TableData {
+                    columns: vec!["A".into()],
+                    rows: vec![vec!["z".into()]],
+                    ids: Some(vec!["r9".into()]),
+                },
+            },
+        })
+        .unwrap();
+    {
+        let data = &store.entries["records"].borrow().data;
+        assert_eq!(data.ids.as_ref().unwrap(), &["r9"]);
+    }
+
+    // Replace with malformed ids rejects.
+    assert!(
+        store
+            .apply(Update {
+                request: 3,
+                id: "records".into(),
+                base_revision: 3,
+                revision: 4,
+                change: Change::Replace {
+                    data: TableData {
+                        columns: vec!["A".into()],
+                        rows: vec![vec!["z".into()]],
+                        ids: Some(vec!["r9".into(), "r9".into()]),
+                    },
+                },
+            })
+            .is_err()
+    );
+}
+
+#[test]
+fn view_columns_must_exist_in_the_dataset() {
+    let view = crate::protocol::TableView {
+        sort: vec![crate::protocol::SortKey {
+            column: 2,
+            direction: crate::protocol::SortDirection::Asc,
+        }],
+        filter: vec![],
+    };
+    let snapshot = crate::protocol::Snapshot {
+        revision: 1,
+        actions: vec![],
+        root: Node::Table {
+            id: "t".into(),
+            style: None,
+            dataset: "records".into(),
+            view: Some(view),
+        },
+    };
+    assert!(validate_views(&snapshot, |_| Some(2)).is_err());
+    assert!(validate_views(&snapshot, |_| Some(3)).is_ok());
 }

@@ -97,6 +97,7 @@ final class GpuiEvent {
           data['dataset'] as String,
           data['dataset_revision'] as int,
           data['row'] as int?,
+          data['record'] as String?,
         )
       : null;
 
@@ -130,11 +131,19 @@ final class TableSelection {
     this.dataset,
     this.datasetRevision,
     this.row,
+    this.record,
   );
   final String table;
   final String dataset;
   final int datasetRevision;
+
+  /// The view row index; for debugging. Consumers key on [record].
   final int? row;
+
+  /// The selected record's stable ID, when the dataset has record IDs. Null
+  /// when it has none or the selection cleared (the disappearance rule emits
+  /// a selection with both [row] and [record] null).
+  final String? record;
 }
 
 /// Experimental desktop host. The Dart application isolate keeps its event loop.
@@ -471,14 +480,21 @@ final class GpuiHost {
     TableDataset dataset, {
     required List<String> columns,
     required List<List<String>> rows,
+    List<String>? rowIds,
   }) {
-    final replacement = TableDataset(dataset.id, columns: columns, rows: rows);
+    final replacement = TableDataset(
+      dataset.id,
+      columns: columns,
+      rows: rows,
+      rowIds: rowIds,
+    );
     return _transact(
       dataset,
       {'op': 'replace', 'data': replacement._data()},
       () {
         dataset._columns = replacement._columns;
         dataset._rows = replacement._rows;
+        dataset._rowIds = replacement._rowIds;
       },
     );
   }

@@ -42,6 +42,23 @@ void main() {
         'dataset_revision': 1,
         'row': -1,
       },
+      {
+        'type': 'table_selection',
+        'revision': 2,
+        'id': 'table',
+        'dataset': 'records',
+        'dataset_revision': 1,
+        'row': null,
+      },
+      {
+        'type': 'table_selection',
+        'revision': 2,
+        'id': 'table',
+        'dataset': 'records',
+        'dataset_revision': 1,
+        'row': null,
+        'record': 4,
+      },
       {'type': 'action', 'revision': 2, 'name': 'app.search'},
       {
         'type': 'action',
@@ -71,6 +88,17 @@ void main() {
       expect(event['trace']['points'], [1, 2]);
       expect(() => event['value'] = 'changed', throwsUnsupportedError);
       expect(() => event['trace']['points'].add(3), throwsUnsupportedError);
+      final cleared = decode({
+        'type': 'table_selection',
+        'revision': 2,
+        'id': 'table',
+        'dataset': 'records',
+        'dataset_revision': 1,
+        'row': null,
+        'record': null,
+      });
+      expect(cleared['row'], isNull);
+      expect(cleared['record'], isNull);
       expect(
         decode({
           'type': 'table_selection',
@@ -78,9 +106,10 @@ void main() {
           'id': 'table',
           'dataset': 'records',
           'dataset_revision': 1,
-          'row': null,
-        })['row'],
-        isNull,
+          'row': 3,
+          'record': 'ACME',
+        })['record'],
+        'ACME',
       );
       final action = decode({
         'type': 'action',
