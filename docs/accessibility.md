@@ -30,17 +30,34 @@ Wayland support. All probe failures and environment limitations are retained.
 ## Model and defaults
 
 Each node gains optional typed `semantics`. Labels are limited to 1,024 UTF-8
-bytes, descriptions to 4,096. Roles use a closed enum. Containers can represent
+bytes. Roles use a closed enum. Containers can represent
 groups, lists and sections; text can represent labels or headings. Controls keep
 their functional roles. Their checked, disabled, expanded, selected, text and
 range states come from the actual retained control state, including native edits
 that precede a Dart acknowledgement. Overrides must not advertise a different
 action or value from the control; incompatible roles/states are rejected.
 
-The wire design must distinguish annotations from control state. Repeating a
-slider's range or a checkbox's checked property in a semantics override must not
-create a second source of truth. The final field matrix and rejected combinations
-will be recorded with the wire-model commit.
+The wire model distinguishes annotations from control state. `UiSemantics` has
+`label`, `role`, and `headingLevel` (required for headings, 1 through 6). Control
+state is derived, rather than repeated in an independently writable annotation.
+This narrows the requested override model: falsely announcing a disabled control
+as enabled, or a checkbox as checked, is rejected rather than overriding behavior.
+Supplementary descriptions are deferred: the pinned component APIs do not expose
+them consistently, and a group wrapper would not describe the same platform node.
+
+| Node | Allowed explicit roles | Native state |
+| --- | --- | --- |
+| Row/column | group, list, list_item | Descendant controls own state |
+| Text | label, heading | Text; heading level |
+| Button / confirmation trigger | button | Enabled, focus; modal is a separate generated dialog |
+| Checkbox | checkbox | Checked, disabled, focus |
+| Slider | slider | Number, range, step, disabled, focus |
+| Input | textbox | Native text, selection, focus |
+| Select | combobox | Choice, expanded, disabled, focus |
+| Table | table | Dimensions, rendered rows/cells, selection |
+
+Unknown fields, mismatched roles, empty explicit names and overlong UTF-8 names
+are rejected on both sides. Existing messages without annotations remain valid.
 
 Defaults: visible button/checkbox labels; current input value with placeholder as
 fallback name; select current choice plus explicit name/placeholder; slider actual

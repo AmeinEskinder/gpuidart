@@ -2,23 +2,26 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'style.dart';
+import 'semantics.dart';
 import 'table_view.dart';
 
 sealed class UiNode {
-  const UiNode(this.id, {this.style});
+  const UiNode(this.id, {this.style, this.semantics});
   final String id;
   final UiStyle? style;
+  final UiSemantics? semantics;
   Map<String, Object> toJson();
 }
 
 final class UiColumn extends UiNode {
-  UiColumn(super.id, List<UiNode> children, {super.style})
+  UiColumn(super.id, List<UiNode> children, {super.style, super.semantics})
     : children = List.unmodifiable(children);
   final List<UiNode> children;
   @override
   Map<String, Object> toJson() => {
     'kind': 'column',
     'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('column'),
     if (style != null) 'style': style!.toJson(),
     'children': children.map((child) => child.toJson()).toList(),
   };
@@ -26,37 +29,40 @@ final class UiColumn extends UiNode {
 
 /// A horizontal group that wraps to another line when the window is narrow.
 final class UiRow extends UiNode {
-  UiRow(super.id, List<UiNode> children, {super.style})
+  UiRow(super.id, List<UiNode> children, {super.style, super.semantics})
     : children = List.unmodifiable(children);
   final List<UiNode> children;
   @override
   Map<String, Object> toJson() => {
     'kind': 'row',
     'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('row'),
     if (style != null) 'style': style!.toJson(),
     'children': children.map((child) => child.toJson()).toList(),
   };
 }
 
 final class UiText extends UiNode {
-  const UiText(super.id, this.text, {super.style});
+  const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;
   @override
   Map<String, Object> toJson() => {
     'kind': 'text',
     'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('text'),
     if (style != null) 'style': style!.toJson(),
     'text': text,
   };
 }
 
 final class UiButton extends UiNode {
-  const UiButton(super.id, this.label, {super.style});
+  const UiButton(super.id, this.label, {super.style, super.semantics});
   final String label;
   @override
   Map<String, Object> toJson() => {
     'kind': 'button',
     'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('button'),
     if (style != null) 'style': style!.toJson(),
     'label': label,
   };
@@ -71,6 +77,7 @@ final class UiCheckbox extends UiNode {
     required this.checked,
     this.disabled = false,
     super.style,
+    super.semantics,
   });
   final String label;
   final bool checked;
@@ -84,6 +91,7 @@ final class UiCheckbox extends UiNode {
     return {
       'kind': 'checkbox',
       'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('checkbox'),
       if (style != null) 'style': style!.toJson(),
       'label': label,
       'checked': checked,
@@ -105,6 +113,7 @@ final class UiSlider extends UiNode {
     required this.number,
     this.disabled = false,
     super.style,
+    super.semantics,
   });
   final double min;
   final double max;
@@ -134,6 +143,7 @@ final class UiSlider extends UiNode {
     return {
       'kind': 'slider',
       'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('slider'),
       if (style != null) 'style': style!.toJson(),
       'min': min,
       'max': max,
@@ -163,6 +173,7 @@ final class UiSelect extends UiNode {
     this.placeholder = '',
     this.disabled = false,
     super.style,
+    super.semantics,
   }) : options = List.unmodifiable(options);
   final List<UiSelectOption> options;
   final String? selected;
@@ -194,6 +205,7 @@ final class UiSelect extends UiNode {
     return {
       'kind': 'select',
       'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('select'),
       if (style != null) 'style': style!.toJson(),
       'options': options.map((o) => o.toJson()).toList(),
       'selected': ?selected,
@@ -217,6 +229,7 @@ final class UiConfirmDialog extends UiNode {
     this.cancelLabel = 'Cancel',
     this.disabled = false,
     super.style,
+    super.semantics,
   });
   final String label;
   final String title;
@@ -240,6 +253,7 @@ final class UiConfirmDialog extends UiNode {
     return {
       'kind': 'confirm_dialog',
       'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('confirm_dialog'),
       if (style != null) 'style': style!.toJson(),
       'label': label,
       'title': title,
@@ -256,6 +270,7 @@ final class UiInput extends UiNode {
   const UiInput(
     super.id, {
     super.style,
+    super.semantics,
     this.placeholder = '',
     this.controlled = false,
   });
@@ -265,6 +280,7 @@ final class UiInput extends UiNode {
   Map<String, Object> toJson() => {
     'kind': 'input',
     'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('input'),
     if (style != null) 'style': style!.toJson(),
     'placeholder': placeholder,
     if (controlled) 'controlled': true,
@@ -273,7 +289,13 @@ final class UiInput extends UiNode {
 
 /// References a dataset registered with this host. Snapshots contain no records.
 final class UiTable extends UiNode {
-  const UiTable(super.id, {super.style, required this.dataset, this.view});
+  const UiTable(
+    super.id, {
+    super.style,
+    super.semantics,
+    required this.dataset,
+    this.view,
+  });
   final String dataset;
 
   /// Presentation-only sort/filter view over the dataset.
@@ -282,6 +304,7 @@ final class UiTable extends UiNode {
   Map<String, Object> toJson() => {
     'kind': 'table',
     'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('table'),
     if (style != null) 'style': style!.toJson(),
     'dataset': dataset,
     if (view != null) 'view': view!.toJson(),

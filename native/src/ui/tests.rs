@@ -23,26 +23,31 @@ fn description(revision: u64) -> Snapshot {
         actions: Vec::new(),
         root: Node::Column {
             id: "root".into(),
+            semantics: None,
             style: None,
             children: vec![
                 Node::Text {
                     id: "label".into(),
+                    semantics: None,
                     style: None,
                     text: format!("Revision {revision}"),
                 },
                 Node::Button {
                     id: "increment".into(),
+                    semantics: None,
                     style: None,
                     label: "Increment".into(),
                 },
                 Node::Input {
                     id: "name".into(),
+                    semantics: None,
                     style: None,
                     placeholder: "Name".into(),
                     controlled: false,
                 },
                 Node::Table {
                     id: "table".into(),
+                    semantics: None,
                     style: None,
                     dataset: "records".into(),
                     view: None,
@@ -236,10 +241,12 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                     1,
                     Node::Row {
                         id: "actions".into(),
+                        semantics: None,
                         style: None,
                         children: (0..3)
                             .map(|i| Node::Button {
                                 id: format!("action-{i}"),
+                                semantics: None,
                                 style: None,
                                 label: format!("A long action label {i}"),
                             })
@@ -248,6 +255,7 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                 );
                 children.push(Node::Button {
                     id: "footer".into(),
+                    semantics: None,
                     style: None,
                     label: "End of screen".into(),
                 });
@@ -431,6 +439,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                 view.materialize(
                     &Node::Input {
                         id: "missing-input".into(),
+                        semantics: None,
                         style: None,
                         placeholder: String::new(),
                         controlled: false,
@@ -445,6 +454,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                 view.materialize(
                     &Node::Table {
                         id: "missing-table".into(),
+                        semantics: None,
                         style: None,
                         dataset: "records".into(),
                         view: None,
@@ -608,6 +618,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
                     actions: Vec::new(),
                     root: Node::Text {
                         id: "empty".into(),
+                        semantics: None,
                         style: None,
                         text: "Closed".into(),
                     },
@@ -766,6 +777,7 @@ fn initial_with_ids() -> Initial {
         actions: Vec::new(),
         root: Node::Table {
             id: "table".into(),
+            semantics: None,
             style: None,
             dataset: "records".into(),
             view,
@@ -811,6 +823,7 @@ fn publish_table_view(
                 actions: Vec::new(),
                 root: Node::Table {
                     id: "table".into(),
+                    semantics: None,
                     style: None,
                     dataset: "records".into(),
                     view: Some(table_view),
@@ -1222,6 +1235,7 @@ fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
             actions: Vec::new(),
             root: Node::Table {
                 id: "table".into(),
+                semantics: None,
                 style: None,
                 dataset: "records".into(),
                 view: None,

@@ -329,6 +329,7 @@ mod tests {
         let input = nodes.pop().unwrap();
         nodes.push(Node::Column {
             id: "new-owner".into(),
+            semantics: None,
             style: None,
             children: vec![input],
         });

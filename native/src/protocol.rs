@@ -2,6 +2,9 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+mod semantics;
+pub use semantics::Semantics;
+
 pub const MAX_MESSAGE_BYTES: usize = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -106,30 +109,40 @@ pub enum Node {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         children: Vec<Node>,
     },
     Row {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         children: Vec<Node>,
     },
     Text {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         text: String,
     },
     Button {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         label: String,
     },
     Checkbox {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         label: String,
         checked: bool,
         #[serde(default)]
@@ -139,6 +152,8 @@ pub enum Node {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         min: f32,
         max: f32,
         step: f32,
@@ -150,6 +165,8 @@ pub enum Node {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         options: Vec<SelectOption>,
         selected: Option<String>,
         #[serde(default)]
@@ -161,6 +178,8 @@ pub enum Node {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         label: String,
         title: String,
         message: String,
@@ -173,6 +192,8 @@ pub enum Node {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         placeholder: String,
         #[serde(default, skip_serializing_if = "is_false")]
         controlled: bool,
@@ -181,6 +202,8 @@ pub enum Node {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
         dataset: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         view: Option<TableView>,
@@ -671,6 +694,21 @@ impl Node {
         }
     }
 
+    pub fn semantics(&self) -> Option<&Semantics> {
+        match self {
+            Self::Column { semantics, .. }
+            | Self::Row { semantics, .. }
+            | Self::Text { semantics, .. }
+            | Self::Button { semantics, .. }
+            | Self::Checkbox { semantics, .. }
+            | Self::Slider { semantics, .. }
+            | Self::Select { semantics, .. }
+            | Self::ConfirmDialog { semantics, .. }
+            | Self::Input { semantics, .. }
+            | Self::Table { semantics, .. } => semantics.as_ref(),
+        }
+    }
+
     pub fn visit(&self, f: &mut impl FnMut(&Node)) {
         f(self);
         if let Self::Column { children, .. } | Self::Row { children, .. } = self {
@@ -705,6 +743,9 @@ impl Snapshot {
             }
             if let Some(style) = node.style() {
                 style.validate(matches!(node, Node::Text { .. }))?;
+            }
+            if let Some(semantics) = node.semantics() {
+                semantics.validate(node)?;
             }
             match node {
                 Node::Column { children, .. } | Node::Row { children, .. } => {
