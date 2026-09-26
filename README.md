@@ -10,7 +10,7 @@ An experimental desktop SDK using Dart application code and GPUI Kit's Rust cont
 
 See [cross-platform acceptance](reports/cross-platform/status.md) for source revisions, package results and remaining gates. Native Wayland, Intel Macs, other Linux distributions and older macOS versions are unverified.
 
-The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include a successful clean Windows launch in Sandbox. Human IME verification, other desktop checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
+The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include a successful clean Windows launch in Sandbox and [Windows Japanese IME verification by agent visual observation](reports/ime/windows-japanese-20260926/README.md), as requested by the owner. Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
 The SDK supports row/column layouts, text, buttons, native text inputs and virtualized tables, plus initial window options and table-selection events. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
@@ -135,7 +135,7 @@ Node IDs must be nonempty and unique throughout one description. An input or tab
 
 ## Current limits
 
-The Windows release checks have a [setup guide](docs/windows-test-setup.md), an automatic Sandbox runner and an observation sheet. Human IME checks remain pending. Windows feature installation requires administrator access; neither generated test files nor installed language components count as completed verification.
+The Windows release checks have a [setup guide](docs/windows-test-setup.md), an automatic Sandbox runner and an observation sheet. [Real Japanese IME composition and reload passed](reports/ime/windows-japanese-20260926/README.md) through owner-authorized agent observation. Other IMEs and display configurations remain unverified. Windows feature installation requires administrator access; neither generated test files nor installed language components count as completed verification.
 
 The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 

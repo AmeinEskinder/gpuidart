@@ -9,7 +9,8 @@ runtime feature is part of this release check.
 1. Read the existing work order, skills and acceptance contracts. Completed.
 2. Record post-restart Windows prerequisites. Windows servicing reports no
    pending restart. Japanese Basic Typing is installed; Japanese was added
-   after English in the current user's language list. Actual IME use is pending.
+   after English in the current user's language list. Actual Japanese IME use
+   subsequently passed the owner-authorized visual checks linked below.
 3. All nine Windows release checks passed on committed `bb6a894`: 41 native
    tests, 41 Dart tests, 500 interaction updates, reload, development launcher,
    packaging and failure checks. The package ran at DPI 120 with PerMonitorV2.
@@ -17,8 +18,8 @@ runtime feature is part of this release check.
    after MIT licensing. Windows used a fresh Sandbox with GPU sharing disabled. The earlier
    guest desktop crashes and duplicate verifier attempt are retained.
 5. The owner selected MIT on 2026-09-26; [LICENSE](../../LICENSE) records the
-   terms. Complete observed IME checks when a human can perform them.
-   Neither an installed input method nor a passing test supplies that evidence.
+   terms. Windows Japanese IME checks passed through owner-authorized agent
+   observation of real composition, screenshots and actual code reload.
 6. Record per-artifact results, remaining gates and a milestone commit.
 
 Success requires current-source release tests and packaging, clean-environment
@@ -31,6 +32,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 
 ## Current evidence
 
+- [Windows Japanese IME observation](../ime/windows-japanese-20260926/README.md): real preedit, candidate navigation, commit/cancel, editing and active-composition reload passed using the MIT release DLL. The owner requested screenshot/tool verification; the observer was an agent. Interrupted attempts and scope limits are retained.
 - [Windows acceptance](bb6a894/windows/acceptance.json), [packaged execution](bb6a894/windows/package.json), [reload](bb6a894/windows/reload.json) and [500-update run](bb6a894/windows/stability.json).
 - [MIT package milestone](4fca314/README.md): all three archives include the project license, with matching source and file hashes. All six workflows passed at the implementation commit.
 - [Current clean-Windows verification](4fca314/clean-windows/verification.json) passed for the MIT package in a fresh guest without developer SDK commands, at DPI 120 with PerMonitorV2. The corrected `<vGPU>` setting was confirmed by adapter inventory and WARP modules. [The investigation](sandbox-investigation/README.md) retains the compositor crashes and corrects the earlier assumption that `<VGpu>` disabled GPU sharing.
@@ -46,7 +48,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 
 | Platform | Local artifact | Verified scope |
 | --- | --- | --- |
-| Windows x64 | [WatchlistMit4fca314-windows-x64.zip](../../build/WatchlistMit4fca314-windows-x64.zip) | MIT license included; local and fresh Sandbox AOT verification, Unicode reports, DLL identity and DPI; confirmed WARP configuration |
+| Windows x64 | [WatchlistMit4fca314-windows-x64.zip](../../build/WatchlistMit4fca314-windows-x64.zip) | MIT license included; local and fresh Sandbox AOT verification, Unicode reports, DLL identity and DPI; confirmed WARP configuration; Japanese IME visually observed on the host |
 | macOS ARM64 | [Watchlist-macos-arm64.tar.gz](../../build/evaluation-4fca314/macos/Watchlist-macos-arm64.tar.gz) | MIT license included; hosted macOS 15 execution and packaging |
 | Linux x64 | [Watchlist-linux-x64.tar.gz](../../build/evaluation-4fca314/linux/Watchlist-linux-x64.tar.gz) | MIT license included; hosted Ubuntu 24.04 X11 and fresh runtime container |
 
@@ -59,16 +61,17 @@ isolate its cost or establish cross-platform performance rankings.
 
 | Gate | Required evidence / decision |
 | --- | --- |
-| Human IME | Observed preedit, candidate placement, commit/cancel, selection and reload, with input method/version. Installed Japanese and injected Unicode do not satisfy this. |
-| Other desktop backends | Clean Mac launch, human IME on each supported backend, Retina/fractional/mixed-monitor observations. Hosted checks retain their narrower scope. |
+| Other input/display backends | Windows Japanese IME passed by owner-authorized agent observation. macOS/Linux IME, AltGr, other IMEs, Retina/fractional/mixed-monitor observations remain open. Hosted checks retain their narrower scope. |
+| Other desktop launches | Clean macOS and Linux desktop/VM observations remain open. Hosted Mac execution and the clean Linux runtime container retain their narrower scope. |
 | Original Windows reload mismatch | The original `attempt-023eef4` remains unlocalized. Passing current checks and the separately proved preparation-race fix do not explain the missing historical values. |
 | macOS distribution | Developer ID signing/notarization and a quarantined clean-Mac launch remain pending. Project licensing is resolved as MIT. |
 
-These records establish current automated acceptance. The stable-release goal
+These records establish current automated acceptance and the scoped Windows IME observation. The stable-release goal
 remains open under `docs/mvp.md` and `docs/cross-platform.md`.
 
 The accepted clean-Windows run is
 `build/release-checks/20260926-033124-d40b4635`.
 Its `results/ime-results.md` remains pending; this guest has only English input.
-Human Japanese IME checks must use the prepared host or another machine with
-the input method installed.
+The separate [host observation](../ime/windows-japanese-20260926/README.md)
+closes Windows Japanese IME for the same package; it does not change the guest's
+historical observation sheet.

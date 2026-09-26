@@ -1,0 +1,90 @@
+import 'dart:convert';
+import 'dart:io';
+
+import '../../tool/src/dev_session.dart';
+
+Future<void> main(List<String> args) async {
+  final prefix = args.single;
+  if (!RegExp(r'^jit-sequence-[0-9]+$').hasMatch(prefix)) {
+    throw ArgumentError('Supply a fresh jit-sequence-N prefix');
+  }
+  final root = Directory('.cache/ime-observation');
+  final reportFile = File('${root.path}/$prefix.json');
+  if (reportFile.existsSync()) throw StateError('Retain the previous attempt');
+  final report = <String, dynamic>{'passed': false, 'observer': 'agent using real IME and screenshots'};
+  final app = File('example/watchlist/app.dart');
+  final original = await app.readAsBytes();
+  final session = await DevSession.start(entry: 'example/watchlist/main.dart');
+  Future<void> desktop(List<String> command, String name) async {
+    final result = await Process.run('python', [
+      '${root.path}/desktop.py', ...command, '--name', '$prefix-$name',
+    ]);
+    if (result.exitCode != 0) throw StateError('${result.stderr}');
+    report[name] = jsonDecode('${result.stdout}'.trim());
+  }
+  void require(bool value, String message) {
+    if (!value) throw StateError(message);
+  }
+  try {
+    final initial = await session.call('inspect');
+    report['initial'] = initial;
+    final nativePid = initial['state']['native_process_id'];
+    await desktop(['bind', '$nativePid', '--activate'], 'open');
+    await desktop(['pin'], 'pinned');
+    await desktop(['keys', 'ctrl+f', '--activate'], 'focused');
+    await desktop(['layout', '0x4110411', '--activate'], 'japanese');
+    await desktop(['keys', 'ctrl+caps', '--activate'], 'hiragana');
+    await desktop(['keys', 'n', 'i', 'h', 'o', 'n', 'g', 'o'], 'preedit');
+    final before = await session.call('inspect');
+    report['before'] = before;
+    require(before['state']['inputs']['search']['text'] == 'にほんご', 'Typing did not produce the expected live preedit');
+    require(before['query'] == '', 'Preedit was committed before the reload');
+    require(before['state']['inputs']['search']['focused'] == true, 'Search lost focus before reload');
+    await app.writeAsString(utf8.decode(original).replaceFirst("'Market watch'", "'Market watch live IME reload'"));
+    report['reload'] = await session.reload();
+    report['after_repaint'] = await session.call('repaint');
+    await desktop(['capture'], 'after-reload');
+    final after = await session.call('inspect');
+    report['after'] = after;
+    require(after['state']['native_process_id'] == nativePid, 'Native process changed');
+    require(after['state']['labels']['title'] == 'Market watch live IME reload', 'Changed component code did not appear');
+    require(jsonEncode(before['state']['inputs']) == jsonEncode(after['state']['inputs']), 'Input text, focus, selection or identity changed');
+    require(after['query'] == '', 'Reload committed the preedit');
+    require(before['metrics']['data_messages'] == after['metrics']['data_messages'], 'Reload sent table data');
+    require(before['metrics']['data_bytes'] == after['metrics']['data_bytes'], 'Reload sent table bytes');
+    await desktop(['keys', 'space'], 'converted');
+    final converted = await session.call('inspect');
+    report['converted_state'] = converted;
+    require(converted['state']['inputs']['search']['text'] == '日本語', 'Composition could not convert after reload');
+    require(converted['query'] == '', 'Conversion committed before Enter');
+    await desktop(['keys', 'enter'], 'committed');
+    final committed = await session.call('inspect');
+    report['committed_state'] = committed;
+    require(committed['state']['inputs']['search']['text'] == '日本語', 'IME commit duplicated or lost text');
+    require(committed['query'] == '日本語', 'Application did not receive the committed text');
+    await desktop(['keys', 'shift+left'], 'selected');
+    final selected = await session.call('inspect');
+    report['selected_before'] = selected;
+    await app.writeAsString(utf8.decode(original).replaceFirst("'Market watch'", "'Market watch committed IME reload'"));
+    report['committed_reload'] = await session.reload();
+    await session.call('repaint');
+    await desktop(['capture'], 'selected-after-reload');
+    final selectedAfter = await session.call('inspect');
+    report['selected_after'] = selectedAfter;
+    require(jsonEncode(selected['state']['inputs']) == jsonEncode(selectedAfter['state']['inputs']), 'Committed text/focus/selection/identity changed');
+    require(selectedAfter['state']['labels']['title'] == 'Market watch committed IME reload', 'Second code change did not appear');
+    report['passed'] = true;
+  } catch (error, stack) {
+    report['error'] = '$error';
+    report['stack'] = '$stack';
+    try { report['failure_state'] = await session.call('inspect'); } catch (_) {}
+    exitCode = 1;
+  } finally {
+    await app.writeAsBytes(original);
+    try { await desktop(['layout', '0x4090409', '--activate'], 'restored-layout'); } catch (_) {}
+    try { await desktop(['unpin'], 'unpinned'); } catch (_) {}
+    await session.close();
+    await reportFile.writeAsString('${const JsonEncoder.withIndent('  ').convert(report)}\n');
+  }
+  stdout.writeln('Saved ${reportFile.path}: ${report['passed']}');
+}

@@ -75,7 +75,7 @@ For each platform, before claiming support:
 
 ## Ordering and non-goals
 
-- Open Windows release gates remain independent and ahead in priority: human IME verification and the unlocalized reload observation. [Clean Windows launch passed](../reports/release/README.md), and the owner selected the [MIT License](../LICENSE). Cross-platform work must not be used to defer remaining gates.
+- The unlocalized Windows reload observation remains independent and ahead in priority. [Clean Windows launch passed](../reports/release/README.md), the owner selected the [MIT License](../LICENSE), and [Windows Japanese IME passed](../reports/ime/windows-japanese-20260926/README.md) using owner-authorized agent visual observation. This accepted method closes that scoped Windows input gate; other backends still require their own observations. Cross-platform work must not be used to defer remaining gates.
 - Non-goals for this work order: mobile, web/WASM, multi-window, and snapshot/dataset protocol or styling changes. Those are separate decisions with their own gates.
 - No per-platform API forks in `lib/gpuidart.dart`. Platform differences surface as capabilities and errors, not different method sets.
 - Each phase lands behind evidence: a phase is complete when its acceptance items are recorded in `reports/cross-platform/`, not when code compiles.

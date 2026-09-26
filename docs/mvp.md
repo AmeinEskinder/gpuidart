@@ -17,6 +17,10 @@ Local acceptance requires passing analysis, native and Dart tests, actual UI int
 
 Clean-machine launch and human IME composition require separate evidence under [Windows release checks](windows-release-checks.md). A development-machine PATH restriction is not clean-machine proof. Character injection is not IME proof. Until those checks pass, describe the artifact as an MVP release candidate and identify these open release gates.
 
+The owner subsequently authorized screenshot/tool observation for the Windows
+IME gate. Record the observer and actual composition evidence when using this
+method; do not label it an independent human pass.
+
 ## Progress
 
 - Milestone 1: benchmark series and SDK preview completed. See [comparison](../reports/comparison/dart-js-20260925.md) and [SDK verification](../reports/sdk/README.md).
@@ -27,9 +31,10 @@ Clean-machine launch and human IME composition require separate evidence under [
 - Reload observation: one table-state comparison failed during the first hardening acceptance run. Eight targeted follow-ups and the full rerun passed unchanged assertions. The cause remains unlocalized; [the saved observation](../reports/mvp/attempt-023eef4/README.md) is not discarded.
 - Reload investigation: `edffde4` fixed a reproduced preparation-acknowledgement race and added checks after rendering. Twelve native tests, 27 Dart tests and 22 actual code reloads passed. [The investigation](../reports/reload-investigation/README.md) keeps this proved diagnostic bug separate from the original unlocalized failure.
 - Current feature-stack acceptance: all nine checks passed on `bb6a894`, including 41 native tests, 41 Dart tests, 500 observed price updates and AOT execution at DPI 120 with PerMonitorV2. Updated macOS/Linux release packages also passed hosted checks. See [current release evidence](../reports/release/README.md).
-- Clean Windows: the corrected `53ea4c7` package passed in a fresh Sandbox with confirmed WARP rendering, no developer SDK commands, preserved Unicode reports and PerMonitorV2 at DPI 120. [The investigation](../reports/release/sandbox-investigation/README.md) retains earlier compositor crashes, the ignored XML setting and the report-text encoding fix. Human IME remains pending despite installed Japanese input on the host.
+- Clean Windows: the corrected `53ea4c7` package passed in a fresh Sandbox with confirmed WARP rendering, no developer SDK commands, preserved Unicode reports and PerMonitorV2 at DPI 120. The MIT package passed again at `4fca314`. [The investigation](../reports/release/sandbox-investigation/README.md) retains earlier compositor crashes, the ignored XML setting and the report-text encoding fix.
+- Windows Japanese IME: [owner-authorized agent observation](../reports/ime/windows-japanese-20260926/README.md) passed on the MIT package at 125% scale, including real preedit, candidates, editing and active-composition code reload. This closes the scoped Windows IME check; other input/display environments remain unverified.
 
-The latest local acceptance run passed. The stable-release goal remains open pending external evidence and resolution of the reload observation. Testing movement between monitors with different DPI remains additional pending coverage.
+The latest local acceptance run and Windows Japanese IME observation passed. The stable Windows release goal remains open pending resolution of the reload observation. Testing movement between monitors with different DPI remains additional pending coverage; cross-platform desktop gates are tracked separately.
 
 ## Reproduce local release acceptance
 

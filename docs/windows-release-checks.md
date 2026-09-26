@@ -24,6 +24,12 @@ malformed UTF-8.
 
 ## Human input and IME composition
 
+Current result: [Windows Japanese IME passed on 2026-09-26](../reports/ime/windows-japanese-20260926/README.md)
+using the owner's requested screenshot/tool method. An agent inspected real IME
+preedit, candidates, editing and active-composition reload at 125% scale. There
+was no independent human observer. This result is specific to the recorded IME,
+artifact and display; retain the same distinctions in future observation sheets.
+
 Use an installed Japanese, Chinese or Korean IME, and record its exact name/version.
 
 1. Focus the search input. Start composing text without committing it. Verify the marked text and candidate window are visible and anchored at the caret.

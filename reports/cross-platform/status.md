@@ -22,7 +22,7 @@ all passed. Subsequent evidence-only commits do not change runtime code.
 | --- | --- | --- |
 | Backend and launcher feasibility | Proven on declared hosted targets; pin unchanged | Other hardware/backends unverified |
 | Host lifecycle and clocks | Full applicable contracts, JIT/AOT and actual reload passed | Physical presentation not measured |
-| Display/input integration | Native backends used; X11 geometry/resize verified at 1 and 1.25 | Human IME, Retina and physical/mixed-monitor checks |
+| Display/input integration | Native backends used; X11 geometry/resize verified at 1 and 1.25; Windows Japanese IME observed at 125% | macOS/Linux IME, other IMEs, Retina and physical/mixed-monitor checks |
 | Build/check/package/CI | Implemented; both extracted packages passed; fresh Ubuntu container passed | Clean Mac and desktop/VM launches; distribution signing |
 | Startup/memory baseline | Three JIT/AOT repetitions per host retained with stage/metric definitions | First useful display and presentation unmeasured |
 
@@ -86,8 +86,10 @@ physical fractional-scaling or mixed-monitor verification.
 
 - Clean macOS launch without development SDKs. [Clean Windows launch passed](../release/README.md). A clean Linux
   container is a narrower automated target; clean desktop/VM checks remain.
-- Human IME composition, candidate placement/commit/cancel, selection,
-  scrolling and window resizing on every declared OS/backend.
+- IME composition, candidate placement/commit/cancel, selection, scrolling and
+  window resizing on macOS/Linux. [Windows Japanese IME passed](../ime/windows-japanese-20260926/README.md)
+  through owner-authorized agent visual observation with real IME key input,
+  screenshots and active-composition reload. Other IMEs and AltGr remain unverified.
 - Retina, physical Linux fractional scaling and mixed-monitor movement. Hosted
   macOS checks cover scale 1; Linux additionally has forced-scale 1.25 geometry
   and resize checks.
@@ -99,4 +101,5 @@ physical fractional-scaling or mixed-monitor verification.
 
 Use the [Unix observation sheet](../../docs/unix-release-checks.md) and
 [Windows release checks](../../docs/windows-release-checks.md) to retain actual
-results. Automated Unicode/synthetic input must not be recorded as human IME.
+results. Automated Unicode injection does not establish IME behavior. Record an
+agent observer explicitly when the owner authorizes that observation method.

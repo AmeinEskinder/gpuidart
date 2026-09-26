@@ -1,0 +1,63 @@
+from pathlib import Path
+import hashlib
+import json
+import re
+import subprocess
+
+root = Path('reports/ime/windows-japanese-20260926')
+read = lambda path: json.loads(path.read_text(encoding='utf-8-sig'))
+files = list(root.rglob('*.json'))
+for path in files:
+    read(path)
+manifest = read(root / 'capture-manifest.json')
+assert len(manifest) == 36
+for entry in manifest:
+    image = root / entry['image']
+    assert hashlib.sha256(image.read_bytes()).hexdigest() == entry['sha256']
+    assert read(root / 'captures' / (image.stem + '.json'))['foreground'] is True
+jit = read(root / 'jit-sequence-1.json')
+assert jit['passed'] is True
+assert jit['before']['state']['inputs'] == jit['after']['state']['inputs']
+assert jit['before']['query'] == jit['after']['query'] == ''
+assert jit['before']['state']['inputs']['search']['text'] == 'にほんご'
+assert jit['after']['state']['labels']['title'] == 'Market watch live IME reload'
+assert jit['converted_state']['state']['inputs']['search']['text'] == '日本語'
+assert jit['converted_state']['query'] == ''
+assert jit['committed_state']['query'] == '日本語'
+assert jit['committed_state']['state']['inputs']['search']['text'] == '日本語'
+assert jit['selected_before']['state']['inputs'] == jit['selected_after']['state']['inputs']
+assert jit['selected_after']['state']['labels']['title'] == 'Market watch committed IME reload'
+for counter in ['data_messages', 'data_bytes']:
+    assert jit['before']['metrics'][counter] == jit['after']['metrics'][counter]
+resize = read(root / 'resize-sequence.json')
+assert resize['passed'] is True
+assert resize['before_resize']['metrics']['ui_callbacks'] == resize['after_resize']['metrics']['ui_callbacks']
+assert resize['before_resize']['state']['tables']['watchlist']['view'] == resize['after_resize']['state']['tables']['watchlist']['view']
+docs = subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines()
+docs += [str(root / 'README.md')]
+links = 0
+for name in docs:
+    path = Path(name)
+    if path.suffix != '.md':
+        continue
+    for target in re.findall(r'\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
+        if '://' in target or target.startswith('#'):
+            continue
+        target = target.split('#')[0]
+        assert (path.parent / target).exists(), f'Missing link in {path}: {target}'
+        links += 1
+subprocess.run(['git', 'diff', '--exit-code', '--', 'example', 'lib', 'native', 'tool'], check=True, stdout=subprocess.DEVNULL)
+subprocess.run(['git', 'diff', '--check'], check=True)
+summary = {
+    'passed': True,
+    'json_files_parsed': len(files),
+    'screenshots_with_matching_sha256': len(manifest),
+    'local_markdown_links_checked': links,
+    'active_composition_reload_assertions': True,
+    'committed_selection_reload_assertions': True,
+    'controlled_sort_resize_assertions': True,
+    'sdk_source_unchanged': True,
+    'scope': 'Evidence consistency audit; visual observations are recorded separately in README.md',
+}
+(root / 'evidence-audit.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
+print(json.dumps(summary))

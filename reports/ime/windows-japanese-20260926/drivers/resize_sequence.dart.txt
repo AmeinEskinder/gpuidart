@@ -1,0 +1,50 @@
+import 'dart:convert';
+import 'dart:io';
+import '../../tool/src/dev_session.dart';
+
+Future<void> main() async {
+  final root = '.cache/ime-observation';
+  final reportFile = File('$root/resize-sequence.json');
+  if (reportFile.existsSync()) throw StateError('Keep the earlier attempt');
+  final report = <String, dynamic>{'passed': false};
+  final session = await DevSession.start(entry: 'example/watchlist/main.dart');
+  Future<void> action(List<String> args, String name) async {
+    final result = await Process.run('python', ['$root/desktop.py', ...args, '--name', 'resize-sequence-$name']);
+    if (result.exitCode != 0) throw StateError('${result.stderr}');
+    report[name] = jsonDecode('${result.stdout}'.trim());
+  }
+  try {
+    final initial = await session.call('inspect');
+    report['initial'] = initial;
+    await action(['bind', '${initial['state']['native_process_id']}', '--activate'], 'open');
+    await action(['pin'], 'pin');
+    for (var i = 0; i < 3; i++) {
+      await action(['click', '655', '244', '--activate'], 'sort-$i');
+      final state = await session.call('inspect');
+      report['sort_state_$i'] = state;
+      if (state['metrics']['ui_callbacks'] != initial['metrics']['ui_callbacks'] + i + 1) {
+        throw StateError('Unexpected callback count for the injected clicks');
+      }
+    }
+    final before = await session.call('inspect');
+    report['before_resize'] = before;
+    await action(['resize', '1050', '840', '--activate'], 'resized');
+    final after = await session.call('inspect');
+    report['after_resize'] = after;
+    if (before['metrics']['ui_callbacks'] != after['metrics']['ui_callbacks'] ||
+        jsonEncode(before['state']['tables']['watchlist']['view']) != jsonEncode(after['state']['tables']['watchlist']['view'])) {
+      throw StateError('Resize changed sort or emitted an application interaction');
+    }
+    report['passed'] = true;
+  } catch (error, stack) {
+    report['error'] = '$error';
+    report['stack'] = '$stack';
+    try { report['failure_state'] = await session.call('inspect'); } catch (_) {}
+    exitCode = 1;
+  } finally {
+    try { await action(['unpin', '--activate'], 'unpinned'); } catch (_) {}
+    await session.close();
+    await reportFile.writeAsString('${const JsonEncoder.withIndent('  ').convert(report)}\n');
+  }
+  stdout.writeln('Resize check: ${report['passed']}');
+}

@@ -1,0 +1,161 @@
+{
+  "state": {
+    "revision": 4,
+    "native_process_id": 35780,
+    "inputs": {
+      "search": {
+        "entity": 4294967298,
+        "text": "日本にほんご",
+        "selection": {
+          "start": 18,
+          "end": 18
+        },
+        "focused": true
+      }
+    },
+    "tables": {
+      "watchlist": {
+        "entity": 4294967300,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 1000,
+        "dataset": "instruments",
+        "dataset_revision": 1,
+        "scroll_y": 0.0,
+        "view": {
+          "source_rows": 1000,
+          "view_rows": 0,
+          "spec_hash": 217780559657167447
+        },
+        "selection": {
+          "row": null,
+          "record": null
+        },
+        "focused": false
+      }
+    },
+    "labels": {
+      "title": "Market watch IME reloaded",
+      "source": "Sample instruments and prices. No live market feed.",
+      "summary": "0 instruments shown · 0 saved",
+      "selection": "No instrument selected",
+      "status": "No instruments match. Edit the search or show all instruments."
+    },
+    "window": {
+      "width": 960.0,
+      "height": 720.0,
+      "scale_factor": 1.25,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 179,
+      "rows_constructed": 1056,
+      "cells_constructed": 5376,
+      "data_records_checked": 0,
+      "data_cells_written": 0,
+      "view_recomputes": 1
+    },
+    "draw": {
+      "samples": 179,
+      "p50_us": 2582.527,
+      "p95_us": 4857.855,
+      "p99_us": 6598.655
+    },
+    "dirty_to_present_submit": {
+      "samples": 177,
+      "p50_us": 11231.231,
+      "p95_us": 19365.887,
+      "p99_us": 22740.991
+    },
+    "present_interval": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    },
+    "input_to_frame": {
+      "samples": 15,
+      "p50_us": 11075.583,
+      "p95_us": 22855.679,
+      "p99_us": 22855.679
+    }
+  },
+  "formatted": {
+    "price": {
+      "error": "Invalid row"
+    },
+    "change": {
+      "error": "Invalid row"
+    }
+  },
+  "query": "日本語",
+  "selected": null,
+  "ticks": 0,
+  "dataset_revision": 1,
+  "metrics": {
+    "description_builds": 4,
+    "encoded_snapshots": 3,
+    "encoded_bytes": 4198,
+    "ffi_callbacks": 21,
+    "ui_callbacks": 1,
+    "diagnostic_callbacks": 15,
+    "description_build": {
+      "samples": 4,
+      "p50_us": 5038,
+      "p95_us": 6766,
+      "p99_us": 6766
+    },
+    "encode": {
+      "samples": 3,
+      "p50_us": 524,
+      "p95_us": 867,
+      "p99_us": 867
+    },
+    "publish_to_applied": {
+      "samples": 3,
+      "p50_us": 2272,
+      "p95_us": 3260,
+      "p99_us": 3260
+    },
+    "initial": {
+      "bytes": 63033,
+      "encode_us": 27268
+    },
+    "data_messages": 0,
+    "data_bytes": 0,
+    "data_records_checked": 0,
+    "data_cells_written": 0,
+    "data_encode": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "data_publish_to_applied": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "native_data_parse": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "native_data_apply": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "native_snapshot_apply": {
+      "samples": 3,
+      "p50_us": 26,
+      "p95_us": 88,
+      "p99_us": 88
+    }
+  }
+}

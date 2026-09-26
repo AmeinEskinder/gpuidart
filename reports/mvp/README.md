@@ -2,7 +2,8 @@
 
 All nine local acceptance checks passed on **2026-09-26** from committed source
 `bb6a89425cfb34e03ab0f7a159836712ee921e9c`. This is a release candidate;
-human IME and the original unlocalized reload observation remain open.
+the original unlocalized reload observation remains open.
+Windows Japanese IME subsequently passed [owner-authorized agent visual checks](../ime/windows-japanese-20260926/README.md), including reload during active composition.
 Clean-Windows launch subsequently passed in a fresh Sandbox with vGPU disabled.
 See the [current release record](../release/README.md) for all three
 platforms and the post-restart Windows attempt.
@@ -72,12 +73,14 @@ The current pass does not establish the cause of the original reload mismatch.
 ## Remaining release checks
 
 The [release record](../release/README.md#gates-still-open) tracks the current
-human IME, macOS distribution and cross-platform desktop checks. The owner
+macOS/Linux IME, macOS distribution and cross-platform desktop checks. The owner
 selected the [MIT License](../../LICENSE) on 2026-09-26.
 Japanese typing is installed and enabled after the restart. The initial Sandbox
 failed before desktop logon; a fresh software-rendering configuration passed the
 package check. [Guest evidence](../release/4fca314/clean-windows/verification.json)
-closes clean-Windows launch for this ZIP. Human IME remains unobserved.
+closes clean-Windows launch for this ZIP. The separate host IME report above
+records real Japanese composition, candidate placement, editing and code reload.
+Its observer was an agent; there was no independent human observer.
 
 Use [Windows release checks](../../docs/windows-release-checks.md) and
 [setup instructions](../../docs/windows-test-setup.md) for the observation steps.

@@ -1,0 +1,242 @@
+import argparse
+import ctypes
+from ctypes import wintypes as W
+import json
+from pathlib import Path
+import subprocess
+import time
+
+from PIL import ImageGrab
+import win32api
+import win32con
+import win32gui
+import win32process
+
+ROOT = Path(__file__).resolve().parent
+USER = ctypes.WinDLL('user32', use_last_error=True)
+USER.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
+USER.OpenInputDesktop.argtypes = [W.DWORD, W.BOOL, W.DWORD]
+USER.OpenInputDesktop.restype = W.HANDLE
+USER.GetUserObjectInformationW.argtypes = [W.HANDLE, ctypes.c_int, W.LPVOID, W.DWORD, ctypes.POINTER(W.DWORD)]
+USER.CloseDesktop.argtypes = [W.HANDLE]
+
+
+def desktop():
+    handle = USER.OpenInputDesktop(0, False, 1)
+    if not handle:
+        raise RuntimeError('Input desktop unavailable; unlock the desktop before continuing')
+    try:
+        value = ctypes.create_unicode_buffer(256)
+        required = W.DWORD()
+        if not USER.GetUserObjectInformationW(handle, 2, value, ctypes.sizeof(value), ctypes.byref(required)):
+            raise ctypes.WinError(ctypes.get_last_error())
+        if value.value != 'Default':
+            raise RuntimeError(f'Input desktop is {value.value}; stop')
+        return value.value
+    finally:
+        USER.CloseDesktop(handle)
+
+
+class MOUSE(ctypes.Structure):
+    _fields_ = [('dx', W.LONG), ('dy', W.LONG), ('mouseData', W.DWORD), ('dwFlags', W.DWORD), ('time', W.DWORD), ('extra', ctypes.c_size_t)]
+
+
+class KEY(ctypes.Structure):
+    _fields_ = [('vk', W.WORD), ('scan', W.WORD), ('flags', W.DWORD), ('time', W.DWORD), ('extra', ctypes.c_size_t)]
+
+
+class PAYLOAD(ctypes.Union):
+    _fields_ = [('mouse', MOUSE), ('key', KEY)]
+
+
+class INPUT(ctypes.Structure):
+    _fields_ = [('type', W.DWORD), ('payload', PAYLOAD)]
+
+
+USER.SendInput.argtypes = [W.UINT, ctypes.POINTER(INPUT), ctypes.c_int]
+USER.SendInput.restype = W.UINT
+KEYS = {'ctrl': 0x11, 'shift': 0x10, 'alt': 0x12, 'caps': 0x14, 'space': 0x20,
+        'enter': 0x0d, 'escape': 0x1b, 'left': 0x25, 'up': 0x26, 'right': 0x27,
+        'down': 0x28, 'home': 0x24, 'end': 0x23, 'backspace': 8, 'delete': 0x2e, 'tab': 9}
+
+
+def send_key(vk, up=False):
+    event = INPUT(type=1, payload=PAYLOAD(key=KEY(vk=vk, flags=2 if up else 0)))
+    if USER.SendInput(1, ctypes.byref(event), ctypes.sizeof(INPUT)) != 1:
+        raise ctypes.WinError(ctypes.get_last_error())
+
+
+def keycode(name):
+    if name in KEYS:
+        return KEYS[name]
+    if len(name) == 1 and name.isascii() and name.isalnum():
+        return ord(name.upper())
+    raise ValueError(f'Unsupported key: {name}')
+
+
+def chord(hwnd, text):
+    require_foreground(hwnd)
+    codes = [keycode(k) for k in text.lower().split('+')]
+    held = []
+    try:
+        for code in codes:
+            send_key(code)
+            held.append(code)
+        time.sleep(.04)
+    finally:
+        for code in reversed(held):
+            send_key(code, True)
+    time.sleep(.12)
+
+
+def window(pid):
+    found = []
+    def collect(hwnd, _):
+        if win32gui.IsWindowVisible(hwnd) and win32process.GetWindowThreadProcessId(hwnd)[1] == pid:
+            found.append(hwnd)
+    win32gui.EnumWindows(collect, None)
+    if len(found) != 1:
+        raise RuntimeError(f'Expected one visible window for owned PID {pid}, found {found}')
+    return found[0]
+
+
+def require_foreground(hwnd):
+    desktop()
+    if win32gui.GetForegroundWindow() != hwnd:
+        raise RuntimeError('Target lost foreground; no input sent')
+
+
+def activate(hwnd):
+    desktop()
+    if win32gui.GetForegroundWindow() == hwnd:
+        return
+    current = win32api.GetCurrentThreadId()
+    foreground = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())[0]
+    attached = current != foreground
+    if attached:
+        win32process.AttachThreadInput(current, foreground, True)
+    try:
+        try:
+            win32gui.SetForegroundWindow(hwnd)
+        except Exception:
+            if win32gui.GetForegroundWindow() != hwnd:
+                flags = win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE
+                was_topmost = bool(win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) & win32con.WS_EX_TOPMOST)
+                win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, flags)
+                try:
+                    rect = win32gui.GetWindowRect(hwnd)
+                    point = (rect[0] + 200, rect[1] + 18)
+                    if win32gui.GetAncestor(win32gui.WindowFromPoint(point), 2) != hwnd:
+                        raise RuntimeError('Target title bar is occluded; no activation click sent')
+                    win32api.SetCursorPos(point)
+                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+                finally:
+                    if not was_topmost:
+                        win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, flags)
+    finally:
+        if attached:
+            win32process.AttachThreadInput(current, foreground, False)
+    time.sleep(.15)
+    require_foreground(hwnd)
+
+
+def capture(hwnd, name):
+    require_foreground(hwnd)
+    rect = win32gui.GetWindowRect(hwnd)
+    client = win32gui.GetClientRect(hwnd)
+    origin = win32gui.ClientToScreen(hwnd, (0, 0))
+    bounds = (origin[0], origin[1], origin[0] + client[2], origin[1] + client[3])
+    def visible():
+        for x in (bounds[0] + 10, bounds[2] - 10):
+            for y in (bounds[1] + 10, bounds[3] - 10):
+                if win32gui.GetAncestor(win32gui.WindowFromPoint((x, y)), 2) != hwnd:
+                    raise RuntimeError('Target client is occluded; screenshot not saved')
+    visible()
+    path = ROOT / f'{name}.png'
+    pixels = ImageGrab.grab(bbox=bounds, all_screens=True)
+    require_foreground(hwnd)
+    visible()
+    pixels.save(path)
+    thread, pid = win32process.GetWindowThreadProcessId(hwnd)
+    record = {'time': time.time(), 'pid': pid, 'hwnd': hwnd, 'rect': rect, 'capture_bounds': bounds,
+              'foreground': win32gui.GetForegroundWindow() == hwnd,
+              'layout': hex(win32api.GetKeyboardLayout(thread) & 0xffffffff), 'screenshot': str(path)}
+    (ROOT / f'{name}.json').write_text(json.dumps(record, indent=2), encoding='utf-8')
+    print(json.dumps(record))
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=['probe', 'start', 'capture', 'activate', 'click', 'keys', 'layout', 'bind', 'close', 'resize', 'scroll', 'hscroll', 'pin', 'unpin'])
+    parser.add_argument('values', nargs='*')
+    parser.add_argument('--name', default='latest')
+    parser.add_argument('--activate', action='store_true')
+    args = parser.parse_args()
+    desktop()
+    if args.action == 'probe':
+        print(json.dumps({'desktop': desktop(), 'layouts': [hex(k & 0xffffffff) for k in win32api.GetKeyboardLayoutList()]}))
+        return
+    if args.action == 'start':
+        exe = Path(args.values[0]).resolve(strict=True)
+        process = subprocess.Popen([str(exe)], cwd=exe.parent)
+        (ROOT / 'target.json').write_text(json.dumps({'pid': process.pid, 'exe': str(exe)}))
+        for _ in range(100):
+            try:
+                hwnd = window(process.pid)
+                break
+            except RuntimeError:
+                time.sleep(.1)
+        else:
+            raise RuntimeError('No window after launch')
+    else:
+        if args.action == 'bind':
+            (ROOT / 'target.json').write_text(json.dumps({'pid': int(args.values[0])}))
+        target = json.loads((ROOT / 'target.json').read_text())
+        hwnd = window(target['pid'])
+    if args.activate:
+        activate(hwnd)
+    if args.action in ('pin', 'unpin'):
+        win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST if args.action == 'pin' else win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE)
+        activate(hwnd)
+    if args.action == 'activate':
+        activate(hwnd)
+    elif args.action == 'click':
+        require_foreground(hwnd)
+        rect = win32gui.GetWindowRect(hwnd)
+        x, y = int(args.values[0]) + rect[0], int(args.values[1]) + rect[1]
+        if win32gui.GetAncestor(win32gui.WindowFromPoint((x, y)), 2) != hwnd:
+            raise RuntimeError('Click point is outside target window')
+        win32api.SetCursorPos((x, y))
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+    elif args.action == 'keys':
+        for key in args.values:
+            chord(hwnd, key)
+    elif args.action == 'layout':
+        require_foreground(hwnd)
+        layout = int(args.values[0], 16)
+        if layout not in [k & 0xffffffff for k in win32api.GetKeyboardLayoutList()]:
+            raise RuntimeError('Requested layout is not installed')
+        win32gui.PostMessage(hwnd, 0x50, 0, layout)
+    elif args.action == 'resize':
+        require_foreground(hwnd)
+        rect = win32gui.GetWindowRect(hwnd)
+        win32gui.MoveWindow(hwnd, rect[0], rect[1], int(args.values[0]), int(args.values[1]), True)
+    elif args.action in ('scroll', 'hscroll'):
+        require_foreground(hwnd)
+        rect = win32gui.GetWindowRect(hwnd)
+        x, y = int(args.values[0]) + rect[0], int(args.values[1]) + rect[1]
+        if win32gui.GetAncestor(win32gui.WindowFromPoint((x, y)), 2) != hwnd:
+            raise RuntimeError('Scroll point is outside target window')
+        win32api.SetCursorPos((x, y))
+        win32api.mouse_event(0x1000 if args.action == 'hscroll' else win32con.MOUSEEVENTF_WHEEL, 0, 0, int(args.values[2]))
+    elif args.action == 'close':
+        win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+        return
+    time.sleep(.45)
+    capture(hwnd, args.name)
+
+
+if __name__ == '__main__':
+    main()
