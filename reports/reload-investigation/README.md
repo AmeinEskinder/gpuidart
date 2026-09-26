@@ -89,3 +89,19 @@ the missing original values. Repeating the same successful workload again would
 not localize the historical failure, so no additional runtime fix or relaxed
 assertion follows from this audit. The observation remains an explicit unresolved
 release decision.
+
+### Recovered fixture audit, 2026-09-26
+
+The original `.cache/watchlist-reload-f29d2617` directory still exists. Its
+creation time falls within the failed reload check. Its `main.dart` matches the
+original source, and `app.dart` differs only by the first heading edit after
+normalizing line endings. [The source audit](source-forensics-20260926.json)
+records file hashes, timestamps and comparisons.
+
+The directory contains only those two source files. It supplies no runtime
+table values or input/foreground trace. The original verifier had already
+accepted the changed heading, application state and input-state equality before
+the table comparison failed. This narrows the failed stage but does not identify
+the differing table field. The issue remains open. Closing it as an accepted
+historical exception would require an explicit owner decision and would not
+establish a runtime fix.

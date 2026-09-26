@@ -1,0 +1,46 @@
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+revision = '023eef424cf1eb948ded933e8134d42b3bb09eab'
+fixture = Path('.cache/watchlist-reload-f29d2617')
+records = []
+for name in ['app.dart', 'main.dart']:
+    file = fixture / name
+    original = subprocess.check_output(['git', 'show', f'{revision}:example/watchlist/{name}'])
+    current = file.read_bytes()
+    original_text = original.decode().replace('\r\n', '\n')
+    current_text = current.decode().replace('\r\n', '\n')
+    expected = original_text.replace("'Market watch'", "'Market watch reloaded'") if name == 'app.dart' else original_text
+    records.append({
+        'path': file.as_posix(),
+        'bytes': len(current),
+        'sha256': hashlib.sha256(current).hexdigest(),
+        'created_at_utc': datetime.fromtimestamp(file.stat().st_ctime, timezone.utc).isoformat(),
+        'modified_at_utc': datetime.fromtimestamp(file.stat().st_mtime, timezone.utc).isoformat(),
+        'matches_original_after_only_first_heading_change_and_line_ending_normalization': current_text == expected,
+    })
+report = {
+    'audited_at_utc': datetime.now(timezone.utc).isoformat(),
+    'source_commit': revision,
+    'fixture_identification': 'Creation time falls inside the failed code-reload check; source is at the first changed heading, where that verifier stopped.',
+    'fixture_files': records,
+    'all_fixture_entries': [p.name for p in fixture.iterdir()],
+    'missing': ['before table object', 'after table object', 'per-field mismatch', 'window geometry at comparison', 'input/foreground trace'],
+    'original_verifier_findings': {
+        'before_scroll_was_negative': True,
+        'input_state_equality_passed_before_table_comparison': True,
+        'application_state_equality_passed_before_table_comparison': True,
+        'changed_heading_check_passed': True,
+        'table_comparison_fields': ['entity', 'visible_rows', 'row_count', 'dataset', 'dataset_revision', 'scroll_y'],
+        'failure_report_written_before_throw': False,
+    },
+    'conclusion': 'Recovered fixture confirms first reload stage but supplies no compared runtime values. Cause remains unlocalized; no new production fix is supported by this evidence.',
+    'release_disposition': 'Open; accepting a documented historical exception requires an explicit owner decision and must not be described as a proved fix.',
+}
+assert all(r['matches_original_after_only_first_heading_change_and_line_ending_normalization'] for r in records)
+output = Path('reports/reload-investigation/source-forensics-20260926.json')
+output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+print(report['conclusion'])
