@@ -1,0 +1,28 @@
+name: JSON encoding measurements
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  measure:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - run: dart pub get --enforce-lockfile
+      - run: dart run tool/performance/run_encoding.dart build/encoding
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: encoding-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/encoding/*.json
+            build/encoding/*.log
+          retention-days: 30

@@ -66,6 +66,11 @@ These attempts are retained and measurement moved to fresh hosted runners on
 all three operating systems. Local correctness smoke is kept separate from the
 hosted release measurements.
 
+The first hosted Windows measurement job selected Git Bash's `link.exe` instead
+of MSVC while building Rust dependencies. The workflow now records the MSVC
+linker path from PowerShell before entering Bash. The failed job's output is
+retained under `implementation/hosted-windows-attempt1`; no workload ran there.
+
 Final local checks: all three strategy live runs at 128 fields passed; three
 native experiment tests passed, including equal geometry. Repeated measurements,
 platform results and adoption decisions will be recorded here after collection.

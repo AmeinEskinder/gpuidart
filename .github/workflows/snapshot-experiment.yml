@@ -36,6 +36,13 @@ jobs:
         if: runner.os == 'Windows'
         with:
           arch: x64
+      - name: Select the MSVC linker before entering Git Bash
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $linker = (Get-Command link.exe).Source
+          if ($linker -notlike '*Visual Studio*') { throw "Expected MSVC linker, got $linker" }
+          "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=$linker" >> $env:GITHUB_ENV
       - name: Linux build and display dependencies
         if: runner.os == 'Linux'
         run: |
