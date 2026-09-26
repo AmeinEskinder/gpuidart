@@ -1,0 +1,3301 @@
+{
+  "started_utc": "2026-09-26T22:19:06.554797Z",
+  "platform": "windows",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"windows_x64\"",
+  "mode": "jit",
+  "scope": "Real native window, GPUI key dispatch and native controls; no OS input injection, hardware IME, or presentation timing.",
+  "steps": [
+    {
+      "name": "initial controlled name",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": false,
+          "status": "Changes stay in this application. Apply to save the draft.",
+          "events": {},
+          "failure": null
+        },
+        "native": {
+          "revision": 1,
+          "inputs": {
+            "name": {
+              "entity": 4294967298,
+              "text": "Dart user",
+              "selection": {
+                "start": 9,
+                "end": 9
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": null
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "Dart user",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "On"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Changes stay in this application. Apply to save the draft.",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "empty-name validation disables notifications",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 2
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 2,
+          "inputs": {
+            "name": {
+              "entity": 4294967298,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": true
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": true
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(1v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": false,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "On"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "native typing reaches Dart",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 5
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 5,
+          "inputs": {
+            "name": {
+              "entity": 4294967298,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": true
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(1v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "ada",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "On"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "checkbox request acknowledged",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 5,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 6,
+          "inputs": {
+            "name": {
+              "entity": 4294967298,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(6v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "ada",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "Off"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "appearance navigation",
+      "observed": {
+        "app": {
+          "section": "appearance",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 5,
+            "checkbox_change": 1,
+            "click": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 7,
+          "inputs": {},
+          "controls": {
+            "spacing": {
+              "kind": "slider",
+              "number": 16.0,
+              "entity": 4294967319,
+              "focused": false
+            },
+            "accent": {
+              "kind": "select",
+              "selected": "ocean",
+              "entity": 4294967315,
+              "focused": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(4v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Workspace appearance",
+              "role": "ControlType.Text",
+              "id": "appearance-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Accent color",
+              "role": "ControlType.Text",
+              "id": "accent-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Workspace accent",
+              "role": "ControlType.ComboBox",
+              "id": "accent",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern",
+                "ValuePatternIdentifiers.Pattern",
+                "ExpandCollapsePatternIdentifiers.Pattern"
+              ],
+              "value": "Ocean",
+              "read_only": false,
+              "expanded": "Collapsed"
+            },
+            {
+              "name": "Ocean",
+              "role": "ControlType.Text",
+              "id": "[\"accent\",\"selected-value\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preview spacing: 16 px",
+              "role": "ControlType.Text",
+              "id": "spacing-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preview spacing",
+              "role": "ControlType.Slider",
+              "id": "spacing",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "RangeValuePatternIdentifiers.Pattern"
+              ],
+              "number": 16,
+              "min": 8,
+              "max": 24,
+              "step": 2,
+              "read_only": false
+            },
+            {
+              "name": "Workspace preview",
+              "role": "ControlType.Text",
+              "id": "preview-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "The chosen accent and spacing apply here.",
+              "role": "ControlType.Text",
+              "id": "preview-body",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "select native keyboard commit",
+      "observed": {
+        "app": {
+          "section": "appearance",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 5,
+            "checkbox_change": 1,
+            "click": 1,
+            "select_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 8,
+          "inputs": {},
+          "controls": {
+            "spacing": {
+              "kind": "slider",
+              "number": 16.0,
+              "entity": 4294967319,
+              "focused": false
+            },
+            "accent": {
+              "kind": "select",
+              "selected": "forest",
+              "entity": 4294967315,
+              "focused": true
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(9v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Workspace appearance",
+              "role": "ControlType.Text",
+              "id": "appearance-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Accent color",
+              "role": "ControlType.Text",
+              "id": "accent-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Workspace accent",
+              "role": "ControlType.ComboBox",
+              "id": "accent",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern",
+                "ValuePatternIdentifiers.Pattern",
+                "ExpandCollapsePatternIdentifiers.Pattern"
+              ],
+              "value": "Forest",
+              "read_only": false,
+              "expanded": "Collapsed"
+            },
+            {
+              "name": "Forest",
+              "role": "ControlType.Text",
+              "id": "[\"accent\",\"selected-value\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preview spacing: 16 px",
+              "role": "ControlType.Text",
+              "id": "spacing-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preview spacing",
+              "role": "ControlType.Slider",
+              "id": "spacing",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "RangeValuePatternIdentifiers.Pattern"
+              ],
+              "number": 16,
+              "min": 8,
+              "max": 24,
+              "step": 2,
+              "read_only": false
+            },
+            {
+              "name": "Workspace preview",
+              "role": "ControlType.Text",
+              "id": "preview-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "The chosen accent and spacing apply here.",
+              "role": "ControlType.Text",
+              "id": "preview-body",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "slider native keyboard step",
+      "observed": {
+        "app": {
+          "section": "appearance",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 5,
+            "checkbox_change": 1,
+            "click": 1,
+            "select_change": 1,
+            "slider_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 9,
+          "inputs": {},
+          "controls": {
+            "spacing": {
+              "kind": "slider",
+              "number": 18.0,
+              "entity": 4294967319,
+              "focused": true
+            },
+            "accent": {
+              "kind": "select",
+              "selected": "forest",
+              "entity": 4294967315,
+              "focused": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(12v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Workspace appearance",
+              "role": "ControlType.Text",
+              "id": "appearance-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Accent color",
+              "role": "ControlType.Text",
+              "id": "accent-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Workspace accent",
+              "role": "ControlType.ComboBox",
+              "id": "accent",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern",
+                "ValuePatternIdentifiers.Pattern",
+                "ExpandCollapsePatternIdentifiers.Pattern"
+              ],
+              "value": "Forest",
+              "read_only": false,
+              "expanded": "Collapsed"
+            },
+            {
+              "name": "Forest",
+              "role": "ControlType.Text",
+              "id": "[\"accent\",\"selected-value\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preview spacing: 18 px",
+              "role": "ControlType.Text",
+              "id": "spacing-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preview spacing",
+              "role": "ControlType.Slider",
+              "id": "spacing",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "RangeValuePatternIdentifiers.Pattern"
+              ],
+              "number": 18,
+              "min": 8,
+              "max": 24,
+              "step": 2,
+              "read_only": false
+            },
+            {
+              "name": "Workspace preview",
+              "role": "ControlType.Text",
+              "id": "preview-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "The chosen accent and spacing apply here.",
+              "role": "ControlType.Text",
+              "id": "preview-body",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "general navigation restores controlled name",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 5,
+            "checkbox_change": 1,
+            "click": 2,
+            "select_change": 1,
+            "slider_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 10,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(3v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "ada",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "Off"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "snapshot preserves native text selection and focus",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": true,
+          "status": "Unsaved changes",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 2,
+            "select_change": 1,
+            "slider_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 11,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": true
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(6v3))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "ada",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "Off"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Unsaved changes",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "apply saves edited preferences",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "dirty": false,
+          "status": "Preferences applied for this session.",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 3,
+            "select_change": 1,
+            "slider_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 12,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(8v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "ada",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "Off"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences applied for this session.",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "confirmation opens",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "dirty": false,
+          "status": "Preferences applied for this session.",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 3,
+            "select_change": 1,
+            "slider_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 12,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": true
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(12v3))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "Reset preferences?",
+              "role": "ControlType.Window",
+              "id": "[\"dialog\",\"reset\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern"
+              ],
+              "modal": true
+            },
+            {
+              "name": "Reset preferences?",
+              "role": "ControlType.Text",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Replace the draft with defaults? Saved preferences stay unchanged until you choose Apply.",
+              "role": "ControlType.Text",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Keep editing",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Reset draft",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "cancel keeps draft and saved preferences",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "dirty": false,
+          "status": "Reset cancelled. Your draft is unchanged.",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 3,
+            "select_change": 1,
+            "slider_change": 1,
+            "dialog_result": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 13,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(7v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "ada",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "Off"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset cancelled. Your draft is unchanged.",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "confirmation reopens",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "saved": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "dirty": false,
+          "status": "Reset cancelled. Your draft is unchanged.",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 3,
+            "select_change": 1,
+            "slider_change": 1,
+            "dialog_result": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 13,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": true
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(13v3))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "Reset preferences?",
+              "role": "ControlType.Window",
+              "id": "[\"dialog\",\"reset\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern"
+              ],
+              "modal": true
+            },
+            {
+              "name": "Reset preferences?",
+              "role": "ControlType.Text",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Replace the draft with defaults? Saved preferences stay unchanged until you choose Apply.",
+              "role": "ControlType.Text",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Keep editing",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Reset draft",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "confirm resets draft through controlled write",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "ada",
+            "notifications": false,
+            "accent": "forest",
+            "spacing": 18.0
+          },
+          "dirty": true,
+          "status": "Defaults restored. Apply to save them.",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 3,
+            "select_change": 1,
+            "slider_change": 1,
+            "dialog_result": 2
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 14,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "Dart user",
+              "selection": {
+                "start": 9,
+                "end": 9
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(7v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "Dart user",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "On"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Defaults restored. Apply to save them.",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply changes",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    },
+    {
+      "name": "apply saves reset draft",
+      "observed": {
+        "app": {
+          "section": "general",
+          "draft": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "saved": {
+            "name": "Dart user",
+            "notifications": true,
+            "accent": "ocean",
+            "spacing": 16.0
+          },
+          "dirty": false,
+          "status": "Preferences applied for this session.",
+          "events": {
+            "input": 7,
+            "checkbox_change": 1,
+            "click": 4,
+            "select_change": 1,
+            "slider_change": 1,
+            "dialog_result": 2
+          },
+          "failure": null
+        },
+        "native": {
+          "revision": 15,
+          "inputs": {
+            "name": {
+              "entity": 21474836483,
+              "text": "Dart user",
+              "selection": {
+                "start": 9,
+                "end": 9
+              },
+              "focused": false
+            }
+          },
+          "controls": {
+            "notifications": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            },
+            "reset": {
+              "kind": "confirm_dialog",
+              "disabled": false,
+              "open": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(8v1))"
+        },
+        "semantics": {
+          "nodes": [
+            {
+              "name": "Preferences",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences",
+              "role": "ControlType.Text",
+              "id": "heading",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Make this workspace your own.",
+              "role": "ControlType.Text",
+              "id": "intro",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "General",
+              "role": "ControlType.Button",
+              "id": "general",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Appearance",
+              "role": "ControlType.Button",
+              "id": "appearance",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Your profile",
+              "role": "ControlType.Text",
+              "id": "general-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Text",
+              "id": "name-label",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Display name",
+              "role": "ControlType.Edit",
+              "id": "name",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "Dart user",
+              "read_only": false
+            },
+            {
+              "name": "Enable workspace notifications",
+              "role": "ControlType.CheckBox",
+              "id": "notifications",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "TogglePatternIdentifiers.Pattern"
+              ],
+              "checked": "On"
+            },
+            {
+              "name": "A display name is required to enable notifications.",
+              "role": "ControlType.Text",
+              "id": "notification-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Preferences applied for this session.",
+              "role": "ControlType.Text",
+              "id": "status",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Reset defaults",
+              "role": "ControlType.Button",
+              "id": "reset",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Apply",
+              "role": "ControlType.Button",
+              "id": "apply",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            }
+          ],
+          "api": "UIAutomationClient",
+          "process": 38664
+        }
+      }
+    }
+  ],
+  "passed": true,
+  "platform_semantics": true,
+  "native_runtime": {
+    "pid": 38664,
+    "os": "windows",
+    "arch": "x86_64",
+    "memory_bytes": {
+      "working_set": 295141376,
+      "private_commit": 297562112
+    },
+    "memory_peak_bytes": {
+      "working_set": 299425792,
+      "commit": 309067776
+    },
+    "memory_source": "GetProcessMemoryInfo PROCESS_MEMORY_COUNTERS_EX; working set and private commit are separate OS metrics",
+    "memory_peak_source": "PROCESS_MEMORY_COUNTERS_EX PeakWorkingSetSize and PeakPagefileUsage; lifetime high-water marks",
+    "cpu_user_us": 2328125,
+    "cpu_system_us": 687500
+  },
+  "trace_metadata": {
+    "clock": "Windows QueryPerformanceCounter",
+    "origin_ticks": 871373362244,
+    "origin_qpc": 871373362244,
+    "frequency": 10000000,
+    "clock_epoch": "System QPC epoch; capture origin stored separately",
+    "suspend_behavior": "Includes sleep and hibernation",
+    "resolution_ticks": null,
+    "cross_thread_order_uncertainty_ticks": 1,
+    "process_id": 38664,
+    "native_process_ids": [
+      38664
+    ],
+    "remote_complete": true,
+    "capacity_per_side": 8192,
+    "dart_dropped": 0,
+    "native_dropped": 0,
+    "native_read_failed": false,
+    "finalized": true,
+    "capture_complete": true,
+    "scope": "Opt-in publication, startup and CPU content paint; excludes OS input, full-window layout, GPU presentation and VM boot. Native dispatch covers synchronous handling; deferred diagnostic replies occur later. Tracing adds overhead."
+  },
+  "finished_utc": "2026-09-26T22:19:24.752397Z"
+}

@@ -1105,23 +1105,25 @@ impl DartView {
             Node::Slider { .. } => self.slider_element(node, colors, cx)?,
             Node::Select { .. } => self.select_element(node, colors)?,
             Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
-            Node::Input { id, .. } => apply_node_style(
-                control_root::AccessibleInput(
-                    Input::new(
-                        &self
-                            .inputs
-                            .get(id)
-                            .ok_or_else(|| format!("Missing retained input: {id}"))?
-                            .state,
-                    )
-                    .id(SharedString::from(id.clone()))
-                    .accessibility_id(id.clone())
-                    .aria_label(accessible_name(node)),
-                ),
-                node,
-                colors,
-            )
-            .into_any_element(),
+            Node::Input { id, .. } => {
+                let state = &self
+                    .inputs
+                    .get(id)
+                    .ok_or_else(|| format!("Missing retained input: {id}"))?
+                    .state;
+                apply_node_style(
+                    control_root::AccessibleInput(
+                        Input::new(state)
+                            .id(SharedString::from(id.clone()))
+                            .accessibility_id(id.clone())
+                            .aria_label(accessible_name(node)),
+                        state.read(cx).focus_handle(cx),
+                    ),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
             Node::Table { id, .. } => {
                 let table = &self
                     .tables

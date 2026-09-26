@@ -64,9 +64,26 @@ Future<void> main(List<String> args) async {
     await capture(
       'initial input and checkbox',
       (nodes) =>
+          hasPlatformRole(named(nodes, 'Display name'), 'input') &&
+          hasPlatformRole(
+            named(nodes, 'Enable workspace notifications'),
+            'checkbox',
+          ) &&
           named(nodes, 'Display name')?['value'] == 'Dart user' &&
           checked(named(nodes, 'Enable workspace notifications')),
     );
+    await platformQuery(process, operation: 'focus', id: 'name');
+    final focusDeadline = DateTime.now().add(const Duration(seconds: 5));
+    Map<String, dynamic>? focusState;
+    do {
+      focusState = await settings.host.diagnose('inspect');
+      if (focusState['inputs']['name']['focused'] == true) break;
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+    } while (DateTime.now().isBefore(focusDeadline));
+    report['external_focus_native_result'] = focusState['inputs']['name'];
+    if (focusState['inputs']['name']['focused'] != true) {
+      throw StateError('Platform Focus did not reach the native input');
+    }
     await platformQuery(
       process,
       operation: 'toggle',
@@ -106,7 +123,8 @@ Future<void> main(List<String> args) async {
     await capture(
       'named select and slider',
       (nodes) =>
-          named(nodes, 'Workspace accent') != null &&
+          hasPlatformRole(named(nodes, 'Workspace accent'), 'select') &&
+          hasPlatformRole(named(nodes, 'Preview spacing'), 'slider') &&
           named(nodes, 'Preview spacing')?['min'] == 8,
     );
     await platformQuery(

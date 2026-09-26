@@ -204,3 +204,32 @@ track pass; only its stale Watchlist query failed. Local patched Windows also
 passes all 57 native tests, disabled checks and 15 Settings steps. The Dart analyzer
 reported a missing-braces style issue in the new provenance verifier; it was fixed
 before the final fatal-info gate. The 40-file provenance check passes locally.
+
+## Focus audit and query diagnostics
+
+The final audit found native input focus was true while the input's accessibility
+node was unfocused in the isolated X11 capture. Kit's outer input frame tracks a
+proxy focus handle; the editing entity has the real handle. Retargeting the frame
+created duplicate tab stops and failed Settings appearance navigation after
+Shift+Tab (`windows-input-focus-rejected.json`), despite headless tests passing.
+That change was reverted. A narrow [GPUI 0.3.6 hook](../../native/vendor/focus.patch)
+now associates the semantic node with editing focus during prepaint, preserving
+the original keyboard tree/tab stops. External Focus must focus the real input;
+the Linux Settings track additionally checks native/platform focus equality.
+Platform role assertions are explicit for inputs, controls, table rows and cells.
+
+Linux's next failed query used the second D-Bus spelling for a stale object,
+`Unknown object '/org/a11y/atspi/accessible/...'` (`linux-stale-object-2.json`). The
+same bounded read-restart policy now recognizes both observed missing-object
+messages. Successful clients now retain stderr too: AT-SPI cache-signature
+warnings are evidence, not proof of working cache notifications. The acceptance
+track checks external queries/actions, not assistive-technology cache-event
+consumption or a human screen reader. Those remain explicit limits.
+
+The focus hook passes locally: `windows-focus-controls.json` records an external
+UIA Focus request followed by native input `focused: true`; `windows-settings-focus-fixed.json`
+passes all 15 keyboard/retention steps that the rejected retargeting broke. Input
+and other control roles are now asserted explicitly in platform responses. The
+GPUI source import is 99 files / about 2.96 MB, with one 16-line Window method
+addition; its complete source delta is separate from copied upstream code. This
+is a maintained local framework extension, not an upstream GPUI API claim.

@@ -1,0 +1,1686 @@
+{
+  "platform": "linux",
+  "scope": "External accessibility actions and state; no screen reader or visual claim.",
+  "steps": [
+    {
+      "step": "initial input and checkbox",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5591,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preferences",
+            "role": "heading",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Make this workspace your own.",
+            "role": "label",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "General",
+            "role": "push button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Appearance",
+            "role": "push button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Your profile",
+            "role": "heading",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "label",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "entry",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "Dart user"
+          },
+          {
+            "parent": 2,
+            "name": "Enable workspace notifications",
+            "role": "check box",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": true,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "A display name is required to enable notifications.",
+            "role": "label",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Changes stay in this application. Apply to save the draft.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset defaults",
+            "role": "push button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Apply",
+            "role": "push button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ],
+        "query_restarts": []
+      }
+    },
+    {
+      "step": "platform toggle reaches Dart",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5591,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preferences",
+            "role": "heading",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Make this workspace your own.",
+            "role": "label",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "General",
+            "role": "push button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Appearance",
+            "role": "push button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Your profile",
+            "role": "heading",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "label",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "entry",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "Dart user"
+          },
+          {
+            "parent": 2,
+            "name": "Enable workspace notifications",
+            "role": "check box",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "A display name is required to enable notifications.",
+            "role": "label",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Unsaved changes",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset defaults",
+            "role": "push button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Apply changes",
+            "role": "push button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ],
+        "query_restarts": []
+      }
+    },
+    {
+      "step": "GPUI text write observed through AT-SPI Text",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5591,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preferences",
+            "role": "heading",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Make this workspace your own.",
+            "role": "label",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "General",
+            "role": "push button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Appearance",
+            "role": "push button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Your profile",
+            "role": "heading",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "label",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "entry",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "Ada"
+          },
+          {
+            "parent": 2,
+            "name": "Enable workspace notifications",
+            "role": "check box",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "A display name is required to enable notifications.",
+            "role": "label",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Unsaved changes",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset defaults",
+            "role": "push button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Apply changes",
+            "role": "push button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ],
+        "query_restarts": []
+      }
+    },
+    {
+      "step": "named select and slider",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5591,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preferences",
+            "role": "heading",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Make this workspace your own.",
+            "role": "label",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "General",
+            "role": "push button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Appearance",
+            "role": "push button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Workspace appearance",
+            "role": "heading",
+            "id": "appearance-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Accent color",
+            "role": "label",
+            "id": "accent-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Workspace accent",
+            "role": "combo box",
+            "id": "accent",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component",
+              "Selection"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 9,
+            "name": "Ocean",
+            "role": "label",
+            "id": "[\"accent\",\"selected-value\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preview spacing: 16 px",
+            "role": "label",
+            "id": "spacing-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preview spacing",
+            "role": "slider",
+            "id": "spacing",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Value"
+            ],
+            "number": 16.0,
+            "min": 8.0,
+            "max": 24.0,
+            "step": 2.0
+          },
+          {
+            "parent": 2,
+            "name": "Workspace preview",
+            "role": "label",
+            "id": "preview-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "The chosen accent and spacing apply here.",
+            "role": "label",
+            "id": "preview-body",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Unsaved changes",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset defaults",
+            "role": "push button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Apply changes",
+            "role": "push button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ],
+        "query_restarts": []
+      }
+    },
+    {
+      "step": "platform range write reaches Dart",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5591,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preferences",
+            "role": "heading",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Make this workspace your own.",
+            "role": "label",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "General",
+            "role": "push button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Appearance",
+            "role": "push button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Workspace appearance",
+            "role": "heading",
+            "id": "appearance-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Accent color",
+            "role": "label",
+            "id": "accent-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Workspace accent",
+            "role": "combo box",
+            "id": "accent",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component",
+              "Selection"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 9,
+            "name": "Ocean",
+            "role": "label",
+            "id": "[\"accent\",\"selected-value\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preview spacing: 22 px",
+            "role": "label",
+            "id": "spacing-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preview spacing",
+            "role": "slider",
+            "id": "spacing",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Value"
+            ],
+            "number": 22.0,
+            "min": 8.0,
+            "max": 24.0,
+            "step": 2.0
+          },
+          {
+            "parent": 2,
+            "name": "Workspace preview",
+            "role": "label",
+            "id": "preview-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "The chosen accent and spacing apply here.",
+            "role": "label",
+            "id": "preview-body",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Unsaved changes",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset defaults",
+            "role": "push button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Apply changes",
+            "role": "push button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ],
+        "query_restarts": []
+      }
+    },
+    {
+      "step": "named modal dialog",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5591,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "Reset preferences?",
+            "role": "dialog",
+            "id": "[\"dialog\",\"reset\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": true,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset preferences?",
+            "role": "heading",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Replace the draft with defaults? Saved preferences stay unchanged until you choose Apply.",
+            "role": "label",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Keep editing",
+            "role": "push button",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset draft",
+            "role": "push button",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ],
+        "query_restarts": []
+      }
+    }
+  ],
+  "passed": false,
+  "unavailable": [
+    "AT-SPI EditableText is absent from the pinned adapter; text change uses GPUI diagnostic keys, followed by external AT-SPI Text read."
+  ],
+  "error": "Bad state: Platform client exited 1: \n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: AddAccessible with unknown signature (so)(so)(so)iiassusau\n\n\n(process:5656): dbind-WARNING **: 22:05:57.549: AT-SPI: Unknown signature so for RemoveAccessible\n\n(process:5656): dbind-WARNING **: 22:05:57.550: AT-SPI: Unknown signature so for RemoveAccessible\n\n(process:5656): dbind-WARNING **: 22:05:57.550: AT-SPI: Unknown signature so for RemoveAccessible\n\n(process:5656): dbind-WARNING **: 22:05:57.550: AT-SPI: Unknown signature so for RemoveAccessible\n\n(process:5656): dbind-WARNING **: 22:05:57.550: AT-SPI: Unknown signature so for RemoveAccessible\nTraceback (most recent call last):\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 96, in <module>\n    run()\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 67, in run\n    \"role\": element.get_role_name(),\n            ^^^^^^^^^^^^^^^^^^^^^^^\ngi.repository.GLib.GError: atspi_error: Unknown object '/org/a11y/atspi/accessible/0/251173190155904437217371024304304553984' (1)\n\n\nrestarts=[]",
+  "stack": "#0      platformQuery (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/client.dart:72:7)\n<asynchronous suspension>\n#1      main.capture (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/controls.dart:34:16)\n<asynchronous suspension>\n#2      main (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/controls.dart:140:5)\n<asynchronous suspension>\n"
+}

@@ -1,0 +1,25 @@
+--- upstream/gpui-pre-0.3.6/src/window.rs
++++ patched/gpui-pre-0.3.6/src/window.rs
+@@ -6783,6 +6783,22 @@
+         self.a11y.debug_tree_json()
+     }
+ 
++    /// Associate an existing accessibility node with the control's editing focus.
++    ///
++    /// Call during that element's prepaint, while its accessibility node exists.
++    /// This registers accessibility focus and Focus actions without registering a
++    /// second keyboard/tab stop. It is useful when an outer presentation frame
++    /// and its inner editor use different focus handles.
++    pub fn track_a11y_focus(&mut self, id: &GlobalElementId, focus: &FocusHandle) {
++        if self.a11y.is_active() {
++            let node_id = id.accesskit_node_id();
++            self.a11y.set_focusable(node_id, focus.id);
++            if focus.is_focused(self) {
++                self.a11y.set_focus(node_id);
++            }
++        }
++    }
++
+     /// Register a listener for an accessibility action on a specific node.
+     /// The listener will be called when a screen reader requests the given
+     /// action on the node identified by `node_id`.

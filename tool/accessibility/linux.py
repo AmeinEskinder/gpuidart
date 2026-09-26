@@ -99,7 +99,7 @@ except GLib.Error as error:
     # Ask the Dart driver to retry the whole query in a fresh client process;
     # never reuse AT-SPI's cached subtree or retry an action.
     if (operation == "query" and error.domain == "atspi_error" and error.code == 1
-            and error.message.startswith("/org/a11y/atspi/accessible/")):
+            and error.message.startswith(("/org/a11y/atspi/accessible/", "Unknown object '/org/a11y/atspi/accessible/"))):
         sys.stderr.write(f"Stale AT-SPI element: {error.message}\n")
         sys.exit(75)
     raise

@@ -63,7 +63,8 @@ Future<void> main(List<String> args) async {
       if (Platform.isLinux) 'Pinned AT-SPI adapter has no EditableText; search uses GPUI diagnostic keys and external Text reads.',
     ];
     bool rowSelected(List nodes) =>
-        find(nodes, rowId) != null && find(nodes, rowId)?['selected'] == true;
+        hasPlatformRole(find(nodes, rowId), 'row') &&
+        find(nodes, rowId)?['selected'] == true;
     Future<void> search(String text) async {
       if (Platform.isLinux) {
         await app.call('accessibility_text', parameters: {'text': text});
@@ -80,8 +81,11 @@ Future<void> main(List<String> args) async {
     final first = await until(
       '100k table with bounded visible semantics',
       (nodes, state) =>
+          hasPlatformRole(find(nodes, 'watchlist'), 'table') &&
           find(nodes, 'watchlist')?['name'] == 'Instruments' &&
-          nodes.any((n) => n['name'] == 'ALP0000'),
+          nodes.any(
+            (n) => hasPlatformRole(n, 'cell') && n['name'] == 'ALP0000',
+          ),
     );
     if ((first['nodes'] as List).length >= 500) {
       throw StateError('100k semantics exceeded viewport bound');
@@ -105,7 +109,8 @@ Future<void> main(List<String> args) async {
     await until(
       'formatted incremental price reaches platform cell',
       (nodes, state) =>
-          state['ticks'] == 1 && nodes.any((n) => n['name'] == '101.82'),
+          state['ticks'] == 1 &&
+          nodes.any((n) => hasPlatformRole(n, 'cell') && n['name'] == '101.82'),
     );
     await search('');
     await until(
@@ -135,7 +140,9 @@ Future<void> main(List<String> args) async {
           state['query'] == 'ALP0000' &&
           state['selected'] == null &&
           find(nodes, rowId) == null &&
-          nodes.any((n) => n['name'] == 'ALP0000'),
+          nodes.any(
+            (n) => hasPlatformRole(n, 'cell') && n['name'] == 'ALP0000',
+          ),
     );
     report['passed'] = true;
   } catch (error, stack) {

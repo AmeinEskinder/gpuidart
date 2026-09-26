@@ -11,6 +11,7 @@ void main() {
     'accesskit_atspi_common-0.19.1',
     'accesskit_consumer-0.38.0',
     'accesskit_windows-0.34.0',
+    'gpui-pre-0.3.6',
   ]) {
     final directory = Directory('native/vendor/$name');
     final manifest = jsonDecode(
@@ -46,5 +47,5 @@ void main() {
       }
     }
   }
-  stdout.writeln('Verified $checked pinned AccessKit source files.');
+  stdout.writeln('Verified $checked pinned accessibility dependency files.');
 }

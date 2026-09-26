@@ -41,7 +41,7 @@ impl RenderOnce for AccessibleSelect {
 /// Adds structured text to the actual input root. AT-SPI requires TextRun
 /// descendants for its Text interface; a scalar aria_value alone is insufficient.
 #[derive(IntoElement)]
-pub(super) struct AccessibleInput(pub Input);
+pub(super) struct AccessibleInput(pub Input, pub FocusHandle);
 impl Styled for AccessibleInput {
     fn style(&mut self) -> &mut StyleRefinement {
         self.0.style()
@@ -57,7 +57,10 @@ impl RenderOnce for AccessibleInput {
                 panic!("Pinned Input root changed; update the accessibility adapter")
             });
         super::semantics::input_text(root.interactivity());
-        *root
+        InputFocus {
+            inner: *root,
+            focus: self.1,
+        }
     }
 }
 
@@ -113,6 +116,81 @@ impl<E: Element<RequestLayoutState = Option<AnyElement>>> Element for ControlRoo
     ) -> Self::PrepaintState {
         self.inner
             .prepaint(id, inspector, bounds, layout, window, cx)
+    }
+    fn paint(
+        &mut self,
+        id: Option<&GlobalElementId>,
+        inspector: Option<&InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        layout: &mut Self::RequestLayoutState,
+        paint: &mut Self::PrepaintState,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        self.inner
+            .paint(id, inspector, bounds, layout, paint, window, cx);
+    }
+    fn a11y_role(&self) -> Option<Role> {
+        self.inner.a11y_role()
+    }
+    fn write_a11y_info(&self, node: &mut gpui::accesskit::Node) {
+        self.inner.write_a11y_info(node);
+    }
+    fn a11y_synthetic_children(
+        &mut self,
+        paint: &mut Self::PrepaintState,
+        builder: &mut A11ySubtreeBuilder,
+    ) {
+        self.inner.a11y_synthetic_children(paint, builder);
+    }
+}
+
+/// Retain Kit's keyboard tree and tab stops. The semantic node delegates Focus
+/// actions and reported focus to the real editing entity through the GPUI seam.
+struct InputFocus<E> {
+    inner: E,
+    focus: FocusHandle,
+}
+impl<E: Element> IntoElement for InputFocus<E> {
+    type Element = Self;
+    fn into_element(self) -> Self {
+        self
+    }
+}
+impl<E: Element> Element for InputFocus<E> {
+    type RequestLayoutState = E::RequestLayoutState;
+    type PrepaintState = E::PrepaintState;
+    fn id(&self) -> Option<ElementId> {
+        self.inner.id()
+    }
+    fn source_location(&self) -> Option<&'static std::panic::Location<'static>> {
+        self.inner.source_location()
+    }
+    fn request_layout(
+        &mut self,
+        id: Option<&GlobalElementId>,
+        inspector: Option<&InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, Self::RequestLayoutState) {
+        self.inner.request_layout(id, inspector, window, cx)
+    }
+    fn prepaint(
+        &mut self,
+        id: Option<&GlobalElementId>,
+        inspector: Option<&InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        layout: &mut Self::RequestLayoutState,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> Self::PrepaintState {
+        let state = self
+            .inner
+            .prepaint(id, inspector, bounds, layout, window, cx);
+        if let Some(id) = id {
+            window.track_a11y_focus(id, &self.focus);
+        }
+        state
     }
     fn paint(
         &mut self,

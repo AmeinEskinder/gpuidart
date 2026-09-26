@@ -127,6 +127,9 @@ heading/list/group roles are available for structure.
 Native inputs attach structured TextRun children only when accessibility is
 active (also in Kit's test-support build). Text comes from the current rendered
 native value, including edits that have not caused a Dart snapshot yet. The
+GPUI focus hook associates the semantic input with its real editing handle
+without adding a tab stop. External Focus actions are checked against native
+input focus; isolated X11 checks also compare the platform focused state. The
 current adapter does not add text-selection actions or glyph range geometry.
 Platform selection/caret navigation is not claimed by these text-value checks.
 Select exposes its current choice as a named child for adapters that lack a

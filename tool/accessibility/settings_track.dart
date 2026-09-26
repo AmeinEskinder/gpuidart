@@ -42,18 +42,27 @@ Future<Map<String, dynamic>> settingsSemantics(
           byName('General') == null) {
         return last;
       }
-    } else if (byName('General') != null && byName('Appearance') != null) {
+    } else if (hasPlatformRole(byName('General'), 'button') &&
+        hasPlatformRole(byName('Appearance'), 'button')) {
       if (app['section'] == 'general') {
         final input = byName('Display name');
         final check = byName('Enable workspace notifications');
-        if (input != null && check != null) {
+        if (hasPlatformRole(input, 'input') &&
+            hasPlatformRole(check, 'checkbox')) {
           final checked =
               check['checked'] == true ||
               check['checked'] == 'On' ||
               check['value'] == 1 ||
               check['value'] == true;
           final enabled = check['enabled'] == true;
-          if (input['value'] == draft['name'] &&
+          // Hosted X11 runs in a private foreground session. Other backends
+          // may have no foreground window, so native focus is tested separately.
+          final focusMatches =
+              !Platform.isLinux ||
+              input['focused'] ==
+                  observed['native']['inputs']['name']['focused'];
+          if (focusMatches &&
+              input['value'] == draft['name'] &&
               checked == draft['notifications'] &&
               enabled == (draft['name'] as String).trim().isNotEmpty) {
             return last;
@@ -67,8 +76,8 @@ Future<Map<String, dynamic>> settingsSemantics(
           'forest': 'Forest',
           'orchid': 'Orchid',
         }[draft['accent']];
-        if (select != null &&
-            slider != null &&
+        if (hasPlatformRole(select, 'select') &&
+            hasPlatformRole(slider, 'slider') &&
             (select['value'] ??
                     nodes
                         .where((n) => n['id'] == '["accent","selected-value"]')

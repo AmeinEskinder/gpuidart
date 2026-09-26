@@ -75,6 +75,22 @@ Future<Map<String, dynamic>> platformQuery(
     }
     final result = jsonDecode(text) as Map<String, dynamic>;
     if (Platform.isLinux) result['query_restarts'] = restarts;
+    if (error.isNotEmpty) result['client_stderr'] = error;
     return result;
   }
+}
+
+/// Platform names asserted against responses, rather than inferred from SDK IDs.
+bool hasPlatformRole(dynamic node, String role) {
+  const roles = {
+    'button': ['ControlType.Button', 'AXButton', 'push button'],
+    'checkbox': ['ControlType.CheckBox', 'AXCheckBox', 'check box'],
+    'input': ['ControlType.Edit', 'AXTextField', 'entry'],
+    'select': ['ControlType.ComboBox', 'AXPopUpButton', 'combo box'],
+    'slider': ['ControlType.Slider', 'AXSlider', 'slider'],
+    'table': ['ControlType.Table', 'AXTable', 'table'],
+    'row': ['ControlType.DataItem', 'AXRow', 'table row'],
+    'cell': ['ControlType.DataItem', 'AXCell', 'table cell'],
+  };
+  return node != null && roles[role]!.contains(node['role']);
 }
