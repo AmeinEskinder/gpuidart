@@ -1,0 +1,10 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+    Finished `test` profile [unoptimized] target(s) in 10.03s
+     Running unittests src\lib.rs (target\debug\deps\gpuidart-bc5b9e3bed0a18c4.exe)
+
+thread 'ui::controls_tests::select_keyboard_popup_retention_identity_cancel_and_disabled' (5348) panicked at native\src\ui\controls_tests.rs:102:5:
+assertion `left == right` failed
+  left: [(2, "appearance", Some("light"))]
+ right: [(2, "appearance", Some("dark"))]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `--lib`

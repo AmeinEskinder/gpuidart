@@ -144,6 +144,65 @@ final class UiSlider extends UiNode {
   }
 }
 
+/// A stable select identity with a separately editable display label.
+final class UiSelectOption {
+  const UiSelectOption(this.id, this.label);
+  final String id;
+  final String label;
+  Map<String, Object> toJson() => {'id': id, 'label': label};
+}
+
+/// A native dropdown. Publish `select_change` event.selected to accept a choice.
+/// A null selection displays [placeholder]. Option order and labels can change
+/// without changing the selected identity. Unchanged snapshots retain the menu.
+final class UiSelect extends UiNode {
+  UiSelect(
+    super.id, {
+    required List<UiSelectOption> options,
+    this.selected,
+    this.placeholder = '',
+    this.disabled = false,
+    super.style,
+  }) : options = List.unmodifiable(options);
+  final List<UiSelectOption> options;
+  final String? selected;
+  final String placeholder;
+  final bool disabled;
+
+  @override
+  Map<String, Object> toJson() {
+    if (options.isEmpty ||
+        options.length > 256 ||
+        utf8.encode(placeholder).length > 1024) {
+      throw ArgumentError(
+        'Select requires 1..256 options and a placeholder of at most 1024 UTF-8 bytes',
+      );
+    }
+    final ids = <String>{};
+    for (final option in options) {
+      if (option.id.isEmpty ||
+          utf8.encode(option.id).length > 256 ||
+          !ids.add(option.id) ||
+          option.label.isEmpty ||
+          utf8.encode(option.label).length > 1024) {
+        throw ArgumentError('Invalid or duplicate select option');
+      }
+    }
+    if (selected != null && !ids.contains(selected)) {
+      throw ArgumentError.value(selected, 'selected', 'Not an option ID');
+    }
+    return {
+      'kind': 'select',
+      'id': id,
+      if (style != null) 'style': style!.toJson(),
+      'options': options.map((o) => o.toJson()).toList(),
+      'selected': ?selected,
+      'placeholder': placeholder,
+      'disabled': disabled,
+    };
+  }
+}
+
 /// Native text, cursor, selection and undo state survive snapshots with this ID.
 final class UiInput extends UiNode {
   const UiInput(super.id, {super.style, this.placeholder = ''});

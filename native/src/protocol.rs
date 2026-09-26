@@ -146,6 +146,17 @@ pub enum Node {
         #[serde(default)]
         disabled: bool,
     },
+    Select {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        options: Vec<SelectOption>,
+        selected: Option<String>,
+        #[serde(default)]
+        placeholder: String,
+        #[serde(default)]
+        disabled: bool,
+    },
     Input {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -160,6 +171,13 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         view: Option<TableView>,
     },
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SelectOption {
+    pub id: String,
+    pub label: String,
 }
 
 /// Presentation-only view of a table's dataset: filter, then sort. The
@@ -613,6 +631,7 @@ impl Node {
             | Self::Button { id, .. }
             | Self::Checkbox { id, .. }
             | Self::Slider { id, .. }
+            | Self::Select { id, .. }
             | Self::Input { id, .. }
             | Self::Table { id, .. } => id,
         }
@@ -626,6 +645,7 @@ impl Node {
             | Self::Button { style, .. }
             | Self::Checkbox { style, .. }
             | Self::Slider { style, .. }
+            | Self::Select { style, .. }
             | Self::Input { style, .. }
             | Self::Table { style, .. } => style.as_ref(),
         }
@@ -702,6 +722,30 @@ impl Snapshot {
                         || number > max
                     {
                         return Err("Invalid slider range, step or number".into());
+                    }
+                }
+                Node::Select {
+                    options,
+                    selected,
+                    placeholder,
+                    ..
+                } => {
+                    if options.is_empty() || options.len() > 256 || placeholder.len() > 1024 {
+                        return Err("Select requires 1..256 options and a placeholder of at most 1024 UTF-8 bytes".into());
+                    }
+                    let mut keys = HashSet::new();
+                    for option in options {
+                        if option.id.is_empty()
+                            || option.id.len() > 256
+                            || !keys.insert(&option.id)
+                            || option.label.is_empty()
+                            || option.label.len() > 1024
+                        {
+                            return Err("Invalid or duplicate select option".into());
+                        }
+                    }
+                    if selected.as_ref().is_some_and(|id| !keys.contains(id)) {
+                        return Err("Select selected ID is not an option".into());
                     }
                 }
                 _ => {}
@@ -795,6 +839,11 @@ pub enum Event {
         id: String,
         number: f32,
     },
+    SelectChange {
+        revision: u64,
+        id: String,
+        selected: Option<String>,
+    },
     Action {
         revision: u64,
         name: String,
@@ -875,6 +924,54 @@ mod tests {
                 "{min} {max} {step} {number}"
             );
         }
+    }
+
+    #[test]
+    fn select_validates_option_identity_selection_and_bounds() {
+        let node = serde_json::json!({"kind":"select","id":"choice",
+            "options":[{"id":"light","label":"Light"},{"id":"dark","label":"Dark"}],"selected":"light"});
+        let parse = |node: &serde_json::Value| {
+            Snapshot::parse(
+                &serde_json::to_vec(&serde_json::json!({"revision":1,"root":node})).unwrap(),
+            )
+        };
+        assert!(parse(&node).is_ok());
+        for (key, value) in [
+            ("selected", serde_json::json!("missing")),
+            ("selected", serde_json::json!(false)),
+            ("options", serde_json::json!([])),
+            ("options", serde_json::json!([{"id":"","label":"X"}])),
+            ("options", serde_json::json!([{"id":"light","label":""}])),
+            (
+                "options",
+                serde_json::json!([{"id":"light","label":"X"},{"id":"light","label":"Y"}]),
+            ),
+            (
+                "options",
+                serde_json::json!([{"id":"x".repeat(257),"label":"X"}]),
+            ),
+            (
+                "options",
+                serde_json::json!([{"id":"light","label":"é".repeat(513)}]),
+            ),
+            (
+                "options",
+                serde_json::json!(
+                    (0..257)
+                        .map(|i| serde_json::json!({"id":i.to_string(),"label":"X"}))
+                        .collect::<Vec<_>>()
+                ),
+            ),
+            ("placeholder", serde_json::json!("x".repeat(1025))),
+            ("disabled", serde_json::json!("false")),
+        ] {
+            let mut invalid = node.clone();
+            invalid[key] = value;
+            assert!(parse(&invalid).is_err(), "{key}");
+        }
+        let mut empty_selection = node.clone();
+        empty_selection["selected"] = serde_json::Value::Null;
+        assert!(parse(&empty_selection).is_ok());
     }
 
     #[test]

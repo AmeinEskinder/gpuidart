@@ -1,6 +1,11 @@
 use super::*;
+use crate::protocol::SelectOption;
 use gpui_kit::base::TestSupportExt;
 use gpui_kit::component::slider::{Slider, SliderEvent, SliderState};
+use gpui_kit::component::{
+    IndexPath,
+    select::{Select, SelectEvent, SelectItem, SelectState},
+};
 use gpui_kit::prelude::FluentBuilder;
 
 pub(super) struct RetainedSlider {
@@ -9,8 +14,26 @@ pub(super) struct RetainedSlider {
     _subscription: Subscription,
 }
 
+pub(super) struct RetainedSelect {
+    pub state: Entity<SelectState<Vec<SelectOption>>>,
+    options: Vec<SelectOption>,
+    disabled: bool,
+    _subscription: Subscription,
+}
+
+impl SelectItem for SelectOption {
+    type Value = String;
+    fn title(&self) -> SharedString {
+        self.label.clone().into()
+    }
+    fn value(&self) -> &String {
+        &self.id
+    }
+}
+
 impl DartView {
     pub(super) fn reconcile_controls(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        self.reconcile_selects(window, cx);
         let mut sliders = HashSet::new();
         self.snapshot.root.visit(&mut |node| {
             if let Node::Slider {
@@ -72,10 +95,130 @@ impl DartView {
     }
 
     pub(super) fn inspect_controls(&self, window: &Window, cx: &App) -> Value {
-        self.sliders.iter().map(|(id, retained)| (id.clone(), json!({
+        let mut controls = self.sliders.iter().map(|(id, retained)| (id.clone(), json!({
             "kind":"slider", "number":retained.state.read(cx).value().start(),
             "entity":retained.state.entity_id().as_u64(), "focused":retained.focus.is_focused(window),
-        }))).collect::<serde_json::Map<_, _>>().into()
+        }))).collect::<serde_json::Map<_, _>>();
+        for (id, retained) in &self.selects {
+            let state = retained.state.read(cx);
+            controls.insert(id.clone(), json!({"kind":"select", "selected":state.selected_value(),
+                "entity":retained.state.entity_id().as_u64(), "focused":state.focus_handle(cx).is_focused(window)}));
+        }
+        controls.into()
+    }
+
+    fn reconcile_selects(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let mut ids = HashSet::new();
+        self.snapshot.root.visit(&mut |node| {
+            let Node::Select {
+                id,
+                options,
+                selected,
+                disabled,
+                ..
+            } = node
+            else {
+                return;
+            };
+            ids.insert(id.clone());
+            let selected_index = selected
+                .as_ref()
+                .and_then(|id| options.iter().position(|o| o.id == *id))
+                .map(|row| IndexPath::default().row(row));
+            if let Some(retained) = self.selects.get_mut(id) {
+                if *disabled
+                    && !retained.disabled
+                    && retained.state.read(cx).focus_handle(cx).is_focused(window)
+                {
+                    // Blur alone can be undone by the open popover restoring
+                    // its focus during the next render. Use its native cancel
+                    // action so selection and menu state close together.
+                    retained.state.read(cx).focus_handle(cx).dispatch_action(
+                        &gpui_kit::base::actions::Cancel,
+                        window,
+                        cx,
+                    );
+                }
+                retained.disabled = *disabled;
+                let changed = retained.options != *options;
+                if changed || retained.state.read(cx).selected_value() != selected.as_ref() {
+                    retained.state.update(cx, |state, cx| {
+                        if changed {
+                            state.set_items(options.clone(), window, cx);
+                        }
+                        state.set_selected_index(selected_index, window, cx);
+                        cx.notify();
+                    });
+                    retained.options = options.clone();
+                }
+            } else {
+                let state =
+                    cx.new(|cx| SelectState::new(options.clone(), selected_index, window, cx));
+                let event_id = id.clone();
+                let subscription = cx.subscribe(
+                    &state,
+                    move |this, _, event: &SelectEvent<Vec<SelectOption>>, _| {
+                        let SelectEvent::Confirm(selected) = event;
+                        this.events.emit(Event::SelectChange {
+                            revision: this.snapshot.revision,
+                            id: event_id.clone(),
+                            selected: selected.clone(),
+                        });
+                    },
+                );
+                self.selects.insert(
+                    id.clone(),
+                    RetainedSelect {
+                        state,
+                        options: options.clone(),
+                        disabled: *disabled,
+                        _subscription: subscription,
+                    },
+                );
+            }
+        });
+        self.selects.retain(|id, _| ids.contains(id));
+    }
+
+    pub(super) fn select_element(
+        &self,
+        node: &Node,
+        colors: &ThemeColor,
+    ) -> Result<AnyElement, String> {
+        let Node::Select {
+            id,
+            disabled,
+            placeholder,
+            ..
+        } = node
+        else {
+            return Err("Select materializer received a different node kind".into());
+        };
+        let retained = self
+            .selects
+            .get(id)
+            .ok_or_else(|| format!("Missing retained select: {id}"))?;
+        // Kit sizes the select's outer trigger to its parent, while Styled
+        // applies to the inner input. Constrain the parent too, so the node's
+        // hit target and declared width describe the same control.
+        Ok(div()
+            .id(SharedString::from(id.clone()))
+            .test_support()
+            .w_full()
+            .when_some(node.style().and_then(|s| s.width), |this, width| {
+                this.w(style_length(width))
+            })
+            .when_some(node.style().and_then(|s| s.height), |this, height| {
+                this.h(style_length(height))
+            })
+            .child(apply_node_style(
+                Select::new(&retained.state)
+                    .placeholder(placeholder.clone())
+                    .disabled(*disabled),
+                node,
+                colors,
+            ))
+            .into_any_element())
     }
 
     pub(super) fn slider_element(

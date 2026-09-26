@@ -62,5 +62,27 @@ Retained slider attempts:
   the test now checks the event after GPUI flushes the update's effects.
 * `native-5`: targeted tests passed. `full`: 47 native tests passed.
 
-Remaining controls: select, confirmation dialog. Parked hardware,
+## Select
+
+Local Windows checks: 49 native library tests passed; 6 Dart controls tests
+passed; analyzer clean. The select tests cover bounded options, unique stable
+IDs, unknown selections, nullable selection, caller-list isolation, style width,
+pointer opening, keyboard selection, retention of an open popup across an
+unchanged snapshot, reorder/selection identity, Escape cancellation with focus
+restoration, disabled activation, and disabling a menu while it is open.
+
+Retained attempts under `select/`:
+
+* `compile`: binding compiled successfully before the new interaction test.
+* `native-1`: a 240-pixel input had a wider outer hit target. Clicking its
+  reported center only focused it; Down opened the menu and Enter selected the
+  original option. The binding now constrains the parent to the declared width.
+* `native-2`: targeted tests passed after that fix.
+* `full`: the additional disable-while-open test failed. Blurring the menu was
+  insufficient because the open popover restored focus while rendering. The
+  binding now dispatches Kit's native Cancel action, preserving the committed
+  selection while dismissing the menu.
+* `full-2`: all 49 native tests passed, including disable-while-open.
+
+Remaining control: confirmation dialog. Parked hardware,
 signing, IME and presentation limitations from the work order remain unchanged.

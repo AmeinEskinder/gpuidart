@@ -99,6 +99,9 @@ final class GpuiEvent {
   /// Requested slider value, only present on `slider_change` events.
   double? get number => (data['number'] as num?)?.toDouble();
 
+  /// Requested option ID on `select_change`; null means no selection.
+  String? get selected => data['selected'] as String?;
+
   /// Native row selection, including the dataset revision used for the index.
   TableSelection? get tableSelection => type == 'table_selection'
       ? TableSelection._(

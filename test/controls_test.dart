@@ -5,6 +5,76 @@ import 'package:gpuidart/src/native_event.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('select freezes options and encodes separate identities and labels', () {
+    final options = [const UiSelectOption('dark', 'Dark')];
+    final select = UiSelect(
+      's',
+      options: options,
+      selected: 'dark',
+      placeholder: 'Choose',
+      style: const UiStyle(foreground: UiColor.token(ThemeToken.primary)),
+    );
+    options.clear();
+    expect(select.toJson(), {
+      'kind': 'select',
+      'id': 's',
+      'options': [
+        {'id': 'dark', 'label': 'Dark'},
+      ],
+      'selected': 'dark',
+      'placeholder': 'Choose',
+      'disabled': false,
+      'style': {'foreground': 'token:primary'},
+    });
+    expect(() => select.options.clear(), throwsUnsupportedError);
+    expect(
+      UiSelect('s', options: select.options).toJson().containsKey('selected'),
+      false,
+    );
+    for (final options in <List<UiSelectOption>>[
+      [],
+      [const UiSelectOption('', 'X')],
+      [const UiSelectOption('x', '')],
+      [const UiSelectOption('x', 'X'), const UiSelectOption('x', 'Y')],
+      [UiSelectOption('x' * 257, 'X')],
+      [UiSelectOption('x', 'é' * 513)],
+      List.generate(257, (i) => UiSelectOption('$i', 'X')),
+    ]) {
+      expect(
+        () => UiSelect('s', options: options).toJson(),
+        throwsArgumentError,
+      );
+    }
+    expect(
+      () =>
+          UiSelect('s', options: select.options, selected: 'missing').toJson(),
+      throwsArgumentError,
+    );
+    expect(
+      () => UiSelect(
+        's',
+        options: select.options,
+        placeholder: 'é' * 513,
+      ).toJson(),
+      throwsArgumentError,
+    );
+  });
+
+  test('select events require a nullable selected ID', () {
+    final event = <String, Object?>{
+      'type': 'select_change',
+      'id': 's',
+      'revision': 1,
+      'selected': 'dark',
+    };
+    Map<String, dynamic> decode(Map<String, Object?> value) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(value)));
+    expect(decode(event)['selected'], 'dark');
+    expect(decode({...event, 'selected': null})['selected'], isNull);
+    expect(() => decode({...event, 'selected': 1}), throwsFormatException);
+    event.remove('selected');
+    expect(() => decode(event), throwsFormatException);
+  });
   test('slider validates native bounds and serializes theme styles', () {
     const slider = UiSlider(
       's',

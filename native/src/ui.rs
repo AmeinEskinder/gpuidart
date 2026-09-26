@@ -160,6 +160,7 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     sliders: HashMap<String, controls::RetainedSlider>,
+    selects: HashMap<String, controls::RetainedSelect>,
     tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
@@ -308,6 +309,7 @@ impl DartView {
             events,
             inputs: HashMap::new(),
             sliders: HashMap::new(),
+            selects: HashMap::new(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
@@ -841,6 +843,11 @@ impl DartView {
                 return self.context_chain(id);
             }
         }
+        for (id, select) in &self.selects {
+            if select.state.read(cx).focus_handle(cx) == focused {
+                return self.context_chain(id);
+            }
+        }
         None
     }
 
@@ -950,6 +957,7 @@ impl DartView {
                 .into_any_element()
             }
             Node::Slider { .. } => self.slider_element(node, colors)?,
+            Node::Select { .. } => self.select_element(node, colors)?,
             Node::Input { id, .. } => apply_node_style(
                 Input::new(
                     &self

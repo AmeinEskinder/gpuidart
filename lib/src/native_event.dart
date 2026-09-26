@@ -87,6 +87,13 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (number is! num || !number.isFinite || number.abs() > 1000000) {
         throw const FormatException('Invalid slider number');
       }
+    case 'select_change':
+      integer('revision', minimum: 1);
+      string('id');
+      if (!value.containsKey('selected')) {
+        throw const FormatException('Missing select selected value');
+      }
+      if (value['selected'] != null) string('selected');
     case 'error':
       string('message');
     default:
