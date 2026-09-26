@@ -18,7 +18,7 @@ rules. Other backends require their own submission hooks and verification.
 | Arm | Producer and update route |
 | --- | --- |
 | A: current Dart application | Native event emits to Dart; Dart computes the value and publishes a revisioned cell edit through FFI and the command queue. Native validates/applies it and emits the existing acknowledgement. |
-| B: native foreground producer | The same event entry computes the same value on the GPUI foreground thread and calls the shared native dataset application routine directly. It skips Dart execution, JSON/FFI submission and the command queue. |
+| B: native foreground producer | The same event entry computes the same value on the GPUI foreground thread and calls the shared native dataset application routine directly. It skips Dart value production, JSON/FFI submission and the command queue. |
 
 Both arms use the same native semantic validation, data application, table
 invalidation and renderer. B must not bypass those operations to make the
@@ -38,6 +38,24 @@ the synthetic application logic and authoritative state live. It does not show
 the benefit of a Dart-originated binding write, nor justify moving arbitrary
 application logic into Rust. Queued native producers and Dart-originated bindings
 are separate treatments, not interchangeable implementations of B.
+
+### View dependencies are a workload factor
+
+The primary pilot edits a column outside the configured view's sort/filter
+columns. A separate workload edits a referenced column, so native view recompute
+is included in `state_committed` for both arms. Do not pool these workloads.
+Before either pilot, commit a manifest with the exact view definition, edited
+columns, values, cadence, selected record, scroll anchor and expected visibility.
+Verify the declared path using native view-recompute counters.
+
+The referenced-column latency workload must keep the target visible. Exercise
+selection disappearance and targets filtered out or moved outside the viewport
+in separate correctness cases with explicitly expected outcomes. Such edits need
+not produce a rendered value; record that reason instead of classifying them as
+lost updates or assigning them a submission latency. Recompute-triggered selection
+events can reach Dart in either arm. Preserve and count those events, and freeze
+their listener behavior in the manifest. B bypasses Dart value production, not
+necessarily every Dart callback.
 
 ## Common event and native endpoints
 
@@ -59,6 +77,23 @@ is a monotonic-clock timestamp at handler completion, after acknowledgement
 serialization and callback submission for this path. It is not the commit point
 and must not be compared to B's earlier version bump. Keep dispatch completion
 as a separate metric; preserve A's real acknowledgement and measure it separately.
+
+Report A's acknowledgement work alongside the shared endpoints in the main
+results table, not only in an appendix:
+
+| Interval | Reported meaning |
+| --- | --- |
+| Event origin to state committed, A and B | Completion of native state work |
+| State committed to `native.emit`, A | Remaining work through acknowledgement serialization |
+| State committed to dispatch end, A | Remaining handler work, including callback submission |
+| `native.emit` to `dart.receive`, A | Reply delivery interval |
+| `dart.receive` to `dart.ack`, A | Decode, validation and acknowledgement handling |
+| Event origin to `dart.ack` and to `dart.commit`, A | Acknowledgement and authoritative Dart dataset completion, respectively |
+
+Report rejection/missing-ack counts and sample denominators. These intervals can
+overlap; do not sum them or their percentiles. B's absent transaction/acknowledgement
+is not applicable, not a zero-duration observation. Keep native-state differences
+separate from A's post-state completion costs and from semantic selection events.
 
 ## Causal analysis and capture validity
 
@@ -144,6 +179,18 @@ for A's acknowledgement before scheduling B. Record backlog, contention, missed
 driver slots, delivered events, failures and supersession. A's work can affect B
 through the shared UI thread; add isolated-arm control runs before attributing a
 result to a removed stage. Pairing in time does not eliminate interference.
+
+Pre-register paired analysis: for each workload and endpoint, compute the arm
+means within each balanced block and their signed difference, B minus A. Average
+block differences within each run, then summarize across independent runs. This
+is the primary latency contrast; do not replace it after inspection with an
+unpaired pooled comparison. Report per-arm eligible counts, failures and
+supersession alongside each contrast. An endpoint with no eligible samples in
+one arm has an unavailable block contrast, not a zero or a silently omitted
+block. Retain all blocks in the outcome accounting. For uncertainty, resample
+independent runs while preserving their blocks and A/B assignments; do not treat
+individual events as independent replicates. Per-arm median/p95/p99 summaries
+remain secondary and retain their workload/run scope.
 
 Match cell counts and value transformations between arms. Treat event cadence
 and cells per event as separate workload factors. A 200 ms interval is not proof
