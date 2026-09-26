@@ -107,6 +107,10 @@ impl DartView {
                 "entity":retained.state.entity_id().as_u64(), "focused":state.focus_handle(cx).is_focused(window)}));
         }
         self.snapshot.root.visit(&mut |node| {
+            if let Node::Tabs { id, selected, disabled, options, .. } = node {
+                let focused = self.tabs.get(id).and_then(|tabs| tabs.focus.iter().find(|(_,f)| f.is_focused(window)).map(|(id,_)| id));
+                controls.insert(id.clone(), json!({"kind":"tabs","selected":selected,"disabled":disabled,"options":options,"focused_option":focused}));
+            }
             if let Node::Checkbox { id, checked, disabled, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"checkbox","checked":checked,"disabled":disabled}));
             }

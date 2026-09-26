@@ -310,3 +310,65 @@ final class UiTable extends UiNode {
     if (view != null) 'view': view!.toJson(),
   };
 }
+
+/// A stable choice identity with a separate display label and enabled state.
+final class UiChoiceOption {
+  const UiChoiceOption(this.id, this.label, {this.disabled = false});
+  final String id;
+  final String label;
+  final bool disabled;
+  Map<String, Object> toJson() => {
+    'id': id,
+    'label': label,
+    'disabled': disabled,
+  };
+}
+
+void _validateChoices(List<UiChoiceOption> options, String selected) {
+  if (options.isEmpty || options.length > 32) {
+    throw ArgumentError('Choice groups require 1..32 options');
+  }
+  final ids = <String>{};
+  for (final option in options) {
+    if (option.id.isEmpty ||
+        utf8.encode(option.id).length > 256 ||
+        !ids.add(option.id) ||
+        option.label.isEmpty ||
+        utf8.encode(option.label).length > 1024) {
+      throw ArgumentError('Invalid or duplicate choice option');
+    }
+  }
+  if (!options.any((o) => o.id == selected && !o.disabled)) {
+    throw ArgumentError('Selected choice must be an enabled option');
+  }
+}
+
+/// A tab strip. The application publishes the active page as a separate node.
+/// Arrows/Home/End move focus; Enter/Space activate. Publish the requested
+/// `tab_change` event.selected to accept a choice. Only one tab is a tab stop.
+final class UiTabs extends UiNode {
+  UiTabs(
+    super.id, {
+    required List<UiChoiceOption> options,
+    required this.selected,
+    this.disabled = false,
+    super.style,
+    super.semantics,
+  }) : options = List.unmodifiable(options);
+  final List<UiChoiceOption> options;
+  final String selected;
+  final bool disabled;
+  @override
+  Map<String, Object> toJson() {
+    _validateChoices(options, selected);
+    return {
+      'kind': 'tabs',
+      'id': id,
+      'options': options.map((o) => o.toJson()).toList(),
+      'selected': selected,
+      'disabled': disabled,
+      if (style != null) 'style': style!.toJson(),
+      if (semantics != null) 'semantics': semantics!.toJson('tabs'),
+    };
+  }
+}

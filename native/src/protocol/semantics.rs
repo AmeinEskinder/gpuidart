@@ -15,6 +15,7 @@ pub enum SemanticRole {
     Textbox,
     Combobox,
     Table,
+    TabList,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -46,6 +47,7 @@ impl Semantics {
                 Node::Checkbox { .. } => role == Checkbox,
                 Node::Slider { .. } => role == Slider,
                 Node::Input { .. } => role == Textbox,
+                Node::Tabs { .. } => role == TabList,
                 Node::Select { .. } => role == Combobox,
                 Node::Table { .. } => role == Table,
             };

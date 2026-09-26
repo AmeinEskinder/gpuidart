@@ -113,7 +113,7 @@ final class GpuiEvent {
   /// Requested slider value, only present on `slider_change` events.
   double? get number => (data['number'] as num?)?.toDouble();
 
-  /// Requested option ID on `select_change`; null means no selection.
+  /// Requested option ID on `select_change` or `tab_change`; null means no selection.
   String? get selected => data['selected'] as String?;
 
   /// Whether the user confirmed a `dialog_result`; false means cancelled.
@@ -738,6 +738,7 @@ final class GpuiHost {
           event.type == 'checkbox_change' ||
           event.type == 'slider_change' ||
           event.type == 'select_change' ||
+          event.type == 'tab_change' ||
           event.type == 'dialog_result') {
         metrics.uiCallbacks++;
       }

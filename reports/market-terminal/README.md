@@ -41,3 +41,28 @@ Navigation chrome, charts, terminal assembly, platform accessibility probes,
 real reload, 100k regressions, final CI and documentation are pending. Human
 visual/screen-reader behavior, presentation latency, physical Mac observations,
 signing and the historical Windows reload disposition remain outside this task.
+
+## Tabs
+
+`UiTabs` binds Kit Base Tab to a host-owned focus group: stable option IDs,
+1..32 choices, manual activation, arrows/Home/End, disabled-choice skipping,
+one tab stop, and current-snapshot validation before events. Focus-handle
+identity rejects callbacks from a removed/remounted group without discarding
+valid clicks just because a snapshot revision advanced. Semantics derive tab
+roles, selected/disabled states and set positions from real controls.
+
+Windows checks: 64 native tests with `snapshot-experiment` enabled passed;
+Dart analyzer clean; 2 wire tests and 1 live-window keyboard/event/rebuild test
+passed. Native tests cover names/roles, focus versus selection, reordering,
+pointer/keyboard activation, disabled groups and stale callbacks. External OS
+queries are deferred to terminal fixture verification, not inferred here.
+
+Retained attempts: initial compile needed materialization's existing view
+context forwarded to listeners and the App argument to `blur`. A test glob
+import recursively shadowed the Rust test attribute; explicit imports fixed it.
+Kit's observed tab snapshot cannot report a focus handle supplied before its
+internal observation wrapper; attempting to add an outer wrapper is unsupported
+for that render-once control. Focus assertions now query the actual retained
+GPUI focus handles, with the live keyboard round trip checking the same behavior.
+The failed focus-inspection attempt was a verifier limitation, not an observed
+failure to move focus. The separate role/selected/name assertions remain.

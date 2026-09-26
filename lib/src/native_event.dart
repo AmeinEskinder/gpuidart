@@ -100,6 +100,10 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (number is! num || !number.isFinite || number.abs() > 1000000) {
         throw const FormatException('Invalid slider number');
       }
+    case 'tab_change':
+      integer('revision', minimum: 1);
+      string('id');
+      string('selected');
     case 'select_change':
       integer('revision', minimum: 1);
       string('id');

@@ -2,6 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+mod navigation;
+pub use navigation::ChoiceOption;
 mod semantics;
 mod theme;
 pub use semantics::{SemanticRole, Semantics};
@@ -162,6 +164,17 @@ pub enum Node {
         max: f32,
         step: f32,
         number: f32,
+        #[serde(default)]
+        disabled: bool,
+    },
+    Tabs {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        options: Vec<ChoiceOption>,
+        selected: String,
         #[serde(default)]
         disabled: bool,
     },
@@ -676,6 +689,7 @@ impl Node {
             | Self::Button { id, .. }
             | Self::Checkbox { id, .. }
             | Self::Slider { id, .. }
+            | Self::Tabs { id, .. }
             | Self::Select { id, .. }
             | Self::ConfirmDialog { id, .. }
             | Self::Input { id, .. }
@@ -691,6 +705,7 @@ impl Node {
             | Self::Button { style, .. }
             | Self::Checkbox { style, .. }
             | Self::Slider { style, .. }
+            | Self::Tabs { style, .. }
             | Self::Select { style, .. }
             | Self::ConfirmDialog { style, .. }
             | Self::Input { style, .. }
@@ -706,6 +721,7 @@ impl Node {
             | Self::Button { semantics, .. }
             | Self::Checkbox { semantics, .. }
             | Self::Slider { semantics, .. }
+            | Self::Tabs { semantics, .. }
             | Self::Select { semantics, .. }
             | Self::ConfirmDialog { semantics, .. }
             | Self::Input { semantics, .. }
@@ -792,6 +808,9 @@ impl Snapshot {
                         return Err("Invalid slider range, step or number".into());
                     }
                 }
+                Node::Tabs {
+                    options, selected, ..
+                } => navigation::validate_choices(options, selected)?,
                 Node::Select {
                     options,
                     selected,
@@ -933,6 +952,11 @@ pub enum Event {
         revision: u64,
         id: String,
         number: f32,
+    },
+    TabChange {
+        revision: u64,
+        id: String,
+        selected: String,
     },
     SelectChange {
         revision: u64,

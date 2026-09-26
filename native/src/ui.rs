@@ -228,6 +228,7 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     next_input_generation: u64,
+    tabs: HashMap<String, tabs::RetainedTabs>,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
@@ -381,6 +382,7 @@ impl DartView {
             events,
             inputs: HashMap::new(),
             next_input_generation: 0,
+            tabs: HashMap::new(),
             sliders: HashMap::new(),
             selects: HashMap::new(),
             active_dialog: Default::default(),
@@ -720,6 +722,7 @@ impl DartView {
         self.reconcile_theme(cx)?;
         self.reconcile_dialog(window, cx);
         self.reconcile_controls(window, cx);
+        self.reconcile_tabs(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
         let mut changed_views = Vec::new();
@@ -959,6 +962,11 @@ impl DartView {
                 return self.context_chain(id);
             }
         }
+        for (id, tabs) in &self.tabs {
+            if tabs.focus.values().any(|handle| *handle == focused) {
+                return self.context_chain(id);
+            }
+        }
         for (id, select) in &self.selects {
             if select.state.read(cx).focus_handle(cx) == focused {
                 return self.context_chain(id);
@@ -996,7 +1004,7 @@ impl DartView {
         &self,
         node: &Node,
         colors: &ThemeColor,
-        cx: &App,
+        cx: &Context<Self>,
     ) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
         let materialized = match node {
@@ -1105,6 +1113,7 @@ impl DartView {
                 )
                 .into_any_element()
             }
+            Node::Tabs { .. } => self.tabs_element(node, colors, cx)?,
             Node::Slider { .. } => self.slider_element(node, colors, cx)?,
             Node::Select { .. } => self.select_element(node, colors)?,
             Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
@@ -1279,6 +1288,9 @@ mod semantics;
 #[cfg(test)]
 mod semantics_tests;
 mod slider;
+mod tabs;
+#[cfg(test)]
+mod tabs_tests;
 mod theming;
 use semantics::{accessible_name, annotate};
 #[cfg(test)]
