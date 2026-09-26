@@ -63,7 +63,7 @@ The Dart FFI request buffer is freed in finally, and Rust retains parsed descrip
 5. Optimize the startup/memory stages identified by traces. Recheck CPU, both memory measures, peak allocations, payload and useful-content readiness on equivalent builds.
 6. Evaluate general node patches only against a demonstrated snapshot-heavy workload. Compare whole-view snapshots, independently invalidated subviews and patches. Measure build/diff work, bytes, native validation/application, layout/draw and memory separately. Include unchanged publication, property edits, inserts/removes/reorders and retained-state failures. Require measured benefit on that workload without regressions before changing the production protocol.
 
-Step 2 implementation: [opt-in publication tracing](tracing.md) now records correlated request stages with bounded buffers and Chrome Trace export. It does not yet provide inspector RPCs, rendering/presentation correlation, or an explanation of the historical acknowledgement tails. Steps 3 and 4 are implemented per the [feature-stack design](feature-stack.md) with evidence in [reports/feature-stack](../reports/feature-stack/README.md); the 100,000-row smoke workloads were re-run after these changes. Step 6 remains gated on a demonstrated snapshot-heavy workload.
+Step 2 implementation: [opt-in publication tracing](tracing.md) now records correlated request stages with bounded buffers and Chrome Trace export. It does not yet provide inspector RPCs, rendering/presentation correlation, or an explanation of the historical acknowledgement tails. Steps 3 and 4 are implemented per the [feature-stack design](feature-stack.md) with evidence in [reports/feature-stack](../reports/feature-stack/README.md); the 100,000-row smoke workloads were re-run after these changes. Step 6's workload gate and experimental comparison are now complete; production protocol changes remain a separate decision.
 
 Keep the current out-of-band dataset design. Shell's bridge limit explains the pinned benchmark's alternate table fixture; it does not invalidate all of Shell's host, registry or type-generation ideas. Per-cell application callbacks and per-signal crossings should be evaluated by call rate and measured cost rather than a claim that all FFI crossings are inherently prohibitive.
 
@@ -74,7 +74,18 @@ now cover empty/1k/10k/100k fixtures, JIT/AOT, application/library controls, sep
 allocation-profile builds and the macOS companion. A [snapshot-heavy inspector](../reports/performance/snapshot-gate/README.md)
 passed 18 runs / 720 state-preserving replacements and demonstrates costs that
 scale with description size for one-property changes. This opens the experiment
-gate. The three-strategy comparison and optimization keep/revert decisions are
-still pending; the production snapshot/dataset protocol remains unchanged.
+gate. The [three-strategy comparison](../reports/performance/strategies/README.md)
+completed 162 normal and 54 allocation-profile runs on three platforms. Cached
+subviews reduce property-update work in the fixed-section fixture, with reorder,
+allocation and state-migration tradeoffs. Patches reduce bytes but retain full
+build/diff, staging/validation and rendering work; they are not adopted.
+The production snapshot/dataset protocol remains unchanged.
+
+Step 5 outcome: [keep direct UTF-8 JSON encoding](../reports/performance/encoding/host-results.md).
+Matched host captures reduced the 100k AOT encode/copy stage on all three
+platforms. Memory and payload tradeoffs are recorded; no presentation or general
+runtime-superiority claim follows. Additional startup/process-model changes were
+not justified by this milestone. The macOS companion's measured costs remain
+separate from hypothetical shared-process alternatives.
 
 The [macOS/Linux work order](cross-platform.md) starts with a separate feasibility gate for the pinned backends and Dart launch mechanism. It does not establish platform support or take priority over the open Windows release checks.

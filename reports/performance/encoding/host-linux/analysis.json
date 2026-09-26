@@ -1,0 +1,2995 @@
+{
+  "capture_directory": "build/performance/encoding-hosted-2fb9ef8/performance-Linux-X64/encoding",
+  "failed_runs": [],
+  "groups": {
+    "aot-host-0-trace-direct-legacy": {
+      "startup_us.dart_main_after_clock_init": {
+        "samples": [
+          6735.678,
+          7145.911,
+          6293.063
+        ],
+        "median": 6735.678,
+        "min": 6293.063,
+        "max": 7145.911
+      },
+      "startup_us.records_constructed": {
+        "samples": [
+          6784.816,
+          7193.863,
+          6339.571
+        ],
+        "median": 6784.816,
+        "min": 6339.571,
+        "max": 7193.863
+      },
+      "startup_us.host_ready": {
+        "samples": [
+          431735.212,
+          124831.339,
+          125387.906
+        ],
+        "median": 125387.906,
+        "min": 124831.339,
+        "max": 431735.212
+      },
+      "startup_us.verified_draw_ack": {
+        "samples": [
+          708594.461,
+          175253.08,
+          176106.872
+        ],
+        "median": 176106.872,
+        "min": 175253.08,
+        "max": 708594.461
+      },
+      "startup_us.idle_start": {
+        "samples": [
+          712876.805,
+          179890.503,
+          181939.709
+        ],
+        "median": 181939.709,
+        "min": 179890.503,
+        "max": 712876.805
+      },
+      "startup_us.idle_end": {
+        "samples": [
+          2828113.747,
+          2295343.292,
+          2296751.218
+        ],
+        "median": 2296751.218,
+        "min": 2295343.292,
+        "max": 2828113.747
+      },
+      "startup_us.first_content_paint": {
+        "samples": [
+          431456.602,
+          124425.693,
+          124992.728
+        ],
+        "median": 124992.728,
+        "min": 124425.693,
+        "max": 431456.602
+      },
+      "stage_us.dart.build": {
+        "samples": [
+          7.781,
+          8.542,
+          8.314
+        ],
+        "median": 8.314,
+        "min": 7.781,
+        "max": 8.542
+      },
+      "stage_us.dart.library": {
+        "samples": [
+          1620.733,
+          1738.556,
+          1642.116
+        ],
+        "median": 1642.116,
+        "min": 1620.733,
+        "max": 1738.556
+      },
+      "stage_us.dart.describe": {
+        "samples": [
+          14.515,
+          15.288,
+          18.581
+        ],
+        "median": 15.288,
+        "min": 14.515,
+        "max": 18.581
+      },
+      "stage_us.dart.encode": {
+        "samples": [
+          61.571,
+          36.658,
+          40.577
+        ],
+        "median": 40.577,
+        "min": 36.658,
+        "max": 61.571
+      },
+      "bytes.dart.encode": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.json": {
+        "samples": [
+          57.942,
+          33.174,
+          36.67
+        ],
+        "median": 36.67,
+        "min": 33.174,
+        "max": 57.942
+      },
+      "stage_us.dart.utf8": {
+        "samples": [
+          1.24,
+          1.251,
+          1.328
+        ],
+        "median": 1.251,
+        "min": 1.24,
+        "max": 1.328
+      },
+      "stage_us.dart.ffi_copy": {
+        "samples": [
+          0.639,
+          0.628,
+          0.796
+        ],
+        "median": 0.639,
+        "min": 0.628,
+        "max": 0.796
+      },
+      "bytes.dart.ffi_copy": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.ffi": {
+        "samples": [
+          79.936,
+          72.952,
+          73.331
+        ],
+        "median": 73.331,
+        "min": 72.952,
+        "max": 79.936
+      },
+      "bytes.dart.ffi": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.native.initial_decode": {
+        "samples": [
+          42.015,
+          39.546,
+          39.453
+        ],
+        "median": 39.546,
+        "min": 39.453,
+        "max": 42.015
+      },
+      "bytes.native.initial_decode": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.native.initial_validate": {
+        "samples": [
+          14.46,
+          13.62,
+          13.524
+        ],
+        "median": 13.62,
+        "min": 13.524,
+        "max": 14.46
+      },
+      "bytes.native.initial_validate": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.runner_spawn": {
+        "samples": [
+          188.6,
+          186.806,
+          192.92
+        ],
+        "median": 188.6,
+        "min": 186.806,
+        "max": 192.92
+      },
+      "stage_us.native.window_create": {
+        "samples": [
+          191550.413,
+          103557.475,
+          104823.982
+        ],
+        "median": 104823.982,
+        "min": 103557.475,
+        "max": 191550.413
+      },
+      "bytes.native.emit": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "bytes.dart.receive": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "stage_us.dart.decode": {
+        "samples": [
+          38.075,
+          42.257,
+          40.028
+        ],
+        "median": 40.028,
+        "min": 38.075,
+        "max": 42.257
+      },
+      "settled.application.memory_bytes.Rss": {
+        "samples": [
+          197013504.0,
+          190050304.0,
+          189665280.0
+        ],
+        "median": 190050304.0,
+        "min": 189665280.0,
+        "max": 197013504.0
+      },
+      "settled.application.memory_bytes.Pss": {
+        "samples": [
+          173320192.0,
+          166441984.0,
+          166054912.0
+        ],
+        "median": 166441984.0,
+        "min": 166054912.0,
+        "max": 173320192.0
+      },
+      "settled.application.memory_bytes.Pss_Dirty": {
+        "samples": [
+          106586112.0,
+          101949440.0,
+          101302272.0
+        ],
+        "median": 101949440.0,
+        "min": 101302272.0,
+        "max": 106586112.0
+      },
+      "settled.application.memory_bytes.Pss_Anon": {
+        "samples": [
+          65966080.0,
+          58843136.0,
+          58269696.0
+        ],
+        "median": 58843136.0,
+        "min": 58269696.0,
+        "max": 65966080.0
+      },
+      "settled.application.memory_bytes.Pss_File": {
+        "samples": [
+          97642496.0,
+          95429632.0,
+          95616000.0
+        ],
+        "median": 95616000.0,
+        "min": 95429632.0,
+        "max": 97642496.0
+      },
+      "settled.application.memory_bytes.Pss_Shmem": {
+        "samples": [
+          9711616.0,
+          12169216.0,
+          12169216.0
+        ],
+        "median": 12169216.0,
+        "min": 9711616.0,
+        "max": 12169216.0
+      },
+      "settled.application.memory_bytes.Shared_Clean": {
+        "samples": [
+          42360832.0,
+          42188800.0,
+          42201088.0
+        ],
+        "median": 42201088.0,
+        "min": 42188800.0,
+        "max": 42360832.0
+      },
+      "settled.application.memory_bytes.Shared_Dirty": {
+        "samples": [
+          24576.0,
+          16384.0,
+          16384.0
+        ],
+        "median": 16384.0,
+        "min": 16384.0,
+        "max": 24576.0
+      },
+      "settled.application.memory_bytes.Private_Clean": {
+        "samples": [
+          48054272.0,
+          45903872.0,
+          46096384.0
+        ],
+        "median": 46096384.0,
+        "min": 45903872.0,
+        "max": 48054272.0
+      },
+      "settled.application.memory_bytes.Private_Dirty": {
+        "samples": [
+          106573824.0,
+          101941248.0,
+          101294080.0
+        ],
+        "median": 101941248.0,
+        "min": 101294080.0,
+        "max": 106573824.0
+      },
+      "settled.application.memory_bytes.Referenced": {
+        "samples": [
+          197013504.0,
+          190050304.0,
+          189665280.0
+        ],
+        "median": 190050304.0,
+        "min": 189665280.0,
+        "max": 197013504.0
+      },
+      "settled.application.memory_bytes.Anonymous": {
+        "samples": [
+          65966080.0,
+          58843136.0,
+          58269696.0
+        ],
+        "median": 58843136.0,
+        "min": 58269696.0,
+        "max": 65966080.0
+      },
+      "settled.application.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.AnonHugePages": {
+        "samples": [
+          6291456.0,
+          6291456.0,
+          6291456.0
+        ],
+        "median": 6291456.0,
+        "min": 6291456.0,
+        "max": 6291456.0
+      },
+      "settled.application.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_peak_bytes.rss": {
+        "samples": [
+          196263936.0,
+          189448192.0,
+          188964864.0
+        ],
+        "median": 189448192.0,
+        "min": 188964864.0,
+        "max": 196263936.0
+      },
+      "settled.ui.memory_bytes.Rss": {
+        "samples": [
+          197013504.0,
+          190050304.0,
+          189665280.0
+        ],
+        "median": 190050304.0,
+        "min": 189665280.0,
+        "max": 197013504.0
+      },
+      "settled.ui.memory_bytes.Pss": {
+        "samples": [
+          173320192.0,
+          166441984.0,
+          166054912.0
+        ],
+        "median": 166441984.0,
+        "min": 166054912.0,
+        "max": 173320192.0
+      },
+      "settled.ui.memory_bytes.Pss_Dirty": {
+        "samples": [
+          106586112.0,
+          101949440.0,
+          101302272.0
+        ],
+        "median": 101949440.0,
+        "min": 101302272.0,
+        "max": 106586112.0
+      },
+      "settled.ui.memory_bytes.Pss_Anon": {
+        "samples": [
+          65966080.0,
+          58843136.0,
+          58269696.0
+        ],
+        "median": 58843136.0,
+        "min": 58269696.0,
+        "max": 65966080.0
+      },
+      "settled.ui.memory_bytes.Pss_File": {
+        "samples": [
+          97642496.0,
+          95429632.0,
+          95616000.0
+        ],
+        "median": 95616000.0,
+        "min": 95429632.0,
+        "max": 97642496.0
+      },
+      "settled.ui.memory_bytes.Pss_Shmem": {
+        "samples": [
+          9711616.0,
+          12169216.0,
+          12169216.0
+        ],
+        "median": 12169216.0,
+        "min": 9711616.0,
+        "max": 12169216.0
+      },
+      "settled.ui.memory_bytes.Shared_Clean": {
+        "samples": [
+          42360832.0,
+          42188800.0,
+          42201088.0
+        ],
+        "median": 42201088.0,
+        "min": 42188800.0,
+        "max": 42360832.0
+      },
+      "settled.ui.memory_bytes.Shared_Dirty": {
+        "samples": [
+          24576.0,
+          16384.0,
+          16384.0
+        ],
+        "median": 16384.0,
+        "min": 16384.0,
+        "max": 24576.0
+      },
+      "settled.ui.memory_bytes.Private_Clean": {
+        "samples": [
+          48054272.0,
+          45903872.0,
+          46096384.0
+        ],
+        "median": 46096384.0,
+        "min": 45903872.0,
+        "max": 48054272.0
+      },
+      "settled.ui.memory_bytes.Private_Dirty": {
+        "samples": [
+          106573824.0,
+          101941248.0,
+          101294080.0
+        ],
+        "median": 101941248.0,
+        "min": 101294080.0,
+        "max": 106573824.0
+      },
+      "settled.ui.memory_bytes.Referenced": {
+        "samples": [
+          197013504.0,
+          190050304.0,
+          189665280.0
+        ],
+        "median": 190050304.0,
+        "min": 189665280.0,
+        "max": 197013504.0
+      },
+      "settled.ui.memory_bytes.Anonymous": {
+        "samples": [
+          65966080.0,
+          58843136.0,
+          58269696.0
+        ],
+        "median": 58843136.0,
+        "min": 58269696.0,
+        "max": 65966080.0
+      },
+      "settled.ui.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.AnonHugePages": {
+        "samples": [
+          6291456.0,
+          6291456.0,
+          6291456.0
+        ],
+        "median": 6291456.0,
+        "min": 6291456.0,
+        "max": 6291456.0
+      },
+      "settled.ui.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_peak_bytes.rss": {
+        "samples": [
+          196263936.0,
+          189448192.0,
+          188964864.0
+        ],
+        "median": 189448192.0,
+        "min": 188964864.0,
+        "max": 196263936.0
+      },
+      "inspect_round_trip_us.run_median": {
+        "samples": [
+          132.448,
+          139.1375,
+          141.977
+        ],
+        "median": 139.1375,
+        "min": 132.448,
+        "max": 141.977
+      },
+      "inspect_round_trip_us.run_p95": {
+        "samples": [
+          151.515,
+          231.1,
+          187.57
+        ],
+        "median": 187.57,
+        "min": 151.515,
+        "max": 231.1
+      }
+    },
+    "aot-host-0-trace-direct-fused": {
+      "startup_us.dart_main_after_clock_init": {
+        "samples": [
+          6025.449,
+          6098.476,
+          6317.675
+        ],
+        "median": 6098.476,
+        "min": 6025.449,
+        "max": 6317.675
+      },
+      "startup_us.records_constructed": {
+        "samples": [
+          6071.583,
+          6160.552,
+          6366.704
+        ],
+        "median": 6160.552,
+        "min": 6071.583,
+        "max": 6366.704
+      },
+      "startup_us.host_ready": {
+        "samples": [
+          123649.793,
+          123079.731,
+          123795.931
+        ],
+        "median": 123649.793,
+        "min": 123079.731,
+        "max": 123795.931
+      },
+      "startup_us.verified_draw_ack": {
+        "samples": [
+          160258.422,
+          158676.115,
+          174404.086
+        ],
+        "median": 160258.422,
+        "min": 158676.115,
+        "max": 174404.086
+      },
+      "startup_us.idle_start": {
+        "samples": [
+          164402.589,
+          163197.204,
+          178788.756
+        ],
+        "median": 164402.589,
+        "min": 163197.204,
+        "max": 178788.756
+      },
+      "startup_us.idle_end": {
+        "samples": [
+          2279185.795,
+          2278896.604,
+          2293901.811
+        ],
+        "median": 2279185.795,
+        "min": 2278896.604,
+        "max": 2293901.811
+      },
+      "startup_us.first_content_paint": {
+        "samples": [
+          123261.271,
+          122767.199,
+          123415.506
+        ],
+        "median": 123261.271,
+        "min": 122767.199,
+        "max": 123415.506
+      },
+      "stage_us.dart.build": {
+        "samples": [
+          8.128,
+          8.615,
+          7.804
+        ],
+        "median": 8.128,
+        "min": 7.804,
+        "max": 8.615
+      },
+      "stage_us.dart.library": {
+        "samples": [
+          1565.404,
+          1580.014,
+          1638.842
+        ],
+        "median": 1580.014,
+        "min": 1565.404,
+        "max": 1638.842
+      },
+      "stage_us.dart.describe": {
+        "samples": [
+          14.993,
+          15.869,
+          17.527
+        ],
+        "median": 15.869,
+        "min": 14.993,
+        "max": 17.527
+      },
+      "stage_us.dart.encode": {
+        "samples": [
+          38.891,
+          38.584,
+          40.13
+        ],
+        "median": 38.891,
+        "min": 38.584,
+        "max": 40.13
+      },
+      "bytes.dart.encode": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.json_utf8": {
+        "samples": [
+          34.207,
+          35.847,
+          37.044
+        ],
+        "median": 35.847,
+        "min": 34.207,
+        "max": 37.044
+      },
+      "stage_us.dart.ffi_copy": {
+        "samples": [
+          3.342,
+          1.369,
+          1.648
+        ],
+        "median": 1.648,
+        "min": 1.369,
+        "max": 3.342
+      },
+      "bytes.dart.ffi_copy": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.ffi": {
+        "samples": [
+          75.688,
+          72.559,
+          74.835
+        ],
+        "median": 74.835,
+        "min": 72.559,
+        "max": 75.688
+      },
+      "bytes.dart.ffi": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.native.initial_decode": {
+        "samples": [
+          42.183,
+          38.775,
+          39.958
+        ],
+        "median": 39.958,
+        "min": 38.775,
+        "max": 42.183
+      },
+      "bytes.native.initial_decode": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.native.initial_validate": {
+        "samples": [
+          13.774,
+          14.395,
+          14.36
+        ],
+        "median": 14.36,
+        "min": 13.774,
+        "max": 14.395
+      },
+      "bytes.native.initial_validate": {
+        "samples": [
+          232.0,
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.runner_spawn": {
+        "samples": [
+          185.251,
+          183.348,
+          191.95
+        ],
+        "median": 185.251,
+        "min": 183.348,
+        "max": 191.95
+      },
+      "stage_us.native.window_create": {
+        "samples": [
+          103631.261,
+          103212.978,
+          103209.293
+        ],
+        "median": 103212.978,
+        "min": 103209.293,
+        "max": 103631.261
+      },
+      "bytes.native.emit": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "stage_us.dart.decode": {
+        "samples": [
+          48.78,
+          35.302,
+          37.753
+        ],
+        "median": 37.753,
+        "min": 35.302,
+        "max": 48.78
+      },
+      "bytes.dart.receive": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "settled.application.memory_bytes.Rss": {
+        "samples": [
+          187346944.0,
+          187035648.0,
+          189816832.0
+        ],
+        "median": 187346944.0,
+        "min": 187035648.0,
+        "max": 189816832.0
+      },
+      "settled.application.memory_bytes.Pss": {
+        "samples": [
+          163822592.0,
+          163477504.0,
+          166273024.0
+        ],
+        "median": 163822592.0,
+        "min": 163477504.0,
+        "max": 166273024.0
+      },
+      "settled.application.memory_bytes.Pss_Dirty": {
+        "samples": [
+          99237888.0,
+          98922496.0,
+          74645504.0
+        ],
+        "median": 98922496.0,
+        "min": 74645504.0,
+        "max": 99237888.0
+      },
+      "settled.application.memory_bytes.Pss_Anon": {
+        "samples": [
+          58683392.0,
+          58527744.0,
+          58634240.0
+        ],
+        "median": 58634240.0,
+        "min": 58527744.0,
+        "max": 58683392.0
+      },
+      "settled.application.memory_bytes.Pss_File": {
+        "samples": [
+          95427584.0,
+          95238144.0,
+          95469568.0
+        ],
+        "median": 95427584.0,
+        "min": 95238144.0,
+        "max": 95469568.0
+      },
+      "settled.application.memory_bytes.Pss_Shmem": {
+        "samples": [
+          9711616.0,
+          9711616.0,
+          12169216.0
+        ],
+        "median": 9711616.0,
+        "min": 9711616.0,
+        "max": 12169216.0
+      },
+      "settled.application.memory_bytes.Shared_Clean": {
+        "samples": [
+          42115072.0,
+          42151936.0,
+          42119168.0
+        ],
+        "median": 42119168.0,
+        "min": 42115072.0,
+        "max": 42151936.0
+      },
+      "settled.application.memory_bytes.Shared_Dirty": {
+        "samples": [
+          16384.0,
+          16384.0,
+          8192.0
+        ],
+        "median": 16384.0,
+        "min": 8192.0,
+        "max": 16384.0
+      },
+      "settled.application.memory_bytes.Private_Clean": {
+        "samples": [
+          45985792.0,
+          45953024.0,
+          73048064.0
+        ],
+        "median": 45985792.0,
+        "min": 45953024.0,
+        "max": 73048064.0
+      },
+      "settled.application.memory_bytes.Private_Dirty": {
+        "samples": [
+          99229696.0,
+          98914304.0,
+          74641408.0
+        ],
+        "median": 98914304.0,
+        "min": 74641408.0,
+        "max": 99229696.0
+      },
+      "settled.application.memory_bytes.Referenced": {
+        "samples": [
+          187346944.0,
+          187035648.0,
+          189816832.0
+        ],
+        "median": 187346944.0,
+        "min": 187035648.0,
+        "max": 189816832.0
+      },
+      "settled.application.memory_bytes.Anonymous": {
+        "samples": [
+          58683392.0,
+          58527744.0,
+          58634240.0
+        ],
+        "median": 58634240.0,
+        "min": 58527744.0,
+        "max": 58683392.0
+      },
+      "settled.application.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.AnonHugePages": {
+        "samples": [
+          6291456.0,
+          6291456.0,
+          6291456.0
+        ],
+        "median": 6291456.0,
+        "min": 6291456.0,
+        "max": 6291456.0
+      },
+      "settled.application.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_peak_bytes.rss": {
+        "samples": [
+          186675200.0,
+          186265600.0,
+          188997632.0
+        ],
+        "median": 186675200.0,
+        "min": 186265600.0,
+        "max": 188997632.0
+      },
+      "settled.ui.memory_bytes.Rss": {
+        "samples": [
+          187346944.0,
+          187035648.0,
+          189816832.0
+        ],
+        "median": 187346944.0,
+        "min": 187035648.0,
+        "max": 189816832.0
+      },
+      "settled.ui.memory_bytes.Pss": {
+        "samples": [
+          163822592.0,
+          163477504.0,
+          166273024.0
+        ],
+        "median": 163822592.0,
+        "min": 163477504.0,
+        "max": 166273024.0
+      },
+      "settled.ui.memory_bytes.Pss_Dirty": {
+        "samples": [
+          99237888.0,
+          98922496.0,
+          74645504.0
+        ],
+        "median": 98922496.0,
+        "min": 74645504.0,
+        "max": 99237888.0
+      },
+      "settled.ui.memory_bytes.Pss_Anon": {
+        "samples": [
+          58683392.0,
+          58527744.0,
+          58634240.0
+        ],
+        "median": 58634240.0,
+        "min": 58527744.0,
+        "max": 58683392.0
+      },
+      "settled.ui.memory_bytes.Pss_File": {
+        "samples": [
+          95427584.0,
+          95238144.0,
+          95469568.0
+        ],
+        "median": 95427584.0,
+        "min": 95238144.0,
+        "max": 95469568.0
+      },
+      "settled.ui.memory_bytes.Pss_Shmem": {
+        "samples": [
+          9711616.0,
+          9711616.0,
+          12169216.0
+        ],
+        "median": 9711616.0,
+        "min": 9711616.0,
+        "max": 12169216.0
+      },
+      "settled.ui.memory_bytes.Shared_Clean": {
+        "samples": [
+          42115072.0,
+          42151936.0,
+          42119168.0
+        ],
+        "median": 42119168.0,
+        "min": 42115072.0,
+        "max": 42151936.0
+      },
+      "settled.ui.memory_bytes.Shared_Dirty": {
+        "samples": [
+          16384.0,
+          16384.0,
+          8192.0
+        ],
+        "median": 16384.0,
+        "min": 8192.0,
+        "max": 16384.0
+      },
+      "settled.ui.memory_bytes.Private_Clean": {
+        "samples": [
+          45985792.0,
+          45953024.0,
+          73048064.0
+        ],
+        "median": 45985792.0,
+        "min": 45953024.0,
+        "max": 73048064.0
+      },
+      "settled.ui.memory_bytes.Private_Dirty": {
+        "samples": [
+          99229696.0,
+          98914304.0,
+          74641408.0
+        ],
+        "median": 98914304.0,
+        "min": 74641408.0,
+        "max": 99229696.0
+      },
+      "settled.ui.memory_bytes.Referenced": {
+        "samples": [
+          187346944.0,
+          187035648.0,
+          189816832.0
+        ],
+        "median": 187346944.0,
+        "min": 187035648.0,
+        "max": 189816832.0
+      },
+      "settled.ui.memory_bytes.Anonymous": {
+        "samples": [
+          58683392.0,
+          58527744.0,
+          58634240.0
+        ],
+        "median": 58634240.0,
+        "min": 58527744.0,
+        "max": 58683392.0
+      },
+      "settled.ui.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.AnonHugePages": {
+        "samples": [
+          6291456.0,
+          6291456.0,
+          6291456.0
+        ],
+        "median": 6291456.0,
+        "min": 6291456.0,
+        "max": 6291456.0
+      },
+      "settled.ui.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_peak_bytes.rss": {
+        "samples": [
+          186675200.0,
+          186265600.0,
+          188997632.0
+        ],
+        "median": 186675200.0,
+        "min": 186265600.0,
+        "max": 188997632.0
+      },
+      "inspect_round_trip_us.run_median": {
+        "samples": [
+          146.9035,
+          144.3295,
+          143.82049999999998
+        ],
+        "median": 144.3295,
+        "min": 143.82049999999998,
+        "max": 146.9035
+      },
+      "inspect_round_trip_us.run_p95": {
+        "samples": [
+          178.15,
+          180.908,
+          206.57
+        ],
+        "median": 180.908,
+        "min": 178.15,
+        "max": 206.57
+      }
+    },
+    "aot-host-100000-trace-direct-legacy": {
+      "startup_us.dart_main_after_clock_init": {
+        "samples": [
+          6569.848,
+          6717.191,
+          6256.857
+        ],
+        "median": 6569.848,
+        "min": 6256.857,
+        "max": 6717.191
+      },
+      "startup_us.records_constructed": {
+        "samples": [
+          33181.204,
+          33429.983,
+          33455.927
+        ],
+        "median": 33429.983,
+        "min": 33181.204,
+        "max": 33455.927
+      },
+      "startup_us.host_ready": {
+        "samples": [
+          210764.893,
+          207806.782,
+          207839.911
+        ],
+        "median": 207839.911,
+        "min": 207806.782,
+        "max": 210764.893
+      },
+      "startup_us.verified_draw_ack": {
+        "samples": [
+          275635.665,
+          273836.968,
+          258883.127
+        ],
+        "median": 273836.968,
+        "min": 258883.127,
+        "max": 275635.665
+      },
+      "startup_us.idle_start": {
+        "samples": [
+          280469.629,
+          278617.853,
+          263940.98
+        ],
+        "median": 278617.853,
+        "min": 263940.98,
+        "max": 280469.629
+      },
+      "startup_us.idle_end": {
+        "samples": [
+          2397994.662,
+          2396064.345,
+          2381722.375
+        ],
+        "median": 2396064.345,
+        "min": 2381722.375,
+        "max": 2397994.662
+      },
+      "startup_us.first_content_paint": {
+        "samples": [
+          210206.281,
+          207358.353,
+          207328.382
+        ],
+        "median": 207358.353,
+        "min": 207328.382,
+        "max": 210206.281
+      },
+      "stage_us.dart.build": {
+        "samples": [
+          9.582,
+          11.867,
+          10.471
+        ],
+        "median": 10.471,
+        "min": 9.582,
+        "max": 11.867
+      },
+      "stage_us.dart.library": {
+        "samples": [
+          1603.96,
+          1650.721,
+          1621.213
+        ],
+        "median": 1621.213,
+        "min": 1603.96,
+        "max": 1650.721
+      },
+      "stage_us.dart.describe": {
+        "samples": [
+          12.209,
+          12.827,
+          12.308
+        ],
+        "median": 12.308,
+        "min": 12.209,
+        "max": 12.827
+      },
+      "stage_us.dart.encode": {
+        "samples": [
+          33255.09,
+          33142.607,
+          33121.912
+        ],
+        "median": 33142.607,
+        "min": 33121.912,
+        "max": 33255.09
+      },
+      "bytes.dart.encode": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.json": {
+        "samples": [
+          26140.26,
+          25536.564,
+          25523.237
+        ],
+        "median": 25536.564,
+        "min": 25523.237,
+        "max": 26140.26
+      },
+      "stage_us.dart.utf8": {
+        "samples": [
+          6685.126,
+          6565.886,
+          6550.56
+        ],
+        "median": 6565.886,
+        "min": 6550.56,
+        "max": 6685.126
+      },
+      "stage_us.dart.ffi_copy": {
+        "samples": [
+          420.643,
+          1032.499,
+          1040.729
+        ],
+        "median": 1032.499,
+        "min": 420.643,
+        "max": 1040.729
+      },
+      "bytes.dart.ffi_copy": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.ffi": {
+        "samples": [
+          23015.846,
+          22831.45,
+          22923.138
+        ],
+        "median": 22923.138,
+        "min": 22831.45,
+        "max": 23015.846
+      },
+      "bytes.dart.ffi": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.native.initial_decode": {
+        "samples": [
+          22772.544,
+          22574.655,
+          22682.653
+        ],
+        "median": 22682.653,
+        "min": 22574.655,
+        "max": 22772.544
+      },
+      "bytes.native.initial_decode": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.native.initial_validate": {
+        "samples": [
+          208.206,
+          223.889,
+          208.592
+        ],
+        "median": 208.592,
+        "min": 208.206,
+        "max": 223.889
+      },
+      "bytes.native.initial_validate": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.runner_spawn": {
+        "samples": [
+          284.182,
+          289.969,
+          269.538
+        ],
+        "median": 284.182,
+        "min": 269.538,
+        "max": 289.969
+      },
+      "stage_us.native.window_create": {
+        "samples": [
+          107590.392,
+          104457.165,
+          104650.533
+        ],
+        "median": 104650.533,
+        "min": 104457.165,
+        "max": 107590.392
+      },
+      "bytes.native.emit": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "bytes.dart.receive": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "stage_us.dart.decode": {
+        "samples": [
+          70.333,
+          51.934,
+          47.758
+        ],
+        "median": 51.934,
+        "min": 47.758,
+        "max": 70.333
+      },
+      "settled.application.memory_bytes.Rss": {
+        "samples": [
+          248176640.0,
+          247279616.0,
+          244576256.0
+        ],
+        "median": 247279616.0,
+        "min": 244576256.0,
+        "max": 248176640.0
+      },
+      "settled.application.memory_bytes.Pss": {
+        "samples": [
+          224678912.0,
+          223719424.0,
+          220987392.0
+        ],
+        "median": 223719424.0,
+        "min": 220987392.0,
+        "max": 224678912.0
+      },
+      "settled.application.memory_bytes.Pss_Dirty": {
+        "samples": [
+          160063488.0,
+          159055872.0,
+          156360704.0
+        ],
+        "median": 159055872.0,
+        "min": 156360704.0,
+        "max": 160063488.0
+      },
+      "settled.application.memory_bytes.Pss_Anon": {
+        "samples": [
+          116944896.0,
+          115773440.0,
+          115650560.0
+        ],
+        "median": 115773440.0,
+        "min": 115650560.0,
+        "max": 116944896.0
+      },
+      "settled.application.memory_bytes.Pss_File": {
+        "samples": [
+          95474688.0,
+          95686656.0,
+          95535104.0
+        ],
+        "median": 95535104.0,
+        "min": 95474688.0,
+        "max": 95686656.0
+      },
+      "settled.application.memory_bytes.Pss_Shmem": {
+        "samples": [
+          12259328.0,
+          12259328.0,
+          9801728.0
+        ],
+        "median": 12259328.0,
+        "min": 9801728.0,
+        "max": 12259328.0
+      },
+      "settled.application.memory_bytes.Shared_Clean": {
+        "samples": [
+          42057728.0,
+          42184704.0,
+          42160128.0
+        ],
+        "median": 42160128.0,
+        "min": 42057728.0,
+        "max": 42184704.0
+      },
+      "settled.application.memory_bytes.Shared_Dirty": {
+        "samples": [
+          16384.0,
+          16384.0,
+          16384.0
+        ],
+        "median": 16384.0,
+        "min": 16384.0,
+        "max": 16384.0
+      },
+      "settled.application.memory_bytes.Private_Clean": {
+        "samples": [
+          46047232.0,
+          46030848.0,
+          46047232.0
+        ],
+        "median": 46047232.0,
+        "min": 46030848.0,
+        "max": 46047232.0
+      },
+      "settled.application.memory_bytes.Private_Dirty": {
+        "samples": [
+          160055296.0,
+          159047680.0,
+          156352512.0
+        ],
+        "median": 159047680.0,
+        "min": 156352512.0,
+        "max": 160055296.0
+      },
+      "settled.application.memory_bytes.Referenced": {
+        "samples": [
+          248176640.0,
+          247279616.0,
+          244576256.0
+        ],
+        "median": 247279616.0,
+        "min": 244576256.0,
+        "max": 248176640.0
+      },
+      "settled.application.memory_bytes.Anonymous": {
+        "samples": [
+          116944896.0,
+          115773440.0,
+          115650560.0
+        ],
+        "median": 115773440.0,
+        "min": 115650560.0,
+        "max": 116944896.0
+      },
+      "settled.application.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.AnonHugePages": {
+        "samples": [
+          10485760.0,
+          10485760.0,
+          10485760.0
+        ],
+        "median": 10485760.0,
+        "min": 10485760.0,
+        "max": 10485760.0
+      },
+      "settled.application.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_peak_bytes.rss": {
+        "samples": [
+          247259136.0,
+          246681600.0,
+          243802112.0
+        ],
+        "median": 246681600.0,
+        "min": 243802112.0,
+        "max": 247259136.0
+      },
+      "settled.ui.memory_bytes.Rss": {
+        "samples": [
+          248176640.0,
+          247279616.0,
+          244576256.0
+        ],
+        "median": 247279616.0,
+        "min": 244576256.0,
+        "max": 248176640.0
+      },
+      "settled.ui.memory_bytes.Pss": {
+        "samples": [
+          224678912.0,
+          223719424.0,
+          220987392.0
+        ],
+        "median": 223719424.0,
+        "min": 220987392.0,
+        "max": 224678912.0
+      },
+      "settled.ui.memory_bytes.Pss_Dirty": {
+        "samples": [
+          160063488.0,
+          159055872.0,
+          156360704.0
+        ],
+        "median": 159055872.0,
+        "min": 156360704.0,
+        "max": 160063488.0
+      },
+      "settled.ui.memory_bytes.Pss_Anon": {
+        "samples": [
+          116944896.0,
+          115773440.0,
+          115650560.0
+        ],
+        "median": 115773440.0,
+        "min": 115650560.0,
+        "max": 116944896.0
+      },
+      "settled.ui.memory_bytes.Pss_File": {
+        "samples": [
+          95474688.0,
+          95686656.0,
+          95535104.0
+        ],
+        "median": 95535104.0,
+        "min": 95474688.0,
+        "max": 95686656.0
+      },
+      "settled.ui.memory_bytes.Pss_Shmem": {
+        "samples": [
+          12259328.0,
+          12259328.0,
+          9801728.0
+        ],
+        "median": 12259328.0,
+        "min": 9801728.0,
+        "max": 12259328.0
+      },
+      "settled.ui.memory_bytes.Shared_Clean": {
+        "samples": [
+          42057728.0,
+          42184704.0,
+          42160128.0
+        ],
+        "median": 42160128.0,
+        "min": 42057728.0,
+        "max": 42184704.0
+      },
+      "settled.ui.memory_bytes.Shared_Dirty": {
+        "samples": [
+          16384.0,
+          16384.0,
+          16384.0
+        ],
+        "median": 16384.0,
+        "min": 16384.0,
+        "max": 16384.0
+      },
+      "settled.ui.memory_bytes.Private_Clean": {
+        "samples": [
+          46047232.0,
+          46030848.0,
+          46047232.0
+        ],
+        "median": 46047232.0,
+        "min": 46030848.0,
+        "max": 46047232.0
+      },
+      "settled.ui.memory_bytes.Private_Dirty": {
+        "samples": [
+          160055296.0,
+          159047680.0,
+          156352512.0
+        ],
+        "median": 159047680.0,
+        "min": 156352512.0,
+        "max": 160055296.0
+      },
+      "settled.ui.memory_bytes.Referenced": {
+        "samples": [
+          248176640.0,
+          247279616.0,
+          244576256.0
+        ],
+        "median": 247279616.0,
+        "min": 244576256.0,
+        "max": 248176640.0
+      },
+      "settled.ui.memory_bytes.Anonymous": {
+        "samples": [
+          116944896.0,
+          115773440.0,
+          115650560.0
+        ],
+        "median": 115773440.0,
+        "min": 115650560.0,
+        "max": 116944896.0
+      },
+      "settled.ui.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.AnonHugePages": {
+        "samples": [
+          10485760.0,
+          10485760.0,
+          10485760.0
+        ],
+        "median": 10485760.0,
+        "min": 10485760.0,
+        "max": 10485760.0
+      },
+      "settled.ui.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_peak_bytes.rss": {
+        "samples": [
+          247259136.0,
+          246681600.0,
+          243802112.0
+        ],
+        "median": 246681600.0,
+        "min": 243802112.0,
+        "max": 247259136.0
+      },
+      "inspect_round_trip_us.run_median": {
+        "samples": [
+          160.58499999999998,
+          155.0755,
+          158.343
+        ],
+        "median": 158.343,
+        "min": 155.0755,
+        "max": 160.58499999999998
+      },
+      "inspect_round_trip_us.run_p95": {
+        "samples": [
+          203.267,
+          196.91,
+          200.217
+        ],
+        "median": 200.217,
+        "min": 196.91,
+        "max": 203.267
+      }
+    },
+    "aot-host-100000-trace-direct-fused": {
+      "startup_us.dart_main_after_clock_init": {
+        "samples": [
+          6672.218,
+          6284.765,
+          6325.192
+        ],
+        "median": 6325.192,
+        "min": 6284.765,
+        "max": 6672.218
+      },
+      "startup_us.records_constructed": {
+        "samples": [
+          33256.024,
+          33077.362,
+          33076.244
+        ],
+        "median": 33077.362,
+        "min": 33076.244,
+        "max": 33256.024
+      },
+      "startup_us.host_ready": {
+        "samples": [
+          199130.82,
+          201886.301,
+          202365.657
+        ],
+        "median": 201886.301,
+        "min": 199130.82,
+        "max": 202365.657
+      },
+      "startup_us.verified_draw_ack": {
+        "samples": [
+          263860.147,
+          266840.217,
+          267178.95
+        ],
+        "median": 266840.217,
+        "min": 263860.147,
+        "max": 267178.95
+      },
+      "startup_us.idle_start": {
+        "samples": [
+          268928.261,
+          271762.656,
+          272213.586
+        ],
+        "median": 271762.656,
+        "min": 268928.261,
+        "max": 272213.586
+      },
+      "startup_us.idle_end": {
+        "samples": [
+          2386983.509,
+          2389841.483,
+          2390303.343
+        ],
+        "median": 2389841.483,
+        "min": 2386983.509,
+        "max": 2390303.343
+      },
+      "startup_us.first_content_paint": {
+        "samples": [
+          198651.189,
+          201323.422,
+          201693.445
+        ],
+        "median": 201323.422,
+        "min": 198651.189,
+        "max": 201693.445
+      },
+      "stage_us.dart.build": {
+        "samples": [
+          11.386,
+          12.033,
+          12.512
+        ],
+        "median": 12.033,
+        "min": 11.386,
+        "max": 12.512
+      },
+      "stage_us.dart.library": {
+        "samples": [
+          1635.902,
+          1668.005,
+          1643.514
+        ],
+        "median": 1643.514,
+        "min": 1635.902,
+        "max": 1668.005
+      },
+      "stage_us.dart.describe": {
+        "samples": [
+          13.539,
+          12.961,
+          14.013
+        ],
+        "median": 13.539,
+        "min": 12.961,
+        "max": 14.013
+      },
+      "stage_us.dart.encode": {
+        "samples": [
+          23014.667,
+          24293.441,
+          24234.483
+        ],
+        "median": 24234.483,
+        "min": 23014.667,
+        "max": 24293.441
+      },
+      "bytes.dart.encode": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.json_utf8": {
+        "samples": [
+          22592.772,
+          23282.309,
+          23240.49
+        ],
+        "median": 23240.49,
+        "min": 22592.772,
+        "max": 23282.309
+      },
+      "stage_us.dart.ffi_copy": {
+        "samples": [
+          417.871,
+          1007.165,
+          989.382
+        ],
+        "median": 989.382,
+        "min": 417.871,
+        "max": 1007.165
+      },
+      "bytes.dart.ffi_copy": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.ffi": {
+        "samples": [
+          22924.502,
+          23019.683,
+          22903.377
+        ],
+        "median": 22924.502,
+        "min": 22903.377,
+        "max": 23019.683
+      },
+      "bytes.dart.ffi": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.native.initial_decode": {
+        "samples": [
+          22679.918,
+          22771.922,
+          22641.143
+        ],
+        "median": 22679.918,
+        "min": 22641.143,
+        "max": 22771.922
+      },
+      "bytes.native.initial_decode": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.native.initial_validate": {
+        "samples": [
+          212.488,
+          216.605,
+          228.612
+        ],
+        "median": 216.605,
+        "min": 212.488,
+        "max": 228.612
+      },
+      "bytes.native.initial_validate": {
+        "samples": [
+          2178134.0,
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.runner_spawn": {
+        "samples": [
+          266.514,
+          276.409,
+          278.354
+        ],
+        "median": 276.409,
+        "min": 266.514,
+        "max": 278.354
+      },
+      "stage_us.native.window_create": {
+        "samples": [
+          106458.611,
+          107759.136,
+          108318.359
+        ],
+        "median": 107759.136,
+        "min": 106458.611,
+        "max": 108318.359
+      },
+      "bytes.native.emit": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "bytes.dart.receive": {
+        "samples": [
+          16.0,
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "stage_us.dart.decode": {
+        "samples": [
+          38.924,
+          60.984,
+          39.275
+        ],
+        "median": 39.275,
+        "min": 38.924,
+        "max": 60.984
+      },
+      "settled.application.memory_bytes.Rss": {
+        "samples": [
+          242241536.0,
+          242466816.0,
+          242204672.0
+        ],
+        "median": 242241536.0,
+        "min": 242204672.0,
+        "max": 242466816.0
+      },
+      "settled.application.memory_bytes.Pss": {
+        "samples": [
+          218710016.0,
+          218966016.0,
+          218683392.0
+        ],
+        "median": 218710016.0,
+        "min": 218683392.0,
+        "max": 218966016.0
+      },
+      "settled.application.memory_bytes.Pss_Dirty": {
+        "samples": [
+          154161152.0,
+          154292224.0,
+          154005504.0
+        ],
+        "median": 154161152.0,
+        "min": 154005504.0,
+        "max": 154292224.0
+      },
+      "settled.application.memory_bytes.Pss_Anon": {
+        "samples": [
+          111026176.0,
+          111054848.0,
+          110870528.0
+        ],
+        "median": 111026176.0,
+        "min": 110870528.0,
+        "max": 111054848.0
+      },
+      "settled.application.memory_bytes.Pss_File": {
+        "samples": [
+          95424512.0,
+          95651840.0,
+          95553536.0
+        ],
+        "median": 95553536.0,
+        "min": 95424512.0,
+        "max": 95651840.0
+      },
+      "settled.application.memory_bytes.Pss_Shmem": {
+        "samples": [
+          12259328.0,
+          12259328.0,
+          12259328.0
+        ],
+        "median": 12259328.0,
+        "min": 12259328.0,
+        "max": 12259328.0
+      },
+      "settled.application.memory_bytes.Shared_Clean": {
+        "samples": [
+          42115072.0,
+          42057728.0,
+          42098688.0
+        ],
+        "median": 42098688.0,
+        "min": 42057728.0,
+        "max": 42115072.0
+      },
+      "settled.application.memory_bytes.Shared_Dirty": {
+        "samples": [
+          16384.0,
+          16384.0,
+          16384.0
+        ],
+        "median": 16384.0,
+        "min": 16384.0,
+        "max": 16384.0
+      },
+      "settled.application.memory_bytes.Private_Clean": {
+        "samples": [
+          45957120.0,
+          46108672.0,
+          46092288.0
+        ],
+        "median": 46092288.0,
+        "min": 45957120.0,
+        "max": 46108672.0
+      },
+      "settled.application.memory_bytes.Private_Dirty": {
+        "samples": [
+          154152960.0,
+          154284032.0,
+          153997312.0
+        ],
+        "median": 154152960.0,
+        "min": 153997312.0,
+        "max": 154284032.0
+      },
+      "settled.application.memory_bytes.Referenced": {
+        "samples": [
+          242241536.0,
+          242466816.0,
+          242204672.0
+        ],
+        "median": 242241536.0,
+        "min": 242204672.0,
+        "max": 242466816.0
+      },
+      "settled.application.memory_bytes.Anonymous": {
+        "samples": [
+          111026176.0,
+          111054848.0,
+          110870528.0
+        ],
+        "median": 111026176.0,
+        "min": 110870528.0,
+        "max": 111054848.0
+      },
+      "settled.application.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.AnonHugePages": {
+        "samples": [
+          8388608.0,
+          6291456.0,
+          6291456.0
+        ],
+        "median": 6291456.0,
+        "min": 6291456.0,
+        "max": 8388608.0
+      },
+      "settled.application.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.application.memory_peak_bytes.rss": {
+        "samples": [
+          241545216.0,
+          241614848.0,
+          241590272.0
+        ],
+        "median": 241590272.0,
+        "min": 241545216.0,
+        "max": 241614848.0
+      },
+      "settled.ui.memory_bytes.Rss": {
+        "samples": [
+          242241536.0,
+          242466816.0,
+          242204672.0
+        ],
+        "median": 242241536.0,
+        "min": 242204672.0,
+        "max": 242466816.0
+      },
+      "settled.ui.memory_bytes.Pss": {
+        "samples": [
+          218710016.0,
+          218966016.0,
+          218683392.0
+        ],
+        "median": 218710016.0,
+        "min": 218683392.0,
+        "max": 218966016.0
+      },
+      "settled.ui.memory_bytes.Pss_Dirty": {
+        "samples": [
+          154161152.0,
+          154292224.0,
+          154005504.0
+        ],
+        "median": 154161152.0,
+        "min": 154005504.0,
+        "max": 154292224.0
+      },
+      "settled.ui.memory_bytes.Pss_Anon": {
+        "samples": [
+          111026176.0,
+          111054848.0,
+          110870528.0
+        ],
+        "median": 111026176.0,
+        "min": 110870528.0,
+        "max": 111054848.0
+      },
+      "settled.ui.memory_bytes.Pss_File": {
+        "samples": [
+          95424512.0,
+          95651840.0,
+          95553536.0
+        ],
+        "median": 95553536.0,
+        "min": 95424512.0,
+        "max": 95651840.0
+      },
+      "settled.ui.memory_bytes.Pss_Shmem": {
+        "samples": [
+          12259328.0,
+          12259328.0,
+          12259328.0
+        ],
+        "median": 12259328.0,
+        "min": 12259328.0,
+        "max": 12259328.0
+      },
+      "settled.ui.memory_bytes.Shared_Clean": {
+        "samples": [
+          42115072.0,
+          42057728.0,
+          42098688.0
+        ],
+        "median": 42098688.0,
+        "min": 42057728.0,
+        "max": 42115072.0
+      },
+      "settled.ui.memory_bytes.Shared_Dirty": {
+        "samples": [
+          16384.0,
+          16384.0,
+          16384.0
+        ],
+        "median": 16384.0,
+        "min": 16384.0,
+        "max": 16384.0
+      },
+      "settled.ui.memory_bytes.Private_Clean": {
+        "samples": [
+          45957120.0,
+          46108672.0,
+          46092288.0
+        ],
+        "median": 46092288.0,
+        "min": 45957120.0,
+        "max": 46108672.0
+      },
+      "settled.ui.memory_bytes.Private_Dirty": {
+        "samples": [
+          154152960.0,
+          154284032.0,
+          153997312.0
+        ],
+        "median": 154152960.0,
+        "min": 153997312.0,
+        "max": 154284032.0
+      },
+      "settled.ui.memory_bytes.Referenced": {
+        "samples": [
+          242241536.0,
+          242466816.0,
+          242204672.0
+        ],
+        "median": 242241536.0,
+        "min": 242204672.0,
+        "max": 242466816.0
+      },
+      "settled.ui.memory_bytes.Anonymous": {
+        "samples": [
+          111026176.0,
+          111054848.0,
+          110870528.0
+        ],
+        "median": 111026176.0,
+        "min": 110870528.0,
+        "max": 111054848.0
+      },
+      "settled.ui.memory_bytes.KSM": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.LazyFree": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.AnonHugePages": {
+        "samples": [
+          8388608.0,
+          6291456.0,
+          6291456.0
+        ],
+        "median": 6291456.0,
+        "min": 6291456.0,
+        "max": 8388608.0
+      },
+      "settled.ui.memory_bytes.ShmemPmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.FilePmdMapped": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Shared_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Private_Hugetlb": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Swap": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.SwapPss": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_bytes.Locked": {
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "settled.ui.memory_peak_bytes.rss": {
+        "samples": [
+          241545216.0,
+          241614848.0,
+          241590272.0
+        ],
+        "median": 241590272.0,
+        "min": 241545216.0,
+        "max": 241614848.0
+      },
+      "inspect_round_trip_us.run_median": {
+        "samples": [
+          165.42000000000002,
+          159.8495,
+          160.6325
+        ],
+        "median": 160.6325,
+        "min": 159.8495,
+        "max": 165.42000000000002
+      },
+      "inspect_round_trip_us.run_p95": {
+        "samples": [
+          197.178,
+          210.473,
+          194.222
+        ],
+        "median": 197.178,
+        "min": 194.222,
+        "max": 210.473
+      }
+    }
+  },
+  "scope": "Each settled-memory value is the median of three observations in one process; group medians summarize fresh-process repetitions. Round-trip run summaries are not pooled. OS peaks are lifetime peaks. Application/UI roles can name the same PID; never sum these role fields as unique memory. Initial spans overlap."
+}

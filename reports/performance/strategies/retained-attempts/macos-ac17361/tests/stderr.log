@@ -1,0 +1,59 @@
+   Compiling rustix v1.1.5
+   Compiling gpui-pre-collections v0.3.6
+   Compiling gpui-pre-zlog v0.3.6
+   Compiling convert_case v0.11.0
+   Compiling wait-timeout v0.2.1
+   Compiling fnv v1.0.7
+   Compiling bit-vec v0.8.0
+   Compiling quick-error v1.2.3
+   Compiling gpui-pre-ztracing v0.3.6
+   Compiling bit-set v0.8.0
+   Compiling proptest-macro v0.5.0
+   Compiling gpui-pre v0.3.6
+   Compiling rand_xorshift v0.4.0
+   Compiling unarray v0.1.4
+   Compiling gpui-pre-http-client v0.3.6
+   Compiling gpui-pre-sum-tree v0.3.6
+   Compiling tempfile v3.27.0
+   Compiling rusty-fork v0.3.1
+   Compiling polling v3.11.0
+   Compiling proptest v1.11.0
+   Compiling hdrhistogram v7.6.0
+   Compiling async-io v2.6.0
+   Compiling async-signal v0.2.14
+   Compiling gpui-pre-apple v0.3.6
+   Compiling async-process v2.5.0
+   Compiling async-net v2.0.0
+   Compiling smol v2.0.2
+   Compiling gpui-component v0.6.5 (https://github.com/longbridge/gpui-kit?rev=21622a70efd25219d26aa459164878c4da9e39f8#21622a70)
+   Compiling gpuidart v0.1.0 (/Users/runner/work/gpuidart/gpuidart/native)
+   Compiling gpui-pre-macos v0.3.6
+   Compiling gpui-base v0.6.5 (https://github.com/longbridge/gpui-kit?rev=21622a70efd25219d26aa459164878c4da9e39f8#21622a70)
+   Compiling gpui-kit-assets v0.6.5 (https://github.com/longbridge/gpui-kit?rev=21622a70efd25219d26aa459164878c4da9e39f8#21622a70)
+   Compiling gpui-pre-platform v0.3.6
+   Compiling gpui-kit v0.6.5 (https://github.com/longbridge/gpui-kit?rev=21622a70efd25219d26aa459164878c4da9e39f8#21622a70)
+warning: use of deprecated function `libc::mach_absolute_time`: Use the `mach2` crate instead
+  --> native/src/clock.rs:36:35
+   |
+36 |             ticks: unsafe { libc::mach_absolute_time() } as i64,
+   |                                   ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated function `libc::_dyld_image_count`: Use the `mach2` crate instead
+  --> native/src/runtime_info.rs:67:27
+   |
+67 |         for i in 0..libc::_dyld_image_count() {
+   |                           ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated function `libc::_dyld_get_image_name`: Use the `mach2` crate instead
+  --> native/src/runtime_info.rs:68:30
+   |
+68 |             let name = libc::_dyld_get_image_name(i);
+   |                              ^^^^^^^^^^^^^^^^^^^^
+
+warning: `gpuidart` (lib test) generated 3 warnings
+    Finished `test` profile [unoptimized] target(s) in 1m 26s
+warning: the following packages contain code that will be rejected by a future version of Rust: block v0.1.6
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/debug/deps/gpuidart-fcaab95b6c6a5708)

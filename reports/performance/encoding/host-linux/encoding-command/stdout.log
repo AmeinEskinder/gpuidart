@@ -1,0 +1,17 @@
+> git rev-parse HEAD
+> git status --porcelain
+> rustc --version
+> /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart compile exe --define=gpuidart.packaged=true tool/performance/capture_baseline.dart -o /home/runner/work/gpuidart/gpuidart/build/performance/encoding/capture
+> /opt/hostedtoolcache/dart/3.13.4/x64/bin/dart compile exe --define=gpuidart.packaged=true --define=gpuidart.legacy_json=true tool/performance/capture_baseline.dart -o /home/runner/work/gpuidart/gpuidart/build/performance/encoding/capture-legacy
+aot-host-0-trace-direct-legacy-1: passed=true
+aot-host-0-trace-direct-fused-1: passed=true
+aot-host-100000-trace-direct-legacy-1: passed=true
+aot-host-100000-trace-direct-fused-1: passed=true
+aot-host-0-trace-direct-legacy-2: passed=true
+aot-host-100000-trace-direct-fused-2: passed=true
+aot-host-100000-trace-direct-legacy-2: passed=true
+aot-host-0-trace-direct-fused-2: passed=true
+aot-host-100000-trace-direct-legacy-3: passed=true
+aot-host-100000-trace-direct-fused-3: passed=true
+aot-host-0-trace-direct-legacy-3: passed=true
+aot-host-0-trace-direct-fused-3: passed=true

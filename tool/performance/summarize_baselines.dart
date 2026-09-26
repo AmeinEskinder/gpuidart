@@ -14,6 +14,11 @@ Future<void> main(List<String> args) async {
   final summary = jsonDecode(
     await File('${directory.path}/summary.json').readAsString(),
   ) as Map;
+  if (summary['expected_runs'] case final int expected) {
+    if ((summary['runs'] as List).length != expected) {
+      throw StateError('Incomplete baseline series; retain it separately');
+    }
+  }
   final groups = <String, Map<String, List<double>>>{};
   final failures = <Object?>[];
   for (final run in (summary['runs'] as List).cast<Map>()) {

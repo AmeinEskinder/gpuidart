@@ -68,5 +68,13 @@ the final commit, and a clean pushed tree.
   The experimental three-strategy harness now passes local geometry, transaction
   and live retained-state checks. It uses a common process transport and fixed
   section bounds; see [experiment contract](../reports/performance/strategies/README.md).
-  Repeated measurements are next.
-- Measured optimization decisions and final CI: not started.
+  Repeated Windows/macOS/Linux measurements are recorded: 162 normal runs and
+  54 allocation-profile runs, with no failed update in the completed series.
+  General patches are not adopted; cached subviews require a separate API decision.
+- Optimization: keep direct JSON-to-UTF-8 encoding after byte-equivalence checks,
+  three-platform microbenchmarks and matched actual-host comparisons. See the
+  [keep decision and tradeoffs](../reports/performance/encoding/host-results.md).
+- Windows/macOS/Linux SDK and Unix lifecycle CI passed for implementation
+  `2fb9ef8`. Every later evidence/docs commit runs the same automatic checks;
+  [commit-specific results](https://github.com/AmeinEskinder/gpuidart/actions?query=branch%3Amain)
+  are the final verification record.

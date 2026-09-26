@@ -150,5 +150,15 @@ measurements; presentation remains unmeasured.
 
 The [snapshot-heavy gate](../reports/performance/snapshot-gate/README.md) correlates
 description build/encode, native parse/dispatch and content paint at 128/512/2048
-property nodes. It establishes a workload for the planned strategy experiment,
-not a production patch-protocol decision.
+property nodes. The [completed strategy experiment](../reports/performance/strategies/README.md)
+then separates Dart preparation, transport bytes, native staging/validation/application
+and CPU rendering using a common experimental process transport. Its layout-gap
+timer includes surrounding GPUI work, and its reply includes diagnostics; neither
+measures presentation. Whole-view production snapshots remain in place.
+
+[Direct UTF-8 encoding was kept](../reports/performance/encoding/host-results.md)
+after matched host measurements. New captures normally have `dart.json_utf8`
+inside `dart.encode`; historical and legacy-control captures have `dart.json`
+plus `dart.utf8`. The outer encode/copy interval and wire bytes retain their
+meaning. Compare the outer interval across these builds; do not invent separate
+JSON/UTF-8 durations for the fused encoder.

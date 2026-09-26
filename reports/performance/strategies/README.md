@@ -71,6 +71,47 @@ of MSVC while building Rust dependencies. The workflow now records the MSVC
 linker path from PowerShell before entering Bash. The failed job's output is
 retained under `implementation/hosted-windows-attempt1`; no workload ran there.
 
-Final local checks: all three strategy live runs at 128 fields passed; three
-native experiment tests passed, including equal geometry. Repeated measurements,
-platform results and adoption decisions will be recorded here after collection.
+Local checks: all three strategy live runs at 128 fields passed; three native
+experiment tests passed, including equal geometry.
+
+## Recorded series and decision
+
+[Run 36253932588](https://github.com/AmeinEskinder/gpuidart/actions/runs/36253932588),
+source `cbe8595`, passed on Windows Server 2022 x64, Ubuntu 24.04 x64/X11 and
+macOS 15 ARM64. Each platform completed 54 normal runs and 18 allocation-profile
+runs. Across the three platforms: **6,480 normal updates plus 2,160 profile updates**, all retained-state
+checks passing. Each platform also passed 306 normal and 102 profile transactional/
+lifecycle checks. A check that expects rejected cross-subview reparenting does
+not establish support for that operation. Environment, hashes, raw captures,
+command logs and separate analyses are in the three `*-cbe8595/` directories.
+
+See [recorded stage and memory results](results.md). In the 2,048-property AOT
+property-edit case, snapshot/subview/patch messages were 275,269 / 4,269 / 143
+bytes. Subviews sharply reduced Dart preparation and cached native rendering.
+Patches reduced transfer/decode work but still built/diffed the entire Dart tree,
+cloned/validated the native model, and rendered the whole view. Their smaller
+messages did not remove those costs.
+
+Subview reordering has a different cost profile: prepaint medians rose to about
+9.5–15.3 ms, versus 1.7–2.5 ms for whole snapshots on the same platforms. The
+allocation-profile workload also requested more cumulative bytes with subviews
+than snapshots on all three machines, despite low costs on property edits.
+Memory readings are mixed, including a higher macOS footprint for subviews.
+There is no universal memory or rendering winner.
+
+**Do not adopt general patches in the production protocol.** Keep whole-view
+snapshots and retained datasets. The fixed-section subview prototype is the more
+promising option for this workload, but fixed bounds and explicit rejection of
+cross-owner control moves prevent treating it as a transparent SDK replacement.
+Any production subview API needs a separate design/acceptance decision. All
+three experimental strategies remain reproducible behind an optional feature;
+none is silently promoted into the SDK. These captures use the original two-stage
+framed JSON encoder, before the separate direct-UTF-8 optimization.
+
+The earlier Unix series from `ac17361` also passed and is retained separately in
+`retained-attempts/`, not pooled with these repetitions. A local Windows series
+ended after two successful cases when its tool session disappeared; no driver
+completion record exists. Its partial files are retained with an explicit
+incomplete marker. The runner now reports expected-run counts and completion,
+and the summarizer refuses partial series. No failed application update was
+excluded from a completed series.

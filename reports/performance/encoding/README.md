@@ -4,8 +4,8 @@ The startup baseline attributes about 24.74 ms to JSON and 5.88 ms to UTF-8 in
 the Windows AOT 100k fixture. This identifies a concrete candidate: use Dart's
 `JsonUtf8Encoder` to avoid building the intermediate JSON string. The candidate
 now uses that encoder in the host, with an internal compile-time legacy control
-for equivalent before/after capture. The final keep/revert decision awaits the
-host comparison; there is no wire-format or ABI change.
+for equivalent before/after capture. **Decision: keep**, based on the
+[actual-host comparison](host-results.md). There is no wire-format or ABI change.
 
 `capture_encoding.dart` compares the existing two-stage encoder with the fused
 encoder in fresh JIT/AOT processes. Fixtures cover an incremental cell message,

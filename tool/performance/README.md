@@ -67,3 +67,33 @@ Linux RSS/PSS from `smaps_rollup` and peak RSS from
 macOS resident size/physical footprint and lifetime maximum physical footprint
 from [`RUSAGE_INFO_V4`](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/resource.h).
 RSS sums across processes include shared pages; none is a universal memory metric.
+
+## Snapshot strategy experiment
+
+Build the separate executable with `cargo build --locked --release -p gpuidart
+--features snapshot-experiment --bin gpuidart-snapshot-experiment`. Build the
+launcher too on Unix. Preserve the normal executable before building with
+`snapshot-experiment,allocation-profile` for a separate profile series.
+
+```powershell
+dart run tool/performance/run_strategies.dart build/strategies-normal target/release/gpuidart-snapshot-experiment.exe target/debug/gpuidart-launcher.exe 3
+dart run tool/performance/summarize_strategies.dart build/strategies-normal build/strategies-normal-analysis.json
+```
+
+Use unsuffixed executable names on Unix. This is common framed process transport,
+not production FFI. The [experiment contract and results](../../reports/performance/strategies/README.md)
+specify fixed geometry, supported mutations, state-ownership limits and timing
+boundaries. `.github/workflows/snapshot-experiment.yml` reproduces all platforms.
+The runner records expected-case counts, and the summarizer rejects partial runs.
+
+## Direct UTF-8 encoding comparison
+
+`run_encoding.dart NEW_DIRECTORY` builds the isolated encoder fixture, checks
+byte equivalence and runs three repetitions in JIT/AOT. Reduce its results with
+`summarize_encoding.dart CAPTURE_DIRECTORY NEW_OUTPUT_JSON`.
+
+`run_baselines.dart NEW_DIRECTORY NATIVE_DIRECTORY 3 encoding` compares actual
+AOT hosts at zero and 100k records, compiling both the default fused encoder and
+the internal `--define=gpuidart.legacy_json=true` control. Both use the exact same
+native library. Select `measurement=encoding` when dispatching `performance.yml`
+to repeat this on Windows/macOS/Linux. See the [keep decision](../../reports/performance/encoding/host-results.md).
