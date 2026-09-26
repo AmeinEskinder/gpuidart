@@ -54,8 +54,12 @@ Future<void> main(List<String> args) async {
           'dart.build',
           'dart.describe',
           'dart.encode',
-          'dart.json',
-          'dart.utf8',
+          if (stages.any((r) => r['name'] == 'dart.json_utf8'))
+            'dart.json_utf8'
+          else ...[
+            'dart.json',
+            'dart.utf8',
+          ],
           'dart.ffi_copy',
           'native.parse',
           'native.dispatch',

@@ -11,7 +11,7 @@ import '../src/owned_process.dart';
 Future<void> main(List<String> args) async {
   if (args.length < 2 || args.length > 4) {
     throw ArgumentError(
-      'Usage: run_baselines.dart NEW_OUTPUT_DIRECTORY NATIVE_DIRECTORY [REPETITIONS=3] [full|smoke]',
+      'Usage: run_baselines.dart NEW_OUTPUT_DIRECTORY NATIVE_DIRECTORY [REPETITIONS=3] [full|smoke|encoding]',
     );
   }
   final output = Directory(args[0]).absolute;
@@ -21,17 +21,19 @@ Future<void> main(List<String> args) async {
   output.createSync(recursive: true);
   final native = Directory(args[1]).absolute;
   final repetitions = args.length > 2 ? int.parse(args[2]) : 3;
-  final smoke = args.length > 3 && args[3] == 'smoke';
+  final encoding = args.length > 3 && args[3] == 'encoding';
+  final smoke = encoding || (args.length > 3 && args[3] == 'smoke');
   if (repetitions < 1 || repetitions > 20) {
     throw ArgumentError('Repetitions must be 1..20');
   }
-  if (args.length > 3 && !['full', 'smoke'].contains(args[3])) {
-    throw ArgumentError('Expected full or smoke');
+  if (args.length > 3 && !['full', 'smoke', 'encoding'].contains(args[3])) {
+    throw ArgumentError('Expected full, smoke or encoding');
   }
   final library = File('${native.path}/${nativeLibraryName('gpuidart')}');
   final suffix = Platform.isWindows ? '.exe' : '';
   final launcher = File('${native.path}/gpuidart-launcher$suffix');
   final executable = '${output.path}/capture$suffix';
+  final legacyExecutable = '${output.path}/capture-legacy$suffix';
   final metadata = <String, Object?>{
     'source': await command('git', ['rev-parse', 'HEAD']),
     'working_tree': await command('git', ['status', '--porcelain']),
@@ -50,6 +52,7 @@ Future<void> main(List<String> args) async {
           .then((v) => '$v'),
     'repetitions': repetitions,
     'smoke': smoke,
+    'encoding_comparison': encoding,
     'scope': 'Sequential rotated fresh processes on one machine; release status depends on supplied native artifact. JIT includes dart run startup. Trace and plain runs are separate. No cross-platform hardware normalization or presentation claims.',
   };
   await command(Platform.resolvedExecutable, [
@@ -62,6 +65,19 @@ Future<void> main(List<String> args) async {
   ]);
   metadata['aot_sha256'] =
       '${await sha256.bind(File(executable).openRead()).first}';
+  if (encoding) {
+    await command(Platform.resolvedExecutable, [
+      'compile',
+      'exe',
+      '--define=gpuidart.packaged=true',
+      '--define=gpuidart.legacy_json=true',
+      'tool/performance/capture_baseline.dart',
+      '-o',
+      legacyExecutable,
+    ]);
+    metadata['legacy_aot_sha256'] =
+        '${await sha256.bind(File(legacyExecutable).openRead()).first}';
+  }
   await File('${output.path}/metadata.json')
       .writeAsString(jsonEncode(metadata));
   final cases =
@@ -72,19 +88,22 @@ Future<void> main(List<String> args) async {
           int rows,
           String tracing,
           bool companion,
+          bool legacy,
         })
       >[
         for (final mode in smoke ? ['aot'] : ['jit', 'aot'])
           for (final rows in smoke ? [0, 100000] : [0, 1000, 10000, 100000])
             for (final control
                 in smoke ? ['host'] : ['data-only', 'library-only', 'host'])
-              (
-                mode: mode,
-                control: control,
-                rows: rows,
-                tracing: 'trace',
-                companion: Platform.isMacOS,
-              ),
+              for (final legacy in encoding ? [true, false] : [false])
+                (
+                  mode: mode,
+                  control: control,
+                  rows: rows,
+                  tracing: 'trace',
+                  companion: Platform.isMacOS,
+                  legacy: legacy,
+                ),
         if (!smoke) ...[
           for (final rows in [0, 100000])
             (
@@ -93,6 +112,7 @@ Future<void> main(List<String> args) async {
               rows: rows,
               tracing: 'plain',
               companion: Platform.isMacOS,
+              legacy: false,
             ),
           if (Platform.isLinux)
             for (final rows in [0, 1000, 10000, 100000])
@@ -102,6 +122,7 @@ Future<void> main(List<String> args) async {
                 rows: rows,
                 tracing: 'trace',
                 companion: true,
+                legacy: false,
               ),
         ],
       ];
@@ -115,7 +136,7 @@ Future<void> main(List<String> args) async {
     ];
     for (final fixture in repetition.isEven ? rotated : rotated.reversed) {
       final name =
-          '${fixture.mode}-${fixture.control}-${fixture.rows}-${fixture.tracing}-${fixture.companion ? 'companion' : 'direct'}-${repetition + 1}';
+          '${fixture.mode}-${fixture.control}-${fixture.rows}-${fixture.tracing}-${fixture.companion ? 'companion' : 'direct'}${encoding ? '-${fixture.legacy ? 'legacy' : 'fused'}' : ''}-${repetition + 1}';
       final record = <String, Object?>{'name': name, 'passed': false};
       final reportPath = '${output.path}/$name.application.json';
       OwnedProcess? process;
@@ -124,7 +145,9 @@ Future<void> main(List<String> args) async {
         final start = clock.now().$1;
         record['driver_launch_ticks'] = start;
         process = await OwnedProcess.start(
-          fixture.mode == 'aot' ? executable : Platform.resolvedExecutable,
+          fixture.mode == 'aot'
+              ? (fixture.legacy ? legacyExecutable : executable)
+              : Platform.resolvedExecutable,
           [
             if (fixture.mode == 'jit') ...[
               'run',
@@ -189,7 +212,10 @@ Future<void> main(List<String> args) async {
         results.add(record);
         await File('${output.path}/summary.json').writeAsString(
           jsonEncode({
-            'passed': failures == 0,
+            'passed':
+                failures == 0 && results.length == cases.length * repetitions,
+            'complete': results.length == cases.length * repetitions,
+            'expected_runs': cases.length * repetitions,
             'failures': failures,
             'runs': results,
           }),

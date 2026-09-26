@@ -2,6 +2,12 @@ name: Performance measurements
 
 on:
   workflow_dispatch:
+    inputs:
+      measurement:
+        description: Measurement suite
+        type: choice
+        default: baselines
+        options: [baselines, encoding]
 
 permissions:
   contents: read
@@ -15,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, ubuntu-24.04]
+        os: [windows-2022, macos-15, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     env:
@@ -23,6 +29,7 @@ jobs:
       CARGO_BUILD_JOBS: '2'
       RUST_BACKTRACE: '1'
       LIBGL_ALWAYS_SOFTWARE: '1'
+      EXECUTABLE_SUFFIX: ${{ matrix.os == 'windows-2022' && '.exe' || '' }}
     defaults:
       run:
         shell: bash
@@ -31,6 +38,17 @@ jobs:
       - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
         with:
           sdk: '3.13.4'
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Select MSVC linker before Git Bash
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $linker = (Get-Command link.exe).Source
+          if ($linker -notlike '*Visual Studio*') { throw "Expected MSVC linker, got $linker" }
+          "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=$linker" >> $env:GITHUB_ENV
       - name: Linux build and display dependencies
         if: runner.os == 'Linux'
         run: |
@@ -45,6 +63,7 @@ jobs:
           key: performance-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
           restore-keys: |
             performance-${{ runner.os }}-${{ runner.arch }}-
+            snapshot-experiment-${{ runner.os }}-${{ runner.arch }}-
             unix-package-${{ runner.os }}-${{ runner.arch }}-
       - name: Build normal and allocation-profile release libraries
         run: |
@@ -52,15 +71,22 @@ jobs:
           dart pub get --enforce-lockfile
           mkdir -p build/performance/native-release build/performance/native-profile
           dart run tool/performance/run_logged.dart build/performance/build-normal cargo build --locked --release -p gpuidart -p gpuidart-launcher
-          cp target/release/libgpuidart.* target/release/gpuidart-launcher build/performance/native-release/
-          dart run tool/performance/run_logged.dart build/performance/build-profile cargo build --locked --release -p gpuidart --features allocation-profile
-          cp target/release/libgpuidart.* target/release/gpuidart-launcher build/performance/native-profile/
-      - name: Measure macOS fresh-process controls and companion
-        if: runner.os == 'macOS'
+          if [[ "$RUNNER_OS" == "Windows" ]]; then LIB=gpuidart.dll; else LIB=libgpuidart.*; fi
+          cp target/release/$LIB target/release/gpuidart-launcher${EXECUTABLE_SUFFIX} build/performance/native-release/
+          if [[ '${{ inputs.measurement }}' == 'baselines' ]]; then
+            dart run tool/performance/run_logged.dart build/performance/build-profile cargo build --locked --release -p gpuidart --features allocation-profile
+            cp target/release/$LIB target/release/gpuidart-launcher${EXECUTABLE_SUFFIX} build/performance/native-profile/
+          fi
+      - name: Measure Windows/macOS fresh-process controls or encoding comparison
+        if: runner.os != 'Linux'
         run: |
           dart run tool/record_platform_environment.dart build/performance/environment.json
-          dart run tool/performance/run_logged.dart build/performance/timing-command dart run tool/performance/run_baselines.dart build/performance/timing build/performance/native-release 3
-          dart run tool/performance/run_logged.dart build/performance/allocation-command dart run tool/performance/run_baselines.dart build/performance/allocation build/performance/native-profile 1
+          if [[ '${{ inputs.measurement }}' == 'encoding' ]]; then
+            dart run tool/performance/run_logged.dart build/performance/encoding-command dart run tool/performance/run_baselines.dart build/performance/encoding build/performance/native-release 3 encoding
+          else
+            dart run tool/performance/run_logged.dart build/performance/timing-command dart run tool/performance/run_baselines.dart build/performance/timing build/performance/native-release 3
+            dart run tool/performance/run_logged.dart build/performance/allocation-command dart run tool/performance/run_baselines.dart build/performance/allocation build/performance/native-profile 1
+          fi
       - name: Measure Linux direct and companion controls under X11
         if: runner.os == 'Linux'
         run: |
@@ -68,8 +94,12 @@ jobs:
           unset WAYLAND_DISPLAY ZED_HEADLESS
           openbox >build/performance/openbox.log 2>&1 &
           dart run tool/record_platform_environment.dart build/performance/environment.json
-          dart run tool/performance/run_logged.dart build/performance/timing-command dart run tool/performance/run_baselines.dart build/performance/timing build/performance/native-release 3
-          dart run tool/performance/run_logged.dart build/performance/allocation-command dart run tool/performance/run_baselines.dart build/performance/allocation build/performance/native-profile 1
+          if [[ '${{ inputs.measurement }}' == 'encoding' ]]; then
+            dart run tool/performance/run_logged.dart build/performance/encoding-command dart run tool/performance/run_baselines.dart build/performance/encoding build/performance/native-release 3 encoding
+          else
+            dart run tool/performance/run_logged.dart build/performance/timing-command dart run tool/performance/run_baselines.dart build/performance/timing build/performance/native-release 3
+            dart run tool/performance/run_logged.dart build/performance/allocation-command dart run tool/performance/run_baselines.dart build/performance/allocation build/performance/native-profile 1
+          fi
           CHECKS
       - name: Retain every attempted measurement
         if: always()

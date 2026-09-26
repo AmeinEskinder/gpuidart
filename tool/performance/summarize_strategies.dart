@@ -15,6 +15,13 @@ Future<void> main(List<String> args) async {
   final series = jsonDecode(
     await File('${directory.path}/summary.json').readAsString(),
   ) as Map;
+  final metadata = jsonDecode(
+    await File('${directory.path}/metadata.json').readAsString(),
+  ) as Map;
+  if ((series['runs'] as List).length !=
+      (metadata['repetitions'] as int) * 18) {
+    throw StateError('Incomplete strategy series; retain it separately');
+  }
   final groups = <String, Map<String, List<double>>>{};
   final memories = <String, Map<String, List<double>>>{};
   final failures = <Object?>[];

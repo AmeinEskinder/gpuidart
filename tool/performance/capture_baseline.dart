@@ -39,6 +39,9 @@ Future<void> main(List<String> args) async {
     'rows': rows,
     'control': control,
     'mode': const bool.fromEnvironment('gpuidart.packaged') ? 'aot' : 'jit',
+    'encoder': const bool.fromEnvironment('gpuidart.legacy_json')
+        ? 'legacy'
+        : 'fused',
     'clock': clock.name,
     'frequency': clock.frequency,
     'clock_init_us': clockInit.elapsedMicroseconds,

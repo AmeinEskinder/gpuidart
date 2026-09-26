@@ -18,7 +18,7 @@ void main() {
         'private-dataset',
         columns: ['secret-column'],
         rows: [
-          ['secret-value'],
+          ['secret-value 東京 😀 "\\\n'],
         ],
       );
       UiNode build() => UiColumn('private-root', [
@@ -34,7 +34,9 @@ void main() {
       try {
         expect((trace.toJson()['metadata'] as Map)['finalized'], false);
         await host.diagnose('repaint', {'frames': 1});
-        await host.editDataset(data, [const CellEdit(0, 0, 'secret-update')]);
+        await host.editDataset(data, [
+          const CellEdit(0, 0, 'secret-update 東京 😀 "\\\n'),
+        ]);
         await host.rebuild();
         await expectLater(
           host.publish(const UiTable('invalid', dataset: 'missing')),
@@ -46,7 +48,7 @@ void main() {
             'row': 0,
             'column': 0,
           }))['value'],
-          'secret-update',
+          'secret-update 東京 😀 "\\\n',
         );
       } finally {
         await host.close();
@@ -120,7 +122,14 @@ void main() {
         record('initial', 1, 'native.first_content_paint')['process'],
         greaterThan(0),
       );
-      for (final name in ['dart.json', 'dart.utf8', 'dart.ffi_copy']) {
+      for (final name in [
+        if (const bool.fromEnvironment('gpuidart.legacy_json')) ...[
+          'dart.json',
+          'dart.utf8',
+        ] else
+          'dart.json_utf8',
+        'dart.ffi_copy',
+      ]) {
         final stage = record('initial', 1, name);
         expect(stage['end'], greaterThanOrEqualTo(stage['start'] as int));
       }

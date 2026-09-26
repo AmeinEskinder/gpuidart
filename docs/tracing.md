@@ -51,7 +51,8 @@ acknowledgement when counting replacement snapshots. Later snapshots start at 2.
 | `dart.build` | Synchronous `openView` / `rebuild` builder invocation |
 | `dart.describe` | Conversion of a view to wire objects; initial conversion includes dataset upload objects |
 | `dart.encode` | JSON/UTF-8 encoding, allocation and copying into the FFI buffer |
-| `dart.json`, `dart.utf8`, `dart.ffi_copy` | Nested encoding stages: JSON string, UTF-8 bytes, then FFI allocation/copy |
+| `dart.json_utf8`, `dart.ffi_copy` | Direct JSON-to-UTF-8 encoding, then FFI allocation/copy; nested in `dart.encode` |
+| `dart.json`, `dart.utf8` | Separate stages in historical captures or the internal `gpuidart.legacy_json=true` comparison build |
 | `native.initial_decode`, `native.initial_validate` | Initial JSON decode and semantic validation, inside the create call (extension 2) |
 | `dart.runner_spawn`, `native.runner_entry`, `native.run` | Isolate spawn interval, native runner entry, UI application entry |
 | `dart.companion_start` | Socket preparation and child process launch, when used |

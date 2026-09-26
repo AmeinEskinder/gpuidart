@@ -20,6 +20,8 @@ part 'dataset.dart';
 part 'tracing.dart';
 part 'companion.dart';
 
+final _jsonUtf8 = JsonUtf8Encoder();
+
 typedef _EventNative = Void Function(Pointer<Uint8>, Size);
 typedef _CreateNative = Pointer<Void> Function(
   Pointer<Uint8>,
@@ -391,17 +393,35 @@ final class GpuiHost {
   ) {
     final timer = Stopwatch()..start();
     final encodingStart = _trace?._clock.now();
-    final json = _trace == null
-        ? jsonEncode(message)
-        : _trace._measure(
-            'dart.json',
-            kind,
-            request,
-            () => jsonEncode(message),
-          );
-    final data = _trace == null
-        ? utf8.encode(json)
-        : _trace._measure('dart.utf8', kind, request, () => utf8.encode(json));
+    final List<int> data;
+    // Internal comparison control; the default build removes this legacy path.
+    if (const bool.fromEnvironment('gpuidart.legacy_json')) {
+      final json = _trace == null
+          ? jsonEncode(message)
+          : _trace._measure(
+              'dart.json',
+              kind,
+              request,
+              () => jsonEncode(message),
+            );
+      data = _trace == null
+          ? utf8.encode(json)
+          : _trace._measure(
+              'dart.utf8',
+              kind,
+              request,
+              () => utf8.encode(json),
+            );
+    } else {
+      data = _trace == null
+          ? _jsonUtf8.convert(message)
+          : _trace._measure(
+              'dart.json_utf8',
+              kind,
+              request,
+              () => _jsonUtf8.convert(message),
+            );
+    }
     final copyStart = _trace?._clock.now();
     final bytes = calloc<Uint8>(data.length);
     try {

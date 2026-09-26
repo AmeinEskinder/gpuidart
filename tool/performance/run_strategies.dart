@@ -101,7 +101,9 @@ Future<void> main(List<String> args) async {
             results.add(record);
             await File('${output.path}/summary.json').writeAsString(
               jsonEncode({
-                'passed': failures == 0,
+                'passed': failures == 0 && results.length == repetitions * 18,
+                'complete': results.length == repetitions * 18,
+                'expected_runs': repetitions * 18,
                 'failures': failures,
                 'runs': results,
               }),
