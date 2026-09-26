@@ -74,6 +74,11 @@ Dataset requests begin after edit validation and conversion to wire objects. Use
 an application span to examine that preparation. Stages overlap: native parsing
 lies inside the FFI span, and callback delivery can overlap native dispatch.
 Adding stage durations or percentiles does not produce end-to-end latency.
+`native.dispatch` ends after immediate acknowledgement serialization and callback
+submission. Its endpoint is handler completion, not an exact state-commit marker.
+The proposed [native producer experiment](native-binding-experiment.md) requires
+a separate trace-only state marker before reply work. Dequeue can precede FFI
+return, but it cannot precede its matching enqueue attempt beyond clock uncertainty.
 Nonzero `native.submit_return` / `dart.ffi` status denotes submission failure;
 nonzero `dart.ack` status denotes a rejected operation. Keep failures visible.
 
