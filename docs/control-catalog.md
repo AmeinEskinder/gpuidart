@@ -49,6 +49,10 @@ continue to identify retained controls; removing a node disposes its state.
   `dialog_result` carries `revision`, `id`, and `confirmed` boolean.
   Escape/cancel reports false; confirm reports true. Native owns opening,
   dismissal, focus trapping and focus restoration. It never resets app data.
+  Style applies to the trigger; the modal uses Kit's current theme. The opening
+  description and revision stay fixed until dismissal. Removing or disabling
+  the trigger cancels its active dialog once. Only one confirmation can be
+  open in this host at a time.
 
 New labels and placeholders have a 1,024 UTF-8 byte limit, messages 8,192 bytes,
 and option IDs 256 bytes. Existing overall snapshot limits still apply.

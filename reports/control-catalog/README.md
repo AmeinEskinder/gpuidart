@@ -84,5 +84,23 @@ Retained attempts under `select/`:
   selection while dismissing the menu.
 * `full-2`: all 49 native tests passed, including disable-while-open.
 
-Remaining control: confirmation dialog. Parked hardware,
+## Confirmation dialog
+
+Windows local checks: 51 native library tests passed, 8 Dart controls tests
+passed, analyzer clean. Tests cover byte bounds and required labels, styled
+trigger bounds, native modal opening, Tab trapping, Escape cancellation and
+focus restoration, Enter confirmation, retention through unrelated snapshots,
+disabled triggers, and cancellation when the trigger is removed or changes
+kind. Results are emitted once and refer to the opening revision.
+
+Retained attempts under `dialog/`: `compile` and `native-1` passed. The expanded
+`full` test incorrectly tried to test Tab trapping with Window::focus_next,
+which is programmatic focus movement outside the dialog's keyboard handler.
+Replacing it with actual GPUI Tab dispatch tests the native focus trap;
+`full-2` passed all 51 tests. New control events also count toward the existing
+UI-callback metric.
+
+All four planned controls are implemented. Controlled inputs, the settings
+application/verifier, schema decision and final evidence are still pending.
+Parked hardware,
 signing, IME and presentation limitations from the work order remain unchanged.

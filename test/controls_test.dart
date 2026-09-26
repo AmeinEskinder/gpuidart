@@ -5,6 +5,67 @@ import 'package:gpuidart/src/native_event.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('confirmation dialog encodes labels, styles and bounded content', () {
+    const dialog = UiConfirmDialog(
+      'reset',
+      'Reset',
+      title: 'Reset preferences?',
+      message: 'Discard draft',
+      style: UiStyle(background: UiColor.token(ThemeToken.secondary)),
+    );
+    expect(dialog.toJson(), {
+      'kind': 'confirm_dialog',
+      'id': 'reset',
+      'label': 'Reset',
+      'title': 'Reset preferences?',
+      'message': 'Discard draft',
+      'confirm_label': 'Confirm',
+      'cancel_label': 'Cancel',
+      'disabled': false,
+      'style': {'background': 'token:secondary'},
+    });
+    for (final invalid in [
+      const UiConfirmDialog('r', '', title: 'Title', message: ''),
+      const UiConfirmDialog('r', 'Reset', title: '', message: ''),
+      const UiConfirmDialog(
+        'r',
+        'Reset',
+        title: 'Title',
+        message: '',
+        confirmLabel: '',
+      ),
+      const UiConfirmDialog(
+        'r',
+        'Reset',
+        title: 'Title',
+        message: '',
+        cancelLabel: '',
+      ),
+      UiConfirmDialog('r', 'é' * 513, title: 'Title', message: ''),
+      UiConfirmDialog('r', 'Reset', title: 'Title', message: 'é' * 4097),
+    ]) {
+      expect(invalid.toJson, throwsArgumentError);
+    }
+    UiConfirmDialog('r', 'Reset', title: 'Title', message: 'é' * 4096).toJson();
+  });
+
+  test('dialog results require a boolean confirmation', () {
+    Map<String, dynamic> decode(Object? confirmed) => decodeNativeEvent(
+      utf8.encode(
+        jsonEncode({
+          'type': 'dialog_result',
+          'revision': 1,
+          'id': 'reset',
+          'confirmed': confirmed,
+        }),
+      ),
+    );
+    expect(decode(true)['confirmed'], true);
+    expect(decode(false)['confirmed'], false);
+    for (final value in [null, 1, 'true']) {
+      expect(() => decode(value), throwsFormatException);
+    }
+  });
   test('select freezes options and encodes separate identities and labels', () {
     final options = [const UiSelectOption('dark', 'Dark')];
     final select = UiSelect(

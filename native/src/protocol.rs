@@ -157,6 +157,18 @@ pub enum Node {
         #[serde(default)]
         disabled: bool,
     },
+    ConfirmDialog {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        label: String,
+        title: String,
+        message: String,
+        confirm_label: String,
+        cancel_label: String,
+        #[serde(default)]
+        disabled: bool,
+    },
     Input {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -632,6 +644,7 @@ impl Node {
             | Self::Checkbox { id, .. }
             | Self::Slider { id, .. }
             | Self::Select { id, .. }
+            | Self::ConfirmDialog { id, .. }
             | Self::Input { id, .. }
             | Self::Table { id, .. } => id,
         }
@@ -646,6 +659,7 @@ impl Node {
             | Self::Checkbox { style, .. }
             | Self::Slider { style, .. }
             | Self::Select { style, .. }
+            | Self::ConfirmDialog { style, .. }
             | Self::Input { style, .. }
             | Self::Table { style, .. } => style.as_ref(),
         }
@@ -748,6 +762,25 @@ impl Snapshot {
                         return Err("Select selected ID is not an option".into());
                     }
                 }
+                Node::ConfirmDialog {
+                    label,
+                    title,
+                    message,
+                    confirm_label,
+                    cancel_label,
+                    ..
+                } => {
+                    if [label, title, confirm_label, cancel_label]
+                        .iter()
+                        .any(|s| s.is_empty() || s.len() > 1024)
+                        || message.len() > 8192
+                    {
+                        return Err(
+                            "Dialog labels must contain 1..1024 UTF-8 bytes; message at most 8192"
+                                .into(),
+                        );
+                    }
+                }
                 _ => {}
             }
             Ok(())
@@ -843,6 +876,11 @@ pub enum Event {
         revision: u64,
         id: String,
         selected: Option<String>,
+    },
+    DialogResult {
+        revision: u64,
+        id: String,
+        confirmed: bool,
     },
     Action {
         revision: u64,
@@ -972,6 +1010,36 @@ mod tests {
         let mut empty_selection = node.clone();
         empty_selection["selected"] = serde_json::Value::Null;
         assert!(parse(&empty_selection).is_ok());
+    }
+
+    #[test]
+    fn confirmation_dialog_validates_labels_message_and_types() {
+        let node = serde_json::json!({"kind":"confirm_dialog","id":"reset","label":"Reset","title":"Reset preferences?","message":"Discard draft","confirm_label":"Reset","cancel_label":"Keep","disabled":false});
+        let parse = |node: &serde_json::Value| {
+            Snapshot::parse(
+                &serde_json::to_vec(&serde_json::json!({"revision":1,"root":node})).unwrap(),
+            )
+        };
+        assert!(parse(&node).is_ok());
+        for key in ["label", "title", "confirm_label", "cancel_label"] {
+            for bad in [
+                serde_json::json!(""),
+                serde_json::json!("é".repeat(513)),
+                serde_json::json!(1),
+            ] {
+                let mut value = node.clone();
+                value[key] = bad;
+                assert!(parse(&value).is_err(), "{key}");
+            }
+        }
+        let mut value = node.clone();
+        value["message"] = serde_json::json!("é".repeat(4096));
+        assert!(parse(&value).is_ok());
+        value["message"] = serde_json::json!("é".repeat(4097));
+        assert!(parse(&value).is_err());
+        value = node.clone();
+        value["disabled"] = serde_json::json!(1);
+        assert!(parse(&value).is_err());
     }
 
     #[test]

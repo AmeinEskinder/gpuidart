@@ -94,6 +94,12 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         throw const FormatException('Missing select selected value');
       }
       if (value['selected'] != null) string('selected');
+    case 'dialog_result':
+      integer('revision', minimum: 1);
+      string('id');
+      if (value['confirmed'] is! bool) {
+        throw const FormatException('Invalid dialog confirmed value');
+      }
     case 'error':
       string('message');
     default:

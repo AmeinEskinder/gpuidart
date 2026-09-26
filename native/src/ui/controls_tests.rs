@@ -4,10 +4,140 @@ use crate::{
     datasets::Initial,
     protocol::{Event, Snapshot},
 };
+use gpui_kit::component::WindowExt;
 use gpui_kit::test::TestWindowExt;
 use gpui_kit::{AppContext, Focusable, TestAppContext, WindowOptions, gpui, point, px};
 use serde_json::json;
 use std::sync::{Arc, Mutex};
+
+#[gpui::test]
+fn confirmation_dialog_cancel_confirm_retention_disabled_and_removal(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let snapshot = |revision, disabled| {
+        Snapshot::parse(&serde_json::to_vec(&json!({
+        "revision":revision,"root":{"kind":"confirm_dialog","id":"reset","label":"Reset",
+        "title":"Reset preferences?","message":"Discard the draft?","confirm_label":"Reset","cancel_label":"Keep",
+        "disabled":disabled,"style":{"width":{"px":160},"background":"token:secondary"}}
+    })).unwrap()).unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, false),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(move |e| collected.lock().unwrap().push(e))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let results = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|e| match e {
+                Event::DialogResult {
+                    revision,
+                    id,
+                    confirmed,
+                } => Some((*revision, id.clone(), *confirmed)),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    let trigger_focus = cx
+        .update_window(handle, |_, window, cx| {
+            window.render_frame(cx);
+            assert_eq!(window.find("reset").bounds().size.width, px(160.));
+            window.focus_next(cx);
+            let focus = window.focused(cx).unwrap();
+            window.click("reset", cx);
+            focus
+        })
+        .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.has_active_dialog(cx));
+        assert_ne!(window.focused(cx), Some(trigger_focus.clone()));
+        for _ in 0..8 {
+            window.press("tab", cx);
+            assert_ne!(
+                window.focused(cx),
+                Some(trigger_focus.clone()),
+                "modal Tab traversal stays inside the dialog"
+            );
+        }
+        view.update(cx, |view, cx| view.publish(snapshot(2, false), window, cx));
+        window.render_frame(cx);
+        assert!(window.has_active_dialog(cx));
+        window.press("escape", cx);
+    })
+    .unwrap();
+    cx.run_until_parked();
+    assert_eq!(
+        results(),
+        [(1, "reset".into(), false)],
+        "opening revision and one cancellation"
+    );
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(!window.has_active_dialog(cx));
+        assert_eq!(window.focused(cx), Some(trigger_focus));
+        window.click("reset", cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        window.press("enter", cx);
+    })
+    .unwrap();
+    cx.run_until_parked();
+    assert_eq!(
+        results(),
+        [(1, "reset".into(), false), (2, "reset".into(), true)]
+    );
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(!window.has_active_dialog(cx));
+        view.update(cx, |view, cx| view.publish(snapshot(3, true), window, cx));
+        window.render_frame(cx);
+        window.click("reset", cx);
+        assert!(!window.has_active_dialog(cx));
+        view.update(cx, |view, cx| view.publish(snapshot(4, false), window, cx));
+        window.render_frame(cx);
+        window.click("reset", cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.has_active_dialog(cx));
+        let removed =
+            Snapshot::parse(br#"{"revision":5,"root":{"kind":"text","id":"reset","text":"Gone"}}"#)
+                .unwrap();
+        view.update(cx, |view, cx| view.publish(removed, window, cx));
+        window.render_frame(cx);
+        assert!(!window.has_active_dialog(cx));
+        assert!(view.read(cx).active_dialog.borrow().is_none());
+    })
+    .unwrap();
+    assert_eq!(
+        results(),
+        [
+            (1, "reset".into(), false),
+            (2, "reset".into(), true),
+            (4, "reset".into(), false)
+        ]
+    );
+}
 
 #[gpui::test]
 fn select_keyboard_popup_retention_identity_cancel_and_disabled(cx: &mut TestAppContext) {

@@ -161,6 +161,7 @@ pub(crate) struct DartView {
     inputs: HashMap<String, RetainedInput>,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
+    active_dialog: dialogs::ActiveDialog,
     tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
@@ -310,6 +311,7 @@ impl DartView {
             inputs: HashMap::new(),
             sliders: HashMap::new(),
             selects: HashMap::new(),
+            active_dialog: Default::default(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
@@ -643,6 +645,7 @@ impl DartView {
     }
 
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
+        self.reconcile_dialog(window, cx);
         self.reconcile_controls(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
@@ -958,6 +961,7 @@ impl DartView {
             }
             Node::Slider { .. } => self.slider_element(node, colors)?,
             Node::Select { .. } => self.select_element(node, colors)?,
+            Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
             Node::Input { id, .. } => apply_node_style(
                 Input::new(
                     &self
@@ -1121,6 +1125,7 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
 mod controls;
 #[cfg(test)]
 mod controls_tests;
+mod dialogs;
 #[cfg(feature = "snapshot-experiment")]
 pub(crate) mod experiment;
 #[cfg(test)]

@@ -102,6 +102,9 @@ final class GpuiEvent {
   /// Requested option ID on `select_change`; null means no selection.
   String? get selected => data['selected'] as String?;
 
+  /// Whether the user confirmed a `dialog_result`; false means cancelled.
+  bool? get confirmed => data['confirmed'] as bool?;
+
   /// Native row selection, including the dataset revision used for the index.
   TableSelection? get tableSelection => type == 'table_selection'
       ? TableSelection._(
@@ -692,7 +695,11 @@ final class GpuiHost {
       if (event.type == 'click' ||
           event.type == 'input' ||
           event.type == 'action' ||
-          event.type == 'table_selection') {
+          event.type == 'table_selection' ||
+          event.type == 'checkbox_change' ||
+          event.type == 'slider_change' ||
+          event.type == 'select_change' ||
+          event.type == 'dialog_result') {
         metrics.uiCallbacks++;
       }
       if (event.type == 'diagnostic') metrics.diagnosticCallbacks++;

@@ -203,6 +203,54 @@ final class UiSelect extends UiNode {
   }
 }
 
+/// A button that opens a native confirmation dialog. [style] applies to the
+/// trigger; the modal uses the current native theme. The opening description
+/// stays visible until dismissal. A `dialog_result` event reports confirmation
+/// or cancellation once. Disabling/removing this node cancels an open dialog.
+final class UiConfirmDialog extends UiNode {
+  const UiConfirmDialog(
+    super.id,
+    this.label, {
+    required this.title,
+    required this.message,
+    this.confirmLabel = 'Confirm',
+    this.cancelLabel = 'Cancel',
+    this.disabled = false,
+    super.style,
+  });
+  final String label;
+  final String title;
+  final String message;
+  final String confirmLabel;
+  final String cancelLabel;
+  final bool disabled;
+  @override
+  Map<String, Object> toJson() {
+    if ([
+          label,
+          title,
+          confirmLabel,
+          cancelLabel,
+        ].any((s) => s.isEmpty || utf8.encode(s).length > 1024) ||
+        utf8.encode(message).length > 8192) {
+      throw ArgumentError(
+        'Dialog labels must contain 1..1024 UTF-8 bytes; message at most 8192',
+      );
+    }
+    return {
+      'kind': 'confirm_dialog',
+      'id': id,
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      'title': title,
+      'message': message,
+      'confirm_label': confirmLabel,
+      'cancel_label': cancelLabel,
+      'disabled': disabled,
+    };
+  }
+}
+
 /// Native text, cursor, selection and undo state survive snapshots with this ID.
 final class UiInput extends UiNode {
   const UiInput(super.id, {super.style, this.placeholder = ''});
