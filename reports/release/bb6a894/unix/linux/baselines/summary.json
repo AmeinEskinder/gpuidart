@@ -1,0 +1,74 @@
+{
+  "source": "bb6a89425cfb34e03ab0f7a159836712ee921e9c",
+  "os": "Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
+  "runs": [
+    {
+      "mode": "jit",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 548245.25,
+        "records_constructed": 599995.452,
+        "host_ready": 870439.868,
+        "verified_draw_ack": 1340375.337
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 7837.875,
+        "records_constructed": 34981.004,
+        "host_ready": 232834.244,
+        "verified_draw_ack": 330020.832
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 7649.451,
+        "records_constructed": 35789.928,
+        "host_ready": 231480.86,
+        "verified_draw_ack": 328871.177
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 568766.599,
+        "records_constructed": 620397.427,
+        "host_ready": 873585.654,
+        "verified_draw_ack": 959425.157
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 517913.113,
+        "records_constructed": 573610.6,
+        "host_ready": 821360.796,
+        "verified_draw_ack": 907713.887
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 7620.008,
+        "records_constructed": 34987.5,
+        "host_ready": 235441.705,
+        "verified_draw_ack": 332332.89
+      }
+    }
+  ],
+  "scope": "Three instrumented repetitions per mode on one runner. Shared OS-clock stage boundaries. No input-to-present or cross-platform hardware-normalized comparison."
+}

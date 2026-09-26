@@ -26,7 +26,8 @@ Clean-machine launch and human IME composition require separate evidence under [
 - Review follow-up: native panic containment, fallible retained lookups, Dart event validation, request/shutdown deadlines, fault-injection tests and pinned Windows CI were committed. All nine local checks passed again from `5c9a292`, including ten native and 23 Dart tests. [Hosted CI passed](../reports/ci/README.md) through `d463696`. The project license choice remains pending.
 - Reload observation: one table-state comparison failed during the first hardening acceptance run. Eight targeted follow-ups and the full rerun passed unchanged assertions. The cause remains unlocalized; [the saved observation](../reports/mvp/attempt-023eef4/README.md) is not discarded.
 - Reload investigation: `edffde4` fixed a reproduced preparation-acknowledgement race and added checks after rendering. Twelve native tests, 27 Dart tests and 22 actual code reloads passed. [The investigation](../reports/reload-investigation/README.md) keeps this proved diagnostic bug separate from the original unlocalized failure.
-- External release gates: clean Windows environment and human IME results are not available yet.
+- Current feature-stack acceptance: all nine checks passed on `bb6a894`, including 41 native tests, 41 Dart tests, 500 observed price updates and AOT execution at DPI 120 with PerMonitorV2. Updated macOS/Linux release packages also passed hosted checks. See [current release evidence](../reports/release/README.md).
+- External release gates: the post-restart Sandbox attempt did not reach interactive logon; its package verifier did not run. Japanese Basic Typing is installed and enabled, but human IME results are not available yet.
 
 The latest local acceptance run passed. The stable-release goal remains open pending external evidence and resolution of the reload observation. Testing movement between monitors with different DPI remains additional pending coverage.
 

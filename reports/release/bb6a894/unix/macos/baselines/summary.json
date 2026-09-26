@@ -1,0 +1,74 @@
+{
+  "source": "bb6a89425cfb34e03ab0f7a159836712ee921e9c",
+  "os": "Version 15.7.9 (Build 24G830)",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"macos_arm64\"",
+  "runs": [
+    {
+      "mode": "jit",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 660765.0416666666,
+        "records_constructed": 719592.6666666666,
+        "host_ready": 2002837.2083333333,
+        "verified_draw_ack": 2112711.75
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 1,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 64085.458333333336,
+        "records_constructed": 93476.08333333333,
+        "host_ready": 476910.375,
+        "verified_draw_ack": 629839.0833333334
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 35749.75,
+        "records_constructed": 72009.33333333333,
+        "host_ready": 407057.0833333333,
+        "verified_draw_ack": 539187.2083333334
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 2,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 667811.75,
+        "records_constructed": 718121.8333333334,
+        "host_ready": 1158396.5,
+        "verified_draw_ack": 1279094.0416666667
+      }
+    },
+    {
+      "mode": "jit",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 590727.25,
+        "records_constructed": 649332.2083333334,
+        "host_ready": 1001054.125,
+        "verified_draw_ack": 1156090.6666666667
+      }
+    },
+    {
+      "mode": "aot",
+      "repetition": 3,
+      "passed": true,
+      "from_driver_launch_us": {
+        "dart_main": 38442.708333333336,
+        "records_constructed": 65324.791666666664,
+        "host_ready": 403429.4583333333,
+        "verified_draw_ack": 554958.875
+      }
+    }
+  ],
+  "scope": "Three instrumented repetitions per mode on one runner. Shared OS-clock stage boundaries. No input-to-present or cross-platform hardware-normalized comparison."
+}

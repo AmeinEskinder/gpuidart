@@ -5,7 +5,13 @@ implementation with automated host acceptance, not a stable-release declaration.
 The public Dart API, native ABI 1 and snapshot/dataset format are unchanged.
 The GPUI Kit dependency pin is unchanged.
 
-Latest verified implementation: **`7690c74`**. Windows
+Current feature-stack source **`bb6a894`** passed the three SDK workflows, Unix
+process lifecycle and [updated Unix packaging](https://github.com/AmeinEskinder/gpuidart/actions/runs/36210888777).
+All nine Windows local release checks also passed. [Current release records](../release/README.md)
+identify the new artifacts and preserve the remaining desktop gates. The tables
+below retain the original host-port results rather than inheriting newer counts.
+
+Original host-port implementation: **`7690c74`**. Windows
 [36193687122](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687122),
 macOS [36193687196](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687196),
 Linux [36193687198](https://github.com/AmeinEskinder/gpuidart/actions/runs/36193687198)
