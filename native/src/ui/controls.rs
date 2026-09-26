@@ -104,6 +104,15 @@ impl DartView {
             controls.insert(id.clone(), json!({"kind":"select", "selected":state.selected_value(),
                 "entity":retained.state.entity_id().as_u64(), "focused":state.focus_handle(cx).is_focused(window)}));
         }
+        self.snapshot.root.visit(&mut |node| {
+            if let Node::Checkbox { id, checked, disabled, .. } = node {
+                controls.insert(id.clone(),json!({"kind":"checkbox","checked":checked,"disabled":disabled}));
+            }
+            if let Node::ConfirmDialog { id, disabled, .. } = node {
+                controls.insert(id.clone(),json!({"kind":"confirm_dialog","disabled":disabled,
+                    "open":self.active_dialog.borrow().as_ref().is_some_and(|session|session.id == *id)}));
+            }
+        });
         controls.into()
     }
 

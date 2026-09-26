@@ -72,11 +72,14 @@ jobs:
           cargo build --locked -p gpuidart -p gpuidart-launcher
           mkdir -p build/macos-window .cache
           dart compile exe tool/capture_publication_trace.dart -o build/macos-window/capture
+          dart compile exe tool/verify_settings.dart -o build/macos-window/settings
           cp target/debug/libgpuidart.dylib target/debug/gpuidart-launcher build/macos-window/
       - name: Real-window lifecycle, 100k JIT/AOT traces and code reload
         run: |
           set -o pipefail
           dart test --tags live-window 2>&1 | tee build/macos-window/tests.log
+          dart run tool/verify_settings.dart build/macos-window/settings-jit.json 2>&1 | tee build/macos-window/settings-jit.log
+          build/macos-window/settings build/macos-window/settings-aot.json 2>&1 | tee build/macos-window/settings-aot.log
           dart run tool/capture_publication_trace.dart build/macos-window/jit-trace.json 2>&1 | tee build/macos-window/jit.log
           build/macos-window/capture build/macos-window/aot-trace.json 2>&1 | tee build/macos-window/aot.log
           dart run tool/verify_watchlist_reload.dart --report=build/macos-window/reload.json --trace --prepare-delay-ms=0 2>&1 | tee build/macos-window/reload.log

@@ -81,6 +81,7 @@ jobs:
           cargo build --locked -p gpuidart -p gpuidart-launcher
           mkdir -p build/linux-window .cache
           dart compile exe tool/capture_publication_trace.dart -o build/linux-window/capture
+          dart compile exe tool/verify_settings.dart -o build/linux-window/settings
           cp target/debug/libgpuidart.so build/linux-window/
       - name: Real-window lifecycle, 100k JIT/AOT traces and code reload
         run: |
@@ -89,6 +90,8 @@ jobs:
           openbox >build/linux-window/openbox.log 2>&1 &
           vulkaninfo --summary >build/linux-window/vulkan.log 2>&1
           dart test --tags live-window 2>&1 | tee build/linux-window/tests.log
+          dart run tool/verify_settings.dart build/linux-window/settings-jit.json 2>&1 | tee build/linux-window/settings-jit.log
+          build/linux-window/settings build/linux-window/settings-aot.json 2>&1 | tee build/linux-window/settings-aot.log
           dart run tool/capture_publication_trace.dart build/linux-window/jit-trace.json 2>&1 | tee build/linux-window/jit.log
           build/linux-window/capture build/linux-window/aot-trace.json 2>&1 | tee build/linux-window/aot.log
           dart run tool/verify_watchlist_reload.dart --report=build/linux-window/reload.json --trace --prepare-delay-ms=0 2>&1 | tee build/linux-window/reload.log

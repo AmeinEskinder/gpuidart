@@ -130,7 +130,34 @@ Retained input attempts:
 * `all`: complete gate passed; final trace checks occur after host close so the
   macOS companion's trace can be collected as well.
 
-All four planned controls and controlled inputs are implemented. The settings
-application/verifier, schema decision and final evidence are still pending.
-Parked hardware,
-signing, IME and presentation limitations from the work order remain unchanged.
+## Settings application
+
+The [Preferences example](../../example/settings/README.md) uses all four controls
+and controlled name writes. Its portable live verifier passed 15 observed steps
+on Windows in JIT and AOT (`settings/settings-jit-5.json` and
+`settings/settings-aot-1.json`). Both traces finalized without dropped records.
+The verifier dispatches GPUI keys into the real window and checks native and Dart
+state. This is not OS input injection or hardware IME verification.
+
+Retained settings attempts:
+
+* `driver-failure`: diagnostic dispatch used typed WindowHandle::update, which
+  borrowed Root during keyboard callbacks that also update Root. The native
+  process panicked. Diagnostics now use AppContext::update_window, which does
+  not borrow Root. The full live sequence is the regression check.
+* `run-3` and `run-4`: 14 steps passed, but the last Apply was sent before Kit's
+  closing animation restored focus. Waiting for another draw alone did not
+  resolve it. The verifier now observes the original focus handle after both
+  cancel and confirm before sending the next key. No fixed animation sleep.
+* `run-5` and `aot-run`: all 15 steps passed, including restored focus.
+* `all-locked-dll`: the first full gate failed to link because the separate
+  settings app opened for visual inspection still held the debug DLL. That
+  task-owned process was stopped before rerunning the gate.
+
+Visual inspection was attempted through the installed Computer Use helper, but
+window discovery failed with "native pipe is unavailable". Its retry and kernel
+reset also failed. No visual or new IME result is claimed for this screen.
+
+The settings application and verifier are implemented. Hosted settings results,
+schema decision and final evidence are pending. Parked hardware, signing, IME
+and presentation limitations from the work order remain unchanged.

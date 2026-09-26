@@ -246,6 +246,7 @@ impl DartView {
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
         json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "controls": self.inspect_controls(window, cx),
+            "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
             "draw": histogram!(frames.draw_duration_histogram),
@@ -1351,8 +1352,10 @@ pub(crate) fn run(
                             }
                         }
                         Command::Diagnostic(request) => {
-                            if handle
-                                .update(cx, |_, window, cx| {
+                            // Keyboard dispatch may update the Root (Tab/modal
+                            // handlers), so do not borrow it through handle.update.
+                            if cx
+                                .update_window(handle.into(), |_, window, cx| {
                                     crate::diagnostics::handle(request, &view, &events, window, cx)
                                 })
                                 .is_err()

@@ -1,5 +1,5 @@
 use crate::{Events, protocol::Event, ui::DartView};
-use gpui_kit::{App, Entity, Window};
+use gpui_kit::{App, Entity, KeyUpEvent, Keystroke, PlatformInput, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::cell::Cell;
@@ -50,6 +50,10 @@ pub(crate) enum Request {
     Inspect {
         request: u64,
     },
+    Key {
+        request: u64,
+        key: String,
+    },
     Repaint {
         request: u64,
         frames: u32,
@@ -74,6 +78,7 @@ impl Request {
             | Self::Focus { request, .. }
             | Self::SelectRow { request, .. }
             | Self::Inspect { request }
+            | Self::Key { request, .. }
             | Self::Repaint { request, .. }
             | Self::Prepare { request, .. } => *request,
         }
@@ -88,6 +93,30 @@ pub(crate) fn handle(
     cx: &mut App,
 ) {
     match request {
+        Request::Key { request, key } => {
+            let parsed = if key.len() > 64 {
+                None
+            } else {
+                Keystroke::parse(&key).ok()
+            };
+            match parsed {
+                Some(key) => {
+                    // GPUI dispatch, not OS injection or an IME simulation. Send
+                    // key-up as well: native Space activation completes there.
+                    window.dispatch_keystroke(key.clone(), cx);
+                    window.dispatch_event(PlatformInput::KeyUp(KeyUpEvent { keystroke: key }), cx);
+                    window.refresh();
+                    events.emit(Event::Diagnostic {
+                        request,
+                        data: json!({"ok":true,"source":"gpui_key_dispatch"}),
+                    });
+                }
+                None => events.emit(Event::Diagnostic {
+                    request,
+                    data: json!({"error":"Invalid diagnostic keystroke"}),
+                }),
+            }
+        }
         Request::Runtime { request } => events.emit(Event::Diagnostic {
             request,
             data: crate::runtime_info::read(),
