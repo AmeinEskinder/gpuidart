@@ -20,6 +20,7 @@ use std::sync::{Arc, Mutex};
 fn description(revision: u64) -> Snapshot {
     Snapshot {
         revision,
+        theme: None,
         actions: Vec::new(),
         root: Node::Column {
             id: "root".into(),
@@ -617,6 +618,7 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
             view.publish(
                 Snapshot {
                     revision: 3,
+                    theme: None,
                     actions: Vec::new(),
                     root: Node::Text {
                         id: "empty".into(),
@@ -776,6 +778,7 @@ fn scoped_actions_dispatch_by_focus_and_unmatched_keys_type(cx: &mut TestAppCont
 fn initial_with_ids() -> Initial {
     let table = |view: Option<TableView>| Snapshot {
         revision: 1,
+        theme: None,
         actions: Vec::new(),
         root: Node::Table {
             id: "table".into(),
@@ -822,6 +825,7 @@ fn publish_table_view(
         view.publish(
             Snapshot {
                 revision,
+                theme: None,
                 actions: Vec::new(),
                 root: Node::Table {
                     id: "table".into(),
@@ -1234,6 +1238,7 @@ fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
         window: Default::default(),
         snapshot: Snapshot {
             revision: 1,
+            theme: None,
             actions: Vec::new(),
             root: Node::Table {
                 id: "table".into(),
@@ -1360,4 +1365,72 @@ fn formatted_cells_keep_viewport_constant_construction(cx: &mut TestAppContext) 
     if let Ok(path) = std::env::var("GPUIDART_FORMATTING_REPORT") {
         std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
     }
+}
+
+#[gpui::test]
+fn theme_switch_resolves_component_tokens_and_preserves_controls(cx: &mut TestAppContext) {
+    use crate::protocol::{ThemeMode, ThemeSpec};
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial(1000), Events(Arc::new(|_| {})), window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        window.click("name", cx);
+        window.input("Theme draft", cx);
+        window.press("shift-left", cx);
+        window.scroll("table", ScrollDelta::Pixels(point(px(0.), px(-400.))), cx);
+        window.render_frame(cx);
+        let before = view.read(cx).inspect(window, cx);
+        let light = cx.theme().colors;
+        let mut snapshot = description(2);
+        snapshot.theme = Some(ThemeSpec {
+            mode: ThemeMode::Dark,
+            overrides: [("primary".into(), "#2D6AC8".into())].into(),
+        });
+        view.update(cx, |view, cx| view.publish(snapshot, window, cx));
+        window.render_frame(cx);
+        let after = view.read(cx).inspect(window, cx);
+        assert_eq!(after["inputs"], before["inputs"]);
+        for field in ["entity", "scroll_y", "dataset_revision"] {
+            assert_eq!(
+                after["tables"]["table"][field],
+                before["tables"]["table"][field]
+            );
+        }
+        assert_eq!(after["theme"]["resolved"]["primary"], "#2D6AC8");
+        assert!(cx.theme().is_dark());
+        assert_eq!(cx.theme().tokens.button_primary.color, cx.theme().primary);
+        assert_eq!(cx.theme().button_primary, cx.theme().primary);
+        assert_eq!(
+            gpui_kit::base::Theme::global(cx).tokens.colors.primary,
+            cx.theme().primary
+        );
+        let mut invalid = description(3);
+        invalid.theme = Some(ThemeSpec {
+            overrides: [("unknown".into(), "#FFFFFF".into())].into(),
+            ..Default::default()
+        });
+        view.update(cx, |view, cx| view.publish(invalid, window, cx));
+        assert_eq!(view.read(cx).snapshot.revision, 2);
+        assert!(cx.theme().is_dark());
+        let mut dark = description(4);
+        dark.theme = Some(ThemeSpec {
+            mode: ThemeMode::Dark,
+            ..Default::default()
+        });
+        view.update(cx, |view, cx| view.publish(dark, window, cx));
+        assert_ne!(
+            view.read(cx).inspect(window, cx)["theme"]["resolved"]["primary"],
+            "#2D6AC8"
+        );
+        view.update(cx, |view, cx| view.publish(description(5), window, cx));
+        assert!(!cx.theme().is_dark());
+        assert_eq!(cx.theme().primary, light.primary);
+        assert_eq!(cx.theme().background, light.background);
+    })
+    .unwrap();
 }

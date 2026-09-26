@@ -32,7 +32,7 @@ owns their effects. Only the owned terminal window closes on Quit.
 ## Track 1: theme as snapshot data
 
 `UiTheme` selects `light` or `dark` and an optional map of overrides. The map uses
-the existing closed set of 16 `UiThemeToken` names and opaque `#RRGGBB` values.
+the existing closed set of 16 `ThemeToken` names and opaque `#RRGGBB` values.
 It cannot contain references, gradients, styles, URLs, scripts, fonts or assets.
 Unknown tokens, malformed colors and more than 16 overrides are rejected before
 application. An omitted theme means the built-in light theme, matching Kit init.
@@ -163,3 +163,10 @@ Human visual/screen-reader sessions, physical hardware/IME checks, signing and t
 historical reload disposition remain parked. No presentation-latency or performance
 advantage claims follow from these correctness tests. Editor bindings, general
 virtual lists and additional chart/control families remain separate milestones.
+
+### Theme implementation note
+
+Custom overrides use Kit's configuration resolver, then synchronize Component
+and Base. Overriding primary/secondary/status backgrounds recalculates their
+hover/active fallbacks. Explicit component-specific colors in the built-in theme
+remain in effect; this is not an exposure of Kit's full theme-file schema.

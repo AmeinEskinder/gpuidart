@@ -249,6 +249,7 @@ fn view_columns_must_exist_in_the_dataset() {
     };
     let snapshot = crate::protocol::Snapshot {
         revision: 1,
+        theme: None,
         actions: vec![],
         root: Node::Table {
             id: "t".into(),

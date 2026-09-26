@@ -104,6 +104,7 @@ impl ExperimentView {
             for node in model::children(&this.snapshot.root).expect("validated experiment root") {
                 let snapshot = Snapshot {
                     revision: 1,
+                    theme: None,
                     actions: Vec::new(),
                     root: node.clone(),
                 };
@@ -166,6 +167,7 @@ impl ExperimentView {
                     if candidate.changed_parts.iter().any(|id| id == node.id()) {
                         let snapshot = Snapshot {
                             revision,
+                            theme: None,
                             actions: Vec::new(),
                             root: node.clone(),
                         };
@@ -174,6 +176,7 @@ impl ExperimentView {
                 } else {
                     let snapshot = Snapshot {
                         revision,
+                        theme: None,
                         actions: Vec::new(),
                         root: node.clone(),
                     };

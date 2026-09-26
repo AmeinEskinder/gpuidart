@@ -3,13 +3,17 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 mod semantics;
+mod theme;
 pub use semantics::{SemanticRole, Semantics};
+pub use theme::{ThemeMode, ThemeSpec};
 
 pub const MAX_MESSAGE_BYTES: usize = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Snapshot {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub theme: Option<ThemeSpec>,
     pub revision: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub actions: Vec<ActionBinding>,
@@ -448,7 +452,7 @@ impl ThemeToken {
         })
     }
 
-    fn name(self) -> &'static str {
+    pub(crate) fn name(self) -> &'static str {
         match self {
             Self::Background => "background",
             Self::Foreground => "foreground",
@@ -730,6 +734,9 @@ impl Snapshot {
     }
 
     pub fn validate(&self) -> Result<(), String> {
+        if let Some(theme) = &self.theme {
+            theme.colors()?;
+        }
         if self.revision == 0 {
             return Err("Revision must be positive".into());
         }

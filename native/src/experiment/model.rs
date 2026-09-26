@@ -164,6 +164,7 @@ pub(crate) fn propose(
     let snapshot = Snapshot {
         revision,
         actions: current.actions.clone(),
+        theme: current.theme.clone(),
         root,
     };
     let validation = std::time::Instant::now();
