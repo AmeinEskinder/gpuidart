@@ -1,0 +1,81 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:794:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+794 |         node["label"] = serde_json::json!("é".repeat(513));
+    |         ^^^^ mutable borrow occurs here
+795 |         assert!(parse(&node).unwrap_err().contains("1024"));
+    |                 ----- immutable borrow later used here
+
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:796:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+...
+796 |         node["label"] = serde_json::json!("");
+    |         ^^^^ mutable borrow occurs here
+797 |         node["checked"] = serde_json::json!("false");
+798 |         assert!(parse(&node).is_err());
+    |                 ----- immutable borrow later used here
+
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:797:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+...
+797 |         node["checked"] = serde_json::json!("false");
+    |         ^^^^ mutable borrow occurs here
+798 |         assert!(parse(&node).is_err());
+    |                 ----- immutable borrow later used here
+
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:799:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+...
+799 |         node["checked"] = serde_json::json!(true);
+    |         ^^^^ mutable borrow occurs here
+800 |         node["disabled"] = serde_json::json!(1);
+801 |         assert!(parse(&node).is_err());
+    |                 ----- immutable borrow later used here
+
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:800:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+...
+800 |         node["disabled"] = serde_json::json!(1);
+    |         ^^^^ mutable borrow occurs here
+801 |         assert!(parse(&node).is_err());
+    |                 ----- immutable borrow later used here
+
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:802:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+...
+802 |         node["disabled"] = serde_json::json!(true);
+    |         ^^^^ mutable borrow occurs here
+803 |         assert!(parse(&node).is_ok());
+    |                 ----- immutable borrow later used here
+
+error[E0502]: cannot borrow `node` as mutable because it is also borrowed as immutable
+   --> native\src\protocol.rs:804:9
+    |
+793 |         assert!(parse(&node).is_ok());
+    |                       ----- immutable borrow occurs here
+...
+804 |         node["unknown"] = serde_json::json!(true);
+    |         ^^^^ mutable borrow occurs here
+805 |         assert!(parse(&node).is_err());
+    |                 ----- immutable borrow later used here
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `gpuidart` (lib test) due to 7 previous errors

@@ -75,6 +75,103 @@ fn initial(count: usize) -> Initial {
 }
 
 #[gpui::test]
+fn checkbox_pointer_keyboard_disabled_and_focus_retention(cx: &mut TestAppContext) {
+    let press = |window: &mut gpui_kit::Window, key: &str, cx: &mut gpui_kit::App| {
+        window.press(key, cx);
+        window.dispatch_event(
+            gpui_kit::PlatformInput::KeyUp(gpui_kit::KeyUpEvent {
+                keystroke: gpui_kit::Keystroke::parse(key).unwrap(),
+            }),
+            cx,
+        );
+        window.render_frame(cx);
+    };
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let snapshot = |revision, checked, disabled| {
+        Snapshot::parse(
+            &serde_json::to_vec(&serde_json::json!({
+                "revision": revision,
+                "root": {"kind":"column", "id":"root", "children":[
+                    {"kind":"checkbox", "id":"notifications", "label":"Notifications",
+                     "checked":checked, "disabled":disabled,
+                     "style":{"width":{"px":240},"foreground":"token:primary"}},
+                    {"kind":"checkbox", "id":"other", "label":"Other", "checked":false}
+                ]}
+            }))
+            .unwrap(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, false, false),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let changes = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::CheckboxChange {
+                    revision,
+                    id,
+                    checked,
+                } => Some((*revision, id.clone(), *checked)),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert_eq!(window.find("notifications").bounds().size.width, px(240.));
+        window.click("notifications", cx);
+        assert_eq!(changes(), [(1, "notifications".into(), true)]);
+        window.focus_next(cx);
+        let focus = window.focused(cx).expect("checkbox is a tab stop");
+        press(window, "space", cx);
+        assert_eq!(changes().len(), 2, "one event per activation");
+        assert_eq!(changes()[1], (1, "notifications".into(), true));
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(2, true, false), window, cx)
+        });
+        window.render_frame(cx);
+        assert_eq!(window.focused(cx), Some(focus));
+        press(window, "space", cx);
+        assert_eq!(changes()[2], (2, "notifications".into(), false));
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(3, true, true), window, cx)
+        });
+        window.render_frame(cx);
+        window.click("notifications", cx);
+        press(window, "space", cx);
+        assert_eq!(
+            changes().len(),
+            3,
+            "disabled pointer and keyboard are inert"
+        );
+        window.focus_next(cx);
+        press(window, "space", cx);
+        assert_eq!(changes()[3], (3, "other".into(), true));
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let trace = Arc::new(crate::trace::Trace::default());

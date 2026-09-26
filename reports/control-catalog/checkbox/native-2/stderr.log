@@ -1,0 +1,10 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+    Finished `test` profile [unoptimized] target(s) in 14.52s
+     Running unittests src\lib.rs (target\debug\deps\gpuidart-bc5b9e3bed0a18c4.exe)
+
+thread 'ui::tests::checkbox_pointer_keyboard_disabled_and_focus_retention' (38364) panicked at native\src\ui\tests.rs:137:9:
+assertion `left == right` failed: one event per activation
+  left: 1
+ right: 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `--lib`

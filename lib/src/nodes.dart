@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'style.dart';
 import 'table_view.dart';
 
@@ -57,6 +59,36 @@ final class UiButton extends UiNode {
     if (style != null) 'style': style!.toJson(),
     'label': label,
   };
+}
+
+/// A controlled checkbox. Publish the requested [GpuiEvent.checked] value to
+/// acknowledge a `checkbox_change` event. Disabled checkboxes are not tab stops.
+final class UiCheckbox extends UiNode {
+  const UiCheckbox(
+    super.id,
+    this.label, {
+    required this.checked,
+    this.disabled = false,
+    super.style,
+  });
+  final String label;
+  final bool checked;
+  final bool disabled;
+
+  @override
+  Map<String, Object> toJson() {
+    if (utf8.encode(label).length > 1024) {
+      throw ArgumentError.value(label, 'label', 'Maximum 1024 UTF-8 bytes');
+    }
+    return {
+      'kind': 'checkbox',
+      'id': id,
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      'checked': checked,
+      'disabled': disabled,
+    };
+  }
 }
 
 /// Native text, cursor, selection and undo state survive snapshots with this ID.

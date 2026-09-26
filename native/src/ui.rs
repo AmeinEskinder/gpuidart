@@ -13,8 +13,9 @@ use gpui_kit::assets::IconName;
 use gpui_kit::base::ScrollbarHandle;
 use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
-    ActiveTheme, Icon, StyledExt,
+    ActiveTheme, Disableable, Icon, StyledExt,
     button::{Button, ButtonVariants},
+    checkbox::Checkbox,
     input::{Input, InputEvent, InputState},
     scroll::ScrollableElement,
     table::{Column, DataTable, TableDelegate, TableEvent, TableState},
@@ -907,6 +908,32 @@ impl DartView {
                                 id: event_id.clone(),
                                 #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
                                 debug_input_sequence: crate::input_trace::sequence(),
+                            });
+                        }),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Checkbox {
+                label,
+                checked,
+                disabled,
+                ..
+            } => {
+                let events = self.events.clone();
+                let event_id = node.id().to_owned();
+                let revision = self.snapshot.revision;
+                apply_node_style(
+                    Checkbox::new(id)
+                        .label(label.clone())
+                        .checked(*checked)
+                        .disabled(*disabled)
+                        .on_change(move |checked, _, _| {
+                            events.emit(Event::CheckboxChange {
+                                revision,
+                                id: event_id.clone(),
+                                checked: *checked,
                             });
                         }),
                     node,

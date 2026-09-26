@@ -93,6 +93,9 @@ final class GpuiEvent {
   int? get revision => data['revision'] as int?;
   String? get value => data['value'] as String?;
 
+  /// Requested checkbox state, only present on `checkbox_change` events.
+  bool? get checked => data['checked'] as bool?;
+
   /// Native row selection, including the dataset revision used for the index.
   TableSelection? get tableSelection => type == 'table_selection'
       ? TableSelection._(

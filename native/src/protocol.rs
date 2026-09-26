@@ -126,6 +126,15 @@ pub enum Node {
         style: Option<Style>,
         label: String,
     },
+    Checkbox {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        label: String,
+        checked: bool,
+        #[serde(default)]
+        disabled: bool,
+    },
     Input {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -591,6 +600,7 @@ impl Node {
             | Self::Row { id, .. }
             | Self::Text { id, .. }
             | Self::Button { id, .. }
+            | Self::Checkbox { id, .. }
             | Self::Input { id, .. }
             | Self::Table { id, .. } => id,
         }
@@ -602,6 +612,7 @@ impl Node {
             | Self::Row { style, .. }
             | Self::Text { style, .. }
             | Self::Button { style, .. }
+            | Self::Checkbox { style, .. }
             | Self::Input { style, .. }
             | Self::Table { style, .. } => style.as_ref(),
         }
@@ -655,6 +666,9 @@ impl Snapshot {
                     if let Some(view) = view {
                         view.validate()?;
                     }
+                }
+                Node::Checkbox { label, .. } if label.len() > 1024 => {
+                    return Err("Checkbox label exceeds 1024 UTF-8 bytes".into());
                 }
                 _ => {}
             }
@@ -737,6 +751,11 @@ pub enum Event {
         id: String,
         value: String,
     },
+    CheckboxChange {
+        revision: u64,
+        id: String,
+        checked: bool,
+    },
     Action {
         revision: u64,
         name: String,
@@ -762,6 +781,29 @@ pub enum Event {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn checkbox_validates_types_and_utf8_label_bound() {
+        let mut node = serde_json::json!({"kind":"checkbox", "id":"c", "label":"é".repeat(512), "checked":false});
+        let parse = |node: &serde_json::Value| {
+            Snapshot::parse(
+                &serde_json::to_vec(&serde_json::json!({"revision":1,"root":node})).unwrap(),
+            )
+        };
+        assert!(parse(&node).is_ok());
+        node["label"] = serde_json::json!("é".repeat(513));
+        assert!(parse(&node).unwrap_err().contains("1024"));
+        node["label"] = serde_json::json!("");
+        node["checked"] = serde_json::json!("false");
+        assert!(parse(&node).is_err());
+        node["checked"] = serde_json::json!(true);
+        node["disabled"] = serde_json::json!(1);
+        assert!(parse(&node).is_err());
+        node["disabled"] = serde_json::json!(true);
+        assert!(parse(&node).is_ok());
+        node["unknown"] = serde_json::json!(true);
+        assert!(parse(&node).is_err());
+    }
 
     #[test]
     fn rejects_ambiguous_retained_identity() {
