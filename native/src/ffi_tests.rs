@@ -20,7 +20,7 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
         assert_eq!(gd_run(null()), -1);
         let host = gd_create(initial.as_ptr(), initial.len(), event);
         assert!(!host.is_null());
-        assert_eq!(trace::gd_trace_version(), 1);
+        assert_eq!(trace::gd_trace_version(), 2);
         assert_eq!(trace::gd_trace_enable(null(), 8), -1);
         assert_eq!(trace::gd_trace_enable(host, 0), -2);
         assert_eq!(trace::gd_trace_enable(host, 256), 0);
@@ -77,6 +77,26 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
         gd_destroy(host);
         let host = gd_create(initial.as_ptr(), initial.len(), event);
         assert!(!host.is_null());
+        gd_destroy(host);
+
+        assert!(gd_create_traced(initial.as_ptr(), initial.len(), event, 0).is_null());
+        assert!(gd_create_traced(initial.as_ptr(), initial.len(), event, 8193).is_null());
+        assert!(gd_create_traced(b"{".as_ptr(), 1, event, 32).is_null());
+        let invalid = br#"{"snapshot":{"revision":0,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}"#;
+        assert!(gd_create_traced(invalid.as_ptr(), invalid.len(), event, 32).is_null());
+        let host = gd_create_traced(initial.as_ptr(), initial.len(), event, 32);
+        assert!(!host.is_null());
+        assert_eq!(trace::gd_trace_enable(host, 32), -2);
+        let bytes = trace::gd_trace_read(host, &mut length);
+        let capture: Value = serde_json::from_slice(slice::from_raw_parts(bytes, length)).unwrap();
+        gd_free_event(bytes, length);
+        let records = capture["records"].as_array().unwrap();
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0]["name"], "native.initial_decode");
+        assert_eq!(records[1]["name"], "native.initial_validate");
+        assert_eq!(records[0]["bytes"], initial.len());
+        assert_eq!(records[1]["status"], 0);
+        assert!(records[1]["start"].as_i64().unwrap() >= records[0]["end"].as_i64().unwrap());
         gd_destroy(host);
     }
 }

@@ -75,6 +75,48 @@ fn initial(count: usize) -> Initial {
 }
 
 #[gpui::test]
+fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let trace = Arc::new(crate::trace::Trace::default());
+    trace.enable(128).unwrap();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                let mut view = DartView::new(initial(1000), Events(Arc::new(|_| {})), window, cx);
+                view.trace = Some(trace.clone());
+                let before: serde_json::Value =
+                    serde_json::from_slice(&trace.snapshot().unwrap()).unwrap();
+                assert!(before["records"].as_array().unwrap().is_empty());
+                view
+            })
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let state = view.read(cx).inspect(window, cx);
+        assert_eq!(state["labels"]["label"], "Revision 1");
+        assert!(state["native"]["rows_constructed"].as_u64().unwrap() > 0);
+        for _ in 0..3 {
+            window.render_frame(cx);
+        }
+    })
+    .unwrap();
+    let after: serde_json::Value = serde_json::from_slice(&trace.snapshot().unwrap()).unwrap();
+    let records = after["records"].as_array().unwrap();
+    let first = records
+        .iter()
+        .filter(|r| r["name"] == "native.first_content_paint")
+        .collect::<Vec<_>>();
+    assert_eq!(first.len(), 1);
+    let paint = records
+        .iter()
+        .find(|r| r["name"] == "native.content_paint")
+        .unwrap();
+    assert!(first[0]["start"].as_i64().unwrap() >= paint["end"].as_i64().unwrap());
+}
+
+#[gpui::test]
 fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let (handle, view) = cx.update(|cx| {

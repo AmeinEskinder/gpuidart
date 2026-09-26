@@ -9,6 +9,7 @@ mod diagnostics;
 #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
 #[path = "../../benchmarks/native/src/input_trace.rs"]
 mod input_trace;
+mod paint_trace;
 mod protocol;
 mod runtime_info;
 mod trace;
@@ -140,18 +141,62 @@ pub unsafe extern "C" fn gd_create(
     callback: EventCallback,
 ) -> *mut Host {
     boundary::call(std::ptr::null_mut(), || unsafe {
-        create(bytes, len, callback)
+        create(bytes, len, callback, 0)
     })
 }
 
-unsafe fn create(bytes: *const u8, len: usize, callback: EventCallback) -> *mut Host {
+/// Trace extension 2: enables tracing before initial decode and validation.
+/// Pointer/callback ownership is identical to gd_create. Capacity is 1..=8192.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_create_traced(
+    bytes: *const u8,
+    len: usize,
+    callback: EventCallback,
+    capacity: usize,
+) -> *mut Host {
+    boundary::call(std::ptr::null_mut(), || {
+        if !(1..=8192).contains(&capacity) {
+            return std::ptr::null_mut();
+        }
+        unsafe { create(bytes, len, callback, capacity) }
+    })
+}
+
+unsafe fn create(
+    bytes: *const u8,
+    len: usize,
+    callback: EventCallback,
+    capacity: usize,
+) -> *mut Host {
     if bytes.is_null() || len > MAX_MESSAGE_BYTES {
         return std::ptr::null_mut();
     }
-    let Ok(initial) = datasets::Initial::parse(unsafe { slice::from_raw_parts(bytes, len) }) else {
+    let trace = Arc::new(trace::Trace::default());
+    if capacity != 0 && trace.enable(capacity).is_err() {
+        return std::ptr::null_mut();
+    }
+    let bytes = unsafe { slice::from_raw_parts(bytes, len) };
+    let parsed = if capacity == 0 {
+        datasets::Initial::parse(bytes)
+    } else {
+        let key = trace::Key {
+            operation: "initial",
+            request: 1,
+        };
+        trace
+            .measure("native.initial_decode", key, Some(len), || {
+                serde_json::from_slice::<datasets::Initial>(bytes).map_err(|e| e.to_string())
+            })
+            .and_then(|initial| {
+                trace.measure("native.initial_validate", key, Some(len), || {
+                    initial.validate()
+                })?;
+                Ok(initial)
+            })
+    };
+    let Ok(initial) = parsed else {
         return std::ptr::null_mut();
     };
-    let trace = Arc::new(trace::Trace::default());
     let event_trace = trace.clone();
     let events = Events(Arc::new(move |event| {
         let bytes = serde_json::to_vec(&event)
@@ -218,6 +263,15 @@ unsafe fn run_with(
         return -1;
     }
     let host = unsafe { &*host };
+    host.trace.point(
+        "native.runner_entry",
+        trace::Key {
+            operation: "initial",
+            request: 1,
+        },
+        None,
+        None,
+    );
     let initial = {
         let Ok(mut initial) = host.initial.lock() else {
             return -4;

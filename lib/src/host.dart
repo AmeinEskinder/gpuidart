@@ -297,13 +297,24 @@ final class GpuiHost {
     host._callback = NativeCallable<_EventNative>.listener(host._receive);
     Pointer<Void> created = nullptr;
     try {
-      created = host._handle = host._withMessage(
-        initial,
-        'initial',
-        1,
-        (bytes, length) =>
-            host._bindings.create(bytes, length, host._callback.nativeFunction),
-      );
+      created = host._handle = host._withMessage(initial, 'initial', 1, (
+        bytes,
+        length,
+      ) {
+        if (nativeTrace?.create case final tracedCreate?) {
+          return tracedCreate(
+            bytes,
+            length,
+            host._callback.nativeFunction,
+            trace!.capacity,
+          );
+        }
+        return host._bindings.create(
+          bytes,
+          length,
+          host._callback.nativeFunction,
+        );
+      });
       if (host._handle == nullptr) {
         throw ArgumentError(
           'Native host creation rejected. Check node IDs and dataset schema; '
@@ -311,10 +322,11 @@ final class GpuiHost {
         );
       }
       if (nativeTrace != null) {
-        if (nativeTrace.enable(host._handle, trace!.capacity) != 0) {
+        if (nativeTrace.create == null &&
+            nativeTrace.enable(host._handle, trace!.capacity) != 0) {
           throw StateError('Native trace enable failed');
         }
-        trace._attach(() => nativeTrace.snapshot(bindings, host._handle));
+        trace!._attach(() => nativeTrace.snapshot(bindings, host._handle));
       }
     } catch (_) {
       trace?._finish();
@@ -330,7 +342,12 @@ final class GpuiHost {
     final result = ReceivePort();
     final nativeDone = result.first;
     try {
+      final companionStart = trace?._clock.now();
       host._companion = await _Companion.start(bindings, path, host._handle);
+      if (companionStart != null && host._companion != null) {
+        trace!._span('dart.companion_start', 'initial', 1, companionStart);
+      }
+      final runnerStart = trace?._clock.now();
       await Isolate.spawn(
         _runNative,
         (path, host._handle.address, result.sendPort, host._companion != null),
@@ -339,6 +356,9 @@ final class GpuiHost {
         errorsAreFatal: true,
         debugName: 'gpui-native-loop',
       );
+      if (runnerStart != null) {
+        trace!._span('dart.runner_spawn', 'initial', 1, runnerStart);
+      }
     } catch (_) {
       await host._companion?.abortStartup();
       for (final dataset in datasets) {
@@ -371,10 +391,30 @@ final class GpuiHost {
   ) {
     final timer = Stopwatch()..start();
     final encodingStart = _trace?._clock.now();
-    final data = utf8.encode(jsonEncode(message));
+    final json = _trace == null
+        ? jsonEncode(message)
+        : _trace._measure(
+            'dart.json',
+            kind,
+            request,
+            () => jsonEncode(message),
+          );
+    final data = _trace == null
+        ? utf8.encode(json)
+        : _trace._measure('dart.utf8', kind, request, () => utf8.encode(json));
+    final copyStart = _trace?._clock.now();
     final bytes = calloc<Uint8>(data.length);
     try {
       bytes.asTypedList(data.length).setAll(0, data);
+      if (copyStart != null) {
+        _trace!._span(
+          'dart.ffi_copy',
+          kind,
+          request,
+          copyStart,
+          bytes: data.length,
+        );
+      }
       metrics.recordEncoding(kind, data.length, timer.elapsedMicroseconds);
       if (encodingStart != null) {
         _trace!._span(

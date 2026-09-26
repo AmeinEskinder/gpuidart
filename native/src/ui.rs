@@ -151,6 +151,7 @@ enum ViewSelection {
 
 pub(crate) struct DartView {
     snapshot: Snapshot,
+    trace: Option<Arc<crate::trace::Trace>>,
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     tables: HashMap<String, RetainedTable>,
@@ -291,6 +292,7 @@ impl DartView {
             cx.stop_propagation();
         });
         let mut view = Self {
+            trace: None,
             snapshot: initial.snapshot,
             datasets: Store::new(initial.datasets),
             events,
@@ -1081,7 +1083,15 @@ impl Render for DartView {
             .vertical_scrollbar(&self.scroll);
         #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
         let root = crate::input_trace::observe(root);
-        root
+        match &self.trace {
+            Some(trace) if self.failure.is_none() => crate::paint_trace::ContentPaint {
+                child: root.into_any_element(),
+                trace: trace.clone(),
+                revision: self.snapshot.revision,
+            }
+            .into_any_element(),
+            _ => root.into_any_element(),
+        }
     }
 }
 
@@ -1133,11 +1143,25 @@ pub(crate) fn run(
                 ..Default::default()
             };
             let mut content = None;
+            let window_started = trace.start();
             let opened = cx.open_window(options, |window, cx| {
-                let view = cx.new(|cx| DartView::new(initial, events.clone(), window, cx));
+                let view = cx.new(|cx| {
+                    let mut view = DartView::new(initial, events.clone(), window, cx);
+                    if trace.enabled() {
+                        view.trace = Some(trace.clone());
+                    }
+                    view
+                });
                 content = Some(view.clone());
                 cx.new(|cx| gpui_kit::component::Root::new(view, window, cx))
             });
+            trace.complete(
+                "native.window_create",
+                initial_key,
+                window_started,
+                None,
+                Some(if opened.is_ok() { 0 } else { -1 }),
+            );
             let handle = match opened {
                 Ok(handle) => handle,
                 Err(error) => {

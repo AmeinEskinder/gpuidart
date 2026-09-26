@@ -1,0 +1,25 @@
+00:00 +0: loading test/native_trace_test.dart
+00:00 +0: real requests correlate across the bridge without recording UI values
+00:00 +0 -1: real requests correlate across the bridge without recording UI values [E]
+  Expected: <true>
+    Actual: <false>
+  
+  package:matcher                   expect
+  test\native_trace_test.dart 56:7  main.<fn>
+  
+00:00 +0 -1: overflow is explicit and does not prevent updates or shutdown
+00:01 +0 -2: overflow is explicit and does not prevent updates or shutdown [E]
+  Expected: <false>
+    Actual: <true>
+  
+  package:matcher                    expect
+  test\native_trace_test.dart 151:7  main.<fn>
+  
+00:01 +0 -2: Some tests failed.
+
+Failing tests:
+  test/native_trace_test.dart: overflow is explicit and does not prevent updates or shutdown
+  test/native_trace_test.dart: real requests correlate across the bridge without recording UI values
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

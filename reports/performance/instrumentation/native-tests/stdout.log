@@ -1,0 +1,47 @@
+
+running 42 tests
+test datasets::tests::view_columns_must_exist_in_the_dataset ... ok
+test datasets::tests::record_ids_validate_and_survive_edits ... ok
+test datasets::tests::invalid_batch_and_stale_revision_preserve_all_records ... ok
+test protocol::tests::cell_formatting_numbers_rules_and_fallback ... ok
+test protocol::tests::accepts_boundary_style_values ... ok
+test protocol::tests::cell_format_rejects_unknown_op_icon_color_and_fields ... ok
+test datasets::tests::initial_upload_rejects_bad_data_and_missing_references ... ok
+test protocol::tests::parses_valid_action_bindings ... ok
+test protocol::tests::rejects_ambiguous_retained_identity ... ok
+test protocol::tests::parses_and_validates_table_views ... ok
+test datasets::tests::cell_format_validates_columns_decimals_and_rule_counts ... ok
+test protocol::tests::parses_valid_styles_on_every_node_kind ... ok
+test protocol::tests::nodes_without_style_behave_as_before ... ok
+test protocol::tests::rejects_conflicting_keys_in_one_context ... ok
+test protocol::tests::rejects_dangling_action_context ... ok
+test protocol::tests::rejects_bare_printable_keys_and_bad_grammar ... ok
+test protocol::tests::rejects_duplicate_action_name_and_context ... ok
+test protocol::tests::rejects_inline_table_records ... ok
+test protocol::tests::rejects_font_style_on_non_text_nodes ... ok
+test protocol::tests::rejects_malformed_hex_colors ... ok
+test protocol::tests::rejects_unknown_style_fields ... ok
+test protocol::tests::rejects_out_of_bounds_style_values ... ok
+test protocol::tests::rejects_unknown_action_binding_fields ... ok
+test protocol::tests::rejects_unknown_theme_token ... ok
+test protocol::tests::view_index_filters_then_stably_sorts ... ok
+test trace::tests::tracing_is_opt_in_bounded_and_preserves_complete_records ... ok
+test protocol::tests::rejects_more_than_256_action_bindings ... ok
+test ffi_tests::ffi_rejects_bad_messages_bounds_queues_and_reports_unwind ... ok
+test ui::tests::missing_retained_state_returns_an_error ... ok
+test ui::tests::styled_nodes_render_without_error ... ok
+test ui::tests::formatted_cells_render_and_report ... ok
+test ui::tests::scoped_actions_dispatch_by_focus_and_unmatched_keys_type ... ok
+test datasets::tests::one_cell_decode_and_apply_allocations_are_independent_of_dataset_size ... ok
+test ui::tests::preparation_ack_waits_for_rendered_scroll ... ok
+test ui::tests::startup_paint_marker_requires_content_paint_and_is_emitted_once ... ok
+test protocol::tests::cell_formatter_cost_is_measured_at_100k_cells ... ok
+test ui::tests::narrow_windows_wrap_actions_and_scroll_to_footer ... ok
+test protocol::tests::view_recompute_at_100k_records_is_measured ... ok
+test ui::tests::views_sort_select_anchor_and_recompute ... ok
+test ui::tests::native_events_retained_input_and_virtualized_table ... ok
+test ui::tests::construction_and_allocations_scale_with_viewport ... ok
+test ui::tests::formatted_cells_keep_viewport_constant_construction ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+

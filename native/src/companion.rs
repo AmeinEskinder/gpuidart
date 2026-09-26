@@ -79,16 +79,22 @@ enum Reply {
 
 fn write_frame(writer: &mut impl Write, value: &impl Serialize) -> Result<(), String> {
     let bytes = serde_json::to_vec(value).map_err(|e| e.to_string())?;
+    write_bytes(writer, &bytes)
+}
+fn write_bytes(writer: &mut impl Write, bytes: &[u8]) -> Result<(), String> {
     if bytes.len() > MAX_FRAME {
         return Err("Companion frame exceeds limit".into());
     }
     writer
         .write_all(&(bytes.len() as u32).to_le_bytes())
-        .and_then(|_| writer.write_all(&bytes))
+        .and_then(|_| writer.write_all(bytes))
         .and_then(|_| writer.flush())
         .map_err(|e| e.to_string())
 }
 fn read_frame<T: DeserializeOwned>(reader: &mut impl Read) -> Result<T, String> {
+    serde_json::from_slice(&read_bytes(reader)?).map_err(|e| format!("Companion JSON: {e}"))
+}
+fn read_bytes(reader: &mut impl Read) -> Result<Vec<u8>, String> {
     let mut length = [0; 4];
     reader
         .read_exact(&mut length)
@@ -101,7 +107,7 @@ fn read_frame<T: DeserializeOwned>(reader: &mut impl Read) -> Result<T, String> 
     reader
         .read_exact(&mut bytes)
         .map_err(|e| format!("Companion body: {e}"))?;
-    serde_json::from_slice(&bytes).map_err(|e| format!("Companion JSON: {e}"))
+    Ok(bytes)
 }
 
 #[unsafe(no_mangle)]
@@ -190,14 +196,25 @@ fn run(host: &Host, initial: Initial, mut socket: UnixStream) -> Result<(), Stri
     std::thread::scope(|scope| {
         let writer = scope.spawn(|| {
             let result = (|| {
-                write_frame(
-                    &mut writer_socket,
-                    &Start {
-                        version: 2,
-                        initial,
-                        trace_limit,
-                    },
-                )?;
+                let key = crate::trace::Key {
+                    operation: "initial",
+                    request: 1,
+                };
+                let bytes = host
+                    .trace
+                    .measure("native.companion_encode", key, None, || {
+                        serde_json::to_vec(&Start {
+                            version: 2,
+                            initial,
+                            trace_limit,
+                        })
+                        .map_err(|e| e.to_string())
+                    })?;
+                host.trace
+                    .measure("native.companion_write", key, Some(bytes.len()), || {
+                        write_bytes(&mut writer_socket, &bytes)
+                    })?;
+                drop(bytes);
                 let mut sent_close = false;
                 while let Ok(command) = host.receiver.recv_blocking() {
                     let close = matches!(command, Command::Close);
@@ -263,11 +280,15 @@ pub unsafe extern "C" fn gd_ui_process_main(bytes: *const u8, len: usize) -> i32
     })
 }
 fn child_main(mut socket: UnixStream) -> Result<(), String> {
+    let receive_start = crate::clock::now();
+    let bytes = read_bytes(&mut socket)?;
+    let receive_end = crate::clock::now();
     let Start {
         version,
         initial,
         trace_limit,
-    } = read_frame(&mut socket)?;
+    } = serde_json::from_slice(&bytes).map_err(|e| format!("Companion JSON: {e}"))?;
+    let decode_end = crate::clock::now();
     if version != 2 {
         return Err("Incompatible companion transport".into());
     }
@@ -276,7 +297,26 @@ fn child_main(mut socket: UnixStream) -> Result<(), String> {
         trace
             .enable(trace_limit)
             .map_err(|_| "Invalid trace capacity")?;
+        let key = crate::trace::Key {
+            operation: "initial",
+            request: 1,
+        };
+        trace.interval(
+            "native.companion_receive",
+            key,
+            receive_start,
+            receive_end,
+            bytes.len(),
+        );
+        trace.interval(
+            "native.companion_decode",
+            key,
+            receive_end,
+            decode_end,
+            bytes.len(),
+        );
     }
+    drop(bytes);
     let output = Arc::new(Mutex::new(socket.try_clone().map_err(|e| e.to_string())?));
     let event_trace = trace.clone();
     let event_output = output.clone();

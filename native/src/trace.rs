@@ -41,10 +41,47 @@ pub(crate) struct Trace {
     clock_failed: AtomicBool,
     remote: AtomicBool,
     remote_complete: AtomicBool,
+    first_paint: AtomicBool,
     buffer: Mutex<Buffer>,
 }
 
 impl Trace {
+    pub fn enabled(&self) -> bool {
+        self.enabled.load(Ordering::Relaxed)
+    }
+
+    pub fn measure<T, E>(
+        &self,
+        name: &'static str,
+        key: Key,
+        bytes: Option<usize>,
+        action: impl FnOnce() -> Result<T, E>,
+    ) -> Result<T, E> {
+        let start = self.start();
+        let result = action();
+        self.complete(
+            name,
+            key,
+            start,
+            bytes,
+            Some(if result.is_ok() { 0 } else { -1 }),
+        );
+        result
+    }
+
+    pub fn first_content_paint(&self) {
+        if !self.first_paint.swap(true, Ordering::Relaxed) {
+            self.point(
+                "native.first_content_paint",
+                Key {
+                    operation: "initial",
+                    request: 1,
+                },
+                None,
+                None,
+            );
+        }
+    }
     pub fn is_remote(&self) -> bool {
         self.remote.load(Ordering::Relaxed)
     }
@@ -122,6 +159,27 @@ impl Trace {
             && let Some(end) = self.start()
         {
             self.push(name, key, start, end.ticks, bytes, status);
+        }
+    }
+
+    /// A companion learns whether tracing is enabled after decoding its start frame.
+    #[cfg(unix)]
+    pub fn interval(
+        &self,
+        name: &'static str,
+        key: Key,
+        start: Option<Stamp>,
+        end: Option<Stamp>,
+        bytes: usize,
+    ) {
+        if !self.enabled() {
+            return;
+        }
+        match (start, end) {
+            (Some(start), Some(end)) => {
+                self.push(name, key, start, end.ticks, Some(bytes), Some(0))
+            }
+            _ => self.clock_failed.store(true, Ordering::Relaxed),
         }
     }
 
@@ -226,7 +284,7 @@ impl crate::protocol::Event {
 /// Optional trace extension version. The ordinary host ABI is unchanged.
 #[unsafe(no_mangle)]
 pub extern "C" fn gd_trace_version() -> u32 {
-    1
+    2
 }
 
 /// `host` must be live. Enable once before gd_run; limit must be 1..=8192.

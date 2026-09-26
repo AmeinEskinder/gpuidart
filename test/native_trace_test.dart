@@ -33,6 +33,7 @@ void main() {
       );
       try {
         expect((trace.toJson()['metadata'] as Map)['finalized'], false);
+        await host.diagnose('repaint', {'frames': 1});
         await host.editDataset(data, [const CellEdit(0, 0, 'secret-update')]);
         await host.rebuild();
         await expectLater(
@@ -65,8 +66,8 @@ void main() {
       for (final key in [
         ('snapshot', 2),
         ('snapshot', 3),
-        ('dataset', 1),
-        ('diagnostic', 2),
+        ('dataset', 2),
+        ('diagnostic', 3),
       ]) {
         final operation = key.$1, request = key.$2;
         final encoded = record(operation, request, 'dart.encode');
@@ -104,13 +105,35 @@ void main() {
       expect(record('snapshot', 1, 'dart.ack')['status'], 0);
       expect(record('initial', 1, 'dart.ack')['status'], 0);
       expect(
-        record('dataset', 1, 'dart.ack')['native_apply_us'],
+        record('dataset', 2, 'dart.ack')['native_apply_us'],
         isNonNegative,
       );
       expect(
-        record('dataset', 1, 'dart.commit')['start'],
-        greaterThanOrEqualTo(record('dataset', 1, 'dart.ack')['start'] as int),
+        record('dataset', 2, 'dart.commit')['start'],
+        greaterThanOrEqualTo(record('dataset', 2, 'dart.ack')['start'] as int),
       );
+      final decoded = record('initial', 1, 'native.initial_decode');
+      final validated = record('initial', 1, 'native.initial_validate');
+      expect(decoded['bytes'], record('initial', 1, 'dart.encode')['bytes']);
+      expect(validated['start'], greaterThanOrEqualTo(decoded['end'] as int));
+      expect(
+        record('initial', 1, 'native.first_content_paint')['process'],
+        greaterThan(0),
+      );
+      for (final name in ['dart.json', 'dart.utf8', 'dart.ffi_copy']) {
+        final stage = record('initial', 1, name);
+        expect(stage['end'], greaterThanOrEqualTo(stage['start'] as int));
+      }
+      if (Platform.isMacOS ||
+          Platform.environment['GPUIDART_COMPANION'] == '1') {
+        final sent = record('initial', 1, 'native.companion_write');
+        final received = record('initial', 1, 'native.companion_receive');
+        final decoded = record('initial', 1, 'native.companion_decode');
+        expect(sent['bytes'], received['bytes']);
+        expect(received['bytes'], decoded['bytes']);
+        expect(sent['process'], isNot(received['process']));
+        expect(decoded['start'], greaterThanOrEqualTo(received['end'] as int));
+      }
       final encoded = jsonEncode(capture);
       expect(encoded, isNot(contains('secret-')));
       expect(encoded, isNot(contains('private-')));

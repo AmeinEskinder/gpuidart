@@ -51,6 +51,14 @@ acknowledgement when counting replacement snapshots. Later snapshots start at 2.
 | `dart.build` | Synchronous `openView` / `rebuild` builder invocation |
 | `dart.describe` | Conversion of a view to wire objects; initial conversion includes dataset upload objects |
 | `dart.encode` | JSON/UTF-8 encoding, allocation and copying into the FFI buffer |
+| `dart.json`, `dart.utf8`, `dart.ffi_copy` | Nested encoding stages: JSON string, UTF-8 bytes, then FFI allocation/copy |
+| `native.initial_decode`, `native.initial_validate` | Initial JSON decode and semantic validation, inside the create call (extension 2) |
+| `dart.runner_spawn`, `native.runner_entry`, `native.run` | Isolate spawn interval, native runner entry, UI application entry |
+| `dart.companion_start` | Socket preparation and child process launch, when used |
+| `native.companion_encode`, `native.companion_write` | Initial Rust transport JSON serialization and framed socket write |
+| `native.companion_receive`, `native.companion_decode` | Child initial receive/wait and JSON decoding; receive can overlap parent write |
+| `native.window_create` | GPUI `open_window` call; may include the first paint |
+| `native.content_paint`, `native.first_content_paint` | Dart view's CPU element paint interval and first successful completion; excludes GPU submission/presentation |
 | `dart.ffi` | Synchronous native call; includes native parsing and queue submission |
 | `native.parse` | Decode/validation before queue submission; excludes initial creation |
 | `native.enqueue_attempt` → `native.dequeue` | Submission attempt through command pickup, including instrumentation and channel overhead; use only successful submissions |
@@ -68,12 +76,14 @@ Adding stage durations or percentiles does not produce end-to-end latency.
 Nonzero `native.submit_return` / `dart.ffi` status denotes submission failure;
 nonzero `dart.ack` status denotes a rejected operation. Keep failures visible.
 
-Initial tracing includes native library loading, encoding/create-call time, native run
-entry and window-open completion. Initial native parsing precedes trace enable
-and is covered only by the Dart create-call span. Window-open completion is not
-proof that useful content has been displayed. This trace does not measure external
-process launch, VM boot, OS input, layout/drawing, GPU presentation or input-to-present
-latency. Inspector RPCs and presentation correlation remain roadmap work.
+Initial tracing includes native library loading, encoding/create-call time and,
+with extension 2, initial decode/validation and first CPU content paint. The paint
+wrapper delegates layout unchanged and records after the content element paints;
+other root elements and GPU submission can follow. Window creation and content
+paint can overlap. Neither marker proves displayed pixels. External process
+launch needs a driver using the same OS clock; VM initialization before Dart main,
+OS input, full-window layout, GPU presentation and input-to-present latency remain
+outside these built-in spans.
 
 ## Bounds, lifetime and compatibility
 
@@ -100,12 +110,15 @@ loss; it does not mean every application request succeeded. Inspect statuses and
 unmatched requests too. A shutdown timeout can return before native teardown;
 such a capture remains unfinalized until the native runner actually exits.
 
-Tracing uses an optional native extension version 1 (`gd_trace_version`,
-`gd_trace_enable`, `gd_trace_read`). The host ABI remains version 1. Untraced hosts
+Tracing uses an optional native extension version 2 (`gd_trace_version`,
+`gd_trace_enable`, `gd_trace_read`, `gd_create_traced`). Dart also accepts version 1;
+its initial decode/validation precedes trace enable and lacks the new native
+startup/paint spans. The host ABI remains version 1. Untraced hosts
 work with older compatible libraries on Windows/Linux; macOS additionally
 requires companion lifecycle extension version 2. Tracing requires its own
-exports. Normal hosts do not allocate trace record buffers or read clocks for
-trace events.
+exports. Normal hosts do not allocate trace record buffers. Companion startup
+reads three timestamps before it learns whether tracing is enabled; untraced
+shared-process hosts do not read clocks for trace events.
 Disabled tracing still adds branches and a small native trace object. Its overhead
 has not been isolated. Enabled captures include clock, allocation and mutex costs;
 do not compare them directly with historical uninstrumented benchmark timings.

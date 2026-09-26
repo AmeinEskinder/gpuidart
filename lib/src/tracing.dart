@@ -217,7 +217,7 @@ final class GpuiTrace {
             _remoteComplete &&
             _dropped == 0 &&
             _nativeDropped == 0,
-        'scope': 'Opt-in publication and host readiness; excludes OS input, layout, GPU presentation and VM boot. Native dispatch covers synchronous handling; deferred diagnostic replies occur later. Tracing adds overhead.',
+        'scope': 'Opt-in publication, startup and CPU content paint; excludes OS input, full-window layout, GPU presentation and VM boot. Native dispatch covers synchronous handling; deferred diagnostic replies occur later. Tracing adds overhead.',
       },
       'records': raw,
       'traceEvents': records.map((record) {
@@ -276,6 +276,16 @@ final class _TraceRecord {
           'native.dispatch',
           'native.emit',
           'native.run',
+          'native.initial_decode',
+          'native.initial_validate',
+          'native.runner_entry',
+          'native.window_create',
+          'native.content_paint',
+          'native.first_content_paint',
+          'native.companion_encode',
+          'native.companion_write',
+          'native.companion_receive',
+          'native.companion_decode',
           'native.window_opened',
           'native.close',
         ].contains(value['name']) ||
@@ -335,7 +345,26 @@ final class _NativeTraceBindings {
       final version = library.lookupFunction<Uint32 Function(), int Function()>(
         'gd_trace_version',
       );
-      if (version() != 1) throw StateError('Unsupported native trace version');
+      final supported = version();
+      if (supported != 1 && supported != 2) {
+        throw StateError('Unsupported native trace version');
+      }
+      create = supported == 2
+          ? library.lookupFunction<
+              Pointer<Void> Function(
+                Pointer<Uint8>,
+                Size,
+                Pointer<NativeFunction<_EventNative>>,
+                Size,
+              ),
+              Pointer<Void> Function(
+                Pointer<Uint8>,
+                int,
+                Pointer<NativeFunction<_EventNative>>,
+                int,
+              )
+            >('gd_create_traced')
+          : null;
       enable = library
           .lookupFunction<
             Int32 Function(Pointer<Void>, Size),
@@ -353,6 +382,13 @@ final class _NativeTraceBindings {
     }
   }
   late final int Function(Pointer<Void>, int) enable;
+  late final Pointer<Void> Function(
+    Pointer<Uint8>,
+    int,
+    Pointer<NativeFunction<_EventNative>>,
+    int,
+  )?
+  create;
   late final Pointer<Uint8> Function(Pointer<Void>, Pointer<Size>) read;
 
   Map<String, dynamic> snapshot(_Bindings bindings, Pointer<Void> host) {

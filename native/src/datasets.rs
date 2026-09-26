@@ -44,29 +44,33 @@ pub struct Upload {
 impl Initial {
     pub fn parse(bytes: &[u8]) -> Result<Self, String> {
         let initial: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
-        if initial.window.title.trim().is_empty()
-            || !(320.0..=8192.0).contains(&initial.window.width)
-            || !(240.0..=8192.0).contains(&initial.window.height)
+        initial.validate()?;
+        Ok(initial)
+    }
+
+    pub fn validate(&self) -> Result<(), String> {
+        if self.window.title.trim().is_empty()
+            || !(320.0..=8192.0).contains(&self.window.width)
+            || !(240.0..=8192.0).contains(&self.window.height)
         {
             return Err("Invalid window title or dimensions".into());
         }
-        initial.snapshot.validate()?;
+        self.snapshot.validate()?;
         let mut ids = HashSet::new();
-        for upload in &initial.datasets {
+        for upload in &self.datasets {
             if upload.id.is_empty() || upload.revision != 1 || !ids.insert(upload.id.as_str()) {
                 return Err("Initial datasets require unique IDs and revision 1".into());
             }
             upload.data.validate()?;
         }
-        validate_references(&initial.snapshot, |id| ids.contains(id))?;
-        validate_views(&initial.snapshot, |id| {
-            initial
-                .datasets
+        validate_references(&self.snapshot, |id| ids.contains(id))?;
+        validate_views(&self.snapshot, |id| {
+            self.datasets
                 .iter()
                 .find(|upload| upload.id == id)
                 .map(|upload| upload.data.columns.len())
         })?;
-        Ok(initial)
+        Ok(())
     }
 }
 

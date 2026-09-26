@@ -1,0 +1,18 @@
+
+running 1 test
+test ui::tests::startup_paint_marker_requires_content_paint_and_is_emitted_once ... FAILED
+
+failures:
+
+---- ui::tests::startup_paint_marker_requires_content_paint_and_is_emitted_once stdout ----
+
+thread 'ui::tests::startup_paint_marker_requires_content_paint_and_is_emitted_once' (33632) panicked at native\src\ui\tests.rs:93:5:
+assertion failed: before["records"].as_array().unwrap().is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::tests::startup_paint_marker_requires_content_paint_and_is_emitted_once
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 41 filtered out; finished in 0.03s
+
