@@ -1,0 +1,18 @@
+
+running 1 test
+test ui::experiment::tests::strategies_lay_out_the_same_controls_and_text ... FAILED
+
+failures:
+
+---- ui::experiment::tests::strategies_lay_out_the_same_controls_and_text stdout ----
+
+thread 'ui::experiment::tests::strategies_lay_out_the_same_controls_and_text' (36648) panicked at native\src\ui\experiment\tests.rs:27:13:
+called `Result::unwrap()` on an `Err` value: Error("Malformed color: foreground", line: 0, column: 0)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::experiment::tests::strategies_lay_out_the_same_controls_and_text
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 45 filtered out; finished in 0.02s
+

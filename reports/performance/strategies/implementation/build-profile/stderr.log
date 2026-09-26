@@ -1,0 +1,9 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+error[E0463]: can't find crate for `gpui_kit`
+ --> native\src\diagnostics.rs:2:5
+  |
+2 | use gpui_kit::{App, Entity, Window};
+  |     ^^^^^^^^ can't find crate
+
+For more information about this error, try `rustc --explain E0463`.
+error: could not compile `gpuidart` (lib) due to 1 previous error

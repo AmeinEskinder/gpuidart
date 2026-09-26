@@ -150,6 +150,10 @@ enum ViewSelection {
 }
 
 pub(crate) struct DartView {
+    #[cfg(all(test, feature = "snapshot-experiment"))]
+    experiment_bounds: Option<Rc<RefCell<HashMap<String, Bounds<Pixels>>>>>,
+    #[cfg(feature = "snapshot-experiment")]
+    embedded: bool,
     snapshot: Snapshot,
     trace: Option<Arc<crate::trace::Trace>>,
     events: Events,
@@ -292,6 +296,10 @@ impl DartView {
             cx.stop_propagation();
         });
         let mut view = Self {
+            #[cfg(all(test, feature = "snapshot-experiment"))]
+            experiment_bounds: None,
+            #[cfg(feature = "snapshot-experiment")]
+            embedded: false,
             trace: None,
             snapshot: initial.snapshot,
             datasets: Store::new(initial.datasets),
@@ -854,7 +862,7 @@ impl DartView {
 
     fn materialize(&self, node: &Node, colors: &ThemeColor) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
-        Ok(match node {
+        let materialized = match node {
             Node::Column { children, .. } => apply_node_style(
                 div().id(id).v_flex().gap_3().w_full().children(
                     children
@@ -939,7 +947,17 @@ impl DartView {
                 colors,
             )
             .into_any_element(),
-        })
+        };
+        #[cfg(all(test, feature = "snapshot-experiment"))]
+        if let Some(bounds) = &self.experiment_bounds {
+            return Ok(experiment::BoundsProbe {
+                child: materialized,
+                id: node.id().to_owned(),
+                bounds: bounds.clone(),
+            }
+            .into_any_element());
+        }
+        Ok(materialized)
     }
 }
 
@@ -1056,6 +1074,8 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     element
 }
 
+#[cfg(feature = "snapshot-experiment")]
+pub(crate) mod experiment;
 #[cfg(test)]
 mod tests;
 
@@ -1072,6 +1092,10 @@ impl Render for DartView {
                 div().child("Unable to render this view").into_any_element()
             }
         };
+        #[cfg(feature = "snapshot-experiment")]
+        if self.embedded {
+            return content;
+        }
         let root = div()
             .id("gpuidart")
             .size_full()

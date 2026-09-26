@@ -6,6 +6,10 @@ mod clock;
 mod companion;
 mod datasets;
 mod diagnostics;
+#[cfg(feature = "snapshot-experiment")]
+mod experiment;
+#[cfg(feature = "snapshot-experiment")]
+pub use experiment::run as run_snapshot_experiment;
 #[cfg(all(feature = "allocation-profile", not(test)))]
 mod heap_profile;
 #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]

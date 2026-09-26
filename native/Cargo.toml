@@ -11,6 +11,12 @@ crate-type = ["cdylib", "rlib"]
 [features]
 benchmark-trace = []
 allocation-profile = []
+snapshot-experiment = []
+
+[[bin]]
+name = "gpuidart-snapshot-experiment"
+path = "src/bin/snapshot_experiment.rs"
+required-features = ["snapshot-experiment"]
 
 [dependencies]
 async-channel = "2"

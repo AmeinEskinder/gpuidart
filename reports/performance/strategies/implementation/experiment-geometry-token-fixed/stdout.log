@@ -1,0 +1,18 @@
+
+running 1 test
+test ui::experiment::tests::strategies_lay_out_the_same_controls_and_text ... FAILED
+
+failures:
+
+---- ui::experiment::tests::strategies_lay_out_the_same_controls_and_text stdout ----
+
+thread 'ui::experiment::tests::strategies_lay_out_the_same_controls_and_text' (35056) panicked at D:\Dev\gpuidart/.tools/cargo\git\checkouts\gpui-kit-ad7eb35d851fbd28\21622a7\crates\kit\src\test.rs:54:9:
+missing ElementId Name("retained-table") in scope []. Registered paths: [View(EntityId(6v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), View(EntityId(2v1)), Name("gpuidart"), Name("root"), Name("gpui_component::input::input::Input"), Name("retained-input")], [View(EntityId(6v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), View(EntityId(2v1)), Name("gpuidart"), Name("root"), Name("retained-table"), Name("gpui_component::table::data_table::DataTable<gpuidart::ui::Rows>"), Name("table"), View(EntityId(5v1)), Name("context-menu-Name(\"table-inner\")"), Name("table-inner"), Name("header"), Name("table-head"), NamedInteger("col-header", 0)], [View(EntityId(6v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), View(EntityId(2v1)), Name("gpuidart"), Name("root"), Name("retained-table"), Name("gpui_component::table::data_table::DataTable<gpuidart::ui::Rows>"), Name("table"), View(EntityId(5v1)), Name("context-menu-Name(\"table-inner\")"), Name("table-inner"), Name("header"), Name("table-head"), NamedInteger("col-header", 1)], [View(EntityId(6v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), View(EntityId(2v1)), Name("gpuidart"), Name("root"), Name("retained-table"), Name("gpui_component::table::data_table::DataTable<gpuidart::ui::Rows>"), Name("table"), View(EntityId(5v1)), Name("context-menu-Name(\"table-inner\")"), Name("table-inner"), Name("table-body"), Name("table-uniform-list"), NamedInteger("row", 0)], [View(EntityId(6v1)), Name("gpui_component::window_border::WindowBorder"), Name("root"), View(EntityId(1v1)), View(EntityId(2v1)), Name("gpuidart"), Name("root"), Name("retained-table"), Name("gpui_component::table::data_table::DataTable<gpuidart::ui::Rows>"), Name("table")]. Check the ID, observation, and completed frame.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::experiment::tests::strategies_lay_out_the_same_controls_and_text
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 45 filtered out; finished in 0.03s
+

@@ -1,0 +1,17 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+warning: linker stdout:    Creating library D:\Dev\gpuidart\target\debug\deps\gpuidart.dll.lib and object D:\Dev\gpuidart\target\debug\deps\gpuidart.dll.exp
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `gpuidart` (lib) generated 1 warning
+error: recursion limit reached while expanding `#[test]`
+ --> native\src\ui\experiment\tests.rs:4:1
+  |
+4 | #[gpui::test]
+  | ^^^^^^^^^^^^^
+  |
+  = help: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`gpuidart`)
+  = note: this error originates in the attribute macro `test` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: could not compile `gpuidart` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

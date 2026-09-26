@@ -1,0 +1,77 @@
+   Compiling gpuidart v0.1.0 (D:\Dev\gpuidart\native)
+
+thread 'coordinator' (33328) panicked at /rustc-dev/48a229ceaefd4985c50990b14116b6d856af0985/compiler\rustc_codegen_ssa\src\back\write.rs:1875:53:
+failed to spawn work thread: Os { code: 1455, kind: Uncategorized, message: "The paging file is too small for this operation to complete." }
+stack backtrace:
+rustc-LLVM ERROR: out of memory
+Allocation failed
+memory allocation of 2097152 bytes failed
+stack backtrace:
+   0:     0x7ffaf3a019b9 - std::sys::backtrace::impl$0::print::impl$0::fmt
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\sys\backtrace.rs:44
+   1:     0x7ffaf3a2a9f1 - core::fmt::write
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\core\src\fmt\mod.rs:0
+   2:     0x7ffaf3a11874 - std::io::Write::write_fmt<std::sys::stdio::windows::Stderr>
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\io\mod.rs:1730
+   3:     0x7ffaf39f393c - std::alloc::default_alloc_error_hook
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\alloc.rs:397
+   4:     0x7ffaf39d815c - std::alloc::rust_oom::closure$0
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\alloc.rs:428
+   5:     0x7ffaf39d578f - std::sys::backtrace::__rust_end_short_backtrace<std::alloc::rust_oom::closure_env$0,never$>
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\sys\backtrace.rs:182
+   6:     0x7ffaf39f39db - std::alloc::rust_oom
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\alloc.rs:424
+   7:     0x7ffaf39d8f98 - std::alloc::_::__rust_alloc_error_handler
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\alloc.rs:423
+   8:     0x7ffaf3a4d9e9 - alloc::alloc::handle_alloc_error
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\alloc\src\alloc.rs:557
+   9:     0x7ffaf3a4da06 - alloc::raw_vec::handle_error
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\alloc\src\raw_vec\mod.rs:894
+  10:     0x7ffa66cb6d43 - <unknown>
+  11:     0x7ffa66789d7e - <unknown>
+  12:     0x7ffa65203e56 - <unknown>
+  13:     0x7ffa6500d5ee - <unknown>
+  14:     0x7ffa64ee9457 - <unknown>
+  15:     0x7ffa6500d49f - <unknown>
+  16:     0x7ffa664f5243 - <unknown>
+  17:     0x7ffa65010a24 - <unknown>
+  18:     0x7ffa64f0a39b - <unknown>
+  19:     0x7ffa68acae89 - <unknown>
+  20:     0x7ffa664f6e05 - <unknown>
+  21:     0x7ffa65014010 - <unknown>
+  22:     0x7ffa662dfb0c - <unknown>
+  23:     0x7ffa65013ee7 - <unknown>
+  24:     0x7ffa66b4962b - <unknown>
+  25:     0x7ffa6594cae0 - <unknown>
+  26:     0x7ffa6592c6c9 - <unknown>
+  27:     0x7ffa6593e1ed - <unknown>
+  28:     0x7ffa663b39b3 - <unknown>
+  29:     0x7ffa66358fd2 - <unknown>
+  30:     0x7ffa663b304c - <unknown>
+  31:     0x7ffa65919eee - <unknown>
+  32:     0x7ffa659363dd - <unknown>
+  33:     0x7ffa6593a814 - <unknown>
+  34:     0x7ffa64c8d6d0 - <unknown>
+  35:     0x7ffa659237d8 - <unknown>
+  36:     0x7ffa65014a27 - <unknown>
+  37:     0x7ffa64f00f50 - <unknown>
+  38:     0x7ffa68acca91 - <unknown>
+  39:     0x7ffa628df30f - <unknown>
+  40:     0x7ffa6294b913 - <unknown>
+  41:     0x7ffa628be233 - <unknown>
+  42:     0x7ffa62890a59 - <unknown>
+  43:     0x7ffa62888a05 - <unknown>
+  44:     0x7ffa62894a97 - <unknown>
+  45:     0x7ffaf39fe6a3 - std::sys::thread::windows::impl$0::new::thread_start
+                               at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library\std\src\sys\thread\windows.rs:58
+  46:     0x7ffb6688cd87 - BaseThreadInitThunk
+  47:     0x7ffb68b6caec - RtlUserThreadStart
+error: could not compile `gpuidart` (lib test)
+
+Caused by:
+  process didn't exit successfully: `D:\Dev\gpuidart/.tools/rustup\toolchains\1.98.1-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name gpuidart --edition=2024 native\src\lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=1 --test --cfg "feature=\"snapshot-experiment\"" --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values(\"allocation-profile\", \"benchmark-trace\", \"snapshot-experiment\"))" -C metadata=7280a20b7f92d550 -C extra-filename=-2943ef3f50cf0116 --out-dir D:\Dev\gpuidart\target\debug\deps -C linker=D:\Dev\gpuidart\.tools\msvc\VC\Tools\MSVC\14.44.35207/bin/Hostx64/x64/link.exe -C incremental=D:\Dev\gpuidart\target\debug\incremental -L dependency=D:\Dev\gpuidart\target\debug\deps --extern async_channel=D:\Dev\gpuidart\target\debug\deps\libasync_channel-79a5d555e73d1810.rlib --extern gpui_kit=D:\Dev\gpuidart\target\debug\deps\libgpui_kit-282a2f93b1b49d16.rlib --extern libc=D:\Dev\gpuidart\target\debug\deps\liblibc-1337fe01a4f9e01a.rlib --extern serde=D:\Dev\gpuidart\target\debug\deps\libserde-7c947eff3a853623.rlib --extern serde_json=D:\Dev\gpuidart\target\debug\deps\libserde_json-7dddfdea5ec41479.rlib -L native=D:\Dev\gpuidart\target\debug\build\gpui-pre-a0208807e7484bc6\out -L native=D:\Dev\gpuidart/.tools/cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib` (exit code: 0xc0000409, STATUS_STACK_BUFFER_OVERRUN)
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `gpuidart` (lib)
+
+Caused by:
+  process didn't exit successfully: `D:\Dev\gpuidart/.tools/rustup\toolchains\1.98.1-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name gpuidart --edition=2024 native\src\lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type cdylib --crate-type rlib --emit=dep-info,link -C embed-bitcode=no -C debuginfo=1 --cfg "feature=\"snapshot-experiment\"" --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values(\"allocation-profile\", \"benchmark-trace\", \"snapshot-experiment\"))" -C metadata=061f4b89eb43afb4 --out-dir D:\Dev\gpuidart\target\debug\deps -C linker=D:\Dev\gpuidart\.tools\msvc\VC\Tools\MSVC\14.44.35207/bin/Hostx64/x64/link.exe -C incremental=D:\Dev\gpuidart\target\debug\incremental -L dependency=D:\Dev\gpuidart\target\debug\deps --extern async_channel=D:\Dev\gpuidart\target\debug\deps\libasync_channel-79a5d555e73d1810.rlib --extern gpui_kit=D:\Dev\gpuidart\target\debug\deps\libgpui_kit-282a2f93b1b49d16.rlib --extern libc=D:\Dev\gpuidart\target\debug\deps\liblibc-1337fe01a4f9e01a.rlib --extern serde=D:\Dev\gpuidart\target\debug\deps\libserde-7c947eff3a853623.rlib --extern serde_json=D:\Dev\gpuidart\target\debug\deps\libserde_json-7dddfdea5ec41479.rlib -L native=D:\Dev\gpuidart\target\debug\build\gpui-pre-a0208807e7484bc6\out -L native=D:\Dev\gpuidart/.tools/cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib -C link-arg=/MANIFEST:EMBED,ID=2 -C "link-arg=/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'"` (exit code: 0xc0000409, STATUS_STACK_BUFFER_OVERRUN)

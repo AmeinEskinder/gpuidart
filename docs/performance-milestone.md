@@ -65,5 +65,8 @@ the final commit, and a clean pushed tree.
   dedicated companion analysis are recorded. See [baselines](../reports/performance/baselines/README.md).
 - Snapshot-heavy gate: demonstrated by 18 Windows runs / 720 retained-state
   checks at 128/512/2048 properties. See [gate evidence](../reports/performance/snapshot-gate/README.md).
-  The three-strategy experiment has not yet been implemented.
+  The experimental three-strategy harness now passes local geometry, transaction
+  and live retained-state checks. It uses a common process transport and fixed
+  section bounds; see [experiment contract](../reports/performance/strategies/README.md).
+  Repeated measurements are next.
 - Measured optimization decisions and final CI: not started.

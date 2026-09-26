@@ -3,7 +3,7 @@ import 'package:gpuidart/gpuidart.dart';
 /// Synthetic device-property inspector: values live in node descriptions.
 /// The retained table is a state-preservation sentinel, not the workload data.
 final class SnapshotFixture {
-  SnapshotFixture(this.fields)
+  SnapshotFixture(this.fields, {this.fixedParts = false})
     : values = List.filled(fields, 0),
       order = List.generate((fields + 31) ~/ 32, (i) => i) {
     if (fields < 32 || fields > 3072) {
@@ -11,6 +11,7 @@ final class SnapshotFixture {
     }
   }
   final int fields;
+  final bool fixedParts;
   final List<int> values;
   List<int> order;
   final extras = <int>[];
@@ -49,17 +50,26 @@ final class SnapshotFixture {
           foreground: UiColor.token(ThemeToken.foreground),
         ),
       ),
-  ], style: const UiStyle(gap: 2));
+  ], style: UiStyle(gap: 2, height: fixedParts ? const UiSize.px(768) : null));
 
   UiNode build() => UiColumn('root', [
-    const UiInput('retained-input', placeholder: 'Retained input'),
+    UiInput(
+      'retained-input',
+      placeholder: 'Retained input',
+      style: fixedParts ? const UiStyle(height: UiSize.px(32)) : null,
+    ),
     const UiTable(
       'retained-table',
       dataset: 'records',
       style: UiStyle(height: UiSize.px(240)),
     ),
     for (final group in order) section(group),
-    for (final extra in extras) UiText('extra-$extra', 'Inserted $extra'),
+    for (final extra in extras)
+      UiText(
+        'extra-$extra',
+        'Inserted $extra',
+        style: fixedParts ? const UiStyle(height: UiSize.px(24)) : null,
+      ),
   ], style: const UiStyle(gap: 4));
 
   static TableDataset dataset() => TableDataset(

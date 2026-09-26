@@ -1,0 +1,88 @@
+name: Snapshot strategy measurements
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: snapshot-experiment-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      EXECUTABLE_SUFFIX: ${{ matrix.os == 'windows-2022' && '.exe' || '' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Linux build and display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers vulkan-tools x11-utils xvfb openbox xauth
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: snapshot-experiment-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            snapshot-experiment-${{ runner.os }}-${{ runner.arch }}-
+            performance-${{ runner.os }}-${{ runner.arch }}-
+      - name: Build normal and allocation-profile experiment executables
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+          mkdir -p build/strategies/normal build/strategies/profile
+          dart run tool/performance/run_logged.dart build/strategies/tests cargo test --locked -p gpuidart --lib --features snapshot-experiment experiment
+          dart run tool/performance/run_logged.dart build/strategies/build-normal cargo build --locked --release -p gpuidart -p gpuidart-launcher --features snapshot-experiment
+          cp target/release/gpuidart-snapshot-experiment${EXECUTABLE_SUFFIX} target/release/gpuidart-launcher${EXECUTABLE_SUFFIX} build/strategies/normal/
+          dart run tool/performance/run_logged.dart build/strategies/build-profile cargo build --locked --release -p gpuidart --features snapshot-experiment,allocation-profile --bin gpuidart-snapshot-experiment
+          cp target/release/gpuidart-snapshot-experiment${EXECUTABLE_SUFFIX} target/release/gpuidart-launcher${EXECUTABLE_SUFFIX} build/strategies/profile/
+      - name: Measure Windows and macOS strategies
+        if: runner.os != 'Linux'
+        run: |
+          dart run tool/record_platform_environment.dart build/strategies/environment.json
+          dart run tool/performance/run_logged.dart build/strategies/timing-command dart run tool/performance/run_strategies.dart build/strategies/timing build/strategies/normal/gpuidart-snapshot-experiment${EXECUTABLE_SUFFIX} build/strategies/normal/gpuidart-launcher${EXECUTABLE_SUFFIX} 3
+          dart run tool/performance/run_logged.dart build/strategies/allocation-command dart run tool/performance/run_strategies.dart build/strategies/allocation build/strategies/profile/gpuidart-snapshot-experiment${EXECUTABLE_SUFFIX} build/strategies/profile/gpuidart-launcher${EXECUTABLE_SUFFIX} 1
+      - name: Measure Linux strategies under X11
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'CHECKS'
+          unset WAYLAND_DISPLAY ZED_HEADLESS
+          openbox >build/strategies/openbox.log 2>&1 &
+          dart run tool/record_platform_environment.dart build/strategies/environment.json
+          dart run tool/performance/run_logged.dart build/strategies/timing-command dart run tool/performance/run_strategies.dart build/strategies/timing build/strategies/normal/gpuidart-snapshot-experiment build/strategies/normal/gpuidart-launcher 3
+          dart run tool/performance/run_logged.dart build/strategies/allocation-command dart run tool/performance/run_strategies.dart build/strategies/allocation build/strategies/profile/gpuidart-snapshot-experiment build/strategies/profile/gpuidart-launcher 1
+          CHECKS
+      - name: Retain every attempted measurement
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: strategies-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/strategies/**/*.json
+            build/strategies/**/*.log
+          retention-days: 30
