@@ -1,0 +1,178 @@
+{
+  "source_commit": "8df7e771810ed7f41c429671bcb42b7781518f0f",
+  "scope": "Windows local correctness with current debug DLL; no performance or presentation claim. AOT refers to Dart application compilation.",
+  "files": [
+    {
+      "file": "windows-100k-jit.trace.json",
+      "sha256": "4492eff8e8daa34d54f5cd3a528b6cd8e34cfc93fc0fd75b23753a127134a993"
+    },
+    {
+      "file": "windows-100k-aot.trace.json",
+      "sha256": "30cbb9e0cf6cd19f23af2d85ded258cd7358db6e88e1660fabb558142d92fc4d"
+    },
+    {
+      "file": "windows-100k-reload.json",
+      "sha256": "f11661b616c346176874ecdc538dc8ddda8290809127d2fb6bd0b25f99dbb88a"
+    },
+    {
+      "file": "windows-100k-reload.json.trace.json",
+      "sha256": "ca56830c73775d914ef874430b93ac3d50dfe147baac888b6700271a4d205ca3"
+    },
+    {
+      "file": "windows-controls-6.json",
+      "sha256": "4d06064071f0353be875eb28454bc721848f75123a2f088a6b1343fc378f9803"
+    },
+    {
+      "file": "settings-platform-4.json",
+      "sha256": "43e131d92919d2fbd7960be9d2d2ede88f79a61da4547d37ef355a40999b9a31"
+    }
+  ],
+  "windows-100k-jit": {
+    "passed": true,
+    "mode": "jit",
+    "rows": 100000,
+    "cell_updates": 30,
+    "snapshot_updates": 30,
+    "trace_records": 1011,
+    "trace": "D:\\Dev\\gpuidart\\build/accessibility/windows-100k-jit.trace.json",
+    "metrics": {
+      "description_builds": 31,
+      "encoded_snapshots": 30,
+      "encoded_bytes": 4993,
+      "ffi_callbacks": 64,
+      "ui_callbacks": 0,
+      "diagnostic_callbacks": 1,
+      "description_build": {
+        "samples": 31,
+        "p50_us": 11,
+        "p95_us": 80,
+        "p99_us": 896
+      },
+      "encode": {
+        "samples": 30,
+        "p50_us": 56,
+        "p95_us": 86,
+        "p99_us": 125
+      },
+      "publish_to_applied": {
+        "samples": 30,
+        "p50_us": 1069,
+        "p95_us": 17059,
+        "p99_us": 17600
+      },
+      "initial": {
+        "bytes": 2178104,
+        "encode_us": 52647
+      },
+      "data_messages": 30,
+      "data_bytes": 4584,
+      "data_records_checked": 30,
+      "data_cells_written": 30,
+      "data_encode": {
+        "samples": 30,
+        "p50_us": 56,
+        "p95_us": 79,
+        "p99_us": 436
+      },
+      "data_publish_to_applied": {
+        "samples": 30,
+        "p50_us": 14019,
+        "p95_us": 17419,
+        "p99_us": 18021
+      },
+      "native_data_parse": {
+        "samples": 30,
+        "p50_us": 59,
+        "p95_us": 82,
+        "p99_us": 96
+      },
+      "native_data_apply": {
+        "samples": 30,
+        "p50_us": 59,
+        "p95_us": 95,
+        "p99_us": 712
+      },
+      "native_snapshot_apply": {
+        "samples": 30,
+        "p50_us": 38,
+        "p95_us": 55,
+        "p99_us": 64
+      }
+    },
+    "scope": "Tracing smoke check; instrumentation enabled. No input-to-present measurement."
+  },
+  "windows-100k-aot": {
+    "passed": true,
+    "mode": "aot",
+    "rows": 100000,
+    "cell_updates": 30,
+    "snapshot_updates": 30,
+    "trace_records": 980,
+    "trace": "D:\\Dev\\gpuidart\\build/accessibility/windows-100k-aot.trace.json",
+    "metrics": {
+      "description_builds": 31,
+      "encoded_snapshots": 30,
+      "encoded_bytes": 4993,
+      "ffi_callbacks": 64,
+      "ui_callbacks": 0,
+      "diagnostic_callbacks": 1,
+      "description_build": {
+        "samples": 31,
+        "p50_us": 1,
+        "p95_us": 3,
+        "p99_us": 36
+      },
+      "encode": {
+        "samples": 30,
+        "p50_us": 6,
+        "p95_us": 9,
+        "p99_us": 10
+      },
+      "publish_to_applied": {
+        "samples": 30,
+        "p50_us": 160,
+        "p95_us": 561,
+        "p99_us": 15468
+      },
+      "initial": {
+        "bytes": 2178104,
+        "encode_us": 27598
+      },
+      "data_messages": 30,
+      "data_bytes": 4584,
+      "data_records_checked": 30,
+      "data_cells_written": 30,
+      "data_encode": {
+        "samples": 30,
+        "p50_us": 6,
+        "p95_us": 17,
+        "p99_us": 20
+      },
+      "data_publish_to_applied": {
+        "samples": 30,
+        "p50_us": 172,
+        "p95_us": 453,
+        "p99_us": 578
+      },
+      "native_data_parse": {
+        "samples": 30,
+        "p50_us": 26,
+        "p95_us": 81,
+        "p99_us": 105
+      },
+      "native_data_apply": {
+        "samples": 30,
+        "p50_us": 24,
+        "p95_us": 43,
+        "p99_us": 91
+      },
+      "native_snapshot_apply": {
+        "samples": 30,
+        "p50_us": 18,
+        "p95_us": 27,
+        "p99_us": 46
+      }
+    },
+    "scope": "Tracing smoke check; instrumentation enabled. No input-to-present measurement."
+  }
+}

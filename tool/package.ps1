@@ -40,6 +40,9 @@ try {
     $kitRoot = Split-Path (Split-Path (Split-Path $kit.manifest_path -Parent) -Parent) -Parent
     Copy-Item -LiteralPath (Join-Path $kitRoot 'LICENSE-APACHE') -Destination "$packageDirectory/GPUI-Kit-LICENSE.txt"
     Copy-Item -LiteralPath "$projectRoot/LICENSE" -Destination "$packageDirectory/LICENSE"
+    Copy-Item -LiteralPath "$projectRoot/native/vendor/NOTICE" -Destination "$packageDirectory/AccessKit-NOTICE.txt"
+    Copy-Item -LiteralPath "$projectRoot/native/vendor/LICENSE-MIT" -Destination "$packageDirectory/AccessKit-LICENSE-MIT.txt"
+    Copy-Item -LiteralPath "$projectRoot/native/vendor/LICENSE-APACHE" -Destination "$packageDirectory/AccessKit-LICENSE-APACHE.txt"
     $dartSdk = & dart run "$PSScriptRoot/src/dart_sdk.dart"
     if ($LASTEXITCODE -ne 0) { throw 'Could not locate the Dart runtime license' }
     Copy-Item -LiteralPath (Join-Path $dartSdk 'LICENSE') -Destination "$packageDirectory/Dart-LICENSE.txt"
@@ -67,12 +70,12 @@ See RELEASE-CHECKS.md for the clean-machine and manual IME checks.
 
 GPUI-Dart is MIT licensed. See LICENSE for the project's copyright and terms.
 This evaluation package also uses GPUI Kit (Apache-2.0) and the Dart runtime.
-Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt and Dart-LICENSE.txt.
+Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, AccessKit-LICENSE-*.txt and Dart-LICENSE.txt.
 vcruntime140.dll comes from Microsoft's release x64 Visual C++ redistributable.
 See the source lockfiles for dependencies. This is an evaluation ZIP, not a signed installer.
 '@.Replace('gpuidart.exe', "$Name.exe").Replace('{{APPLICATION_NOTES}}', $applicationNotes) | Set-Content -LiteralPath "$packageDirectory/README.txt" -Encoding UTF8
 
-    $names = @("$Name.exe", 'gpuidart.dll', 'vcruntime140.dll', 'LICENSE', 'GPUI-Kit-LICENSE.txt', 'Dart-LICENSE.txt', 'README.txt', 'verify.ps1', 'RELEASE-CHECKS.md')
+    $names = @("$Name.exe", 'gpuidart.dll', 'vcruntime140.dll', 'LICENSE', 'GPUI-Kit-LICENSE.txt', 'AccessKit-NOTICE.txt', 'AccessKit-LICENSE-MIT.txt', 'AccessKit-LICENSE-APACHE.txt', 'Dart-LICENSE.txt', 'README.txt', 'verify.ps1', 'RELEASE-CHECKS.md')
     $files = foreach ($fileName in $names) {
         $path = Join-Path $packageDirectory $fileName
         [ordered]@{name=$fileName; bytes=(Get-Item -LiteralPath $path).Length; sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()}

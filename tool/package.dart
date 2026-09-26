@@ -130,6 +130,11 @@ Future<void> main(List<String> args) async {
   await File('${kitRoot.path}/LICENSE-APACHE')
       .copy('${stage.path}/GPUI-Kit-LICENSE.txt');
   await File('LICENSE').copy('${stage.path}/LICENSE');
+  await File('native/vendor/NOTICE').copy('${stage.path}/AccessKit-NOTICE.txt');
+  await File('native/vendor/LICENSE-MIT')
+      .copy('${stage.path}/AccessKit-LICENSE-MIT.txt');
+  await File('native/vendor/LICENSE-APACHE')
+      .copy('${stage.path}/AccessKit-LICENSE-APACHE.txt');
   await File.fromUri(
     File(Platform.resolvedExecutable).parent.parent.uri.resolve('LICENSE'),
   ).copy('${stage.path}/Dart-LICENSE.txt');
@@ -175,7 +180,7 @@ On a machine without developer inspection tools, use ./verify --runtime-only --r
 See RELEASE-CHECKS.md for OS prerequisites and human checks.
 ${Platform.isMacOS ? 'This app has an ad-hoc signature. Developer ID distribution and notarization are unverified.' : 'Requires Ubuntu 24.04 x64, X11 and the documented system runtime libraries.'}
 GPUI-Dart is MIT licensed. See LICENSE for the project's copyright and terms.
-Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, Dart-LICENSE.txt and THIRD-PARTY.json.
+Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, AccessKit-LICENSE-*.txt, Dart-LICENSE.txt and THIRD-PARTY.json.
 ''');
   final files = await stage
       .list(recursive: true, followLinks: false)

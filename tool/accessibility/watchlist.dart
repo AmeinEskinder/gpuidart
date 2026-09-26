@@ -59,12 +59,11 @@ Future<void> main(List<String> args) async {
     }
 
     report['unavailable'] = [
-      if (Platform.isWindows) 'Pinned UIA adapter has no Grid/Table or row SelectionItem patterns; native diagnostic selects the row; retained selection is checked through inspect, not claimed as a UIA query/action.',
+      if (Platform.isWindows) 'UIA Grid/Table coordinate patterns remain unavailable; row SelectionItem is supplied by the pinned adapter patch.',
       if (Platform.isLinux) 'Pinned AT-SPI adapter has no EditableText; search uses GPUI diagnostic keys and external Text reads.',
     ];
     bool rowSelected(List nodes) =>
-        find(nodes, rowId) != null &&
-        (Platform.isWindows || find(nodes, rowId)?['selected'] == true);
+        find(nodes, rowId) != null && find(nodes, rowId)?['selected'] == true;
     Future<void> search(String text) async {
       if (Platform.isLinux) {
         await app.call('accessibility_text', parameters: {'text': text});
@@ -97,15 +96,9 @@ Future<void> main(List<String> args) async {
           state['state']['tables']['watchlist']['view']['view_rows'] == 1 &&
           state['state']['tables']['watchlist']['row_count'] == 100000,
     );
-    if (Platform.isWindows) {
-      await app.call('accessibility_select', parameters: {'row': '0'});
-    } else {
-      await platformQuery(process, operation: 'invoke', id: rowId);
-    }
+    await platformQuery(process, operation: 'select', id: rowId);
     await until(
-      Platform.isWindows
-          ? 'native selection with UIA record query'
-          : 'platform row selection reaches application',
+      'platform row selection reaches application',
       (nodes, state) => state['selected'] == 'BRK0025' && rowSelected(nodes),
     );
     await platformQuery(process, operation: 'invoke', id: 'tick');

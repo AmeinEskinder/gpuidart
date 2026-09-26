@@ -61,6 +61,7 @@ jobs:
         run: |
           rustup show active-toolchain
           dart pub get --enforce-lockfile
+          dart run tool/accessibility/verify_vendor.dart
           cargo build --locked -p gpuidart -p gpuidart-launcher
       - name: Build macOS external AX client
         if: runner.os == 'macOS'

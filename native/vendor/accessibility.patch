@@ -1,0 +1,55 @@
+--- upstream/accesskit_atspi_common-0.19.1/src/node.rs
++++ patched/accesskit_atspi_common-0.19.1/src/node.rs
+@@ -372,7 +372,7 @@
+ 
+         if state.is_read_only_supported() && state.is_read_only_or_disabled() {
+             atspi_state.insert(State::ReadOnly);
+-        } else {
++        } else if !state.is_disabled() {
+             atspi_state.insert(State::Enabled | State::Sensitive);
+         }
+ 
+--- upstream/accesskit_consumer-0.38.0/src/node.rs
++++ patched/accesskit_consumer-0.38.0/src/node.rs
+@@ -903,7 +903,8 @@
+     pub fn is_item_like(&self) -> bool {
+         matches!(
+             self.role(),
+-            Role::Article
++            Role::Row
++                | Role::Article
+                 | Role::Comment
+                 | Role::ListItem
+                 | Role::MenuItem
+@@ -921,7 +922,8 @@
+     pub fn is_container_with_selectable_children(&self) -> bool {
+         matches!(
+             self.role(),
+-            Role::ComboBox
++            Role::Table
++                | Role::ComboBox
+                 | Role::EditableComboBox
+                 | Role::Grid
+                 | Role::ListBox
+--- upstream/accesskit_windows-0.34.0/src/node.rs
++++ patched/accesskit_windows-0.34.0/src/node.rs
+@@ -646,7 +646,8 @@
+ 
+     pub(crate) fn is_selection_item_pattern_supported(&self) -> bool {
+         match self.node.role() {
+-            // TODO: tables (#29)
++            // Grid/Table coordinate patterns remain unsupported; selectable
++            // rows use the existing SelectionItem action and state mapping.
+             // https://www.w3.org/TR/core-aam-1.1/#mapping_state-property_table
+             // SelectionItem.IsSelected is exposed when aria-checked is True or
+             // False, for 'radio' and 'menuitemradio' roles.
+@@ -655,7 +656,8 @@
+             }
+             // https://www.w3.org/TR/wai-aria-1.1/#aria-selected
+             // SelectionItem.IsSelected is exposed when aria-select is True or False.
+-            Role::ListBoxOption
++            Role::Row
++            | Role::ListBoxOption
+             | Role::ListItem
+             | Role::MenuListOption
+             | Role::Tab

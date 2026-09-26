@@ -18,6 +18,10 @@ Future<void> main(List<String> args) async {
     if (status != 0) exit(status);
   }
 
+  await run(Platform.resolvedExecutable, [
+    'run',
+    'tool/accessibility/verify_vendor.dart',
+  ]);
   await run('cargo', ['fmt', '--all', '--check']);
   await run('rustfmt', [
     '--edition',

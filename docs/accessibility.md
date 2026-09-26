@@ -141,9 +141,11 @@ persistent OS object handles or offscreen table navigation.
 
 ### Known pinned-adapter gaps
 
-- Windows AccessKit 0.34.0 has no Grid/Table patterns or row SelectionItem pattern.
-  Selected-state rows also lack Invoke. The Watchlist verifier declares its native
-  selection driver/state assertions separately from external UIA content queries.
+- Windows AccessKit 0.34.0 has no Grid/Table coordinate patterns. A narrow
+  [pinned dependency patch](../native/vendor/README.md) adds row SelectionItem
+  support; the same consumer correction exposes AX selected-row attributes.
+  The AT-SPI patch prevents disabled buttons from being reported as enabled.
+  Unmodified-upstream failures are retained in the report.
 - Linux AccessKit AT-SPI 0.19.1 has no EditableText interface. External Text reads
   are supported by structured text children; Linux test edits use declared GPUI
   diagnostic keys. They are not AT-SPI write passes.

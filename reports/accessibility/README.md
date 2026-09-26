@@ -156,3 +156,35 @@ reached the new Text interface but Python GI resolved an inherited deprecated
 The rendered-cell headless test now also checks Row/Cell roles and the formatted
 price label; its first compile caught a missing qualified Role type, then the
 selector's owned-SharedString requirement. The corrected test passes.
+
+## Adapter mapping corrections
+
+At `8df7e77`, Linux passes all nine control steps (declared GPUI-key text-write
+path, external AT-SPI reads), but `linux-disabled-1.json` shows a disabled Confirm
+button reported enabled. Source in accesskit_atspi_common grants Enabled/Sensitive
+whenever read-only state is unsupported, even if disabled. macOS Settings and
+disabled checks pass; `macos-watchlist-2.json` proves AXPress selected BRK0025 in the
+application, but AXSelected was absent. The consumer excludes Row/Table from
+item/container classification. Windows additionally excludes Row from its
+SelectionItem provider. These are adapter omissions; changing SDK roles or
+accepting false states would hide them.
+
+Three narrowly patched, version-preserving AccessKit crates are now vendored;
+[the complete patch and provenance](../../native/vendor/README.md) separate four
+mapping corrections from upstream source. The Watchlist verifier now requires
+external row-selection actions and selected-state queries on **all** platforms;
+the earlier Windows diagnostic-selection fallback was removed. General Grid/Table
+coordinate patterns and AT-SPI EditableText remain unimplemented. The real disabled
+button assertion remains required on Linux. Updated Windows verification and hosted
+runs are pending at this source checkpoint.
+
+The patched Windows build now passes `watchlist-platform-4.json`: UIA
+SelectionItem.Select reaches Dart and UIA IsSelected remains true through filter
+clearing and sorting. The diagnostic-selection fallback is gone. Initial/full
+view captures have 72 nodes, one-record views have 24; both contain the same
+record/cell author IDs for BRK0025. Existing native construction/allocation tests
+provide the separate viewport-scaling check. Before the dependency patch, Windows
+57 native + 56 headless Dart + 6 live-window tests, 15 Settings steps, 9 control
+steps, 100k JIT/AOT traces (zero dropped records) and 11 code reloads passed; raw
+regression captures and source hash are in `windows-regression/`. Dependency-patch
+checks are recorded separately as they complete.

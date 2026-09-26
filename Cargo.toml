@@ -16,3 +16,10 @@ debug = 1
 
 [profile.release]
 panic = "unwind"
+
+# Narrow accessibility adapter fixes; provenance and patch-only diff are in
+# native/vendor/README.md. GPUI/Kit revisions and dependency versions are unchanged.
+[patch.crates-io]
+accesskit_atspi_common = { path = "native/vendor/accesskit_atspi_common-0.19.1" }
+accesskit_consumer = { path = "native/vendor/accesskit_consumer-0.38.0" }
+accesskit_windows = { path = "native/vendor/accesskit_windows-0.34.0" }
