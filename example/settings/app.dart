@@ -321,6 +321,7 @@ final class SettingsApplication {
           return;
         }
         draft = draft.copyWith(name: current.value);
+        _nameState = current;
       }
       if (draft.name.trim().isEmpty) {
         status = 'Enter a display name before applying.';
