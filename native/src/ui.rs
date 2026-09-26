@@ -10,7 +10,7 @@ use crate::{
 };
 use async_channel::Receiver;
 use gpui_kit::assets::IconName;
-use gpui_kit::base::ScrollbarHandle;
+use gpui_kit::base::{ScrollbarHandle, TestSupportExt};
 use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
     ActiveTheme, Disableable, Icon, StyledExt,
@@ -31,6 +31,7 @@ use std::{
 };
 
 struct Rows {
+    table_id: String,
     data: SharedDataset,
     /// View index: view row -> source row. Identity mapping when the table
     /// has no view.
@@ -41,6 +42,14 @@ struct Rows {
 impl Rows {
     fn source_row(&self, view_row: usize) -> usize {
         self.index.borrow()[view_row]
+    }
+
+    fn record_key(&self, source: usize) -> String {
+        let data = self.data.borrow();
+        match &data.data.ids {
+            Some(ids) => json!([self.table_id, data.id, "record", ids[source]]).to_string(),
+            None => json!([self.table_id, data.id, "source", source]).to_string(),
+        }
     }
 }
 
@@ -58,6 +67,23 @@ impl TableDelegate for Rows {
         )
         .width(px(200.))
     }
+    fn render_th(
+        &mut self,
+        col: usize,
+        _: &mut Window,
+        _: &mut Context<TableState<Self>>,
+    ) -> impl IntoElement {
+        let label = self.data.borrow().data.columns[col].clone();
+        div()
+            .id(("column-header", col))
+            .role(Role::ColumnHeader)
+            .accessibility_id(json!([self.table_id, "column", col]).to_string())
+            .aria_column_index(col)
+            .test_support()
+            .aria_label(label.clone())
+            .size_full()
+            .child(label)
+    }
     fn render_td(
         &mut self,
         row: usize,
@@ -69,18 +95,31 @@ impl TableDelegate for Rows {
         let source = self.source_row(row);
         let data = self.data.borrow();
         let raw = data.data.rows[source][col].clone();
+        let cell_id = json!([self.record_key(source), "cell", col]).to_string();
+        let semantic_cell = div()
+            .id(SharedString::from(cell_id.clone()))
+            .accessibility_id(cell_id)
+            .role(Role::Cell)
+            .test_support()
+            .aria_row_index(row)
+            .aria_column_index(col);
         let Some(format) = data
             .data
             .format
             .as_ref()
             .and_then(|format| format.columns.get(&col))
         else {
-            return div().child(raw).into_any_element();
+            return semantic_cell
+                .aria_label(raw.clone())
+                .child(raw)
+                .into_any_element();
         };
         let formatted = format.apply(&raw);
         let colors = cx.theme().colors.clone();
         let color = formatted.color.map(|color| resolve_color(color, &colors));
-        let mut cell = div().child(formatted.text);
+        let mut cell = semantic_cell
+            .aria_label(formatted.text.clone())
+            .child(formatted.text);
         if let Some(color) = color {
             cell = cell.text_color(color);
         }
@@ -114,7 +153,13 @@ impl TableDelegate for Rows {
         // Key real rows by source record so element identity survives view
         // changes; the table also asks for filler rows past the view's end.
         match self.index.borrow().get(row) {
-            Some(&source) => div().id(("row", source)),
+            Some(&source) => {
+                let key = self.record_key(source);
+                div()
+                    .id(SharedString::from(key.clone()))
+                    .accessibility_id(key)
+                    .aria_row_index(row)
+            }
             None => div().id(("row-filler", row)),
         }
     }
@@ -773,6 +818,7 @@ impl DartView {
                     let table = cx.new(|cx| {
                         TableState::new(
                             Rows {
+                                table_id: id.clone(),
                                 data: data.clone(),
                                 index,
                                 counters: self.counters.clone(),
@@ -923,40 +969,63 @@ impl DartView {
         }
     }
 
-    fn materialize(&self, node: &Node, colors: &ThemeColor) -> Result<AnyElement, String> {
+    fn materialize(
+        &self,
+        node: &Node,
+        colors: &ThemeColor,
+        cx: &App,
+    ) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
         let materialized = match node {
             Node::Column { children, .. } => apply_node_style(
-                div().id(id).v_flex().gap_3().w_full().children(
-                    children
-                        .iter()
-                        .map(|child| self.materialize(child, colors))
-                        .collect::<Result<Vec<_>, _>>()?,
-                ),
+                annotate(div().id(id), node)
+                    .test_support()
+                    .v_flex()
+                    .gap_3()
+                    .w_full()
+                    .children(
+                        children
+                            .iter()
+                            .map(|child| self.materialize(child, colors, cx))
+                            .collect::<Result<Vec<_>, _>>()?,
+                    ),
                 node,
                 colors,
             )
             .into_any_element(),
             Node::Row { children, .. } => apply_node_style(
-                div().id(id).h_flex().flex_wrap().gap_3().w_full().children(
-                    children
-                        .iter()
-                        .map(|child| self.materialize(child, colors))
-                        .collect::<Result<Vec<_>, _>>()?,
-                ),
+                annotate(div().id(id), node)
+                    .test_support()
+                    .h_flex()
+                    .flex_wrap()
+                    .gap_3()
+                    .w_full()
+                    .children(
+                        children
+                            .iter()
+                            .map(|child| self.materialize(child, colors, cx))
+                            .collect::<Result<Vec<_>, _>>()?,
+                    ),
                 node,
                 colors,
             )
             .into_any_element(),
-            Node::Text { text, .. } => {
-                apply_node_style(div().id(id).child(text.clone()), node, colors).into_any_element()
-            }
+            Node::Text { text, .. } => apply_node_style(
+                annotate(div().id(id), node)
+                    .test_support()
+                    .child(text.clone()),
+                node,
+                colors,
+            )
+            .into_any_element(),
             Node::Button { label, .. } => {
                 let events = self.events.clone();
                 let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
                 apply_node_style(
                     Button::new(id)
+                        .accessibility_id(node.id().to_owned())
+                        .accessibility_label(accessible_name(node))
                         .primary()
                         .label(label.clone())
                         .on_click(move |_, _, _| {
@@ -988,9 +1057,19 @@ impl DartView {
                 let revision = self.snapshot.revision;
                 apply_node_style(
                     Checkbox::new(id)
+                        .accessibility_id(node.id().to_owned())
+                        .accessibility_label(accessible_name(node))
                         .label(label.clone())
                         .checked(*checked)
                         .disabled(*disabled)
+                        .a11y_synthetic_children({
+                            let disabled = *disabled;
+                            move |tree| {
+                                if disabled {
+                                    tree.parent_node().set_disabled();
+                                }
+                            }
+                        })
                         .on_change(move |checked, _, _| {
                             events.emit(Event::CheckboxChange {
                                 revision,
@@ -1003,7 +1082,7 @@ impl DartView {
                 )
                 .into_any_element()
             }
-            Node::Slider { .. } => self.slider_element(node, colors)?,
+            Node::Slider { .. } => self.slider_element(node, colors, cx)?,
             Node::Select { .. } => self.select_element(node, colors)?,
             Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
             Node::Input { id, .. } => apply_node_style(
@@ -1014,31 +1093,32 @@ impl DartView {
                         .ok_or_else(|| format!("Missing retained input: {id}"))?
                         .state,
                 )
-                .id(SharedString::from(id.clone())),
+                .id(SharedString::from(id.clone()))
+                .accessibility_id(id.clone())
+                .aria_label(accessible_name(node)),
                 node,
                 colors,
             )
             .into_any_element(),
-            Node::Table { id, .. } => apply_node_style(
-                div()
-                    .id(SharedString::from(id.clone()))
-                    .w_full()
-                    .h(px(320.))
-                    .child(
-                        DataTable::new(
-                            &self
-                                .tables
-                                .get(id)
-                                .ok_or_else(|| format!("Missing retained table: {id}"))?
-                                .state,
-                        )
-                        .stripe(true)
-                        .bordered(true),
-                    ),
-                node,
-                colors,
-            )
-            .into_any_element(),
+            Node::Table { id, .. } => {
+                let table = &self
+                    .tables
+                    .get(id)
+                    .ok_or_else(|| format!("Missing retained table: {id}"))?
+                    .state;
+                let delegate = table.read(cx).delegate();
+                apply_node_style(
+                    annotate(div().id(SharedString::from(id.clone())), node)
+                        .aria_row_count(delegate.index.borrow().len())
+                        .aria_column_count(delegate.data.borrow().data.columns.len())
+                        .w_full()
+                        .h(px(320.))
+                        .child(DataTable::new(table).stripe(true).bordered(true)),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
         };
         #[cfg(all(test, feature = "snapshot-experiment"))]
         if let Some(bounds) = &self.experiment_bounds {
@@ -1167,6 +1247,12 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
 }
 
 mod controls;
+mod select_semantics;
+mod semantics;
+#[cfg(test)]
+mod semantics_tests;
+mod slider;
+use semantics::{accessible_name, annotate};
 #[cfg(test)]
 mod controls_tests;
 mod dialogs;
@@ -1184,7 +1270,7 @@ impl Render for DartView {
             .materializations
             .set(self.counters.materializations.get() + 1);
         let colors = cx.theme().colors.clone();
-        let content = match self.materialize(&self.snapshot.root, &colors) {
+        let content = match self.materialize(&self.snapshot.root, &colors, cx) {
             Ok(content) => content,
             Err(message) => {
                 self.fail(message, cx);
@@ -1197,6 +1283,15 @@ impl Render for DartView {
         }
         let root = div()
             .id("gpuidart")
+            .role(Role::Group)
+            .a11y_synthetic_children({
+                let modal = self.active_dialog.clone();
+                move |tree| {
+                    if modal.borrow().is_some() {
+                        tree.parent_node().set_hidden();
+                    }
+                }
+            })
             .size_full()
             .overflow_y_scroll()
             .track_scroll(&self.scroll)

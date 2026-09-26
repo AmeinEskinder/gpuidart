@@ -1,5 +1,6 @@
 use super::*;
-use gpui_kit::component::{WindowExt, dialog::DialogButtonProps};
+use gpui_kit::base::TestSupportExt;
+use gpui_kit::component::WindowExt;
 use std::cell::Cell;
 
 pub(super) type ActiveDialog = Rc<RefCell<Option<Rc<Session>>>>;
@@ -80,7 +81,9 @@ impl DartView {
         let events = self.events.clone();
         let revision = self.snapshot.revision;
         Ok(apply_node_style(
-            Button::new(SharedString::from(id.clone()))
+            super::semantics::control(Button::new(SharedString::from(id.clone())), node, *disabled)
+                .accessibility_id(id.clone())
+                .accessibility_label(accessible_name(node))
                 .label(label.clone())
                 .disabled(*disabled)
                 .on_click(move |_, window, cx| {
@@ -94,6 +97,7 @@ impl DartView {
                         closed: Cell::new(false),
                     });
                     *active.borrow_mut() = Some(session.clone());
+                    window.refresh();
                     let (active, events) = (active.clone(), events.clone());
                     let (title, message, confirm_label, cancel_label) = (
                         title.clone(),
@@ -105,21 +109,79 @@ impl DartView {
                         let accepted = session.clone();
                         let (closed, active, events) =
                             (session.clone(), active.clone(), events.clone());
-                        dialog
-                            .title(title.clone())
-                            .child(message.clone())
-                            .overlay_closable(false)
-                            .button_props(
-                                DialogButtonProps::default()
-                                    .show_cancel(true)
-                                    .ok_text(confirm_label.clone())
-                                    .cancel_text(cancel_label.clone()),
+                        let (ok_session, ok_active, ok_events) =
+                            (session.clone(), active.clone(), events.clone());
+                        let (cancel_session, cancel_active, cancel_events) =
+                            (session.clone(), active.clone(), events.clone());
+                        // Supply the actual modal content and buttons. At this pin,
+                        // button_props configures decisions but creates no footer.
+                        let content = div()
+                            .id("confirmation-content")
+                            .test_support()
+                            .role(Role::Dialog)
+                            .aria_label(title.clone())
+                            .accessibility_id(json!(["dialog", session.id]).to_string())
+                            .a11y_synthetic_children(|tree| tree.parent_node().set_modal())
+                            .v_flex()
+                            .gap_4()
+                            .child(
+                                div()
+                                    .id("confirmation-title")
+                                    .role(Role::Heading)
+                                    .aria_level(2)
+                                    .aria_label(title.clone())
+                                    .text_lg()
+                                    .child(title.clone()),
                             )
+                            .child(
+                                div()
+                                    .id("confirmation-message")
+                                    .role(Role::Label)
+                                    .aria_value(message.clone())
+                                    .child(message.clone()),
+                            )
+                            .child(
+                                div()
+                                    .h_flex()
+                                    .justify_end()
+                                    .gap_2()
+                                    .child(
+                                        Button::new("cancel").label(cancel_label.clone()).on_click(
+                                            move |_, window, cx| {
+                                                finish(
+                                                    &cancel_active,
+                                                    &cancel_session,
+                                                    &cancel_events,
+                                                );
+                                                window.close_dialog(cx);
+                                                window.refresh();
+                                            },
+                                        ),
+                                    )
+                                    .child(
+                                        Button::new("ok")
+                                            .primary()
+                                            .label(confirm_label.clone())
+                                            .on_click(move |_, window, cx| {
+                                                ok_session.confirmed.set(true);
+                                                finish(&ok_active, &ok_session, &ok_events);
+                                                window.close_dialog(cx);
+                                                window.refresh();
+                                            }),
+                                    ),
+                            );
+                        dialog
+                            .child(content)
+                            .close_button(false)
+                            .overlay_closable(false)
                             .on_ok(move |_, _, _| {
                                 accepted.confirmed.set(true);
                                 true
                             })
-                            .on_close(move |_, _, _| finish(&active, &closed, &events))
+                            .on_close(move |_, window, _| {
+                                finish(&active, &closed, &events);
+                                window.refresh();
+                            })
                     });
                 }),
             node,

@@ -1,7 +1,9 @@
+use super::select_semantics::AccessibleSelect;
+use super::slider::SliderPresentation;
 use super::*;
 use crate::protocol::SelectOption;
 use gpui_kit::base::TestSupportExt;
-use gpui_kit::component::slider::{Slider, SliderEvent, SliderState};
+use gpui_kit::component::slider::{SliderEvent, SliderState};
 use gpui_kit::component::{
     IndexPath,
     select::{Select, SelectEvent, SelectItem, SelectState},
@@ -221,9 +223,14 @@ impl DartView {
                 this.h(style_length(height))
             })
             .child(apply_node_style(
-                Select::new(&retained.state)
-                    .placeholder(placeholder.clone())
-                    .disabled(*disabled),
+                AccessibleSelect {
+                    select: Select::new(&retained.state)
+                        .accessibility_label(accessible_name(node))
+                        .placeholder(placeholder.clone())
+                        .disabled(*disabled),
+                    id: id.clone(),
+                    disabled: *disabled,
+                },
                 node,
                 colors,
             ))
@@ -234,6 +241,7 @@ impl DartView {
         &self,
         node: &Node,
         colors: &ThemeColor,
+        cx: &App,
     ) -> Result<AnyElement, String> {
         let Node::Slider { id, disabled, .. } = node else {
             return Err("Slider materializer received a different node kind".into());
@@ -247,8 +255,21 @@ impl DartView {
         let events = self.events.clone();
         let id = id.clone();
         let revision = self.snapshot.revision;
-        let element = div()
-            .id(SharedString::from(id.clone()))
+        let slider = retained.state.read(cx);
+        let element = annotate(div().id(SharedString::from(id.clone())), node)
+            .aria_numeric_value(slider.value().start() as f64)
+            .aria_min_numeric_value(slider.min_value() as f64)
+            .aria_max_numeric_value(slider.max_value() as f64)
+            .aria_numeric_value_step(slider.step_value() as f64)
+            .aria_orientation(gpui::accesskit::Orientation::Horizontal)
+            .a11y_synthetic_children({
+                let disabled = *disabled;
+                move |tree| {
+                    if disabled {
+                        tree.parent_node().set_disabled();
+                    }
+                }
+            })
             .test_support()
             .w_full()
             .py_2()
@@ -287,8 +308,46 @@ impl DartView {
                         cx.stop_propagation();
                     })
             })
+            .when(!*disabled, |this| {
+                let mut this = this;
+                for action in [
+                    AccessibleAction::SetValue,
+                    AccessibleAction::Increment,
+                    AccessibleAction::Decrement,
+                ] {
+                    let state = retained.state.clone();
+                    this = this.on_a11y_action(action, move |data, window, cx| {
+                        state.update(cx, |state, cx| {
+                            let old = state.value().start();
+                            let next = match action {
+                                AccessibleAction::Increment => old + state.step_value(),
+                                AccessibleAction::Decrement => old - state.step_value(),
+                                AccessibleAction::SetValue => match data {
+                                    Some(gpui::accesskit::ActionData::NumericValue(value))
+                                        if value.is_finite() =>
+                                    {
+                                        *value as f32
+                                    }
+                                    _ => return,
+                                },
+                                _ => return,
+                            };
+                            if !next.is_finite() {
+                                return;
+                            }
+                            let next = next.clamp(state.min_value(), state.max_value());
+                            if next != old {
+                                state.set_value(next, window, cx);
+                                cx.emit(SliderEvent::Change(state.value()));
+                            }
+                        });
+                    });
+                }
+                this.on_mouse_up(MouseButton::Left, window_release(retained.state.clone()))
+                    .on_mouse_up_out(MouseButton::Left, window_release(retained.state.clone()))
+            })
             .child(
-                Slider::new(&retained.state)
+                SliderPresentation::new(&retained.state)
                     .disabled(*disabled)
                     .w_full()
                     .when_some(
@@ -310,4 +369,8 @@ fn slider_state(min: f32, max: f32, step: f32, number: f32) -> SliderState {
         .max(max)
         .step(step)
         .default_value(number)
+}
+
+fn window_release(state: Entity<SliderState>) -> impl Fn(&MouseUpEvent, &mut Window, &mut App) {
+    move |_, _, cx| state.update(cx, |state, cx| state.handle_release(cx))
 }

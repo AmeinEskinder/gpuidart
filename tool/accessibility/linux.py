@@ -9,6 +9,7 @@ from gi.repository import Atspi
 
 process = int(sys.argv[1])
 operation, name, value = sys.argv[2:5]
+identifier = sys.argv[5]
 Atspi.init()
 Atspi.set_timeout(3000, 10000)
 desktop = Atspi.get_desktop(0)
@@ -31,7 +32,7 @@ def visit(element, parent=None):
 
 visit(apps[0])
 if operation != "query":
-    matches = [e for e, _ in elements if e.get_name() == name]
+    matches = [e for e, _ in elements if (e.get_accessible_id() == identifier if identifier else e.get_name() == name)]
     if len(matches) != 1:
         raise RuntimeError(f"Expected one AT-SPI element named {name}, got {len(matches)}")
     element = matches[0]
@@ -68,6 +69,7 @@ else:
             "checked": state.contains(Atspi.StateType.CHECKED),
             "selected": state.contains(Atspi.StateType.SELECTED),
             "expanded": state.contains(Atspi.StateType.EXPANDED),
+            "modal": state.contains(Atspi.StateType.MODAL),
             "interfaces": list(element.get_interfaces()),
         }
         action = element.get_action_iface()

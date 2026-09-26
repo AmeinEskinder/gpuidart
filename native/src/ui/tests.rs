@@ -445,6 +445,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                         controlled: false,
                     },
                     &cx.theme().colors.clone(),
+                    cx,
                 )
                 .err()
                 .unwrap()
@@ -460,6 +461,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                         view: None,
                     },
                     &cx.theme().colors.clone(),
+                    cx,
                 )
                 .err()
                 .unwrap()

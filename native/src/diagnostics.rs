@@ -50,6 +50,9 @@ pub(crate) enum Request {
     Inspect {
         request: u64,
     },
+    Semantics {
+        request: u64,
+    },
     Key {
         request: u64,
         key: String,
@@ -78,6 +81,7 @@ impl Request {
             | Self::Focus { request, .. }
             | Self::SelectRow { request, .. }
             | Self::Inspect { request }
+            | Self::Semantics { request }
             | Self::Key { request, .. }
             | Self::Repaint { request, .. }
             | Self::Prepare { request, .. } => *request,
@@ -93,6 +97,15 @@ pub(crate) fn handle(
     cx: &mut App,
 ) {
     match request {
+        Request::Semantics { request } => {
+            let tree = window
+                .debug_a11y_tree_json()
+                .and_then(|text| serde_json::from_str::<Value>(&text).ok());
+            events.emit(Event::Diagnostic {
+                request,
+                data: json!({"active":window.is_a11y_active(),"tree":tree}),
+            });
+        }
         Request::Key { request, key } => {
             let parsed = if key.len() > 64 {
                 None

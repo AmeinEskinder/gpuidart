@@ -4,14 +4,17 @@ import 'dart:io';
 import 'package:gpuidart/tracing.dart';
 
 import '../example/settings/app.dart';
+import 'accessibility/settings_track.dart';
 
 Future<void> main(List<String> args) async {
-  if (args.length != 1) {
+  final semantics = args.contains('--semantics');
+  final paths = args.where((a) => a != '--semantics').toList();
+  if (paths.length != 1) {
     throw ArgumentError(
-      'Usage: dart run tool/verify_settings.dart REPORT.json',
+      'Usage: dart run tool/verify_settings.dart REPORT.json [--semantics]',
     );
   }
-  final output = File(args.single);
+  final output = File(paths.single);
   if (output.existsSync()) {
     throw StateError('Refusing to overwrite settings evidence: ${output.path}');
   }
@@ -25,6 +28,7 @@ Future<void> main(List<String> args) async {
     'scope': 'Real native window, GPUI key dispatch and native controls; no OS input injection, hardware IME, or presentation timing.',
     'steps': steps,
     'passed': false,
+    'platform_semantics': semantics,
   };
   final trace = GpuiTrace(capacity: 8192);
   SettingsApplication? app;
@@ -32,6 +36,9 @@ Future<void> main(List<String> args) async {
     app = await SettingsApplication.open(trace: trace);
     final settings = app;
     report['native_runtime'] = await settings.host.diagnose('runtime');
+    final process = semantics
+        ? (await settings.host.diagnose('inspect'))['native_process_id'] as int
+        : null;
     Future<Map<String, dynamic>> observe() async {
       await settings.idle;
       if (settings.failure != null) {
@@ -58,6 +65,9 @@ Future<void> main(List<String> args) async {
       while (DateTime.now().isBefore(deadline)) {
         last = await observe();
         if (ready(last)) {
+          if (process != null) {
+            last['semantics'] = await settingsSemantics(process, last);
+          }
           steps.add({'name': name, 'observed': last});
           return last;
         }

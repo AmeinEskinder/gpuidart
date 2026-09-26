@@ -156,6 +156,7 @@ class WatchlistApplication {
       UiText(
         'title',
         heading,
+        semantics: const UiSemantics(role: UiRole.heading, headingLevel: 1),
         style: const UiStyle(fontSize: 22, fontWeight: UiFontWeight.semibold),
       ),
       const UiText(
@@ -186,6 +187,7 @@ class WatchlistApplication {
       UiTable(
         'watchlist',
         dataset: 'instruments',
+        semantics: const UiSemantics(label: 'Instruments'),
         view: view,
         style: const UiStyle(
           borderColor: UiColor.token(ThemeToken.border),

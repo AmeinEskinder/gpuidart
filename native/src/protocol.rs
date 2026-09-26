@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 mod semantics;
-pub use semantics::Semantics;
+pub use semantics::{SemanticRole, Semantics};
 
 pub const MAX_MESSAGE_BYTES: usize = 16 * 1024 * 1024;
 

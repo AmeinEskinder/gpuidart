@@ -78,7 +78,19 @@ jobs:
           gdbus call --session --dest org.a11y.Bus --object-path /org/a11y/bus --method org.freedesktop.DBus.Properties.Set org.a11y.Status IsEnabled '<true>'
           gdbus call --session --dest org.a11y.Bus --object-path /org/a11y/bus --method org.freedesktop.DBus.Properties.Set org.a11y.Status ScreenReaderEnabled '<true>'
           dart run tool/accessibility/probe.dart build/accessibility/platform-spike.json
+          dart run tool/accessibility/controls.dart build/accessibility/controls.json
+          dart run tool/accessibility/disabled.dart build/accessibility/disabled.json
+          dart run tool/verify_settings.dart build/accessibility/settings.json --semantics
           PROBE
+      - name: External control actions
+        if: runner.os != 'Linux'
+        run: dart run tool/accessibility/controls.dart build/accessibility/controls.json
+      - name: Disabled control states and actions
+        if: runner.os != 'Linux'
+        run: dart run tool/accessibility/disabled.dart build/accessibility/disabled.json
+      - name: Settings semantics at every verifier step
+        if: runner.os != 'Linux'
+        run: dart run tool/verify_settings.dart build/accessibility/settings.json --semantics
       - name: Retain platform responses and failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

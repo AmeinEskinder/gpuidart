@@ -9,6 +9,7 @@ Future<Map<String, dynamic>> platformQuery(
   String operation = 'query',
   String name = '',
   String value = '',
+  String id = '',
 }) async {
   final (command, args) = switch (Platform.operatingSystem) {
     'windows' => (
@@ -24,15 +25,16 @@ Future<Map<String, dynamic>> platformQuery(
         operation,
         if (name.isNotEmpty) ...['-Name', name],
         if (value.isNotEmpty) ...['-Value', value],
+        if (id.isNotEmpty) ...['-Id', id],
       ],
     ),
     'linux' => (
       '/usr/bin/python3',
-      ['tool/accessibility/linux.py', '$process', operation, name, value],
+      ['tool/accessibility/linux.py', '$process', operation, name, value, id],
     ),
     'macos' => (
       'build/accessibility/ax-probe',
-      ['$process', operation, name, value],
+      ['$process', operation, name, value, id],
     ),
     _ => throw UnsupportedError('No platform accessibility probe'),
   };

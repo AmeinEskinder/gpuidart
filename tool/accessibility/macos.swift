@@ -13,7 +13,7 @@ func attribute(_ element: AXUIElement, _ key: String) throws -> CFTypeRef? {
 }
 
 func run() throws {
-    guard CommandLine.arguments.count == 5, let process = Int32(CommandLine.arguments[1]) else {
+    guard CommandLine.arguments.count == 6, let process = Int32(CommandLine.arguments[1]) else {
         throw ProbeError.failure("Usage: ax-probe PID OP NAME VALUE")
     }
     guard AXIsProcessTrusted() else {
@@ -22,6 +22,7 @@ func run() throws {
     let operation = CommandLine.arguments[2]
     let name = CommandLine.arguments[3]
     let value = CommandLine.arguments[4]
+    let identifier = CommandLine.arguments[5]
     let app = AXUIElementCreateApplication(process)
     AXUIElementSetMessagingTimeout(app, 3)
     var elements: [(AXUIElement, Int?)] = []
@@ -43,7 +44,7 @@ func run() throws {
         var nodes: [[String: Any]] = []
         for (element, parent) in elements {
             var node: [String: Any] = ["name": try label(element), "parent": parent as Any? ?? NSNull()]
-            for (field, key) in [("role", "AXRole"), ("id", "AXIdentifier"),
+            for (field, key) in [("role", "AXRole"), ("id", "AXIdentifier"), ("subrole", "AXSubrole"), ("modal", "AXModal"),
                                  ("value", "AXValue"), ("min", "AXMinValue"), ("max", "AXMaxValue"),
                                  ("enabled", "AXEnabled"), ("focused", "AXFocused"),
                                  ("selected", "AXSelected"), ("expanded", "AXExpanded")] {
@@ -61,7 +62,10 @@ func run() throws {
         }
         output["nodes"] = nodes
     } else {
-        let matches = try elements.filter { try label($0.0) == name }
+        let matches = try elements.filter {
+            if !identifier.isEmpty { return try attribute($0.0, "AXIdentifier") as? String == identifier }
+            return try label($0.0) == name
+        }
         guard matches.count == 1 else { throw ProbeError.failure("Expected one AX element named \(name), got \(matches.count)") }
         let element = matches[0].0
         let result: AXError

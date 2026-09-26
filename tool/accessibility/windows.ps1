@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory)][int]$AppProcessId,
     [ValidateSet('query','invoke','toggle','set-value','set-range','focus')][string]$Operation = 'query',
     [string]$Name = '',
-    [string]$Value = ''
+    [string]$Value = '',
+    [string]$Id = ''
 )
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
@@ -13,7 +14,7 @@ if ($null -eq $window) { throw "No UIA window for process $AppProcessId" }
 $elements = $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [System.Windows.Automation.Condition]::TrueCondition)
 if ($elements.Count -gt 4096) { throw "UIA tree exceeds probe bound: $($elements.Count)" }
 if ($Operation -ne 'query') {
-    $matches = @($elements | Where-Object { $_.Current.Name -ceq $Name })
+    $matches = @($elements | Where-Object { if ($Id) { $_.Current.AutomationId -ceq $Id } else { $_.Current.Name -ceq $Name } })
     if ($matches.Count -ne 1) { throw "Expected one UIA element named '$Name', got $($matches.Count)" }
     $element = $matches[0]
     switch ($Operation) {
@@ -53,6 +54,8 @@ foreach ($element in $elements) {
     }
     $pattern = $null
     if ($element.TryGetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern, [ref]$pattern)) { $node.expanded = $pattern.Current.ExpandCollapseState.ToString() }
+    $pattern = $null
+    if ($element.TryGetCurrentPattern([System.Windows.Automation.WindowPattern]::Pattern, [ref]$pattern)) { $node.modal = $pattern.Current.IsModal }
     $nodes += $node
 }
 @{ api = 'UIAutomationClient'; process = $AppProcessId; nodes = $nodes } | ConvertTo-Json -Depth 8 -Compress

@@ -1,0 +1,1286 @@
+{
+  "platform": "windows",
+  "scope": "External accessibility actions and state; no screen reader or visual claim.",
+  "steps": [
+    {
+      "step": "initial input and checkbox",
+      "tree": {
+        "nodes": [
+          {
+            "name": "Preferences",
+            "role": "ControlType.Window",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "WindowPatternIdentifiers.Pattern",
+              "TransformPatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Preferences",
+            "role": "ControlType.Text",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Make this workspace your own.",
+            "role": "ControlType.Text",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "General",
+            "role": "ControlType.Button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Appearance",
+            "role": "ControlType.Button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Your profile",
+            "role": "ControlType.Text",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Display name",
+            "role": "ControlType.Text",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Display name",
+            "role": "ControlType.Edit",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "ValuePatternIdentifiers.Pattern"
+            ],
+            "value": "Dart user",
+            "read_only": false
+          },
+          {
+            "name": "Enable workspace notifications",
+            "role": "ControlType.CheckBox",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "TogglePatternIdentifiers.Pattern"
+            ],
+            "checked": "On"
+          },
+          {
+            "name": "A display name is required to enable notifications.",
+            "role": "ControlType.Text",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Changes stay in this application. Apply to save the draft.",
+            "role": "ControlType.Text",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Reset defaults",
+            "role": "ControlType.Button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Apply",
+            "role": "ControlType.Button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          }
+        ],
+        "api": "UIAutomationClient",
+        "process": 36188
+      }
+    },
+    {
+      "step": "platform toggle reaches Dart",
+      "tree": {
+        "nodes": [
+          {
+            "name": "Preferences",
+            "role": "ControlType.Window",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": [
+              "WindowPatternIdentifiers.Pattern",
+              "TransformPatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Preferences",
+            "role": "ControlType.Text",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Make this workspace your own.",
+            "role": "ControlType.Text",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "General",
+            "role": "ControlType.Button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Appearance",
+            "role": "ControlType.Button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Your profile",
+            "role": "ControlType.Text",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Display name",
+            "role": "ControlType.Text",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Display name",
+            "role": "ControlType.Edit",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "ValuePatternIdentifiers.Pattern"
+            ],
+            "value": "Dart user",
+            "read_only": false
+          },
+          {
+            "name": "Enable workspace notifications",
+            "role": "ControlType.CheckBox",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "TogglePatternIdentifiers.Pattern"
+            ],
+            "checked": "Off"
+          },
+          {
+            "name": "A display name is required to enable notifications.",
+            "role": "ControlType.Text",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Unsaved changes",
+            "role": "ControlType.Text",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Reset defaults",
+            "role": "ControlType.Button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Apply changes",
+            "role": "ControlType.Button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          }
+        ],
+        "api": "UIAutomationClient",
+        "process": 36188
+      }
+    },
+    {
+      "step": "platform text write reaches Dart",
+      "tree": {
+        "nodes": [
+          {
+            "name": "Preferences",
+            "role": "ControlType.Window",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": [
+              "WindowPatternIdentifiers.Pattern",
+              "TransformPatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Preferences",
+            "role": "ControlType.Text",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Make this workspace your own.",
+            "role": "ControlType.Text",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "General",
+            "role": "ControlType.Button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Appearance",
+            "role": "ControlType.Button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Your profile",
+            "role": "ControlType.Text",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Display name",
+            "role": "ControlType.Text",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Display name",
+            "role": "ControlType.Edit",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "ValuePatternIdentifiers.Pattern"
+            ],
+            "value": "Ada",
+            "read_only": false
+          },
+          {
+            "name": "Enable workspace notifications",
+            "role": "ControlType.CheckBox",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "TogglePatternIdentifiers.Pattern"
+            ],
+            "checked": "Off"
+          },
+          {
+            "name": "A display name is required to enable notifications.",
+            "role": "ControlType.Text",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Unsaved changes",
+            "role": "ControlType.Text",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Reset defaults",
+            "role": "ControlType.Button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Apply changes",
+            "role": "ControlType.Button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          }
+        ],
+        "api": "UIAutomationClient",
+        "process": 36188
+      }
+    },
+    {
+      "step": "named select and slider",
+      "tree": {
+        "nodes": [
+          {
+            "name": "Preferences",
+            "role": "ControlType.Window",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": [
+              "WindowPatternIdentifiers.Pattern",
+              "TransformPatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Preferences",
+            "role": "ControlType.Text",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Make this workspace your own.",
+            "role": "ControlType.Text",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "General",
+            "role": "ControlType.Button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Appearance",
+            "role": "ControlType.Button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Workspace appearance",
+            "role": "ControlType.Text",
+            "id": "appearance-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Accent color",
+            "role": "ControlType.Text",
+            "id": "accent-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Workspace accent",
+            "role": "ControlType.ComboBox",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "SelectionPatternIdentifiers.Pattern",
+              "ValuePatternIdentifiers.Pattern",
+              "ExpandCollapsePatternIdentifiers.Pattern"
+            ],
+            "value": "Ocean",
+            "read_only": false,
+            "expanded": "Collapsed"
+          },
+          {
+            "name": "Preview spacing: 16 px",
+            "role": "ControlType.Text",
+            "id": "spacing-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Preview spacing",
+            "role": "ControlType.Slider",
+            "id": "spacing",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "RangeValuePatternIdentifiers.Pattern"
+            ],
+            "number": 16,
+            "min": 8,
+            "max": 24,
+            "step": 2,
+            "read_only": false
+          },
+          {
+            "name": "Workspace preview",
+            "role": "ControlType.Text",
+            "id": "preview-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "The chosen accent and spacing apply here.",
+            "role": "ControlType.Text",
+            "id": "preview-body",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Unsaved changes",
+            "role": "ControlType.Text",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Reset defaults",
+            "role": "ControlType.Button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Apply changes",
+            "role": "ControlType.Button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          }
+        ],
+        "api": "UIAutomationClient",
+        "process": 36188
+      }
+    },
+    {
+      "step": "platform range write reaches Dart",
+      "tree": {
+        "nodes": [
+          {
+            "name": "Preferences",
+            "role": "ControlType.Window",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": [
+              "WindowPatternIdentifiers.Pattern",
+              "TransformPatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Preferences",
+            "role": "ControlType.Text",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Make this workspace your own.",
+            "role": "ControlType.Text",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "General",
+            "role": "ControlType.Button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Appearance",
+            "role": "ControlType.Button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Workspace appearance",
+            "role": "ControlType.Text",
+            "id": "appearance-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Accent color",
+            "role": "ControlType.Text",
+            "id": "accent-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Workspace accent",
+            "role": "ControlType.ComboBox",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "SelectionPatternIdentifiers.Pattern",
+              "ValuePatternIdentifiers.Pattern",
+              "ExpandCollapsePatternIdentifiers.Pattern"
+            ],
+            "value": "Ocean",
+            "read_only": false,
+            "expanded": "Collapsed"
+          },
+          {
+            "name": "Preview spacing: 22 px",
+            "role": "ControlType.Text",
+            "id": "spacing-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Preview spacing",
+            "role": "ControlType.Slider",
+            "id": "spacing",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "RangeValuePatternIdentifiers.Pattern"
+            ],
+            "number": 22,
+            "min": 8,
+            "max": 24,
+            "step": 2,
+            "read_only": false
+          },
+          {
+            "name": "Workspace preview",
+            "role": "ControlType.Text",
+            "id": "preview-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "The chosen accent and spacing apply here.",
+            "role": "ControlType.Text",
+            "id": "preview-body",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Unsaved changes",
+            "role": "ControlType.Text",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Reset defaults",
+            "role": "ControlType.Button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Apply changes",
+            "role": "ControlType.Button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          }
+        ],
+        "api": "UIAutomationClient",
+        "process": 36188
+      }
+    },
+    {
+      "step": "named modal dialog",
+      "tree": {
+        "nodes": [
+          {
+            "name": "Preferences",
+            "role": "ControlType.Window",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "WindowPatternIdentifiers.Pattern",
+              "TransformPatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Preferences",
+            "role": "ControlType.Text",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Make this workspace your own.",
+            "role": "ControlType.Text",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "General",
+            "role": "ControlType.Button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Appearance",
+            "role": "ControlType.Button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Workspace appearance",
+            "role": "ControlType.Text",
+            "id": "appearance-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Accent color",
+            "role": "ControlType.Text",
+            "id": "accent-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Workspace accent",
+            "role": "ControlType.ComboBox",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "SelectionPatternIdentifiers.Pattern",
+              "ValuePatternIdentifiers.Pattern",
+              "ExpandCollapsePatternIdentifiers.Pattern"
+            ],
+            "value": "Ocean",
+            "read_only": false,
+            "expanded": "Collapsed"
+          },
+          {
+            "name": "Preview spacing: 22 px",
+            "role": "ControlType.Text",
+            "id": "spacing-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Preview spacing",
+            "role": "ControlType.Slider",
+            "id": "spacing",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "RangeValuePatternIdentifiers.Pattern"
+            ],
+            "number": 22,
+            "min": 8,
+            "max": 24,
+            "step": 2,
+            "read_only": false
+          },
+          {
+            "name": "Workspace preview",
+            "role": "ControlType.Text",
+            "id": "preview-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "The chosen accent and spacing apply here.",
+            "role": "ControlType.Text",
+            "id": "preview-body",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Unsaved changes",
+            "role": "ControlType.Text",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "offscreen": false,
+            "patterns": []
+          },
+          {
+            "name": "Reset defaults",
+            "role": "ControlType.Button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Apply changes",
+            "role": "ControlType.Button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          },
+          {
+            "name": "Close",
+            "role": "ControlType.Button",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "offscreen": false,
+            "patterns": [
+              "InvokePatternIdentifiers.Pattern"
+            ]
+          }
+        ],
+        "api": "UIAutomationClient",
+        "process": 36188
+      },
+      "failed": true
+    }
+  ],
+  "passed": false,
+  "failed_frame_debug": {
+    "active": true,
+    "tree": {
+      "root": "p",
+      "gpui_focus": null,
+      "active_descendant_focus": null,
+      "frame": {
+        "rendered_at": "2026-09-27T00:05:23.080+03:00",
+        "frame_number": 43,
+        "window_title": "Preferences",
+        "node_count": 16,
+        "tab_stop_count": 7,
+        "viewport_size": {
+          "width": 780.0,
+          "height": 670.4000244140625
+        },
+        "scale_factor": 1.25
+      },
+      "nodes": {
+        "a": {
+          "accesskit_id": "16925148900422194591",
+          "element_id": "Name(\"heading\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Heading",
+            "label": "Preferences",
+            "level": 1
+          }
+        },
+        "b": {
+          "accesskit_id": "13041079447395360195",
+          "element_id": "Name(\"intro\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Label",
+            "label": "Make this workspace your own.",
+            "value": "Make this workspace your own."
+          }
+        },
+        "c": {
+          "accesskit_id": "12656119924178692727",
+          "element_id": "Name(\"general\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "D:\\Dev\\gpuidart/.tools/cargo\\git\\checkouts\\gpui-kit-ad7eb35d851fbd28\\21622a7\\crates\\base\\src\\button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "General"
+          }
+        },
+        "d": {
+          "accesskit_id": "7069066646577866099",
+          "element_id": "Name(\"appearance\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "D:\\Dev\\gpuidart/.tools/cargo\\git\\checkouts\\gpui-kit-ad7eb35d851fbd28\\21622a7\\crates\\base\\src\\button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Appearance"
+          }
+        },
+        "e": {
+          "accesskit_id": "8384855890757304894",
+          "element_id": "Name(\"appearance-title\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Heading",
+            "label": "Workspace appearance",
+            "level": 2
+          }
+        },
+        "f": {
+          "accesskit_id": "9944790085619013260",
+          "element_id": "Name(\"accent-label\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Label",
+            "label": "Accent color",
+            "value": "Accent color"
+          }
+        },
+        "g": {
+          "accesskit_id": "1777379474928005928",
+          "element_id": "NamedInteger(\"select\", 4294967315)",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "D:\\Dev\\gpuidart/.tools/cargo\\git\\checkouts\\gpui-kit-ad7eb35d851fbd28\\21622a7\\crates\\base\\src\\select.rs:63:19",
+          "aria": {
+            "role": "ComboBox",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Workspace accent",
+            "value": "Ocean",
+            "expanded": false
+          }
+        },
+        "h": {
+          "accesskit_id": "13219120079964063038",
+          "element_id": "Name(\"spacing-label\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Label",
+            "label": "Preview spacing: 22 px",
+            "value": "Preview spacing: 22 px"
+          }
+        },
+        "i": {
+          "accesskit_id": "7229106759896377667",
+          "element_id": "Name(\"spacing\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui\\controls.rs:254:32",
+          "aria": {
+            "role": "Slider",
+            "on_action": [
+              "Focus",
+              "Decrement",
+              "Increment",
+              "SetValue"
+            ],
+            "label": "Preview spacing",
+            "orientation": "Horizontal",
+            "numeric_value": 22.0,
+            "min_numeric_value": 8.0,
+            "max_numeric_value": 24.0,
+            "numeric_value_step": 2.0
+          }
+        },
+        "j": {
+          "accesskit_id": "18377609229460423675",
+          "element_id": "Name(\"preview-title\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Label",
+            "label": "Workspace preview",
+            "value": "Workspace preview"
+          }
+        },
+        "k": {
+          "accesskit_id": "324814300270840728",
+          "element_id": "Name(\"preview-body\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Label",
+            "label": "The chosen accent and spacing apply here.",
+            "value": "The chosen accent and spacing apply here."
+          }
+        },
+        "l": {
+          "accesskit_id": "3099672305796883046",
+          "element_id": "Name(\"status\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native\\src\\ui.rs:1010:26",
+          "aria": {
+            "role": "Label",
+            "label": "Unsaved changes",
+            "value": "Unsaved changes"
+          }
+        },
+        "m": {
+          "accesskit_id": "9261496907502167360",
+          "element_id": "Name(\"reset\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "D:\\Dev\\gpuidart/.tools/cargo\\git\\checkouts\\gpui-kit-ad7eb35d851fbd28\\21622a7\\crates\\base\\src\\button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Reset defaults"
+          }
+        },
+        "n": {
+          "accesskit_id": "4733219019830317053",
+          "element_id": "Name(\"apply\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "D:\\Dev\\gpuidart/.tools/cargo\\git\\checkouts\\gpui-kit-ad7eb35d851fbd28\\21622a7\\crates\\base\\src\\button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Apply changes"
+          }
+        },
+        "o": {
+          "accesskit_id": "11261317263329288105",
+          "element_id": "Name(\"close\")",
+          "view": "gpui_component::root::WindowState",
+          "source_location": "D:\\Dev\\gpuidart/.tools/cargo\\git\\checkouts\\gpui-kit-ad7eb35d851fbd28\\21622a7\\crates\\base\\src\\button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Close"
+          }
+        },
+        "p": {
+          "accesskit_id": "0",
+          "children": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o"
+          ],
+          "aria": {
+            "role": "Window",
+            "label": "Preferences"
+          }
+        }
+      }
+    }
+  },
+  "error": "Bad state: Platform state did not settle: named modal dialog",
+  "stack": "#0      main.capture (file:///D:/Dev/gpuidart/tool/accessibility/controls.dart:43:7)\n<asynchronous suspension>\n#1      main (file:///D:/Dev/gpuidart/tool/accessibility/controls.dart:110:5)\n<asynchronous suspension>\n"
+}

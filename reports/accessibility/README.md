@@ -50,9 +50,57 @@ constructor argument during removal of the unsupported description field.
 
 ## Remaining acceptance work
 
-- Apply annotations to native controls and generate viewport-bounded table semantics.
-- Verify actions and disabled/value/focus states, including the slider gap.
-- Per-control headless semantics tests; full settings and Watchlist platform track.
+### Native adapter checkpoint (local Windows)
+
+Annotations now reach real controls. Text uses AccessKit's text value (a Label's
+label alone produced an empty UIA name). Tables generate column headers and
+viewport rows/cells; record IDs key the row elements and author IDs. External
+table verification is still pending.
+
+The settings platform track passed all 15 steps locally in
+`settings-platform-2.json`. `windows-controls-5.json` passed nine external action
+steps: toggle, text/range writes, dialog open/cancel/confirm and resulting state.
+`windows-disabled-1.json` verifies disabled flags, rejected/inert actions and a
+single enabled-slider change event. The native suite has 57 passing tests.
+
+Fixes and retained failures:
+
+- `windows-controls-1.json` / `windows-controls-3.json`: modal absent from the
+  platform tree. The binding supplied decision callbacks but no footer: at this
+  pin `button_props` does not instantiate buttons. The host now provides actual
+  named modal content and Confirm/Cancel buttons, retains Kit's focus trap and
+  keyboard dismissal, and hides background semantics while open. Headless tests
+  click both decisions and verify exactly one result event apiece.
+- `windows-controls-2.json`: verifier name lookup became ambiguous after ordinary
+  text labels were correctly exposed. Action clients now support author IDs and
+  fixture assertions distinguish text labels from controls.
+- `settings-platform-1.json`: disabled Checkbox was inert but UIA reported enabled.
+  The adapter now sets the actual AccessKit disabled flag. Slider and confirmation
+  trigger receive the same flag; Select needed a root metadata decorator.
+- Adding test observation to the outer table collided with Kit's inner `table`
+  observation ID in three existing tests. Removed that redundant observation;
+  platform table semantics remain on the outer node.
+- The new headless modal pointer test initially clicked during the opening
+  animation and failed in the full suite. It now waits for stable button bounds
+  before a single click; all 57 tests passed together.
+
+The pinned Slider root has neither a label setter nor SetValue behavior. The host
+uses Kit's track/thumb/state beneath one focusable semantic root, with bounded
+SetValue/Increment/Decrement actions on the existing event path. This preserves
+native pointer/keyboard behavior; visual equivalence of the simplified presentation
+has not been asserted.
+
+The pinned Select component exposes no author-ID/disabled-metadata setters. Its
+adapter decorates the actual Base root after layout using GPUI's checked element
+downcast API. Two concrete output types are tied to the pin; a dependency upgrade
+must update this adapter if those types change. A mismatch fails explicitly, and
+headless/live tests exercise both observation-enabled and ordinary native builds.
+No unsafe memory cast, parallel semantics tree or dependency-cache edit is used.
+
+Hosted checks for the full adapter/settings track are pending at this checkpoint.
+
+- Hosted action, disabled-state and 15-step settings platform checks.
+- Watchlist platform track, generated table roles/identity and virtualization checks.
 - 100k JIT/AOT and reload regression checks after adapter changes.
 - All suites/platform queries green at final commit, updated public docs, clean tree.
 

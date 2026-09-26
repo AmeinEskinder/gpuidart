@@ -1,0 +1,289 @@
+{
+  "platform": "windows",
+  "passed": true,
+  "disabled": {
+    "nodes": [
+      {
+        "name": "GPUI-Dart",
+        "role": "ControlType.Window",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "WindowPatternIdentifiers.Pattern",
+          "TransformPatternIdentifiers.Pattern"
+        ],
+        "modal": false
+      },
+      {
+        "name": "",
+        "role": "ControlType.Group",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": []
+      },
+      {
+        "name": "Flag",
+        "role": "ControlType.CheckBox",
+        "id": "flag",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": [
+          "TogglePatternIdentifiers.Pattern"
+        ],
+        "checked": "On"
+      },
+      {
+        "name": "Range",
+        "role": "ControlType.Slider",
+        "id": "range",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": [
+          "RangeValuePatternIdentifiers.Pattern"
+        ],
+        "number": 5,
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "read_only": false
+      },
+      {
+        "name": "Choice",
+        "role": "ControlType.ComboBox",
+        "id": "choice",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": [
+          "SelectionPatternIdentifiers.Pattern",
+          "ValuePatternIdentifiers.Pattern",
+          "ExpandCollapsePatternIdentifiers.Pattern"
+        ],
+        "value": "One",
+        "read_only": false,
+        "expanded": "Collapsed"
+      },
+      {
+        "name": "Confirm",
+        "role": "ControlType.Button",
+        "id": "confirm",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": []
+      }
+    ],
+    "api": "UIAutomationClient",
+    "process": 38272
+  },
+  "disabled_actions": [
+    {
+      "name": "Flag",
+      "rejected": "Bad state: Platform client exited 1: D:\\Dev\\gpuidart\\tool\\accessibility\\windows.ps1 : Exception calling \"Toggle\" with \"0\" argument(s): \"Unrecognized error.\"\r\n    + CategoryInfo          : NotSpecified: (:) [windows.ps1], MethodInvocationException\r\n    + FullyQualifiedErrorId : ElementNotEnabledException,windows.ps1\r\n \r\n\n"
+    },
+    {
+      "name": "Range",
+      "rejected": "Bad state: Platform client exited 1: D:\\Dev\\gpuidart\\tool\\accessibility\\windows.ps1 : Exception calling \"SetValue\" with \"1\" argument(s): \"The operation is \r\nnot allowed on a nonenabled element.\"\r\n    + CategoryInfo          : NotSpecified: (:) [windows.ps1], MethodInvocationException\r\n    + FullyQualifiedErrorId : ElementNotEnabledException,windows.ps1\r\n \r\n\n"
+    },
+    {
+      "name": "Confirm",
+      "rejected": "Bad state: Platform client exited 1: D:\\Dev\\gpuidart\\tool\\accessibility\\windows.ps1 : Exception calling \"GetCurrentPattern\" with \"1\" argument(s): \r\n\"Unsupported Pattern.\"\r\n    + CategoryInfo          : NotSpecified: (:) [windows.ps1], MethodInvocationException\r\n    + FullyQualifiedErrorId : InvalidOperationException,windows.ps1\r\n \r\n\n"
+    }
+  ],
+  "after_actions": {
+    "nodes": [
+      {
+        "name": "GPUI-Dart",
+        "role": "ControlType.Window",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "WindowPatternIdentifiers.Pattern",
+          "TransformPatternIdentifiers.Pattern"
+        ],
+        "modal": false
+      },
+      {
+        "name": "",
+        "role": "ControlType.Group",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": []
+      },
+      {
+        "name": "Flag",
+        "role": "ControlType.CheckBox",
+        "id": "flag",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": [
+          "TogglePatternIdentifiers.Pattern"
+        ],
+        "checked": "On"
+      },
+      {
+        "name": "Range",
+        "role": "ControlType.Slider",
+        "id": "range",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": [
+          "RangeValuePatternIdentifiers.Pattern"
+        ],
+        "number": 5,
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "read_only": false
+      },
+      {
+        "name": "Choice",
+        "role": "ControlType.ComboBox",
+        "id": "choice",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": [
+          "SelectionPatternIdentifiers.Pattern",
+          "ValuePatternIdentifiers.Pattern",
+          "ExpandCollapsePatternIdentifiers.Pattern"
+        ],
+        "value": "One",
+        "read_only": false,
+        "expanded": "Collapsed"
+      },
+      {
+        "name": "Confirm",
+        "role": "ControlType.Button",
+        "id": "confirm",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": []
+      }
+    ],
+    "api": "UIAutomationClient",
+    "process": 38272
+  },
+  "enabled": {
+    "nodes": [
+      {
+        "name": "GPUI-Dart",
+        "role": "ControlType.Window",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "WindowPatternIdentifiers.Pattern",
+          "TransformPatternIdentifiers.Pattern"
+        ],
+        "modal": false
+      },
+      {
+        "name": "",
+        "role": "ControlType.Group",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "offscreen": false,
+        "patterns": []
+      },
+      {
+        "name": "Flag",
+        "role": "ControlType.CheckBox",
+        "id": "flag",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "TogglePatternIdentifiers.Pattern"
+        ],
+        "checked": "On"
+      },
+      {
+        "name": "Range",
+        "role": "ControlType.Slider",
+        "id": "range",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "RangeValuePatternIdentifiers.Pattern"
+        ],
+        "number": 5,
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "read_only": false
+      },
+      {
+        "name": "Choice",
+        "role": "ControlType.ComboBox",
+        "id": "choice",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "SelectionPatternIdentifiers.Pattern",
+          "ValuePatternIdentifiers.Pattern",
+          "ExpandCollapsePatternIdentifiers.Pattern"
+        ],
+        "value": "One",
+        "read_only": false,
+        "expanded": "Collapsed"
+      },
+      {
+        "name": "Confirm",
+        "role": "ControlType.Button",
+        "id": "confirm",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "offscreen": false,
+        "patterns": [
+          "InvokePatternIdentifiers.Pattern"
+        ]
+      }
+    ],
+    "api": "UIAutomationClient",
+    "process": 38272
+  },
+  "events": [
+    {
+      "type": "slider_change",
+      "revision": 2,
+      "id": "range",
+      "number": 9.0
+    }
+  ]
+}

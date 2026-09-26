@@ -115,6 +115,7 @@ final class SettingsApplication {
     const UiText(
       'heading',
       'Preferences',
+      semantics: UiSemantics(role: UiRole.heading, headingLevel: 1),
       style: UiStyle(fontSize: 28, fontWeight: UiFontWeight.semibold),
     ),
     const UiText(
@@ -131,6 +132,7 @@ final class SettingsApplication {
         const UiText(
           'general-title',
           'Your profile',
+          semantics: UiSemantics(role: UiRole.heading, headingLevel: 2),
           style: UiStyle(fontSize: 20, fontWeight: UiFontWeight.semibold),
         ),
         const UiText('name-label', 'Display name'),
@@ -138,6 +140,7 @@ final class SettingsApplication {
           'name',
           controlled: true,
           placeholder: 'Your display name',
+          semantics: UiSemantics(label: 'Display name'),
           style: UiStyle(width: UiSize.full),
         ),
         UiCheckbox(
@@ -160,11 +163,13 @@ final class SettingsApplication {
         const UiText(
           'appearance-title',
           'Workspace appearance',
+          semantics: UiSemantics(role: UiRole.heading, headingLevel: 2),
           style: UiStyle(fontSize: 20, fontWeight: UiFontWeight.semibold),
         ),
         const UiText('accent-label', 'Accent color'),
         UiSelect(
           'accent',
+          semantics: const UiSemantics(label: 'Workspace accent'),
           options: const [
             UiSelectOption('ocean', 'Ocean'),
             UiSelectOption('forest', 'Forest'),
@@ -177,6 +182,7 @@ final class SettingsApplication {
         UiText('spacing-label', 'Preview spacing: ${draft.spacing.toInt()} px'),
         UiSlider(
           'spacing',
+          semantics: const UiSemantics(label: 'Preview spacing'),
           min: 8,
           max: 24,
           step: 2,
