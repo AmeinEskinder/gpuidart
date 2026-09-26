@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'src/dev_session.dart';
+import 'src/windows_powershell.dart';
 
 Future<void> main() async {
   final fixture = await Directory('.cache').createTemp('launcher-failures-');
@@ -60,7 +61,7 @@ Future<void> main(List<String> args) async {
     };
   }
   final needle = fixture.absolute.path.replaceAll("'", "''");
-  final processes = await Process.run('powershell.exe', [
+  final processes = await runWindowsPowerShell([
     '-NoProfile',
     '-Command',
     "@(Get-CimInstance Win32_Process | Where-Object { \$_.Name -match '^dart(vm)?\\.exe\$' -and \$_.CommandLine -like '*$needle*' }).Count",

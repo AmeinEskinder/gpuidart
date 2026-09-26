@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'src/dev_session.dart';
+import 'src/windows_powershell.dart';
 
 Future<void> main() async {
   final session = await DevSession.start(entry: 'example/watchlist/main.dart');
@@ -15,7 +16,7 @@ Future<void> main() async {
   }
 
   Future<Map<String, dynamic>> step(String name) async {
-    final result = await Process.run('powershell.exe', [
+    final result = await runWindowsPowerShell([
       '-NoProfile',
       '-File',
       'tool/windows/watchlist_probe.ps1',

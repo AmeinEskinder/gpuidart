@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'windows_powershell.dart';
+
 Future<String> command(
   String executable,
   List<String> args, {
@@ -7,12 +9,19 @@ Future<String> command(
   String? workingDirectory,
 }) async {
   stdout.writeln('> $executable ${args.join(' ')}');
-  final result = await Process.run(
-    executable,
-    args,
-    environment: environment,
-    workingDirectory: workingDirectory,
-  );
+  final result =
+      Platform.isWindows && executable.toLowerCase() == 'powershell.exe'
+      ? await runWindowsPowerShell(
+          args,
+          environment: environment,
+          workingDirectory: workingDirectory,
+        )
+      : await Process.run(
+          executable,
+          args,
+          environment: environment,
+          workingDirectory: workingDirectory,
+        );
   if (result.exitCode != 0) {
     throw StateError(
       '$executable failed (${result.exitCode}): ${result.stdout}\n${result.stderr}',

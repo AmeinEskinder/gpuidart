@@ -1,0 +1,34 @@
+﻿windows	Native headless and Dart protocol checks	2026-09-26T03:10:32.9707893Z ✅ test\style_test.dart: style rides along on every node kind
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:32.9729906Z ✅ test\style_test.dart: hex colors validate format eagerly
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:32.9742108Z ✅ test\style_test.dart: token enum covers exactly the documented wire names
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:32.9751396Z ✅ test\style_test.dart: padding must list four edges
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:33.0884483Z ✅ test\table_view_test.dart: table view serializes to the wire shape and omits empty lists
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:33.0910118Z ✅ test\table_view_test.dart: table view validates term counts and column indices
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:33.0944585Z ✅ test\table_view_test.dart: dataset record IDs validate eagerly and read back by row
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:33.2148026Z ✅ test\tracing_test.dart: application spans are bounded and preserve exceptions
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:33.2298080Z ✅ test\tracing_test.dart: tracing needs optional exports and cannot reuse a host attempt
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8057020Z ##[endgroup]
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8058704Z ##[group]❌ test\windows_preparation_test.dart: Sandbox preparation uses the case-sensitive vGPU element (failed)
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8059639Z Expected: <0>
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8060454Z   Actual: <1>
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8061256Z Get-FileHash : The term 'Get-FileHash' is not recognized as the name of a cmdlet, function, script file, or operable 
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8063315Z program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8064340Z At D:\a\gpuidart\gpuidart\tool\prepare_windows_release_checks.ps1:20 char:19
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8065083Z +     zip_sha256 = (Get-FileHash -LiteralPath $archive).Hash.ToLowerInv ...
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8065794Z +                   ~~~~~~~~~~~~
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8066523Z     + CategoryInfo          : ObjectNotFound: (Get-FileHash:String) [], ParentContainsErrorRecordException
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8067284Z     + FullyQualifiedErrorId : CommandNotFoundException
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8067713Z  
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8067820Z 
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8067854Z 
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8081955Z package:matcher                          expect
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8082597Z test\windows_preparation_test.dart 23:7  main.<fn>
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8083416Z ##[endgroup]
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8137766Z 
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:35.8174693Z ##[error]36 tests passed, 1 failed.
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:36.1583704Z [31;1mException: [0mD:\a\gpuidart\gpuidart\tool\check.ps1:7[0m
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:36.1584701Z [31;1m[0m[36;1mLine |[0m
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:36.1585573Z [31;1m[0m[36;1m[36;1m   7 | [0m     if ($LASTEXITCODE -ne 0) { [36;1mthrow 'SDK checks failed'[0m }[0m
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:36.1586645Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m                                ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:36.1587586Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mSDK checks failed[0m
+windows	Native headless and Dart protocol checks	2026-09-26T03:10:36.1830886Z ##[error]Process completed with exit code 1.

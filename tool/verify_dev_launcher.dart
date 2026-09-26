@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
+import 'src/windows_powershell.dart';
+
 Future<void> main() async {
   final fixture = await Directory('.cache').createTemp('watchlist-launcher-');
   final app = await File('example/watchlist/app.dart')
@@ -68,7 +70,7 @@ Future<void> main() async {
     if (state['state']['labels']['title'] != 'Market watch from file watcher') {
       throw StateError('File watcher did not apply changed code');
     }
-    final close = await Process.run('powershell.exe', [
+    final close = await runWindowsPowerShell([
       '-NoProfile',
       '-File',
       'tool/windows/watchlist_probe.ps1',
