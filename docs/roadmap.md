@@ -89,3 +89,12 @@ not justified by this milestone. The macOS companion's measured costs remain
 separate from hypothetical shared-process alternatives.
 
 The [macOS/Linux work order](cross-platform.md) starts with a separate feasibility gate for the pinned backends and Dart launch mechanism. It does not establish platform support or take priority over the open Windows release checks.
+
+Control-catalog follow-up: [the settings design](control-catalog.md) selects four
+controls from an actual preferences screen. Checkbox `cddca71`, slider `07bfccf`,
+select `35cf74d`, confirmation dialog `3014d31`, controlled inputs `edc8dab`, and
+the settings application/verifier `3ec8a87` are implemented. The
+[evidence report](../reports/control-catalog/README.md) records their tests and
+retained failures. [Schema generation is skipped for now](protocol-schema-decision.md)
+with a defined future equivalence gate. This does not expand the production
+snapshot protocol into patches or close the parked hardware/IME/signing gates.

@@ -5,8 +5,8 @@
 | Workflow | Runner | Checks |
 | --- | --- | --- |
 | Windows SDK checks | Windows Server 2022 x64 | Formatting, analysis, native tests and Dart tests excluding `live-window` |
-| macOS SDK checks | macOS 15 ARM64 | Separate headless and native-window jobs; 100k JIT/AOT trace smoke and code reload |
-| Linux SDK checks | Ubuntu 24.04 x64 | Separate headless and X11/Xvfb/Openbox/Mesa window jobs; 100k JIT/AOT trace smoke and code reload |
+| macOS SDK checks | macOS 15 ARM64 | Separate headless and native-window jobs; settings JIT/AOT verifier, 100k JIT/AOT trace smoke and code reload |
+| Linux SDK checks | Ubuntu 24.04 x64 | Separate headless and X11/Xvfb/Openbox/Mesa window jobs; settings JIT/AOT verifier, 100k JIT/AOT trace smoke and code reload |
 | Unix process lifecycle | macOS 15 ARM64 / Ubuntu 24.04 x64 | Owned process-group cleanup, including orphan and failed exec |
 | Unix release packages | Same Unix targets, manual dispatch | Release/AOT packages, extraction/dependency checks, three JIT/AOT baselines per target; Linux runtime-only container |
 

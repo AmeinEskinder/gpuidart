@@ -17,7 +17,13 @@ On macOS/Linux, use `dart run tool/build.dart` in place of the PowerShell build 
 
 The default entry point is [Market watch](../example/watchlist/main.dart). It contains 1,000 fictitious instruments, search, row selection, a shortlist, price sorting and sample price updates. Search and the shortlist toggle are a native view over the dataset; updating a price or shortlist entry sends one cell edit. There is no live feed or trading connection. Application data is in memory and resets when the process exits.
 
-Select a row, add it to the shortlist, simulate a price update, and switch to the shortlist. Editing the search preserves the native input and replaces the table records. Dataset replacement clears selection and resets scrolling. Ordinary view rebuilds and code reload preserve those native entities.
+Select a row, add it to the shortlist, simulate a price update, and switch to the shortlist. Editing the search changes the native table view without republishing its records. Selection follows stable record IDs; if filtering removes the selected record, selection clears. Ordinary view rebuilds and code reload preserve mounted native entities.
+
+The [Preferences example](../example/settings/README.md) exercises checkboxes,
+selects, sliders, confirmation dialogs and controlled text. Run it with
+`dart run tool/dev.dart example/settings/main.dart`. Its draft and saved values
+are in memory for the session. It handles conflicting input writes and leaves
+native composition authoritative.
 
 For another entry point:
 
@@ -111,7 +117,7 @@ Custom entry point and filename:
 ./tool/verify_package.ps1 -Zip build/MyApp-windows-x64.zip
 ```
 
-The verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot and passed set to the boolean true. The supplied examples implement that contract. A custom application supplies its own meaningful self-test. Failed verification writes passed false and the error to its report, replacing any earlier success. Supply -CrtDirectory when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
+The package verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot and passed set to the boolean true. The counter and watchlist examples implement that contract. Preferences has a separate `tool/verify_settings.dart` JIT/AOT verifier. A custom application supplies its own meaningful self-test. Failed package verification writes passed false and the error to its report, replacing any earlier success. Supply -CrtDirectory when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
 
 The manifest records the native ABI, Git commit, whether source files were modified, tool versions and hashes of source files and shipped files. It includes the application entry file even if that file is ignored by Git or outside the SDK repository. Such an entry is marked as uncommitted source. The included release instructions use the chosen executable filename. Keep the manifest with a result. Use verify_package.ps1 -ReportPath to retain separate verification reports for different packages.
 
@@ -128,10 +134,18 @@ dart run tool/verify_watchlist_stability.dart
 dart run tool/verify_watchlist_reload.dart
 dart run tool/verify_dev_launcher.dart
 dart run tool/verify_dev_failures.dart
+dart run tool/verify_settings.dart build/settings-check.json
 ./tool/package.ps1
 ./tool/verify_package.ps1
 ```
 
 See [the SDK milestone record](../reports/sdk/README.md). Automated checks cover native input/navigation, dataset transactions, the live watchlist's posted mouse/character messages, state-preserving code reload, AOT launch and 125% DPI. Posted messages are not IME composition or physical input-to-present measurements.
+
+The [settings milestone](../reports/control-catalog/README.md) records per-control
+validation, headless interaction, Dart wire and live-window checks. Its driver
+uses GPUI keyboard dispatch, observes focus restoration after the dialog closes,
+and checks both native values and application state. The current
+[schema decision](protocol-schema-decision.md) keeps manual codecs and semantic
+tests; internal wire formats are not a supported external API.
 
 [Release evidence](../reports/release/README.md) records clean Windows Sandbox and Linux desktop VM launches. [Windows Japanese IME observation](../reports/ime/windows-japanese-20260926/README.md) passed at 125% scale. [Linux Japanese XIM observation](../reports/ime/linux-japanese-20260926/README.md) passed with configured Fcitx5/Mozc on Xorg; see the required setting in [Unix release checks](unix-release-checks.md#japanese-input-with-fcitx5-on-x11). Both include real composition, screenshots and reload while composing. The owner authorized agent observation; no independent human observer participated. Other input backends and physical mixed-monitor behavior remain unverified. The [reload observation](../reports/mvp/attempt-023eef4/README.md) also remains unlocalized despite subsequent passing checks. The SDK uses the [MIT License](../LICENSE); dependencies retain their own terms.

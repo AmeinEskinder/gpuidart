@@ -1,6 +1,6 @@
 # GPUI-Dart
 
-An experimental desktop SDK using Dart application code and GPUI Kit's Rust controls. Start with the [SDK guide](docs/sdk.md) and the [Market watch example](example/watchlist/main.dart).
+An experimental desktop SDK using Dart application code and GPUI Kit's Rust controls. Start with the [SDK guide](docs/sdk.md), [Market watch](example/watchlist/main.dart), or the [Preferences example](example/settings/README.md).
 
 | Target | Verified scope |
 | --- | --- |
@@ -12,7 +12,7 @@ See [cross-platform acceptance](reports/cross-platform/status.md) for source rev
 
 The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include clean Windows Sandbox and Linux desktop VM launches. Owner-authorized agent visual observation verified Japanese composition and reload on [Windows](reports/ime/windows-japanese-20260926/README.md) and [configured Linux Fcitx5/Mozc](reports/ime/linux-japanese-20260926/README.md). Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
-The SDK supports row/column layouts, text, buttons, native text inputs and virtualized tables, plus initial window options and table-selection events. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
+The SDK supports row/column layouts, text, buttons, native text inputs, virtualized tables, checkboxes, sliders, selects and confirmation dialogs. Typed styles, scoped keyboard actions and guarded controlled-input writes share the existing host. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
 Table datasets upload once. View snapshots reference them by ID; cell and row edits transfer only changed data. See [the dataset API](docs/datasets.md) and [100,000-record acceptance measurements](reports/data-publication.md).
 
@@ -30,6 +30,12 @@ dart run tool/dev.dart
 ```
 
 Market watch opens a native GPUI window with 1,000 fictitious instruments. Search by symbol, select a row, add it to your shortlist, sort by price and simulate a price update. Search and the shortlist toggle are a native view over the dataset: filtering and sorting never move or republish records, selection survives them by stable record ID, and prices/changes render through declarative number formats with color and icon rules. Ctrl+F focuses search and Ctrl+Enter saves the selected record as scoped key actions. Input text, focus, selection and scroll state survive ordinary description replacement. State is in memory. The earlier counter and 10,000-row measurement example remains in example/main.dart.
+
+Run `dart run tool/dev.dart example/settings/main.dart` for Preferences. General
+edits a controlled name and notifications checkbox; Appearance uses a select and
+slider to change a preview. Apply saves the draft in memory, and Reset asks for
+confirmation. See [the controls contract](docs/control-catalog.md) and
+[verification evidence](reports/control-catalog/README.md).
 
 For a release build:
 
@@ -143,7 +149,8 @@ The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/Q
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks are not implemented. Sorting and filtering are native views over the dataset; stable record identity is supported through optional `rowIds`, and table selection follows the record ID when present (row indices otherwise).
-- The adapter has a small row/column layout API and fixed component theme. It is not a complete GPUI style binding.
+- The adapter exposes ten node kinds and a bounded typed style/theme-token API. It is not the full GPUI Kit catalog. Confirmation content is title/message/buttons; radio groups, tabs, arbitrary dialog content and an accessibility tree are not bound.
+- Controlled inputs reject Dart writes during native composition. New controlled-write tests use GPUI's input handler; earlier Windows/Linux OS IME observations cover the default input path. macOS IME remains unverified.
 
 GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPUI dependency is `gpui-pre` 0.3.6. Both Cargo and Dart dependency lockfiles are included.
 

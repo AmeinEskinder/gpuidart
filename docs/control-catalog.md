@@ -1,12 +1,13 @@
 # Settings controls milestone
 
-Design baseline: `52a9e9e`. This document is a work order, not verification
-evidence. The snapshot/dataset architecture and the pinned GPUI Kit revision
-remain unchanged.
+Design baseline: `52a9e9e`, committed before code as `420c7f6`. This document
+defines the contract; [the evidence report](../reports/control-catalog/README.md)
+records implementation and verification status. The snapshot/dataset architecture
+and the pinned GPUI Kit revision remain unchanged.
 
 ## Application and scope
 
-`example/settings/` will edit application preferences: a display name,
+`example/settings/` edits application preferences: a display name,
 notifications, appearance, and a numeric density preference. General and
 Appearance navigation use existing buttons. Apply saves the in-process draft;
 Reset asks for confirmation before restoring defaults. These are demonstration
@@ -118,3 +119,9 @@ The milestone is complete only with a clean pushed tree and those verification
 results. Accessibility-tree work, macOS IME, presentation latency, signing,
 physical Mac observations, and the historical reload disposition remain out of
 scope. Catalog breadth is not an acceptance criterion.
+
+## Schema decision
+
+[Keep manual codecs for this milestone](protocol-schema-decision.md). Generation
+remains a separate migration with versioning, deterministic output and wire
+equivalence gates. The public Dart API and semantic tests remain either way.

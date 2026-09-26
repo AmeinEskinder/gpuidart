@@ -162,3 +162,13 @@ inside `dart.encode`; historical and legacy-control captures have `dart.json`
 plus `dart.utf8`. The outer encode/copy interval and wire bytes retain their
 meaning. Compare the outer interval across these builds; do not invent separate
 JSON/UTF-8 durations for the fused encoder.
+
+## Settings interaction capture
+
+`dart run tool/verify_settings.dart build/settings.json` exports a trace after
+closing the real settings window, alongside its application/native-state report.
+The trace includes controlled-input command request IDs and the ordinary
+snapshot/diagnostic operations. The verifier observes native focus restoration
+after modal dismissal before sending another key. Its keys use GPUI dispatch;
+these captures do not measure OS input-to-present or verify OS IME composition.
+See [settings evidence](../reports/control-catalog/README.md).

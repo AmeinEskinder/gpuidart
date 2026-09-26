@@ -1,9 +1,54 @@
 # Settings control catalog evidence
 
 Work order: [control-catalog design](../../docs/control-catalog.md), committed
-before implementation as `420c7f6`. This is an in-progress milestone. The
-settings application, controlled inputs, schema decision and final hosted
-verification are not complete.
+before implementation as `420c7f6`. All four selected controls, controlled
+inputs, the settings app/verifier and the schema decision are implemented.
+This report records behavior checks, not performance or hardware IME claims.
+
+## Acceptance summary
+
+| Deliverable | Implementation and proof |
+| --- | --- |
+| Checkbox | `cddca71`; bounded wire values, styled bounds, pointer/Space, disabled behavior and retained focus |
+| Slider | `07bfccf`; f32 bounds, pointer clamping, arrow/Home/End keys, Tab focus and retained state |
+| Select | `35cf74d`; stable option IDs, popup retention, keyboard selection/cancel and disabled dismissal |
+| Confirmation dialog | `3014d31`; single result, modal Tab trap, cancel/confirm and trigger removal |
+| Controlled input | `edc8dab`; UTF-16 selection, generation/revision conflicts, composition rejection, command deadlines and trace correlation |
+| Settings app | `3ec8a87`; all four controls, name edits, navigation, Apply and reset/cancel through the real native window |
+| Schema decision | `564fa41`; [keep manual codecs](../../docs/protocol-schema-decision.md), with explicit future generation gates |
+
+The local Windows complete gate passed 53 native library tests, 3 experimental
+strategy tests and 59 Dart tests, plus formatting, analysis and native builds.
+See `settings/all-passed/`. Hosted Unix live suites passed 8 tests each, including
+their additional companion lifecycle cases.
+
+## Platform evidence
+
+Settings JIT and AOT each passed all 15 observed steps on three platforms. Every
+settings trace finalized with zero Dart/native dropped records. The six 100k
+smokes each applied 30 one-cell edits and 30 counter snapshots with correlated
+acknowledgements. These use debug native builds and are correctness/instrumentation
+checks; their incidental timings do not replace release performance baselines.
+
+| Target | Retained reports | Hosted run |
+| --- | --- | --- |
+| Windows x64 local desktop | `settings/settings-jit-5.json`, `settings/settings-aot-1.json`, `smoke/` | Hosted Windows is headless; local windows supply the interaction evidence |
+| macOS 15 ARM64 native companion | `hosted/macos-3ec8a87/` includes settings JIT/AOT, 100k traces, live tests and reload | [macOS SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36267937371) |
+| Ubuntu 24.04 x64 X11/Xvfb/Mesa | `hosted/linux-3ec8a87/` includes the same checks | [Linux SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36267937408) |
+
+[Windows headless](https://github.com/AmeinEskinder/gpuidart/actions/runs/36267937385)
+and [Unix lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36267937372)
+also passed at `3ec8a87`. The settings follow-up `c1f76f0` records the latest acknowledged
+input revision during Apply so an older queued edit cannot replace it. Local
+JIT (`settings-apply-guard.json`) and AOT (`settings-aot-final.json`) both passed
+the complete 15-step sequence after that change.
+
+All four hosted workflows had already passed for each control and controlled
+input. The controlled-input source `edc8dab` passed
+[Windows](https://github.com/AmeinEskinder/gpuidart/actions/runs/36266902713),
+[macOS](https://github.com/AmeinEskinder/gpuidart/actions/runs/36266902623),
+[Linux](https://github.com/AmeinEskinder/gpuidart/actions/runs/36266902666), and
+[lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36266902624).
 
 ## Checkbox
 
@@ -15,9 +60,8 @@ Windows local checks on 2026-09-26, debug/headless native build:
   traversal past a disabled control; theme-token styling and exact width.
 * Full native library suite: 45 passed.
 * Dart controls/event/style suites: 10 passed. `dart analyze` passed.
-* This establishes component behavior in GPUI's headless test window. It does
-  not yet establish live desktop behavior or cross-platform results for the
-  new binding.
+* These initial captures establish headless component behavior. The settings
+  platform evidence above adds live-window coverage of the binding.
 
 Retained attempts under `checkbox/`:
 
@@ -158,6 +202,17 @@ Visual inspection was attempted through the installed Computer Use helper, but
 window discovery failed with "native pipe is unavailable". Its retry and kernel
 reset also failed. No visual or new IME result is claimed for this screen.
 
-The settings application and verifier are implemented. Hosted settings results,
-schema decision and final evidence are pending. Parked hardware, signing, IME
-and presentation limitations from the work order remain unchanged.
+## Limits and parked gates
+
+The settings verifier uses GPUI dispatch, not OS event injection. Software
+marked-text tests cover the controlled-input conflict contract; earlier
+Windows/Linux Japanese IME observations cover the default input path. No new
+controlled-mode hardware IME or macOS IME claim is made. The screenshot helper
+failure above remains a limit of this session's screen inspection.
+
+Preferences are session-local, not persisted to disk. Dialog content is bounded
+title/message/buttons, not an arbitrary node tree. Radio groups, tabs, sheets,
+tooltips, general virtual lists and an accessibility tree remain outside the
+selected application scope. Full snapshots, retained datasets and the pinned
+GPUI Kit revision remain in production. Mac hardware observations, signing,
+presentation timing and the historical reload disposition stay parked.
