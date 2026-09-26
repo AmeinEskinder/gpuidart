@@ -4,14 +4,14 @@ Find the current candidate and its hash in [release evidence](../reports/release
 Prepare a separate, repeatable Sandbox run with its ZIP path:
 
 ```powershell
-./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistRelease53ea4c7-windows-x64.zip
+./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistMit4fca314-windows-x64.zip
 ```
 
 If the Sandbox desktop disconnects before the package test starts, preserve the
 guest and connection errors. To test software rendering in a separate fresh run:
 
 ```powershell
-./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistRelease53ea4c7-windows-x64.zip -VGpu Disable
+./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistMit4fca314-windows-x64.zip -VGpu Disable
 ```
 
 The default remains `-VGpu Enable`. Microsoft's [Sandbox configuration guide](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file)

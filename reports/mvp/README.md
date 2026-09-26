@@ -9,8 +9,8 @@ platforms and the post-restart Windows attempt.
 
 ## Run it
 
-Extract [WatchlistRelease53ea4c7-windows-x64.zip](../../build/WatchlistRelease53ea4c7-windows-x64.zip)
-and launch `WatchlistRelease53ea4c7.exe`. Keep all packaged files together.
+Extract [WatchlistMit4fca314-windows-x64.zip](../../build/WatchlistMit4fca314-windows-x64.zip)
+and launch `WatchlistMit4fca314.exe`. Keep all packaged files together.
 The Market watch screen uses typed styles, scoped actions, stable record IDs,
 dataset views and declarative cell formatting. Application state is in memory.
 
@@ -20,21 +20,21 @@ For development, run `dart run tool/dev.dart` in the repository.
 
 | Item | Value |
 | --- | --- |
-| Source commit | `53ea4c7f50aecd54c7ba2a70ae9384d3f82777fe` |
+| Source commit | `4fca3147806878bd3b8fbcff0a92676b8452727e` |
 | Source state at packaging | Clean |
-| ZIP size | 11,716,956 bytes |
-| ZIP SHA-256 | `596b3836de98b5feeb3bc4982b2b6e064400035f7bf29cdfdedeb925e683d27b` |
-| Recorded source SHA-256 | `87900f38c46388298468b5e3489e47badd6a8a80c226c5c0f24fd817d3454a71` |
+| ZIP size | 11,718,871 bytes |
+| ZIP SHA-256 | `e5b66c8b3dfafc5af04bd85f56f572acc5bf69a41e2c50b6f823def67476d87b` |
+| Recorded source SHA-256 | `d9ca0450e36906542790e7fb91d8aeceba1c08ca93174c32b63d94d794b4b809` |
 | Native ABI | 1 |
 | Local OS | Windows 11 Pro, 10.0.26200, x64 |
 | Display check | PerMonitorV2, DPI 120 |
 
-The [current package report](../release/53ea4c7/clean-windows/verification.json)
+The [current package report](../release/4fca314/clean-windows/verification.json)
 records file hashes, source identity and loaded modules. This unsigned evaluation
-ZIP includes the UTF-8 verifier fix. Application sources are unchanged from the
-nine-check `bb6a894` run, and the native DLL hash is identical. Root reports in
+ZIP includes the MIT license and UTF-8 verifier fix. Application sources are unchanged from the
+nine-check `bb6a894` run. The DLL was rebuilt; its hash differs. Root reports in
 this directory retain that earlier full run; [tooling regressions](../release/encoding/README.md)
-and the new guest check verify the follow-up changes.
+and the [MIT package milestone](../release/4fca314/README.md) verify the follow-up changes.
 
 ## Acceptance
 
@@ -76,7 +76,7 @@ human IME, macOS distribution and cross-platform desktop checks. The owner
 selected the [MIT License](../../LICENSE) on 2026-09-26.
 Japanese typing is installed and enabled after the restart. The initial Sandbox
 failed before desktop logon; a fresh software-rendering configuration passed the
-package check. [Guest evidence](../release/53ea4c7/clean-windows/verification.json)
+package check. [Guest evidence](../release/4fca314/clean-windows/verification.json)
 closes clean-Windows launch for this ZIP. Human IME remains unobserved.
 
 Use [Windows release checks](../../docs/windows-release-checks.md) and

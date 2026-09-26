@@ -13,8 +13,8 @@ runtime feature is part of this release check.
 3. All nine Windows release checks passed on committed `bb6a894`: 41 native
    tests, 41 Dart tests, 500 interaction updates, reload, development launcher,
    packaging and failure checks. The package ran at DPI 120 with PerMonitorV2.
-4. Both Unix package jobs passed on `bb6a894`. The clean-Windows check also
-   passed in a fresh Sandbox with virtual GPU sharing disabled. The earlier
+4. Both Unix package jobs and the clean-Windows check passed again on `4fca314`
+   after MIT licensing. Windows used a fresh Sandbox with GPU sharing disabled. The earlier
    guest desktop crashes and duplicate verifier attempt are retained.
 5. The owner selected MIT on 2026-09-26; [LICENSE](../../LICENSE) records the
    terms. Complete observed IME checks when a human can perform them.
@@ -32,9 +32,10 @@ Raw evidence is kept in revision-specific directories. The decision log is
 ## Current evidence
 
 - [Windows acceptance](bb6a894/windows/acceptance.json), [packaged execution](bb6a894/windows/package.json), [reload](bb6a894/windows/reload.json) and [500-update run](bb6a894/windows/stability.json).
-- [Current clean-Windows verification](53ea4c7/clean-windows/verification.json) passed for the UTF-8-corrected package in a fresh guest without developer SDK commands, at DPI 120 with PerMonitorV2. The corrected `<vGPU>` setting was confirmed by adapter inventory and WARP modules. [The investigation](sandbox-investigation/README.md) retains the compositor crashes and corrects the earlier assumption that `<VGpu>` disabled GPU sharing.
-- [Unix package workflow](https://github.com/AmeinEskinder/gpuidart/actions/runs/36210888777): extracted macOS/Linux packages, macOS runtime-only verification, three JIT/AOT baseline repetitions per host, X11 geometry at scales 1 and 1.25, and a fresh Ubuntu runtime container passed. [Raw records](bb6a894/unix/) retain their individual scope.
-- [Current Windows identity](53ea4c7/artifact.json): ZIP SHA-256 `596b3836de98b5feeb3bc4982b2b6e064400035f7bf29cdfdedeb925e683d27b`. [Earlier archive identities](bb6a894/artifacts.json) retain the previous Windows ZIP and the unchanged Unix packages.
+- [MIT package milestone](4fca314/README.md): all three archives include the project license, with matching source and file hashes. All six workflows passed at the implementation commit.
+- [Current clean-Windows verification](4fca314/clean-windows/verification.json) passed for the MIT package in a fresh guest without developer SDK commands, at DPI 120 with PerMonitorV2. The corrected `<vGPU>` setting was confirmed by adapter inventory and WARP modules. [The investigation](sandbox-investigation/README.md) retains the compositor crashes and corrects the earlier assumption that `<VGpu>` disabled GPU sharing.
+- [Current Unix package workflow](https://github.com/AmeinEskinder/gpuidart/actions/runs/36214976228): extracted macOS/Linux packages, macOS runtime-only verification, X11 geometry at scales 1 and 1.25, and a fresh Ubuntu runtime container passed. [Raw records](4fca314/unix/) retain their individual scope; [earlier evidence](bb6a894/unix/) remains available.
+- [Current Windows identity](4fca314/windows-artifact.json): ZIP SHA-256 `e5b66c8b3dfafc5af04bd85f56f572acc5bf69a41e2c50b6f823def67476d87b`. [Current Unix identities](4fca314/unix-artifacts.json) and [previous Windows identity](53ea4c7/artifact.json) are retained separately.
 - [PowerShell environment follow-up](powershell-environment/README.md): the new preparation test exposed a hosted Windows module-loading failure. The shared Dart launcher now lets Windows PowerShell rebuild its module path; all 37 local headless tests pass. The hosted failure and unsuccessful local reproduction probes are retained.
 - [Post-restart inspection](bb6a894/prerequisites.json) and [Japanese readiness](bb6a894/japanese-readiness.json): no pending restart, Basic Typing installed, Japanese added after English. These are preparation records, not IME observations.
 - [Sandbox attempt](bb6a894/sandbox-attempt.json): folder mappings worked; the guest had no logged-in desktop session. The environment later disappeared for an unknown reason. No package result was produced. The desktop inspection helper could not connect after retries and a reset.
@@ -45,9 +46,9 @@ Raw evidence is kept in revision-specific directories. The decision log is
 
 | Platform | Local artifact | Verified scope |
 | --- | --- | --- |
-| Windows x64 | [WatchlistRelease53ea4c7-windows-x64.zip](../../build/WatchlistRelease53ea4c7-windows-x64.zip) | Local and fresh Sandbox AOT verification, Unicode reports, DLL identity and DPI; confirmed WARP configuration |
-| macOS ARM64 | [Watchlist-macos-arm64.tar.gz](../../build/evaluation-bb6a894/macos/Watchlist-macos-arm64.tar.gz) | Hosted macOS 15 execution and packaging |
-| Linux x64 | [Watchlist-linux-x64.tar.gz](../../build/evaluation-bb6a894/linux/Watchlist-linux-x64.tar.gz) | Hosted Ubuntu 24.04 X11 and fresh runtime container |
+| Windows x64 | [WatchlistMit4fca314-windows-x64.zip](../../build/WatchlistMit4fca314-windows-x64.zip) | MIT license included; local and fresh Sandbox AOT verification, Unicode reports, DLL identity and DPI; confirmed WARP configuration |
+| macOS ARM64 | [Watchlist-macos-arm64.tar.gz](../../build/evaluation-4fca314/macos/Watchlist-macos-arm64.tar.gz) | MIT license included; hosted macOS 15 execution and packaging |
+| Linux x64 | [Watchlist-linux-x64.tar.gz](../../build/evaluation-4fca314/linux/Watchlist-linux-x64.tar.gz) | MIT license included; hosted Ubuntu 24.04 X11 and fresh runtime container |
 
 Archives are build outputs and are not committed to Git. Unix downloads are also
 available as artifacts of the workflow linked above. The macOS application/UI
@@ -67,7 +68,7 @@ These records establish current automated acceptance. The stable-release goal
 remains open under `docs/mvp.md` and `docs/cross-platform.md`.
 
 The accepted clean-Windows run is
-`build/release-checks/20260926-025749-1ad11737`.
+`build/release-checks/20260926-033124-d40b4635`.
 Its `results/ime-results.md` remains pending; this guest has only English input.
 Human Japanese IME checks must use the prepared host or another machine with
 the input method installed.
