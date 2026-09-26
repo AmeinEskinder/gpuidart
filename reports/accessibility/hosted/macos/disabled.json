@@ -1,0 +1,521 @@
+{
+  "platform": "macos",
+  "passed": true,
+  "disabled": {
+    "api": "AXUIElement",
+    "nodes": [
+      {
+        "actions": [],
+        "name": "gpuidart-launcher",
+        "parent": null,
+        "role": "AXApplication"
+      },
+      {
+        "actions": [
+          "AXRaise"
+        ],
+        "focused": true,
+        "modal": false,
+        "name": "GPUI-Dart",
+        "parent": 0,
+        "role": "AXWindow",
+        "subrole": "AXStandardWindow"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXGroup",
+        "subrole": "AXUnknown"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 2,
+        "role": "AXGroup",
+        "subrole": "AXApplicationGroup"
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "flag",
+        "name": "Flag",
+        "parent": 3,
+        "role": "AXCheckBox",
+        "subrole": "AXUnknown",
+        "value": true
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "range",
+        "max": 10,
+        "min": 0,
+        "name": "Range",
+        "parent": 3,
+        "role": "AXSlider",
+        "subrole": "AXUnknown",
+        "value": 5
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "choice",
+        "name": "Choice",
+        "parent": 3,
+        "role": "AXPopUpButton",
+        "subrole": "AXUnknown",
+        "value": "One"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "id": "[\"choice\",\"selected-value\"]",
+        "name": "",
+        "parent": 6,
+        "role": "AXStaticText",
+        "subrole": "AXUnknown",
+        "value": "One"
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "confirm",
+        "name": "Confirm",
+        "parent": 3,
+        "role": "AXButton",
+        "subrole": "AXUnknown"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXCloseButton"
+      },
+      {
+        "actions": [
+          "AXPress",
+          "AXZoomWindow",
+          "AXShowMenu"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXFullScreenButton"
+      },
+      {
+        "actions": [],
+        "focused": false,
+        "name": "",
+        "parent": 10,
+        "role": "AXGroup"
+      },
+      {
+        "actions": [],
+        "focused": false,
+        "name": "",
+        "parent": 11,
+        "role": "AXGroup"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXMinimizeButton"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXStaticText",
+        "value": "GPUI-Dart"
+      }
+    ],
+    "process": 4752,
+    "query_restarts": []
+  },
+  "disabled_actions": [
+    {
+      "name": "Flag",
+      "reply": {
+        "accepted": true,
+        "api": "AXUIElement",
+        "operation": "toggle",
+        "process": 4752,
+        "query_restarts": []
+      }
+    },
+    {
+      "name": "Range",
+      "reply": {
+        "accepted": true,
+        "api": "AXUIElement",
+        "operation": "set-range",
+        "process": 4752,
+        "query_restarts": []
+      }
+    },
+    {
+      "name": "Confirm",
+      "reply": {
+        "accepted": true,
+        "api": "AXUIElement",
+        "operation": "invoke",
+        "process": 4752,
+        "query_restarts": []
+      }
+    }
+  ],
+  "after_actions": {
+    "api": "AXUIElement",
+    "nodes": [
+      {
+        "actions": [],
+        "name": "gpuidart-launcher",
+        "parent": null,
+        "role": "AXApplication"
+      },
+      {
+        "actions": [
+          "AXRaise"
+        ],
+        "focused": true,
+        "modal": false,
+        "name": "GPUI-Dart",
+        "parent": 0,
+        "role": "AXWindow",
+        "subrole": "AXStandardWindow"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXGroup",
+        "subrole": "AXUnknown"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 2,
+        "role": "AXGroup",
+        "subrole": "AXApplicationGroup"
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "flag",
+        "name": "Flag",
+        "parent": 3,
+        "role": "AXCheckBox",
+        "subrole": "AXUnknown",
+        "value": true
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "range",
+        "max": 10,
+        "min": 0,
+        "name": "Range",
+        "parent": 3,
+        "role": "AXSlider",
+        "subrole": "AXUnknown",
+        "value": 5
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "choice",
+        "name": "Choice",
+        "parent": 3,
+        "role": "AXPopUpButton",
+        "subrole": "AXUnknown",
+        "value": "One"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "id": "[\"choice\",\"selected-value\"]",
+        "name": "",
+        "parent": 6,
+        "role": "AXStaticText",
+        "subrole": "AXUnknown",
+        "value": "One"
+      },
+      {
+        "actions": [],
+        "enabled": false,
+        "focused": false,
+        "id": "confirm",
+        "name": "Confirm",
+        "parent": 3,
+        "role": "AXButton",
+        "subrole": "AXUnknown"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXCloseButton"
+      },
+      {
+        "actions": [
+          "AXPress",
+          "AXZoomWindow",
+          "AXShowMenu"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXFullScreenButton"
+      },
+      {
+        "actions": [],
+        "focused": false,
+        "name": "",
+        "parent": 10,
+        "role": "AXGroup"
+      },
+      {
+        "actions": [],
+        "focused": false,
+        "name": "",
+        "parent": 11,
+        "role": "AXGroup"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXMinimizeButton"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXStaticText",
+        "value": "GPUI-Dart"
+      }
+    ],
+    "process": 4752,
+    "query_restarts": []
+  },
+  "enabled": {
+    "api": "AXUIElement",
+    "nodes": [
+      {
+        "actions": [],
+        "name": "gpuidart-launcher",
+        "parent": null,
+        "role": "AXApplication"
+      },
+      {
+        "actions": [
+          "AXRaise"
+        ],
+        "focused": true,
+        "modal": false,
+        "name": "GPUI-Dart",
+        "parent": 0,
+        "role": "AXWindow",
+        "subrole": "AXStandardWindow"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXGroup",
+        "subrole": "AXUnknown"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 2,
+        "role": "AXGroup",
+        "subrole": "AXApplicationGroup"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "id": "flag",
+        "name": "Flag",
+        "parent": 3,
+        "role": "AXCheckBox",
+        "subrole": "AXUnknown",
+        "value": true
+      },
+      {
+        "actions": [
+          "AXIncrement",
+          "AXDecrement"
+        ],
+        "enabled": true,
+        "focused": false,
+        "id": "range",
+        "max": 10,
+        "min": 0,
+        "name": "Range",
+        "parent": 3,
+        "role": "AXSlider",
+        "subrole": "AXUnknown",
+        "value": 5
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "id": "choice",
+        "name": "Choice",
+        "parent": 3,
+        "role": "AXPopUpButton",
+        "subrole": "AXUnknown",
+        "value": "One"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "id": "[\"choice\",\"selected-value\"]",
+        "name": "",
+        "parent": 6,
+        "role": "AXStaticText",
+        "subrole": "AXUnknown",
+        "value": "One"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "id": "confirm",
+        "name": "Confirm",
+        "parent": 3,
+        "role": "AXButton",
+        "subrole": "AXUnknown"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXCloseButton"
+      },
+      {
+        "actions": [
+          "AXPress",
+          "AXZoomWindow",
+          "AXShowMenu"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXFullScreenButton"
+      },
+      {
+        "actions": [],
+        "focused": false,
+        "name": "",
+        "parent": 10,
+        "role": "AXGroup"
+      },
+      {
+        "actions": [],
+        "focused": false,
+        "name": "",
+        "parent": 11,
+        "role": "AXGroup"
+      },
+      {
+        "actions": [
+          "AXPress"
+        ],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXButton",
+        "subrole": "AXMinimizeButton"
+      },
+      {
+        "actions": [],
+        "enabled": true,
+        "focused": false,
+        "name": "",
+        "parent": 1,
+        "role": "AXStaticText",
+        "value": "GPUI-Dart"
+      }
+    ],
+    "process": 4752,
+    "query_restarts": []
+  },
+  "events": [
+    {
+      "type": "slider_change",
+      "revision": 2,
+      "id": "range",
+      "number": 9.0
+    }
+  ]
+}

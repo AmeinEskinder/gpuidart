@@ -1,0 +1,485 @@
+{
+  "platform": "linux",
+  "passed": true,
+  "disabled": {
+    "api": "AT-SPI",
+    "process": 5804,
+    "nodes": [
+      {
+        "parent": null,
+        "name": "dartvm",
+        "role": "application",
+        "id": "",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible"
+        ]
+      },
+      {
+        "parent": 0,
+        "name": "GPUI-Dart",
+        "role": "frame",
+        "id": "",
+        "enabled": true,
+        "focused": true,
+        "focusable": true,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 1,
+        "name": "",
+        "role": "panel",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Flag",
+        "role": "check box",
+        "id": "flag",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": true,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Range",
+        "role": "slider",
+        "id": "range",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component",
+          "Value"
+        ],
+        "number": 5.0,
+        "min": 0.0,
+        "max": 10.0,
+        "step": 1.0
+      },
+      {
+        "parent": 2,
+        "name": "Choice",
+        "role": "combo box",
+        "id": "choice",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component",
+          "Selection"
+        ]
+      },
+      {
+        "parent": 5,
+        "name": "One",
+        "role": "label",
+        "id": "[\"choice\",\"selected-value\"]",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Confirm",
+        "role": "push button",
+        "id": "confirm",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      }
+    ],
+    "query_restarts": []
+  },
+  "disabled_actions": [
+    {
+      "name": "Flag",
+      "rejected": "Bad state: Platform client exited 1: Traceback (most recent call last):\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 105, in <module>\n    run()\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 53, in run\n    names = [action.get_action_name(i) for i in range(action.get_n_actions())]\n                                                      ^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'get_n_actions'\n\n\nrestarts=[]"
+    },
+    {
+      "name": "Range",
+      "reply": {
+        "api": "AT-SPI",
+        "operation": "set-range",
+        "accepted": true,
+        "query_restarts": []
+      }
+    },
+    {
+      "name": "Confirm",
+      "rejected": "Bad state: Platform client exited 1: Traceback (most recent call last):\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 105, in <module>\n    run()\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 53, in run\n    names = [action.get_action_name(i) for i in range(action.get_n_actions())]\n                                                      ^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'get_n_actions'\n\n\nrestarts=[]"
+    }
+  ],
+  "after_actions": {
+    "api": "AT-SPI",
+    "process": 5804,
+    "nodes": [
+      {
+        "parent": null,
+        "name": "dartvm",
+        "role": "application",
+        "id": "",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible"
+        ]
+      },
+      {
+        "parent": 0,
+        "name": "GPUI-Dart",
+        "role": "frame",
+        "id": "",
+        "enabled": true,
+        "focused": true,
+        "focusable": true,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 1,
+        "name": "",
+        "role": "panel",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Flag",
+        "role": "check box",
+        "id": "flag",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": true,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Range",
+        "role": "slider",
+        "id": "range",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component",
+          "Value"
+        ],
+        "number": 5.0,
+        "min": 0.0,
+        "max": 10.0,
+        "step": 1.0
+      },
+      {
+        "parent": 2,
+        "name": "Choice",
+        "role": "combo box",
+        "id": "choice",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component",
+          "Selection"
+        ]
+      },
+      {
+        "parent": 5,
+        "name": "One",
+        "role": "label",
+        "id": "[\"choice\",\"selected-value\"]",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Confirm",
+        "role": "push button",
+        "id": "confirm",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      }
+    ],
+    "query_restarts": []
+  },
+  "enabled": {
+    "api": "AT-SPI",
+    "process": 5804,
+    "nodes": [
+      {
+        "parent": null,
+        "name": "dartvm",
+        "role": "application",
+        "id": "",
+        "enabled": false,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible"
+        ]
+      },
+      {
+        "parent": 0,
+        "name": "GPUI-Dart",
+        "role": "frame",
+        "id": "",
+        "enabled": true,
+        "focused": true,
+        "focusable": true,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 1,
+        "name": "",
+        "role": "panel",
+        "id": "",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Flag",
+        "role": "check box",
+        "id": "flag",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "checked": true,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Action",
+          "Component"
+        ],
+        "actions": [
+          "click"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Range",
+        "role": "slider",
+        "id": "range",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Component",
+          "Value"
+        ],
+        "number": 5.0,
+        "min": 0.0,
+        "max": 10.0,
+        "step": 1.0
+      },
+      {
+        "parent": 2,
+        "name": "Choice",
+        "role": "combo box",
+        "id": "choice",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Action",
+          "Component",
+          "Selection"
+        ],
+        "actions": [
+          "click"
+        ]
+      },
+      {
+        "parent": 5,
+        "name": "One",
+        "role": "label",
+        "id": "[\"choice\",\"selected-value\"]",
+        "enabled": true,
+        "focused": false,
+        "focusable": false,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible"
+        ]
+      },
+      {
+        "parent": 2,
+        "name": "Confirm",
+        "role": "push button",
+        "id": "confirm",
+        "enabled": true,
+        "focused": false,
+        "focusable": true,
+        "checked": false,
+        "selected": false,
+        "expanded": false,
+        "modal": false,
+        "interfaces": [
+          "Accessible",
+          "Action",
+          "Component"
+        ],
+        "actions": [
+          "click"
+        ]
+      }
+    ],
+    "query_restarts": [],
+    "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+  },
+  "events": [
+    {
+      "type": "slider_change",
+      "revision": 2,
+      "id": "range",
+      "number": 9.0
+    }
+  ]
+}

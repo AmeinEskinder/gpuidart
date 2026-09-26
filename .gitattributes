@@ -1,3 +1,6 @@
 
 # Preserve byte hashes in vendored dependency provenance.
 native/vendor/** -text
+# Retained capture hashes describe exact bytes, including PowerShell log encodings.
+reports/accessibility/windows-final/** -text
+reports/accessibility/hosted/** -text

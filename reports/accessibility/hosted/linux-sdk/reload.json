@@ -1,0 +1,770 @@
+{
+  "passed": true,
+  "prepare_delay_ms": 0,
+  "tracing": true,
+  "rows": 1000,
+  "prepared": {
+    "revision": 5,
+    "native_process_id": 5887,
+    "inputs": {
+      "search": {
+        "entity": 4294967298,
+        "text": "0",
+        "selection": {
+          "start": 0,
+          "end": 1
+        },
+        "focused": true
+      }
+    },
+    "tables": {
+      "watchlist": {
+        "entity": 4294967300,
+        "visible_rows": {
+          "start": 17,
+          "end": 26
+        },
+        "row_count": 1000,
+        "dataset": "instruments",
+        "dataset_revision": 2,
+        "scroll_y": -548.0,
+        "view": {
+          "source_rows": 1000,
+          "view_rows": 1000,
+          "spec_hash": 556118766591525534
+        },
+        "selection": {
+          "row": 25,
+          "record": "BRK0025"
+        },
+        "focused": false
+      }
+    },
+    "labels": {
+      "title": "Market watch",
+      "source": "Sample instruments and prices. No live market feed.",
+      "summary": "1000 instruments shown · 0 saved",
+      "selection": "BRK0025 · Brookfield Labs · 101.82",
+      "status": "Updated BRK0025 to 101.82."
+    },
+    "controls": {},
+    "focus_handle": "FocusHandle(FocusId(1v1))",
+    "window": {
+      "width": 960.0,
+      "height": 720.0,
+      "scale_factor": 1.0,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 4,
+      "rows_constructed": 44,
+      "cells_constructed": 224,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "view_recomputes": 1
+    },
+    "draw": {
+      "samples": 4,
+      "p50_us": 25067.519,
+      "p95_us": 66093.055,
+      "p99_us": 66093.055
+    },
+    "dirty_to_present_submit": {
+      "samples": 2,
+      "p50_us": 53280.767,
+      "p95_us": 78643.199,
+      "p99_us": 78643.199
+    },
+    "present_interval": {
+      "samples": 1,
+      "p50_us": 79495.167,
+      "p95_us": 79495.167,
+      "p99_us": 79495.167
+    },
+    "input_to_frame": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    }
+  },
+  "before": {
+    "state": {
+      "revision": 5,
+      "native_process_id": 5887,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "0",
+          "selection": {
+            "start": 0,
+            "end": 1
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -548.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 556118766591525534
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "controls": {},
+      "focus_handle": "FocusHandle(FocusId(1v1))",
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.0,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 5,
+        "rows_constructed": 55,
+        "cells_constructed": 280,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 1
+      },
+      "draw": {
+        "samples": 5,
+        "p50_us": 25067.519,
+        "p95_us": 66093.055,
+        "p99_us": 66093.055
+      },
+      "dirty_to_present_submit": {
+        "samples": 3,
+        "p50_us": 53280.767,
+        "p95_us": 78643.199,
+        "p99_us": 78643.199
+      },
+      "present_interval": {
+        "samples": 2,
+        "p50_us": 50233.343,
+        "p95_us": 79495.167,
+        "p99_us": 79495.167
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "0",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 5,
+      "encoded_snapshots": 4,
+      "encoded_bytes": 6127,
+      "ffi_callbacks": 13,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 5,
+      "description_build": {
+        "samples": 5,
+        "p50_us": 782,
+        "p95_us": 3442,
+        "p99_us": 3442
+      },
+      "encode": {
+        "samples": 4,
+        "p50_us": 127,
+        "p95_us": 143,
+        "p99_us": 143
+      },
+      "publish_to_applied": {
+        "samples": 4,
+        "p50_us": 4332,
+        "p95_us": 4524,
+        "p99_us": 4524
+      },
+      "initial": {
+        "bytes": 63171,
+        "encode_us": 12954
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 44,
+        "p95_us": 44,
+        "p99_us": 44
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 45137,
+        "p95_us": 45137,
+        "p99_us": 45137
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 48,
+        "p95_us": 48,
+        "p99_us": 48
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 66,
+        "p95_us": 66,
+        "p99_us": 66
+      },
+      "native_snapshot_apply": {
+        "samples": 4,
+        "p50_us": 94,
+        "p95_us": 261,
+        "p99_us": 261
+      }
+    }
+  },
+  "after": {
+    "state": {
+      "revision": 6,
+      "native_process_id": 5887,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "0",
+          "selection": {
+            "start": 0,
+            "end": 1
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -548.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 556118766591525534
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch reloaded",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "controls": {},
+      "focus_handle": "FocusHandle(FocusId(1v1))",
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.0,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 9,
+        "rows_constructed": 99,
+        "cells_constructed": 504,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 1
+      },
+      "draw": {
+        "samples": 9,
+        "p50_us": 22511.615,
+        "p95_us": 66093.055,
+        "p99_us": 66093.055
+      },
+      "dirty_to_present_submit": {
+        "samples": 7,
+        "p50_us": 53280.767,
+        "p95_us": 78643.199,
+        "p99_us": 78643.199
+      },
+      "present_interval": {
+        "samples": 6,
+        "p50_us": 50233.343,
+        "p95_us": 79495.167,
+        "p99_us": 79495.167
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "0",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 6,
+      "encoded_snapshots": 5,
+      "encoded_bytes": 7639,
+      "ffi_callbacks": 17,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 8,
+      "description_build": {
+        "samples": 6,
+        "p50_us": 1165,
+        "p95_us": 3442,
+        "p99_us": 3442
+      },
+      "encode": {
+        "samples": 5,
+        "p50_us": 127,
+        "p95_us": 1076,
+        "p99_us": 1076
+      },
+      "publish_to_applied": {
+        "samples": 5,
+        "p50_us": 4332,
+        "p95_us": 41927,
+        "p99_us": 41927
+      },
+      "initial": {
+        "bytes": 63171,
+        "encode_us": 12954
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 44,
+        "p95_us": 44,
+        "p99_us": 44
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 45137,
+        "p95_us": 45137,
+        "p99_us": 45137
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 48,
+        "p95_us": 48,
+        "p99_us": 48
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 66,
+        "p95_us": 66,
+        "p99_us": 66
+      },
+      "native_snapshot_apply": {
+        "samples": 5,
+        "p50_us": 94,
+        "p95_us": 261,
+        "p99_us": 261
+      }
+    }
+  },
+  "after_repaint": {
+    "revision": 6,
+    "native_process_id": 5887,
+    "inputs": {
+      "search": {
+        "entity": 4294967298,
+        "text": "0",
+        "selection": {
+          "start": 0,
+          "end": 1
+        },
+        "focused": true
+      }
+    },
+    "tables": {
+      "watchlist": {
+        "entity": 4294967300,
+        "visible_rows": {
+          "start": 17,
+          "end": 26
+        },
+        "row_count": 1000,
+        "dataset": "instruments",
+        "dataset_revision": 2,
+        "scroll_y": -548.0,
+        "view": {
+          "source_rows": 1000,
+          "view_rows": 1000,
+          "spec_hash": 556118766591525534
+        },
+        "selection": {
+          "row": 25,
+          "record": "BRK0025"
+        },
+        "focused": false
+      }
+    },
+    "labels": {
+      "title": "Market watch reloaded",
+      "source": "Sample instruments and prices. No live market feed.",
+      "summary": "1000 instruments shown · 0 saved",
+      "selection": "BRK0025 · Brookfield Labs · 101.82",
+      "status": "Updated BRK0025 to 101.82."
+    },
+    "controls": {},
+    "focus_handle": "FocusHandle(FocusId(1v1))",
+    "window": {
+      "width": 960.0,
+      "height": 720.0,
+      "scale_factor": 1.0,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 12,
+      "rows_constructed": 132,
+      "cells_constructed": 672,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "view_recomputes": 1
+    },
+    "draw": {
+      "samples": 12,
+      "p50_us": 20873.215,
+      "p95_us": 66093.055,
+      "p99_us": 66093.055
+    },
+    "dirty_to_present_submit": {
+      "samples": 10,
+      "p50_us": 47349.759,
+      "p95_us": 78643.199,
+      "p99_us": 78643.199
+    },
+    "present_interval": {
+      "samples": 7,
+      "p50_us": 50233.343,
+      "p95_us": 79495.167,
+      "p99_us": 79495.167
+    },
+    "input_to_frame": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    }
+  },
+  "latest_recovery": {
+    "state": {
+      "revision": 16,
+      "native_process_id": 5887,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "0",
+          "selection": {
+            "start": 0,
+            "end": 1
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -548.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 556118766591525534
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch recovered 10",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "controls": {},
+      "focus_handle": "FocusHandle(FocusId(1v1))",
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.0,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 47,
+        "rows_constructed": 517,
+        "cells_constructed": 2632,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 1
+      },
+      "draw": {
+        "samples": 47,
+        "p50_us": 18628.607,
+        "p95_us": 27181.055,
+        "p99_us": 66093.055
+      },
+      "dirty_to_present_submit": {
+        "samples": 45,
+        "p50_us": 44990.463,
+        "p95_us": 65699.839,
+        "p99_us": 79560.703
+      },
+      "present_interval": {
+        "samples": 31,
+        "p50_us": 49381.375,
+        "p95_us": 131989.503,
+        "p99_us": 152829.951
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "0",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 16,
+      "encoded_snapshots": 15,
+      "encoded_bytes": 22797,
+      "ffi_callbacks": 70,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 51,
+      "description_build": {
+        "samples": 16,
+        "p50_us": 1826,
+        "p95_us": 3025,
+        "p99_us": 3442
+      },
+      "encode": {
+        "samples": 15,
+        "p50_us": 674,
+        "p95_us": 1076,
+        "p99_us": 1184
+      },
+      "publish_to_applied": {
+        "samples": 15,
+        "p50_us": 2687,
+        "p95_us": 29217,
+        "p99_us": 41927
+      },
+      "initial": {
+        "bytes": 63171,
+        "encode_us": 12954
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 44,
+        "p95_us": 44,
+        "p99_us": 44
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 45137,
+        "p95_us": 45137,
+        "p99_us": 45137
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 48,
+        "p95_us": 48,
+        "p99_us": 48
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 66,
+        "p95_us": 66,
+        "p99_us": 66
+      },
+      "native_snapshot_apply": {
+        "samples": 15,
+        "p50_us": 100,
+        "p95_us": 126,
+        "p99_us": 261
+      }
+    }
+  },
+  "latest_recovery_repaint": {
+    "revision": 16,
+    "native_process_id": 5887,
+    "inputs": {
+      "search": {
+        "entity": 4294967298,
+        "text": "0",
+        "selection": {
+          "start": 0,
+          "end": 1
+        },
+        "focused": true
+      }
+    },
+    "tables": {
+      "watchlist": {
+        "entity": 4294967300,
+        "visible_rows": {
+          "start": 17,
+          "end": 26
+        },
+        "row_count": 1000,
+        "dataset": "instruments",
+        "dataset_revision": 2,
+        "scroll_y": -548.0,
+        "view": {
+          "source_rows": 1000,
+          "view_rows": 1000,
+          "spec_hash": 556118766591525534
+        },
+        "selection": {
+          "row": 25,
+          "record": "BRK0025"
+        },
+        "focused": false
+      }
+    },
+    "labels": {
+      "title": "Market watch recovered 10",
+      "source": "Sample instruments and prices. No live market feed.",
+      "summary": "1000 instruments shown · 0 saved",
+      "selection": "BRK0025 · Brookfield Labs · 101.82",
+      "status": "Updated BRK0025 to 101.82."
+    },
+    "controls": {},
+    "focus_handle": "FocusHandle(FocusId(1v1))",
+    "window": {
+      "width": 960.0,
+      "height": 720.0,
+      "scale_factor": 1.0,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 50,
+      "rows_constructed": 550,
+      "cells_constructed": 2800,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "view_recomputes": 1
+    },
+    "draw": {
+      "samples": 50,
+      "p50_us": 18612.223,
+      "p95_us": 27181.055,
+      "p99_us": 66093.055
+    },
+    "dirty_to_present_submit": {
+      "samples": 48,
+      "p50_us": 44990.463,
+      "p95_us": 65699.839,
+      "p99_us": 79560.703
+    },
+    "present_interval": {
+      "samples": 33,
+      "p50_us": 49381.375,
+      "p95_us": 131989.503,
+      "p99_us": 152829.951
+    },
+    "input_to_frame": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    }
+  },
+  "same_application_process_id": 5887,
+  "same_native_process_id": 5887,
+  "launcher_process_id": 5887,
+  "same_isolate_id": "isolates/7225159369276187",
+  "changed_code_executed": true,
+  "invalid_source_rejected": true,
+  "successful_reloads": 11,
+  "recovered_after_invalid_source": true
+}

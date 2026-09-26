@@ -98,3 +98,13 @@ the settings application/verifier `3ec8a87` are implemented. The
 retained failures. [Schema generation is skipped for now](protocol-schema-decision.md)
 with a defined future equivalence gate. This does not expand the production
 snapshot protocol into patches or close the parked hardware/IME/signing gates.
+
+Accessibility follow-up: [the semantics model and native adapters](accessibility.md)
+are implemented and the external UIA/AT-SPI/AX track passes on all three hosted
+platforms. Settings verifies all 15 steps through the OS tree; Watchlist verifies
+viewport-bounded table semantics and stable-record selection through sort/filter
+over 100,000 records. [The evidence](../reports/accessibility/README.md) retains
+provider defects, verifier failures and the narrow pinned dependency corrections.
+Human screen-reader sessions, offscreen virtual-table navigation, Linux EditableText
+and live announcements remain outside the verified surface. This milestone does
+not close the parked release gates or justify a production patch protocol.

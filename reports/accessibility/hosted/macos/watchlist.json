@@ -1,0 +1,3434 @@
+{
+  "platform": "macos",
+  "records": 100000,
+  "scope": "External platform tree/actions against the actual Watchlist application; no screen reader or visual claim.",
+  "steps": [
+    {
+      "step": "100k table with bounded visible semantics",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": ""
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Sort by price",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "100000 instruments shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "100000 instruments shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0000\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",0]",
+            "name": "ALP0000",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",1]",
+            "name": "Alpine Research",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",2]",
+            "name": "100.00",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",3]",
+            "name": "-0.20",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0001\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",0]",
+            "name": "BRK0001",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",1]",
+            "name": "Brookfield Labs",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",2]",
+            "name": "100.07",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",3]",
+            "name": "-0.07",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0002\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",0]",
+            "name": "CED0002",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",1]",
+            "name": "Cedar Systems",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",2]",
+            "name": "100.14",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",3]",
+            "name": "0.06",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0003\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",0]",
+            "name": "DLT0003",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",1]",
+            "name": "Delta Works",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",2]",
+            "name": "100.21",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",3]",
+            "name": "0.19",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0004\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",0]",
+            "name": "ELM0004",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",1]",
+            "name": "Elm Networks",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",2]",
+            "name": "100.28",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",3]",
+            "name": "-0.09",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0005\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",0]",
+            "name": "FIR0005",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",1]",
+            "name": "Fir Energy",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",2]",
+            "name": "100.35",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",3]",
+            "name": "0.04",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0006\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",0]",
+            "name": "GLN0006",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",1]",
+            "name": "Glen Robotics",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",2]",
+            "name": "100.42",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",3]",
+            "name": "0.17",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0007\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",0]",
+            "name": "HBR0007",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",1]",
+            "name": "Harbor Design",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",2]",
+            "name": "100.49",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",3]",
+            "name": "-0.11",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0008\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",0]",
+            "name": "ALP0008",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",1]",
+            "name": "Alpine Research",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",2]",
+            "name": "100.56",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",3]",
+            "name": "0.02",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "No instrument selected",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "No instrument selected"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Select a row to update its sample price or save it to your shortlist.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Select a row to update its sample price or save it to your shortlist."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 75,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 76,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "",
+      "selected": null,
+      "data_messages": 0
+    },
+    {
+      "step": "search filters native dataset",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": "BRK0025"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Sort by price",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "1 instrument shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "1 instrument shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "name": "BRK0025",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "name": "Brookfield Labs",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "name": "101.75",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "name": "0.18",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "No instrument selected",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "No instrument selected"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Select a row to update its sample price or save it to your shortlist.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Select a row to update its sample price or save it to your shortlist."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 27,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 28,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "BRK0025",
+      "selected": null,
+      "data_messages": 0
+    },
+    {
+      "step": "platform row selection reaches application",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": "BRK0025"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Sort by price",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "1 instrument shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "1 instrument shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": true,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "name": "BRK0025",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "name": "Brookfield Labs",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "name": "101.75",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "name": "0.18",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "BRK0025 · Brookfield Labs · 101.75",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "BRK0025 · Brookfield Labs · 101.75"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Select a row to update its sample price or save it to your shortlist.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Select a row to update its sample price or save it to your shortlist."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 27,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 28,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "BRK0025",
+      "selected": "BRK0025",
+      "data_messages": 0
+    },
+    {
+      "step": "formatted incremental price reaches platform cell",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": "BRK0025"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Sort by price",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "1 instrument shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "1 instrument shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": true,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "name": "BRK0025",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "name": "Brookfield Labs",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "name": "101.82",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "name": "0.18",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "BRK0025 · Brookfield Labs · 101.82",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "BRK0025 · Brookfield Labs · 101.82"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Updated BRK0025 to 101.82.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Updated BRK0025 to 101.82."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 27,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 28,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "BRK0025",
+      "selected": "BRK0025",
+      "data_messages": 1
+    },
+    {
+      "step": "cleared filter preserves record selection",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": ""
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Sort by price",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "1 instrument shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "1 instrument shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": true,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "name": "BRK0025",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "name": "Brookfield Labs",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "name": "101.82",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "name": "0.18",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "BRK0025 · Brookfield Labs · 101.82",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "BRK0025 · Brookfield Labs · 101.82"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Updated BRK0025 to 101.82.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Updated BRK0025 to 101.82."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 27,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 28,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "",
+      "selected": "BRK0025",
+      "data_messages": 1
+    },
+    {
+      "step": "sorting preserves selected platform record identity",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": ""
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Price high → low",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "100000 instruments shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "100000 instruments shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": true,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "name": "BRK0025",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "name": "Brookfield Labs",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "name": "101.82",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "name": "0.18",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0026\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",0]",
+            "name": "CED0026",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",1]",
+            "name": "Cedar Systems",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",2]",
+            "name": "101.82",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",3]",
+            "name": "-0.10",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 24,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0024\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",0]",
+            "name": "ALP0024",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",1]",
+            "name": "Alpine Research",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",2]",
+            "name": "101.68",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",3]",
+            "name": "0.05",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 30,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0023\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",0]",
+            "name": "HBR0023",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",1]",
+            "name": "Harbor Design",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",2]",
+            "name": "101.61",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",3]",
+            "name": "-0.08",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 36,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0022\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",0]",
+            "name": "GLN0022",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",1]",
+            "name": "Glen Robotics",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",2]",
+            "name": "101.54",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",3]",
+            "name": "0.20",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 42,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0021\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",0]",
+            "name": "FIR0021",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",1]",
+            "name": "Fir Energy",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",2]",
+            "name": "101.47",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",3]",
+            "name": "0.07",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 48,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0020\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",0]",
+            "name": "ELM0020",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",1]",
+            "name": "Elm Networks",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",2]",
+            "name": "101.40",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",3]",
+            "name": "-0.06",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 54,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0019\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",0]",
+            "name": "DLT0019",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",1]",
+            "name": "Delta Works",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",2]",
+            "name": "101.33",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",3]",
+            "name": "-0.19",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 60,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0018\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",0]",
+            "name": "CED0018",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",1]",
+            "name": "Cedar Systems",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",2]",
+            "name": "101.26",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",3]",
+            "name": "0.09",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 66,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "BRK0025 · Brookfield Labs · 101.82",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "BRK0025 · Brookfield Labs · 101.82"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Updated BRK0025 to 101.82.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Updated BRK0025 to 101.82."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 75,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 76,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "",
+      "selected": "BRK0025",
+      "data_messages": 1
+    },
+    {
+      "step": "filtered-out selection disappears",
+      "tree": {
+        "api": "AXUIElement",
+        "nodes": [
+          {
+            "actions": [],
+            "name": "gpuidart-launcher",
+            "parent": null,
+            "role": "AXApplication"
+          },
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "focused": true,
+            "modal": false,
+            "name": "Market watch",
+            "parent": 0,
+            "role": "AXWindow",
+            "subrole": "AXStandardWindow"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXGroup",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 2,
+            "role": "AXGroup",
+            "subrole": "AXApplicationGroup"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "title",
+            "name": "Market watch",
+            "parent": 3,
+            "role": "Heading",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "source",
+            "name": "Sample instruments and prices. No live market feed.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Sample instruments and prices. No live market feed."
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "search",
+            "name": "Search instruments by symbol",
+            "parent": 3,
+            "role": "AXTextField",
+            "subrole": "AXUnknown",
+            "value": "ALP0000"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-filter",
+            "name": "Show shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "shortlist-toggle",
+            "name": "Add to shortlist",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "tick",
+            "name": "Simulate price update",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "sort-price",
+            "name": "Price high → low",
+            "parent": 3,
+            "role": "AXButton",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "summary",
+            "name": "1 instrument shown · 0 saved",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "1 instrument shown · 0 saved"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "watchlist",
+            "name": "Instruments",
+            "parent": 3,
+            "role": "AXTable",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",0]",
+            "name": "Symbol",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",1]",
+            "name": "Company",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",2]",
+            "name": "Price",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",3]",
+            "name": "Change",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"column\",4]",
+            "name": "Shortlist",
+            "parent": 12,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [
+              "AXPick",
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0000\"]",
+            "name": "",
+            "parent": 12,
+            "role": "AXRow",
+            "selected": false,
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",0]",
+            "name": "ALP0000",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",1]",
+            "name": "Alpine Research",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",2]",
+            "name": "100.00",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",3]",
+            "name": "-0.20",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",4]",
+            "name": "",
+            "parent": 18,
+            "role": "AXCell",
+            "subrole": "AXUnknown"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "selection",
+            "name": "No instrument selected",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "No instrument selected"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "id": "status",
+            "name": "Updated BRK0025 to 101.82.",
+            "parent": 3,
+            "role": "AXStaticText",
+            "subrole": "AXUnknown",
+            "value": "Updated BRK0025 to 101.82."
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXCloseButton"
+          },
+          {
+            "actions": [
+              "AXPress",
+              "AXZoomWindow",
+              "AXShowMenu"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXFullScreenButton"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 27,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [],
+            "focused": false,
+            "name": "",
+            "parent": 28,
+            "role": "AXGroup"
+          },
+          {
+            "actions": [
+              "AXPress"
+            ],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXButton",
+            "subrole": "AXMinimizeButton"
+          },
+          {
+            "actions": [],
+            "enabled": true,
+            "focused": false,
+            "name": "",
+            "parent": 1,
+            "role": "AXStaticText",
+            "value": "Market watch"
+          }
+        ],
+        "process": 4825,
+        "query_restarts": []
+      },
+      "query": "ALP0000",
+      "selected": null,
+      "data_messages": 1
+    }
+  ],
+  "passed": true,
+  "unavailable": []
+}

@@ -1,0 +1,407 @@
+{
+  "source_commit": "8b612defb0caefa0b83b803a6ab0380c2f3ce0bd",
+  "run": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069695",
+  "scope": "External UIA, AT-SPI and AX programmatic queries/actions on hosted real windows; no screen reader, visual, hardware or latency claim.",
+  "platforms": {
+    "windows": {
+      "controls": {
+        "passed": true,
+        "steps": 9
+      },
+      "settings": {
+        "passed": true,
+        "steps": 15
+      },
+      "watchlist": {
+        "passed": true,
+        "steps": 7,
+        "node_counts": [
+          72,
+          24,
+          24,
+          24,
+          72,
+          72,
+          24
+        ],
+        "query_restarts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "linux": {
+      "controls": {
+        "passed": true,
+        "steps": 9
+      },
+      "cache_events": {
+        "api": "Gio.DBusConnection",
+        "process": 5726,
+        "add": 50,
+        "remove": 47,
+        "invalid": [],
+        "passed": true
+      },
+      "settings": {
+        "passed": true,
+        "steps": 15
+      },
+      "watchlist": {
+        "passed": true,
+        "steps": 7,
+        "node_counts": [
+          73,
+          25,
+          25,
+          25,
+          73,
+          73,
+          25
+        ],
+        "query_restarts": [
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    },
+    "macos": {
+      "controls": {
+        "passed": true,
+        "steps": 9
+      },
+      "settings": {
+        "passed": true,
+        "steps": 15
+      },
+      "watchlist": {
+        "passed": true,
+        "steps": 7,
+        "node_counts": [
+          80,
+          32,
+          32,
+          32,
+          32,
+          80,
+          32
+        ],
+        "query_restarts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "files": [
+    {
+      "file": "windows/controls.json",
+      "sha256": "ce89a5f7fd524ef3e57d82b685ba375f13dcce831ffc3d2d3aaa4b1ea799812d"
+    },
+    {
+      "file": "windows/disabled.json",
+      "sha256": "b3e667985af27cc3941dbe7cb6ac9437f586d2af375d4ab3338ca47bff332662"
+    },
+    {
+      "file": "windows/platform-spike.json",
+      "sha256": "aa41f67de6615ef11804c7d1227cfa8956a2981933e67e80e4a81347566ebd9c"
+    },
+    {
+      "file": "windows/settings.json",
+      "sha256": "a5c22bc0fa3b58cb49811005a3f4a50ab72d72ffbf1cd777c22e7d95cd329e34"
+    },
+    {
+      "file": "windows/settings.json.trace.json",
+      "sha256": "0726fb61114972e72f68213f2fb1095b49a4ab5525384df3c10785afe90a447b"
+    },
+    {
+      "file": "windows/watchlist.json",
+      "sha256": "63f1a26dcbd9a077dd640840595b3afbe67e101fafaa1e0cede0b5881bfe61fd"
+    },
+    {
+      "file": "linux/controls.json",
+      "sha256": "09abc47a34990b331d810d2e7dbc7bec37d9a05a22edba0ae73f77434594f0ec"
+    },
+    {
+      "file": "linux/controls.json.cache-events.json",
+      "sha256": "7d95c4a68fe67d50419588fb6923c50d3375c5c6151c1e271010d8e14a92cf31"
+    },
+    {
+      "file": "linux/disabled.json",
+      "sha256": "d204821dc3764c3f805f33ec0cf039acda56807ab54cc1a27b0bb7bee9fe7423"
+    },
+    {
+      "file": "linux/platform-spike.json",
+      "sha256": "f5e9dc03a86d9d713dc281ef47c1c7cf3ad457791751e21a70c4c26d4d98173a"
+    },
+    {
+      "file": "linux/settings.json",
+      "sha256": "17fe9926e78e057af5b88b30a31e37cd7c7cdb793572b5a30605da19e852d8e1"
+    },
+    {
+      "file": "linux/settings.json.trace.json",
+      "sha256": "d62c51a57f9ab45d61d10ed1dd7fc42b43fc10de775bb3178f1ac7fa06167439"
+    },
+    {
+      "file": "linux/watchlist.json",
+      "sha256": "441bc1b4c2f6066b46bceafc6a7d08072679b5ebeeed4a8d8e20060a018c55ee"
+    },
+    {
+      "file": "macos/controls.json",
+      "sha256": "bd9a154904835a0b8935836f24578d66a3043c638b33011a3d162f1947296aca"
+    },
+    {
+      "file": "macos/disabled.json",
+      "sha256": "bc71d5d490c297dc7e2dd1f9b815f35aff803c4b83ac3cba152b37e8ce7b458f"
+    },
+    {
+      "file": "macos/platform-spike.json",
+      "sha256": "f72817ccb7a47c713d25be9b44432d498904e9599bd9ae13765bcab5a6903bd7"
+    },
+    {
+      "file": "macos/settings.json",
+      "sha256": "5a3644bba568bf2b609b35df092802b7a52e2bf605008848ebda8415e88b94ef"
+    },
+    {
+      "file": "macos/settings.json.trace.json",
+      "sha256": "0a2e9fbab47676b064343c215a32aba6e270dc126baa49d5c1c6537d7c36848a"
+    },
+    {
+      "file": "macos/watchlist.json",
+      "sha256": "d150b724c33db1b6d5127da4036b8d3b6370f8898b4e4c39a06ad5696b1d7c28"
+    },
+    {
+      "file": "linux-sdk/aot-trace.json",
+      "sha256": "f39c8ba87d2b5fcc56b1d76b65114b9690636ecdb1a67ddca29eed57c48b45ec"
+    },
+    {
+      "file": "linux-sdk/aot.log",
+      "sha256": "e40c2ee47e7d1e4468b6cc63a4b3761fca05005eb7d0a46b1f50384345b29083"
+    },
+    {
+      "file": "linux-sdk/jit-trace.json",
+      "sha256": "5a521f484b9c8bd7e3b90d0caf128417c387395f610dd5fb91415823d5b5aeb4"
+    },
+    {
+      "file": "linux-sdk/jit.log",
+      "sha256": "4d2319c9f636bcc84839112b584fcf020296c66d4600d24f75e4239ade718f04"
+    },
+    {
+      "file": "linux-sdk/reload.json",
+      "sha256": "c511e900e830be6df59789ad58db38765d21d9c1f9dfe422e24cd95d9000b2c0"
+    },
+    {
+      "file": "linux-sdk/reload.json.trace.json",
+      "sha256": "f3d20774092f5de8c522083111a70dbe9021261da2501cf98cfbcb1e78602016"
+    },
+    {
+      "file": "linux-sdk/reload.log",
+      "sha256": "daecf87833956c2a2c3307ea85d8276a54891033796dd3b0f650d9cd09c104a0"
+    },
+    {
+      "file": "linux-sdk/settings-aot.json",
+      "sha256": "bf810031a2c5bbe839a172de0449a5d94ecfbf61e3b4f9be0d184acc4a16aa05"
+    },
+    {
+      "file": "linux-sdk/settings-aot.json.trace.json",
+      "sha256": "f24d7ff4a62163ae29908df0599dc15a3b8dc711c547047f98243f6ab3fc98fc"
+    },
+    {
+      "file": "linux-sdk/settings-jit.json",
+      "sha256": "e703420b74e1fd18b590a8095fd58acbfc46140a6743c15329769b953940cb6e"
+    },
+    {
+      "file": "linux-sdk/settings-jit.json.trace.json",
+      "sha256": "27fdee8a1de937b4af0cdf6453e4bb91fb56f3d8b6c4d5f11681cf5dfc1c8bd3"
+    },
+    {
+      "file": "linux-sdk/tests.log",
+      "sha256": "358efa5bb7a143e6482b95dc509efb8b18907c9f25f652875c93503bda26f8d9"
+    },
+    {
+      "file": "macos-sdk/aot-trace.json",
+      "sha256": "13852c5762c02e784b23926eda22e7ffb4da2baba2c76ce8aec3fcd08d307719"
+    },
+    {
+      "file": "macos-sdk/aot.log",
+      "sha256": "fdd0d5a99279e2259401f2aab1f6152aca24d1d7a2fab38c872310ca1a4f74e0"
+    },
+    {
+      "file": "macos-sdk/jit-trace.json",
+      "sha256": "929d61074bce5af0b62c4f61128c927783b15cd30b046d01442ed124beef8cce"
+    },
+    {
+      "file": "macos-sdk/jit.log",
+      "sha256": "e6eba00a46b4f3f9c5c514c49ada6bfd068c4c01b2edeb48e08450063d75ba11"
+    },
+    {
+      "file": "macos-sdk/reload.json",
+      "sha256": "f898b4f20c6d2781e6d118355f47a3b29680cdd3411da9508fb2463f25e67843"
+    },
+    {
+      "file": "macos-sdk/reload.json.trace.json",
+      "sha256": "eed0dd1807ba487a60656e4a2f0ab4b96adec7bb7fb760bc61503eb551f8745d"
+    },
+    {
+      "file": "macos-sdk/reload.log",
+      "sha256": "0e39bc9484579a87067561ae6d700a861c4b62492743e9ebb576b83a6547eb38"
+    },
+    {
+      "file": "macos-sdk/settings-aot.json",
+      "sha256": "a403de692fa61761463851120d5bc6375a0336ffac1afb97b2b67b74cff5a5e7"
+    },
+    {
+      "file": "macos-sdk/settings-aot.json.trace.json",
+      "sha256": "062277218f5b3406013d49994390caa1e3c93b11b1b379228259089bcb887ecf"
+    },
+    {
+      "file": "macos-sdk/settings-jit.json",
+      "sha256": "0128c2bd493979a61905fda54dc4ba964f7d93244ddfae41b988a5e5a0086d24"
+    },
+    {
+      "file": "macos-sdk/settings-jit.json.trace.json",
+      "sha256": "2a358b91003653c952a6376d9bae47dc9b2c9c66f29cfc1528a0a7adde5b2cda"
+    },
+    {
+      "file": "macos-sdk/tests.log",
+      "sha256": "38c4883b88668dc46cb3143148d030c019d3773c4741b750e1b01efd032cdc60"
+    }
+  ],
+  "sdk_runs": {
+    "linux": {
+      "run": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069642",
+      "smokes": {
+        "jit": {
+          "passed": true,
+          "rows": 100000,
+          "mode": "jit",
+          "cell_updates": 30,
+          "snapshot_updates": 30,
+          "trace_records": 984
+        },
+        "aot": {
+          "passed": true,
+          "rows": 100000,
+          "mode": "aot",
+          "cell_updates": 30,
+          "snapshot_updates": 30,
+          "trace_records": 983
+        }
+      },
+      "traces": {
+        "aot-trace.json": {
+          "records": 983,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "jit-trace.json": {
+          "records": 984,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "reload.json.trace.json": {
+          "records": 1066,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "settings-aot.json.trace.json": {
+          "records": 2305,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "settings-jit.json.trace.json": {
+          "records": 2305,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        }
+      },
+      "reload": {
+        "passed": true,
+        "rows": 1000,
+        "successful_reloads": 11,
+        "changed_code_executed": true,
+        "invalid_source_rejected": true
+      }
+    },
+    "macos": {
+      "run": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069665",
+      "smokes": {
+        "jit": {
+          "passed": true,
+          "rows": 100000,
+          "mode": "jit",
+          "cell_updates": 30,
+          "snapshot_updates": 30,
+          "trace_records": 987
+        },
+        "aot": {
+          "passed": true,
+          "rows": 100000,
+          "mode": "aot",
+          "cell_updates": 30,
+          "snapshot_updates": 30,
+          "trace_records": 985
+        }
+      },
+      "traces": {
+        "aot-trace.json": {
+          "records": 985,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "jit-trace.json": {
+          "records": 987,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "reload.json.trace.json": {
+          "records": 1059,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "settings-aot.json.trace.json": {
+          "records": 2265,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        },
+        "settings-jit.json.trace.json": {
+          "records": 2251,
+          "dart_dropped": 0,
+          "native_dropped": 0,
+          "capture_complete": true
+        }
+      },
+      "reload": {
+        "passed": true,
+        "rows": 1000,
+        "successful_reloads": 11,
+        "changed_code_executed": true,
+        "invalid_source_rejected": true
+      }
+    }
+  }
+}

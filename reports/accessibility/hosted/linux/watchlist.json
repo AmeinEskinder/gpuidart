@@ -1,0 +1,5788 @@
+{
+  "platform": "linux",
+  "records": 100000,
+  "scope": "External platform tree/actions against the actual Watchlist application; no screen reader or visual claim.",
+  "steps": [
+    {
+      "step": "100k table with bounded visible semantics",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": ""
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sort by price",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "100000 instruments shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0000\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "ALP0000",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Alpine Research",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "100.00",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "-0.20",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0001\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "BRK0001",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "100.07",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "-0.07",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0002\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "CED0002",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "Cedar Systems",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "100.14",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "0.06",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0003\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "DLT0003",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "Delta Works",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "100.21",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "0.19",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0004\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "ELM0004",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "Elm Networks",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "100.28",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "-0.09",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0005\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "FIR0005",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "Fir Energy",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "100.35",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "0.04",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0006\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "GLN0006",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "Glen Robotics",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "100.42",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "0.17",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0007\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "HBR0007",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "Harbor Design",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "100.49",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "-0.11",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0008\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "ALP0008",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "Alpine Research",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "100.56",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "0.02",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "No instrument selected",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Select a row to update its sample price or save it to your shortlist.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "",
+      "selected": null,
+      "data_messages": 0
+    },
+    {
+      "step": "search filters native dataset",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "BRK0025"
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sort by price",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "1 instrument shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "BRK0025",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "101.75",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "0.18",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "No instrument selected",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Select a row to update its sample price or save it to your shortlist.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [
+          "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\nStale AT-SPI object: The application no longer exists; owned application root still answers AccessibleId\n"
+        ],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "BRK0025",
+      "selected": null,
+      "data_messages": 0
+    },
+    {
+      "step": "platform row selection reaches application",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "BRK0025"
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sort by price",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "1 instrument shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": true,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "BRK0025",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "101.75",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "0.18",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "BRK0025 · Brookfield Labs · 101.75",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Select a row to update its sample price or save it to your shortlist.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "BRK0025",
+      "selected": "BRK0025",
+      "data_messages": 0
+    },
+    {
+      "step": "formatted incremental price reaches platform cell",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "BRK0025"
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sort by price",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "1 instrument shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": true,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "BRK0025",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "101.82",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "0.18",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "BRK0025 · Brookfield Labs · 101.82",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Updated BRK0025 to 101.82.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "BRK0025",
+      "selected": "BRK0025",
+      "data_messages": 1
+    },
+    {
+      "step": "cleared filter preserves record selection",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": ""
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sort by price",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "100000 instruments shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": true,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "BRK0025",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "101.82",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "0.18",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0026\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "CED0026",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "Cedar Systems",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "101.82",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "-0.10",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0027\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "DLT0027",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0027\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "Delta Works",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0027\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "101.89",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0027\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "0.03",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0027\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0027\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0028\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "ELM0028",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0028\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "Elm Networks",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0028\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "101.96",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0028\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "0.16",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0028\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0028\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0029\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "FIR0029",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0029\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "Fir Energy",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0029\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "102.03",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0029\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "-0.12",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0029\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0029\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0030\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "GLN0030",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0030\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "Glen Robotics",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0030\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "102.10",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0030\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "0.01",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0030\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0030\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0031\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "HBR0031",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0031\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "Harbor Design",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0031\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "102.17",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0031\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "0.14",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0031\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0031\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0032\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "ALP0032",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0032\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "Alpine Research",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0032\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "102.24",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0032\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "-0.14",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0032\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0032\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0033\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "BRK0033",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0033\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0033\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "102.31",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0033\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "-0.01",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0033\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0033\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "BRK0025 · Brookfield Labs · 101.82",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Updated BRK0025 to 101.82.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "",
+      "selected": "BRK0025",
+      "data_messages": 1
+    },
+    {
+      "step": "sorting preserves selected platform record identity",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": ""
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Price high → low",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "100000 instruments shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": true,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "BRK0025",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Brookfield Labs",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "101.82",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "0.18",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0026\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "CED0026",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "Cedar Systems",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "101.82",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "-0.10",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 23,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0026\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0024\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "ALP0024",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "Alpine Research",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "101.68",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "0.05",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 29,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0023\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "HBR0023",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "Harbor Design",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "101.61",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "-0.08",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 35,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0022\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "GLN0022",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "Glen Robotics",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "101.54",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "0.20",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 41,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0021\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "FIR0021",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "Fir Energy",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "101.47",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "0.07",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 47,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0020\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "ELM0020",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "Elm Networks",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "101.40",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "-0.06",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 53,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0019\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "DLT0019",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "Delta Works",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "101.33",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "-0.19",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 59,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0018\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "CED0018",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "Cedar Systems",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "101.26",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "0.09",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 65,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "BRK0025 · Brookfield Labs · 101.82",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Updated BRK0025 to 101.82.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [
+          "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\nStale AT-SPI object: The application no longer exists; owned application root still answers AccessibleId\n"
+        ],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "",
+      "selected": "BRK0025",
+      "data_messages": 1
+    },
+    {
+      "step": "filtered-out selection disappears",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5951,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Market watch",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Market watch",
+            "role": "heading",
+            "id": "title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Sample instruments and prices. No live market feed.",
+            "role": "label",
+            "id": "source",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Search instruments by symbol",
+            "role": "entry",
+            "id": "search",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Text"
+            ],
+            "value": "ALP0000"
+          },
+          {
+            "parent": 2,
+            "name": "Show shortlist",
+            "role": "push button",
+            "id": "shortlist-filter",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Add to shortlist",
+            "role": "push button",
+            "id": "shortlist-toggle",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Simulate price update",
+            "role": "push button",
+            "id": "tick",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Price high → low",
+            "role": "push button",
+            "id": "sort-price",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "1 instrument shown · 0 saved",
+            "role": "label",
+            "id": "summary",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Instruments",
+            "role": "table",
+            "id": "watchlist",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component",
+              "Selection"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Symbol",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Company",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Price",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Change",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "Shortlist",
+            "role": "column header",
+            "id": "[\"watchlist\",\"column\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 11,
+            "name": "",
+            "role": "table row",
+            "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0000\"]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "ALP0000",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",0]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "Alpine Research",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",1]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "100.00",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",2]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "-0.20",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",3]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 17,
+            "name": "",
+            "role": "table cell",
+            "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",4]",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "No instrument selected",
+            "role": "label",
+            "id": "selection",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Updated BRK0025 to 101.82.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          }
+        ],
+        "query_restarts": [
+          "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\nStale AT-SPI element: /org/a11y/atspi/accessible/0/16752240464293032420734407984677912576\n"
+        ],
+        "client_stderr": "/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:89: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n"
+      },
+      "query": "ALP0000",
+      "selected": null,
+      "data_messages": 1
+    }
+  ],
+  "passed": true,
+  "unavailable": [
+    "Pinned AT-SPI adapter has no EditableText; search uses GPUI diagnostic keys and external Text reads."
+  ]
+}

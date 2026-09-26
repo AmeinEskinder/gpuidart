@@ -1,7 +1,8 @@
 # Accessibility work order
 
-Status: semantics and native adapters implemented; expanded hosted verification is
-in progress. See [retained results and failures](../reports/accessibility/README.md).
+Status: semantics and native adapters implemented and externally verified on
+Windows UIA, Linux X11 AT-SPI and macOS AX. See
+[accepted results and retained failures](../reports/accessibility/README.md).
 This is not a human screen-reader usability claim. Design reference: `3a72688`.
 
 ## Platform spike
@@ -148,7 +149,9 @@ persistent OS object handles or offscreen table navigation.
   [pinned dependency patch](../native/vendor/README.md) adds row SelectionItem
   support; the same consumer correction exposes AX selected-row attributes.
   The AT-SPI patch prevents disabled buttons from being reported as enabled.
-  Unmodified-upstream failures are retained in the report.
+  The Unix adapter also corrects cache-signal argument encoding; an external
+  D-Bus observer checks both addition and removal messages. Unmodified-upstream
+  failures and the exact local patches are retained in the report.
 - Linux AccessKit AT-SPI 0.19.1 has no EditableText interface. External Text reads
   are supported by structured text children; Linux test edits use declared GPUI
   diagnostic keys. They are not AT-SPI write passes.
@@ -163,3 +166,23 @@ The clients require native platform accessibility access; Linux CI uses a privat
 D-Bus accessibility session, and the macOS external client must be authorized.
 The scripts refuse to replace a prior report and fail on missing platform access.
 An internal diagnostic tree never substitutes for an external platform query.
+
+### Reading a changing platform tree
+
+A platform query consists of multiple OS calls and can overlap a frame update.
+AT-SPI and AX clients discard the entire read when a referenced object disappears;
+they retry only known stale-object errors with a fixed bound. AT-SPI's
+APPLICATION_GONE error is eligible only when the same application root still
+answers an uncached property request. All retries and client stderr are retained.
+Actions are never replayed and a partial tree never passes an assertion. These
+read-recovery rules do not make snapshot acknowledgements platform-tree fences.
+
+The Linux Settings control probe also starts an independent D-Bus signal monitor.
+It requires correctly typed AddAccessible and RemoveAccessible messages from the
+owned native PID. Valid cache message delivery does not establish screen-reader
+interpretation, speech, or navigation behavior.
+
+Dependency upgrades must pass the same external actions, disabled-state checks,
+focus checks and stable-record selection checks before the small pinned overrides
+can be removed. [Vendor provenance](../native/vendor/README.md) records original
+archive hashes, per-file hashes, licenses and patch-only diffs.

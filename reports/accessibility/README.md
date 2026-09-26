@@ -1,7 +1,94 @@
-# Accessibility milestone: progress and evidence
+# Accessibility milestone: results and evidence
 
-The milestone is **in progress**. These are feasibility and wire-contract results,
-not complete SDK accessibility acceptance or human screen-reader verification.
+The semantics model and native adapters are implemented. The external platform
+track passes on Windows, Linux X11 and macOS at `8b612de` in
+[run 36277069695](https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069695).
+All five SDK/lifecycle/accessibility workflows pass at that source commit
+([recorded CI jobs](hosted/ci.json)). The milestone is complete within its
+programmatic scope; it does not establish human screen-reader usability.
+
+## Accepted platform evidence
+
+Raw responses, per-file hashes and the exact source commit are in
+[hosted/manifest.json](hosted/manifest.json). Every platform runs the same settings
+application and the real 100,000-record Watchlist, using an external OS client.
+
+| Check | Windows 2022 / UIA | Ubuntu 24.04 X11 / AT-SPI | macOS 15 ARM64 / AX |
+| --- | --- | --- | --- |
+| Control roles, names, values and actions | 9 steps passed | 9 steps passed | 9 steps passed |
+| Disabled states and inert/rejected actions | Passed | Passed | Passed |
+| Settings semantics alongside keyboard/retention verifier | 15 steps passed | 15 steps passed | 15 steps passed |
+| Watchlist filter, selection, price edit and sort | 7 steps passed | 7 steps passed | 7 steps passed |
+| Initial platform nodes over 100k source records | 72 | 73 | 80 |
+| External row selection and selected-state query | SelectionItem | AT-SPI Action/state | AXPress/AXSelected |
+
+Inputs, buttons, checkboxes, sliders, selects, modal content, headings and table
+rows/cells use the real GPUI/AccessKit tree. Native state supplies values, checked,
+disabled, focus and selection. Explicit annotations supply bounded names and
+compatible roles; they cannot override behavior. Snapshot acknowledgement is not
+an OS accessibility publication fence; the verifiers await platform state.
+
+Watchlist verifies the same BRK0025 row author ID after filter clearing and sorting,
+reads its formatted `101.82` price, and observes selection removal when filtered
+out. It sends only one dataset update (the price edit). Platform tree counts are
+viewport observations; existing native construction/allocation tests provide the
+separate scaling check. Offscreen retrieval is not established.
+
+Linux Watchlist needed three whole-query restarts, each retained in its report:
+two disposed-object errors with a successful fresh application-root request, and
+one missing-object error. Windows/macOS needed none in these accepted Watchlist
+captures. No partial tree or repeated action was accepted. The independent Linux
+cache observer received 50 additions and 47 removals with valid argument types and
+zero invalid signals. Client deprecation warnings remain in raw stderr.
+
+## Regression and maintenance scope
+
+[Local Windows results](windows-final/manifest.json) record 57 native library tests,
+56 headless Dart tests, 6 live-window tests, 100k JIT/AOT smokes (30 cell edits and
+30 snapshot updates each), and 11 successful code reloads with retained state.
+The JIT/AOT traces contain 1,040 / 1,017 records and the reload trace 1,078; all
+report zero drops and complete capture. These use a debug native DLL. AOT describes
+Dart compilation; these are correctness captures, not performance measurements.
+The manifest preserves the capture's source identity separately from later
+Unix-only changes. Original PowerShell logs retain UTF-16 encoding; hashes describe
+exact bytes and are protected from checkout newline conversion.
+
+Hosted [Linux SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069642)
+and [macOS SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069665)
+pass headless suites, live-window lifecycle, 100k JIT/AOT publication smokes, Settings
+JIT/AOT and reload. Their reload fixture has 1,000 rows; the local Windows reload
+fixture above has 100,000. Both hosted platforms retain complete traces with zero
+drops in [the manifest](hosted/manifest.json).
+[Windows SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069617)
+and [Unix process lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36277069614)
+also pass. These checks supplement the external accessibility workflow; their
+internal diagnostics do not substitute for UIA, AT-SPI or AX evidence.
+
+Four version-preserving AccessKit overrides fix disabled-button metadata, row
+selection mapping and cache-signal encoding. One GPUI method associates the input
+semantic node with its actual editing focus without introducing a tab stop.
+[Provenance, licenses and small patch diffs](../../native/vendor/README.md) are
+separate from copied upstream source. The 160-file digest gate runs on every SDK
+check. Updating the toolkit must pass these same external regression checks;
+these fixes are maintained locally and are not attributed to unmodified upstream.
+
+## Limits carried forward
+
+- Linux has no AT-SPI EditableText at this pin. Fixture text edits use declared
+  GPUI diagnostic keys; the subsequent value reads are real external AT-SPI Text
+  queries. Windows/macOS text writes use their external platform APIs.
+- Text selection/caret actions and glyph geometry are not added. Windows Grid/Table
+  coordinate patterns and offscreen virtual-table navigation remain unsupported.
+- macOS modal content, dialog subrole and decisions are checked; a missing AXModal
+  property is not inferred from the internal modal flag.
+- No screen-reader speech/navigation, visual layout/contrast, Wayland, controlled
+  hardware IME, Mac physical display, signing or presentation-latency claim.
+  Live-region announcements remain unbound and unverified.
+- Parked hardware/signing and historical reload-disposition gates remain open.
+  This milestone does not declare the overall stable-release goal complete.
+
+The chronological checkpoints below retain earlier incomplete states and failed
+attempts. The accepted results above describe the current implementation.
 
 ## Platform spike (`a103da1`)
 
@@ -48,7 +135,7 @@ literals. The helper was corrected to explicit UTF-8 and the literals updated;
 native and experiment tests passed. Dart analyzer also caught an obsolete
 constructor argument during removal of the unsupported description field.
 
-## Remaining acceptance work
+## Historical native-adapter checkpoint
 
 ### Native adapter checkpoint (local Windows)
 
