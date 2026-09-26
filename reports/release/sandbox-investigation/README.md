@@ -10,6 +10,12 @@ Windows or GPU-driver defect.
 
 ## Controlled follow-up
 
+**Correction after the later failure:** the first generated files used
+`<VGpu>Disable</VGpu>`. This spelling was ignored by the installed Sandbox
+version. Those earlier passes are valid clean-VM launches, but they are not
+evidence that GPU sharing was disabled. Their raw requested settings remain
+unchanged in the retained reports.
+
 `tool/prepare_windows_release_checks.ps1` now accepts `-VGpu Enable|Disable`,
 defaulting to `Enable`. The candidate identity and environment report record
 the setting. All other preparation settings, including disabled networking,
@@ -29,10 +35,37 @@ checks the existing `bb6a894` ZIP, a distinct guest UUID, no developer SDK
 commands, AOT application self-test, sibling DLLs, Common Controls v6 and
 PerMonitorV2 at DPI 120. No SDK or additional runtime was installed in the guest.
 
-The guest reports Windows 11 Enterprise, build 10.0.26100. Its adapter inventory
+That guest reports Windows 11 Enterprise, build 10.0.26100. Its adapter inventory
 and loaded module list are preserved; the configuration alone does not isolate
 which driver each rendering operation used. This is clean-VM packaging evidence,
 not physical-GPU performance or a fix to the host's graphics driver.
+
+## XML cause and corrected run
+
+The new `53ea4c7` package's first fresh guest hit the same compositor failure
+before application launch. [The retained attempt](../53ea4c7/attempt-desktop-failure/)
+still enumerated NVIDIA and Intel virtual adapters despite the requested
+`Disable` setting. The Windows SDK's `ntstatus.h` identifies `0xc00001ad` as
+`STATUS_FATAL_MEMORY_EXHAUSTION`. The failed allocation is unknown; after the
+crash the guest had about 3 GiB of free physical memory.
+
+Changing only the XML element to the documented, case-sensitive
+`<vGPU>Disable</vGPU>` removed those virtual adapters. The guest reported only
+Microsoft Remote Display Adapter, reached logon, and ran the automatic verifier
+successfully. Its [loaded modules](../53ea4c7/clean-windows/verification.json)
+include `d3d10warp.dll` and no NVIDIA/Intel graphics driver modules. The Unicode
+label is intact. No SDKs or other runtime prerequisites were installed.
+
+The generator now uses `vGPU`. A Windows-only preparation test checks both
+setting values against the case-sensitive XML contract. It [failed before](xml-before.log)
+and [passed after](xml-after.log); Dart analysis also passed. It creates files
+without launching a guest and can run in headless CI.
+
+The current accepted artifact is `WatchlistRelease53ea4c7-windows-x64.zip`,
+SHA-256 `596b3836de98b5feeb3bc4982b2b6e064400035f7bf29cdfdedeb925e683d27b`.
+Its [guest identity, settings and results](../53ea4c7/clean-windows/) are retained.
+This fixes our ignored configuration setting and proves a clean launch through
+software rendering. It does not repair the host's virtual-GPU driver path.
 
 ## Reporting follow-up
 

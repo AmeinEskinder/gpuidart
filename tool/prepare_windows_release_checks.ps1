@@ -26,7 +26,7 @@ $inputXml = [Security.SecurityElement]::Escape($inputDirectory)
 $outputXml = [Security.SecurityElement]::Escape($outputDirectory)
 @"
 <Configuration>
-  <VGpu>$VGpu</VGpu>
+  <vGPU>$VGpu</vGPU>
   <Networking>Disable</Networking>
   <AudioInput>Disable</AudioInput>
   <VideoInput>Disable</VideoInput>

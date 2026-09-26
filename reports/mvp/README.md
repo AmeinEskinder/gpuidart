@@ -9,8 +9,8 @@ platforms and the post-restart Windows attempt.
 
 ## Run it
 
-Extract [WatchlistReleaseBb6a894-windows-x64.zip](../../build/WatchlistReleaseBb6a894-windows-x64.zip)
-and launch `WatchlistReleaseBb6a894.exe`. Keep all packaged files together.
+Extract [WatchlistRelease53ea4c7-windows-x64.zip](../../build/WatchlistRelease53ea4c7-windows-x64.zip)
+and launch `WatchlistRelease53ea4c7.exe`. Keep all packaged files together.
 The Market watch screen uses typed styles, scoped actions, stable record IDs,
 dataset views and declarative cell formatting. Application state is in memory.
 
@@ -20,17 +20,21 @@ For development, run `dart run tool/dev.dart` in the repository.
 
 | Item | Value |
 | --- | --- |
-| Source commit | `bb6a89425cfb34e03ab0f7a159836712ee921e9c` |
+| Source commit | `53ea4c7f50aecd54c7ba2a70ae9384d3f82777fe` |
 | Source state at packaging | Clean |
-| ZIP size | 11,716,763 bytes |
-| ZIP SHA-256 | `e4d050c7a0ca938bf49094c60598f9616bdde54cc4831b88cf3f7e81363e2323` |
-| Recorded source SHA-256 | `65ae70f400b2d678a2c145482a9611c81ba35abd4922144f04211172a2b4b7e5` |
+| ZIP size | 11,716,956 bytes |
+| ZIP SHA-256 | `596b3836de98b5feeb3bc4982b2b6e064400035f7bf29cdfdedeb925e683d27b` |
+| Recorded source SHA-256 | `87900f38c46388298468b5e3489e47badd6a8a80c226c5c0f24fd817d3454a71` |
 | Native ABI | 1 |
 | Local OS | Windows 11 Pro, 10.0.26200, x64 |
 | Display check | PerMonitorV2, DPI 120 |
 
-The [package report](package.json) records individual file hashes, tool versions,
-source identity and loaded module paths. This is an unsigned evaluation ZIP.
+The [current package report](../release/53ea4c7/clean-windows/verification.json)
+records file hashes, source identity and loaded modules. This unsigned evaluation
+ZIP includes the UTF-8 verifier fix. Application sources are unchanged from the
+nine-check `bb6a894` run, and the native DLL hash is identical. Root reports in
+this directory retain that earlier full run; [tooling regressions](../release/encoding/README.md)
+and the new guest check verify the follow-up changes.
 
 ## Acceptance
 
@@ -71,7 +75,7 @@ The [release record](../release/README.md#gates-still-open) tracks the current
 Sandbox attempt, human IME, owner license and cross-platform desktop checks.
 Japanese typing is installed and enabled after the restart. The initial Sandbox
 failed before desktop logon; a fresh software-rendering configuration passed the
-package check. [Guest evidence](../release/bb6a894/clean-windows/verification.json)
+package check. [Guest evidence](../release/53ea4c7/clean-windows/verification.json)
 closes clean-Windows launch for this ZIP. Human IME remains unobserved.
 
 Use [Windows release checks](../../docs/windows-release-checks.md) and

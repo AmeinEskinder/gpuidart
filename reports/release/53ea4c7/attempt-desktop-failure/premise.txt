@@ -1,0 +1,3 @@
+﻿Premise tested next: the requested vGPU Disable setting was honored by the guest.
+Observed against that premise: the guest still enumerates NVIDIA/Intel virtual adapters and the same dwm.exe memory-exhaustion crash recurred before application launch.
+Next controlled change: use the exact vGPU XML element spelling in Microsoft's configuration reference. Keep the ZIP, memory, network and mapped folders unchanged. Capture adapter inventory if startup succeeds; do not infer a driver fix from a single successful launch.
