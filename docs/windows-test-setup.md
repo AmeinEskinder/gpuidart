@@ -1,10 +1,10 @@
 # Prepare Windows release checks
 
-The current candidate is `build/WatchlistMvp-windows-x64.zip`. Prepare a separate,
-repeatable Sandbox run with:
+Find the current candidate and its hash in [release evidence](../reports/release/README.md).
+Prepare a separate, repeatable Sandbox run with its ZIP path:
 
 ```powershell
-./tool/prepare_windows_release_checks.ps1
+./tool/prepare_windows_release_checks.ps1 -Zip build/WatchlistReleaseBb6a894-windows-x64.zip
 ```
 
 The command prints a new directory under `build/release-checks`. Its `check.wsb`
@@ -81,11 +81,14 @@ PowerShell, preserving existing languages and their order:
 
 ```powershell
 $gpuiLanguages = Get-WinUserLanguageList
-if ('ja-JP' -notin $gpuiLanguages.LanguageTag) {
+if (!($gpuiLanguages.LanguageTag | Where-Object { $_ -match '^ja(?:-|$)' })) {
     $gpuiLanguages.Add('ja-JP')
     Set-WinUserLanguageList -LanguageList $gpuiLanguages -Force
 }
 ```
+
+Windows can normalize the installed tag to `ja`. The check accepts both forms
+so rerunning it does not add Japanese again.
 
 Select Microsoft Japanese IME through the taskbar input selector and choose
 Hiragana. Complete `results/ime-results.md` in the prepared run directory using

@@ -22,7 +22,15 @@ try {
         os = (Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,OSArchitecture)
         model = $system.Model; guest_uuid = $uuid; zip_sha256 = $hash
         developer_commands = $sdkCommands
-        installed_languages = @(Get-InstalledLanguage | Select-Object LanguageId,LanguagePacks,LanguageFeatures)
+        installed_languages = @(
+            foreach ($language in (Get-InstalledLanguage)) {
+                [ordered]@{
+                    LanguageId = [string]$language.LanguageId
+                    LanguagePacks = [string]$language.LanguagePacks
+                    LanguageFeatures = [string]$language.LanguageFeatures
+                }
+            }
+        )
     }
     $environment | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $outputDirectory 'environment.json') -Encoding UTF8
     if ($sdkCommands.Count -ne 0) { throw 'Unexpected developer SDK commands in fresh guest.' }

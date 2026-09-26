@@ -34,6 +34,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 - [Archive identities](bb6a894/artifacts.json): downloaded Unix hashes match the workflow records. Windows ZIP SHA-256 is `e4d050c7a0ca938bf49094c60598f9616bdde54cc4831b88cf3f7e81363e2323`.
 - [Post-restart inspection](bb6a894/prerequisites.json) and [Japanese readiness](bb6a894/japanese-readiness.json): no pending restart, Basic Typing installed, Japanese added after English. These are preparation records, not IME observations.
 - [Sandbox attempt](bb6a894/sandbox-attempt.json): folder mappings worked; the guest had no logged-in desktop session. The environment later disappeared for an unknown reason. No package result was produced. The desktop inspection helper could not connect after retries and a reset.
+- [Language metadata check](language-metadata-check.json): the old PowerShell pipeline produced null fields; explicit iteration reports installed languages correctly. The setup instructions also accept Windows' normalized `ja` tag. [A fresh configuration](bb6a894/sandbox-next-attempt.json) contains the corrected guest script and the same candidate ZIP; it has not been executed.
 - [Previous root MVP records](bb6a894/prior-mvp/) were saved before the new acceptance run. Historical failures elsewhere in `reports/mvp/` remain intact.
 
 ## Evaluation packages
@@ -61,3 +62,10 @@ isolate its cost or establish cross-platform performance rankings.
 
 These records establish current automated acceptance. The stable-release goal
 remains open under `docs/mvp.md` and `docs/cross-platform.md`.
+
+The next prepared Windows configuration is
+`build/release-checks/20260926-022825-0dd0a5f5/check.wsb`.
+Keep its Sandbox desktop open until `results/status.json` says `passed` or
+`failed`. If a connection error appears before the desktop, retain that error;
+the package check has not started. The adjacent `results/ime-results.md` is the
+human observation sheet, with each outcome left pending.
