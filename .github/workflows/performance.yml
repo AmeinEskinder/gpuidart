@@ -1,0 +1,82 @@
+name: Performance measurements
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: performance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  baselines:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUST_BACKTRACE: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
+        with:
+          sdk: '3.13.4'
+      - name: Linux build and display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers vulkan-tools x11-utils xvfb openbox xauth
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: performance-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            performance-${{ runner.os }}-${{ runner.arch }}-
+            unix-package-${{ runner.os }}-${{ runner.arch }}-
+      - name: Build normal and allocation-profile release libraries
+        run: |
+          rustup show active-toolchain
+          dart pub get --enforce-lockfile
+          mkdir -p build/performance/native-release build/performance/native-profile
+          dart run tool/performance/run_logged.dart build/performance/build-normal cargo build --locked --release -p gpuidart -p gpuidart-launcher
+          cp target/release/libgpuidart.* target/release/gpuidart-launcher build/performance/native-release/
+          dart run tool/performance/run_logged.dart build/performance/build-profile cargo build --locked --release -p gpuidart --features allocation-profile
+          cp target/release/libgpuidart.* target/release/gpuidart-launcher build/performance/native-profile/
+      - name: Measure macOS fresh-process controls and companion
+        if: runner.os == 'macOS'
+        run: |
+          dart run tool/record_platform_environment.dart build/performance/environment.json
+          dart run tool/performance/run_logged.dart build/performance/timing-command dart run tool/performance/run_baselines.dart build/performance/timing build/performance/native-release 3
+          dart run tool/performance/run_logged.dart build/performance/allocation-command dart run tool/performance/run_baselines.dart build/performance/allocation build/performance/native-profile 1
+      - name: Measure Linux direct and companion controls under X11
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'CHECKS'
+          unset WAYLAND_DISPLAY ZED_HEADLESS
+          openbox >build/performance/openbox.log 2>&1 &
+          dart run tool/record_platform_environment.dart build/performance/environment.json
+          dart run tool/performance/run_logged.dart build/performance/timing-command dart run tool/performance/run_baselines.dart build/performance/timing build/performance/native-release 3
+          dart run tool/performance/run_logged.dart build/performance/allocation-command dart run tool/performance/run_baselines.dart build/performance/allocation build/performance/native-profile 1
+          CHECKS
+      - name: Retain every attempted measurement
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: performance-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/performance/**/*.json
+            build/performance/**/*.log
+          retention-days: 30

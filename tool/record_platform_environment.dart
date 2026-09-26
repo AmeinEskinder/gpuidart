@@ -9,8 +9,27 @@ Future<void> main(List<String> args) async {
     ['git', 'rev-parse', 'HEAD'],
     ['rustc', '--version'],
     ['cargo', '--version'],
-    ['uname', '-a'],
-    if (Platform.isMacOS) ...[
+    if (!Platform.isWindows) ['uname', '-a'],
+    if (Platform.isWindows) ...[
+      [
+        'powershell.exe',
+        '-NoProfile',
+        '-Command',
+        'Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,TotalVisibleMemorySize | ConvertTo-Json',
+      ],
+      [
+        'powershell.exe',
+        '-NoProfile',
+        '-Command',
+        'Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors | ConvertTo-Json',
+      ],
+      [
+        'powershell.exe',
+        '-NoProfile',
+        '-Command',
+        'Get-CimInstance Win32_VideoController | Select-Object Name,DriverVersion,CurrentHorizontalResolution,CurrentVerticalResolution | ConvertTo-Json',
+      ],
+    ] else if (Platform.isMacOS) ...[
       ['sw_vers'],
       ['xcodebuild', '-version'],
       ['xcrun', '--find', 'metal'],

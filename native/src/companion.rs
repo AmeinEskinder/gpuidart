@@ -200,21 +200,22 @@ fn run(host: &Host, initial: Initial, mut socket: UnixStream) -> Result<(), Stri
                     operation: "initial",
                     request: 1,
                 };
+                let packet = Start {
+                    version: 2,
+                    initial,
+                    trace_limit,
+                };
                 let bytes = host
                     .trace
                     .measure("native.companion_encode", key, None, || {
-                        serde_json::to_vec(&Start {
-                            version: 2,
-                            initial,
-                            trace_limit,
-                        })
-                        .map_err(|e| e.to_string())
+                        serde_json::to_vec(&packet).map_err(|e| e.to_string())
                     })?;
                 host.trace
                     .measure("native.companion_write", key, Some(bytes.len()), || {
                         write_bytes(&mut writer_socket, &bytes)
                     })?;
                 drop(bytes);
+                drop(packet);
                 let mut sent_close = false;
                 while let Ok(command) = host.receiver.recv_blocking() {
                     let close = matches!(command, Command::Close);

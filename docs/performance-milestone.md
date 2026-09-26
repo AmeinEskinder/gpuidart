@@ -52,10 +52,15 @@ the final commit, and a clean pushed tree.
 
 ## Progress
 
-- Source audit: existing baseline covers one 100k fixture, three repetitions,
+- Starting source audit: the old baseline covers one 100k fixture, three repetitions,
   window readiness and a later diagnostic repaint. Initial parsing occurs
   before trace enable; JSON/UTF-8/copy share one span. These do not yet satisfy
   the startup or allocation contracts above.
-- Startup instrumentation and reproducible baseline harness: in progress.
+- Startup instrumentation: committed as `61c61b9`, with Windows/macOS/Linux and
+  Unix lifecycle CI passing. Initial decode/validation and CPU content paint are
+  now explicit. See [instrumentation checks](../reports/performance/instrumentation/README.md).
+- Baseline harness: empty/1k/10k/100k, JIT/AOT, data/library/host controls,
+  OS memory peaks and a separate Rust allocation-profile build implemented;
+  debug Windows smoke passed. Release measurement collection is in progress.
 - Snapshot-heavy gate and three-strategy experiment: not started.
 - Measured optimization decisions and final CI: not started.

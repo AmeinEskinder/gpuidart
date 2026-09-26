@@ -1,6 +1,8 @@
 use serde_json::{Value, json};
 
 pub(crate) fn read() -> Value {
+    #[cfg(all(feature = "allocation-profile", not(test)))]
+    let heap = crate::heap_profile::snapshot();
     #[allow(unused_mut)]
     let mut value = json!({"pid": std::process::id(), "os": std::env::consts::OS, "arch": std::env::consts::ARCH});
     #[cfg(unix)]
@@ -11,6 +13,13 @@ pub(crate) fn read() -> Value {
                 json!(usage.ru_utime.tv_sec * 1_000_000 + i64::from(usage.ru_utime.tv_usec));
             value["cpu_system_us"] =
                 json!(usage.ru_stime.tv_sec * 1_000_000 + i64::from(usage.ru_stime.tv_usec));
+            #[cfg(target_os = "linux")]
+            {
+                value["memory_peak_bytes"] = json!({"rss": usage.ru_maxrss * 1024});
+                value["memory_peak_source"] = json!(
+                    "getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes"
+                );
+            }
         }
     }
     #[cfg(target_os = "linux")]
@@ -67,23 +76,120 @@ pub(crate) fn read() -> Value {
         }
         value["loaded_images"] = json!(libraries);
         value["loaded_images_source"] = json!("dyld image enumeration");
-        let mut usage: libc::rusage_info_v0 = std::mem::zeroed();
+        let mut usage: libc::rusage_info_v4 = std::mem::zeroed();
         if libc::proc_pid_rusage(
             libc::getpid(),
-            libc::RUSAGE_INFO_V0,
-            (&mut usage as *mut libc::rusage_info_v0).cast(),
+            libc::RUSAGE_INFO_V4,
+            (&mut usage as *mut libc::rusage_info_v4).cast(),
         ) == 0
         {
             value["memory_bytes"] = json!({"resident_size": usage.ri_resident_size, "physical_footprint": usage.ri_phys_footprint});
+            value["memory_peak_bytes"] =
+                json!({"physical_footprint": usage.ri_lifetime_max_phys_footprint});
+            value["memory_peak_source"] =
+                json!("proc_pid_rusage RUSAGE_INFO_V4 lifetime maximum physical footprint");
             value["memory_source"] = json!(
-                "proc_pid_rusage RUSAGE_INFO_V0; resident size and physical footprint are separate OS metrics"
+                "proc_pid_rusage RUSAGE_INFO_V4; resident size and physical footprint are separate OS metrics"
             );
         } else {
             value["memory_error"] = json!(std::io::Error::last_os_error().to_string());
         }
         value["main_thread"] = json!(libc::pthread_main_np() == 1);
     }
+    #[cfg(windows)]
+    windows::append(&mut value);
+    #[cfg(all(feature = "allocation-profile", not(test)))]
+    {
+        value["rust_allocator"] = heap;
+    }
     value
+}
+
+#[cfg(windows)]
+mod windows {
+    use super::*;
+    use std::ffi::c_void;
+
+    #[repr(C)]
+    #[derive(Default)]
+    struct FileTime {
+        low: u32,
+        high: u32,
+    }
+    impl FileTime {
+        fn micros(&self) -> u64 {
+            ((u64::from(self.high) << 32) | u64::from(self.low)) / 10
+        }
+    }
+    #[repr(C)]
+    #[derive(Default)]
+    struct MemoryCounters {
+        size: u32,
+        page_fault_count: u32,
+        peak_working_set: usize,
+        working_set: usize,
+        quota_peak_paged: usize,
+        quota_paged: usize,
+        quota_peak_nonpaged: usize,
+        quota_nonpaged: usize,
+        pagefile: usize,
+        peak_pagefile: usize,
+        private_usage: usize,
+    }
+    #[link(name = "kernel32")]
+    unsafe extern "system" {
+        fn GetCurrentProcess() -> *mut c_void;
+        fn GetProcessTimes(
+            process: *mut c_void,
+            creation: *mut FileTime,
+            exit: *mut FileTime,
+            kernel: *mut FileTime,
+            user: *mut FileTime,
+        ) -> i32;
+    }
+    #[link(name = "psapi")]
+    unsafe extern "system" {
+        fn GetProcessMemoryInfo(
+            process: *mut c_void,
+            counters: *mut MemoryCounters,
+            size: u32,
+        ) -> i32;
+    }
+    pub(super) fn append(value: &mut Value) {
+        let process = unsafe { GetCurrentProcess() };
+        let mut memory = MemoryCounters {
+            size: std::mem::size_of::<MemoryCounters>() as u32,
+            ..Default::default()
+        };
+        if unsafe { GetProcessMemoryInfo(process, &mut memory, memory.size) } != 0 {
+            value["memory_bytes"] =
+                json!({"working_set": memory.working_set, "private_commit": memory.private_usage});
+            value["memory_peak_bytes"] =
+                json!({"working_set": memory.peak_working_set, "commit": memory.peak_pagefile});
+            value["memory_source"] = json!(
+                "GetProcessMemoryInfo PROCESS_MEMORY_COUNTERS_EX; working set and private commit are separate OS metrics"
+            );
+            value["memory_peak_source"] = json!(
+                "PROCESS_MEMORY_COUNTERS_EX PeakWorkingSetSize and PeakPagefileUsage; lifetime high-water marks"
+            );
+        } else {
+            value["memory_error"] = json!(std::io::Error::last_os_error().to_string());
+        }
+        let (mut creation, mut exit, mut kernel, mut user) = (
+            FileTime::default(),
+            FileTime::default(),
+            FileTime::default(),
+            FileTime::default(),
+        );
+        if unsafe { GetProcessTimes(process, &mut creation, &mut exit, &mut kernel, &mut user) }
+            != 0
+        {
+            value["cpu_user_us"] = json!(user.micros());
+            value["cpu_system_us"] = json!(kernel.micros());
+        } else {
+            value["cpu_error"] = json!(std::io::Error::last_os_error().to_string());
+        }
+    }
 }
 
 /// Optional diagnostics extension, version 1. Read-only process metadata.
@@ -113,12 +219,13 @@ pub unsafe extern "C" fn gd_runtime_read(length: *mut usize) -> *mut u8 {
     })
 }
 
-#[cfg(all(test, unix))]
+#[cfg(test)]
 mod tests {
     #[test]
     fn runtime_probe_reports_current_process_loaded_images_and_memory() {
         let value = super::read();
         assert_eq!(value["pid"], std::process::id());
+        #[cfg(unix)]
         assert!(
             value["loaded_images"]
                 .as_array()
@@ -132,5 +239,11 @@ mod tests {
         assert!(value["cpu_user_us"].as_i64().is_some_and(|time| time >= 0));
         assert!(value.get("loaded_images_error").is_none());
         assert!(value.get("memory_error").is_none());
+        assert!(
+            value["memory_peak_bytes"]
+                .as_object()
+                .is_some_and(|memory| !memory.is_empty())
+        );
+        assert!(value.get("cpu_error").is_none());
     }
 }

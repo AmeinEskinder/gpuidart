@@ -6,6 +6,8 @@ mod clock;
 mod companion;
 mod datasets;
 mod diagnostics;
+#[cfg(all(feature = "allocation-profile", not(test)))]
+mod heap_profile;
 #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
 #[path = "../../benchmarks/native/src/input_trace.rs"]
 mod input_trace;

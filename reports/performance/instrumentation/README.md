@@ -20,13 +20,33 @@ paint during `open_window`; stage intervals may overlap.
 
 | Attempt | Result and disposition |
 | --- | --- |
-| `paint-test-first-attempt.log` | PowerShell treated ordinary Cargo stderr as a terminating error under `ErrorActionPreference=Stop`. Replaced the logging pipeline with `tool/performance/run_logged.dart`, which retains stdout, stderr and exit status independently. |
+| Initial shell attempt (session output only) | PowerShell treated ordinary Cargo stderr as a terminating error under `ErrorActionPreference=Stop`. No usable log was retained. Replaced the logging pipeline with `tool/performance/run_logged.dart`, which retains stdout, stderr and exit status independently. |
 | `paint-test-first/` | Regression assertion expected no paint after `open_window`; GPUI's test helper had already painted. Moved the pre-paint assertion inside window construction. |
 | `native-tests/` | All 42 native tests passed, including actual content paint, exactly one first-paint marker, and traced-create FFI validation. |
 | `native-build/` | Debug library build passed. |
 | `live-trace/` | Both live tests failed because the Dart trace reader's allowlist rejected the new stage names. No application-update failure was observed. |
 | `live-trace-reader-fixed/` | Both live tests passed after updating the trace reader. Includes stage/byte correlation, content privacy, bounded overflow and shutdown. |
 
-`dart analyze` also passed. Companion stage checks run in macOS CI (and in Linux
-companion mode); they have not been locally executed in this Windows attempt.
-Baseline data, macOS overhead controls and the step-6 comparison are still pending.
+`dart analyze` and the headless Dart tests also passed. At `61c61b9`, hosted
+[macOS](https://github.com/AmeinEskinder/gpuidart/actions/runs/36249486205),
+[Linux](https://github.com/AmeinEskinder/gpuidart/actions/runs/36249486233),
+[Windows](https://github.com/AmeinEskinder/gpuidart/actions/runs/36249486183) and
+[Unix lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36249486184)
+checks passed. macOS exercises the new companion stage assertions.
+
+## Baseline harness checks
+
+`runtime-metrics/` passes the Windows native OS-counter regression.
+`native-memory-build/` builds that debug DLL. `baseline-smoke/` runs fresh AOT
+processes with zero and 100k rows against it. Both passed; the two raw captures,
+artifact hashes and driver timestamps are under `baseline-smoke/captures/`.
+They verify measurement collection, not release performance. Source metadata
+correctly records the uncommitted harness/native-metrics changes in this attempt.
+The driver reports first content paint from launch and preserves incomplete
+captures/failures. Plain builds and allocation-profile builds will be measured
+separately. Release baselines and the step-6 comparison are still pending.
+
+`release-build/` and `profile-build/` retain optimized normal/profile build logs.
+`profile-smoke/` passes zero/100k AOT fixtures with the separate profiled library.
+Raw captures show nonzero Rust allocator requests and a live/peak distinction;
+these profiled timings are excluded from normal release timing comparisons.
