@@ -158,5 +158,5 @@ GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPU
 
 GPUI-Dart is licensed under the [MIT License](LICENSE), selected by the owner on
 2026-09-26. Third-party dependencies retain their own licenses. The evaluation
-packages include the project license, GPUI Kit's Apache-2.0 license and the Dart
-runtime license. MIT licensing does not establish completion of the release checks.
+packages include the project license, GPUI Kit's Apache-2.0 license, AccessKit's
+license texts/notices and the Dart runtime license. MIT licensing does not establish completion of the release checks.

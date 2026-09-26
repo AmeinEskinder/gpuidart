@@ -196,3 +196,11 @@ The Linux client now reports that specific query-only failure with exit 75; the
 Dart driver retries the whole read in a fresh process (clearing AT-SPI cache), at
 most four times within one 20-second deadline. All restarts are retained; no
 actions, permission errors or unrelated failures are retried.
+
+Patched run [36274755091](https://github.com/AmeinEskinder/gpuidart/actions/runs/36274755091)
+passes all platform steps on Windows and macOS, including real row selection and
+selected-state queries through sort/filter. Linux's disabled assertion and Settings
+track pass; only its stale Watchlist query failed. Local patched Windows also
+passes all 57 native tests, disabled checks and 15 Settings steps. The Dart analyzer
+reported a missing-braces style issue in the new provenance verifier; it was fixed
+before the final fatal-info gate. The 40-file provenance check passes locally.

@@ -29,8 +29,9 @@ void main() {
     for (final entry in expected.entries) {
       final file = File('${directory.path}/${entry.key}');
       final actual = sha256.convert(file.readAsBytesSync()).toString();
-      if (actual != entry.value)
+      if (actual != entry.value) {
         throw StateError('Unreviewed vendor change: ${file.path}');
+      }
       checked++;
     }
     for (final file
