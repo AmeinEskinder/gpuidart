@@ -143,3 +143,16 @@ formatted incremental price, clear-filter retention, sort retention and removal.
 Only the selection action/state use the declared diagnostic path. Dataset messages
 increase by exactly one for the price edit; view changes do not republish records.
 No offscreen-cell retrieval or UIA Grid/Table pattern support is claimed.
+
+At `6d48631`, Windows platform checks pass including Watchlist. On macOS, control
+actions, disabled controls and all 15 Settings steps pass. The first Watchlist
+read after filtering failed with AX invalid-element: traversal held a row that
+was removed by the concurrent frame update (`macos-watchlist-1.json`). The client
+now restarts the whole **query** at most four times on that specific error and
+records each restart. It never retries actions or accepts a partial tree. Linux
+reached the new Text interface but Python GI resolved an inherited deprecated
+`Accessible.get_text` overload instead of the Text method; the explicit
+`Atspi.Text.get_text` call fixes that client error (`linux-text-client-1.json`).
+The rendered-cell headless test now also checks Row/Cell roles and the formatted
+price label; its first compile caught a missing qualified Role type, then the
+selector's owned-SharedString requirement. The corrected test passes.

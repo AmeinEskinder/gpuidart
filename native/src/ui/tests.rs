@@ -1257,6 +1257,17 @@ fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
     });
     cx.update_window(handle, |_, window, cx| {
         window.render_frame(cx);
+        // Real cell semantics announce formatted text, not raw data. Without
+        // record IDs, row identity uses the source index.
+        let row_key = serde_json::json!(["table", "records", "source", 1]).to_string();
+        let cell_key = serde_json::json!([row_key, "cell", 1]).to_string();
+        let cell = window.find(gpui_kit::SharedString::from(cell_key));
+        assert_eq!(cell.role(), Some(gpui_kit::Role::Cell));
+        assert_eq!(cell.label(), Some("1.10"));
+        assert_eq!(
+            window.find(gpui_kit::SharedString::from(row_key)).role(),
+            Some(gpui_kit::Role::Row)
+        );
         // Number column: fixed decimals.
         let cell = view.read(cx).formatted_cell("table", 0, 1, cx);
         assert_eq!(cell["text"], "0.00");

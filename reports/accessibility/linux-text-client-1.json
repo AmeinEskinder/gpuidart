@@ -1,0 +1,9 @@
+{
+  "platform": "linux",
+  "time_utc": "2026-09-26T21:45:55.867541Z",
+  "scope": "Pinned backend feasibility; external platform queries, not full SDK semantics acceptance.",
+  "passed": false,
+  "native_process": 5364,
+  "error": "Bad state: Platform client exited 1: /home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:77: DeprecationWarning: Atspi.Action.get_action_name is deprecated\n  node[\"actions\"] = [action.get_action_name(i) for i in range(action.get_n_actions())]\n/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py:80: DeprecationWarning: Atspi.Accessible.get_text is deprecated\n  node[\"value\"] = text.get_text(0, -1)\nTraceback (most recent call last):\n  File \"/home/runner/work/gpuidart/gpuidart/tool/accessibility/linux.py\", line 80, in <module>\n    node[\"value\"] = text.get_text(0, -1)\n                    ^^^^^^^^^^^^^^^^^^^^\nTypeError: Atspi.Accessible.get_text() takes exactly 1 argument (3 given)\n\n",
+  "stack": "#0      platformQuery (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/client.dart:55:5)\n<asynchronous suspension>\n#1      main (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/probe.dart:26:14)\n<asynchronous suspension>\n"
+}

@@ -1,7 +1,8 @@
 # Accessibility work order
 
-Status: platform spike in progress. This document is a design and acceptance
-contract, not a claim that the SDK is accessible. Reference code: `3a72688`.
+Status: semantics and native adapters implemented; expanded hosted verification is
+in progress. See [retained results and failures](../reports/accessibility/README.md).
+This is not a human screen-reader usability claim. Design reference: `3a72688`.
 
 ## Platform spike
 
@@ -59,7 +60,7 @@ them consistently, and a group wrapper would not describe the same platform node
 Unknown fields, mismatched roles, empty explicit names and overlong UTF-8 names
 are rejected on both sides. Existing messages without annotations remain valid.
 
-Defaults: visible button/checkbox labels; current input value with placeholder as
+Defaults: visible button/checkbox labels; current input value with placeholder (then node ID) as
 fallback name; select current choice plus explicit name/placeholder; slider actual
 range/value; open dialog title, description and modal state. Explicit names do
 not change visible text. SDK node IDs become queryable stable identifiers where
@@ -102,3 +103,58 @@ contrast, occlusion, or screen-reader usability. Human NVDA/VoiceOver sessions,
 Mac hardware observations, signing, historical reload disposition and presentation
 latency stay outside this milestone. Live announcements are added only if the
 spike establishes a supported GPUI API and an observable platform result.
+
+## Using semantics
+
+```dart
+UiColumn('preferences', [
+  const UiText('title', 'Preferences',
+    semantics: UiSemantics(role: UiRole.heading, headingLevel: 1)),
+  const UiInput('name',
+    semantics: UiSemantics(label: 'Display name')),
+  UiSlider('spacing', min: 8, max: 24, step: 2, number: spacing,
+    semantics: const UiSemantics(label: 'Preview spacing')),
+], semantics: const UiSemantics(label: 'Preferences form'))
+```
+
+Use a persistent control ID and a name that describes the control. Explicit
+semantics names do not replace visible labels. Checkbox state, input text, slider
+range/value, select state and modal state come from the real native controls.
+Labels are 1..1024 UTF-8 bytes; heading levels are 1..6. Controls reject incompatible
+roles and independently forged state fields. `UiText` defaults to label; explicit
+heading/list/group roles are available for structure.
+
+Native inputs attach structured TextRun children only when accessibility is
+active (also in Kit's test-support build). Text comes from the current rendered
+native value, including edits that have not caused a Dart snapshot yet. The
+current adapter does not add text-selection actions or glyph range geometry.
+Platform selection/caret navigation is not claimed by these text-value checks.
+Select exposes its current choice as a named child for adapters that lack a
+scalar string-value query.
+
+Table rows/cells are emitted only for the rendered viewport. Row author IDs encode
+`[table ID, dataset ID, "record", record ID]`; datasets without IDs use `"source"`
+and a source index. Cell IDs encode `[row author ID, "cell", column index]`.
+Names reflect formatted visible cell text. A record ID preserves the semantic key
+through view reorder; GPUI ancestor identity still matters. Keys do not promise
+persistent OS object handles or offscreen table navigation.
+
+### Known pinned-adapter gaps
+
+- Windows AccessKit 0.34.0 has no Grid/Table patterns or row SelectionItem pattern.
+  Selected-state rows also lack Invoke. The Watchlist verifier declares its native
+  selection driver/state assertions separately from external UIA content queries.
+- Linux AccessKit AT-SPI 0.19.1 has no EditableText interface. External Text reads
+  are supported by structured text children; Linux test edits use declared GPUI
+  diagnostic keys. They are not AT-SPI write passes.
+- Modal content/decisions are externally queried on macOS; a missing AXModal
+  property is not inferred from the internal modal flag.
+- Live-region/announcement APIs are not bound or verified. The existence of an
+  AccessKit dependency does not establish delivered announcements.
+
+Use `dart run tool/verify_settings.dart REPORT.json --semantics` for the settings
+track and `dart run tool/accessibility/watchlist.dart REPORT.json` for Watchlist.
+The clients require native platform accessibility access; Linux CI uses a private
+D-Bus accessibility session, and the macOS external client must be authorized.
+The scripts refuse to replace a prior report and fail on missing platform access.
+An internal diagnostic tree never substitutes for an external platform query.

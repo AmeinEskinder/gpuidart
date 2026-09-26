@@ -149,7 +149,7 @@ The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/Q
 - One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks are not implemented. Sorting and filtering are native views over the dataset; stable record identity is supported through optional `rowIds`, and table selection follows the record ID when present (row indices otherwise).
-- The adapter exposes ten node kinds and a bounded typed style/theme-token API. It is not the full GPUI Kit catalog. Confirmation content is title/message/buttons; radio groups, tabs, arbitrary dialog content and an accessibility tree are not bound.
+- The adapter exposes ten node kinds and a bounded typed style/theme-token API. It is not the full GPUI Kit catalog. Confirmation content is title/message/buttons; radio groups, tabs and arbitrary dialog content are not bound. [Typed semantics and native accessibility adapters](docs/accessibility.md) are implemented; expanded platform acceptance is in progress. The report distinguishes external queries from known adapter gaps.
 - Controlled inputs reject Dart writes during native composition. New controlled-write tests use GPUI's input handler; earlier Windows/Linux OS IME observations cover the default input path. macOS IME remains unverified.
 
 GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPUI dependency is `gpui-pre` 0.3.6. Both Cargo and Dart dependency lockfiles are included.

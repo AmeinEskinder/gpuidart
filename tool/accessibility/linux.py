@@ -77,7 +77,7 @@ else:
             node["actions"] = [action.get_action_name(i) for i in range(action.get_n_actions())]
         text = element.get_text_iface()
         if text:
-            node["value"] = text.get_text(0, -1)
+            node["value"] = Atspi.Text.get_text(text, 0, -1)
         numeric = element.get_value_iface()
         if numeric:
             node.update(number=numeric.get_current_value(), min=numeric.get_minimum_value(),

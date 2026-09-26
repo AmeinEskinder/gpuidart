@@ -164,7 +164,11 @@ class WatchlistApplication {
         'Sample instruments and prices. No live market feed.',
         style: UiStyle(foreground: UiColor.token(ThemeToken.mutedForeground)),
       ),
-      const UiInput('search', placeholder: 'Search by symbol (Ctrl+F)'),
+      const UiInput(
+        'search',
+        placeholder: 'Search by symbol (Ctrl+F)',
+        semantics: UiSemantics(label: 'Search instruments by symbol'),
+      ),
       UiRow('actions', [
         UiButton(
           'shortlist-filter',

@@ -2,17 +2,18 @@
 import ApplicationServices
 import Foundation
 
-enum ProbeError: Error { case failure(String) }
+enum ProbeError: Error { case failure(String), staleElement(String) }
 
 func attribute(_ element: AXUIElement, _ key: String) throws -> CFTypeRef? {
     var value: CFTypeRef?
     let result = AXUIElementCopyAttributeValue(element, key as CFString, &value)
+    if result == .invalidUIElement { throw ProbeError.staleElement(key) }
     if result == .attributeUnsupported || result == .noValue { return nil }
     guard result == .success else { throw ProbeError.failure("\(key): AXError \(result.rawValue)") }
     return value
 }
 
-func run() throws {
+func run(queryRestarts: [String]) throws {
     guard CommandLine.arguments.count == 6, let process = Int32(CommandLine.arguments[1]) else {
         throw ProbeError.failure("Usage: ax-probe PID OP NAME VALUE")
     }
@@ -39,7 +40,7 @@ func run() throws {
         if !title.isEmpty { return title }
         return try attribute(element, "AXDescription") as? String ?? ""
     }
-    var output: [String: Any] = ["api": "AXUIElement", "process": process]
+    var output: [String: Any] = ["api": "AXUIElement", "process": process, "query_restarts": queryRestarts]
     if operation == "query" {
         var nodes: [[String: Any]] = []
         for (element, parent) in elements {
@@ -54,6 +55,7 @@ func run() throws {
             }
             var actions: CFArray?
             let result = AXUIElementCopyActionNames(element, &actions)
+            if result == .invalidUIElement { throw ProbeError.staleElement("AXActionNames") }
             guard result == .success || result == .notImplemented else {
                 throw ProbeError.failure("AX actions: \(result.rawValue)")
             }
@@ -86,7 +88,23 @@ func run() throws {
     print(String(decoding: data, as: UTF8.self))
 }
 
-do { try run() } catch {
-    FileHandle.standardError.write(Data("\(error)\n".utf8))
-    exit(1)
+// AX element handles can become invalid while a filtered viewport is replaced.
+// Restart the entire read, retain every restart, and never retry a mutation.
+var restarts: [String] = []
+while true {
+    do {
+        try run(queryRestarts: restarts)
+        break
+    } catch ProbeError.staleElement(let attribute) {
+        guard CommandLine.arguments.count > 2,
+              CommandLine.arguments[2] == "query", restarts.count < 4 else {
+            FileHandle.standardError.write(Data("Invalid AX element at \(attribute); query restarts=\(restarts)\n".utf8))
+            exit(1)
+        }
+        restarts.append(attribute)
+        Thread.sleep(forTimeInterval: 0.05)
+    } catch {
+        FileHandle.standardError.write(Data("\(error)\n".utf8))
+        exit(1)
+    }
 }

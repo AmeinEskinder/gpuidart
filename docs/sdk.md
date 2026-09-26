@@ -84,6 +84,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiInput | Native-retained by default. `controlled: true` enables guarded text/selection writes; native remains authoritative during composition. See [controlled inputs](controlled-inputs.md). |
 | UiCheckbox / UiSlider / UiSelect | Application values with native change-request events; publish the accepted value. See the [settings controls contract](control-catalog.md). |
 | UiConfirmDialog | Native confirmation modal with one result, focus trapping and cancellation when its trigger is removed or disabled. |
+| UiSemantics | Optional bounded names and compatible roles on every node; native controls supply their states. See [accessibility and platform gaps](accessibility.md). |
 | UiTable | References a registered dataset ID. Cells contain strings and render in Rust. |
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
