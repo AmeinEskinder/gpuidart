@@ -113,6 +113,44 @@ Future<void> main(List<String> args) async {
   });
 
   if (!const bool.fromEnvironment('dart.vm.product')) {
+    // Linux's pinned AT-SPI adapter has Text but no EditableText. This JIT-only
+    // verifier hook uses the established native key dispatcher; the report names
+    // this path explicitly and still reads the resulting text through AT-SPI.
+    registerExtension('ext.gpuidart.accessibility_select', (
+      _,
+      parameters,
+    ) async {
+      final row = int.parse(parameters['row']!);
+      return ServiceExtensionResponse.result(
+        jsonEncode(
+          await host.diagnose('select_row', {'table': 'watchlist', 'row': row}),
+        ),
+      );
+    });
+    registerExtension('ext.gpuidart.accessibility_text', (_, parameters) async {
+      final text = parameters['text'] ?? '';
+      if (!RegExp(r'^[A-Z0-9]{0,32}$').hasMatch(text)) {
+        throw ArgumentError(
+          'Verifier search accepts at most 32 ASCII symbol characters',
+        );
+      }
+      await host.diagnose('focus', {'input': 'search'});
+      for (final key in [
+        'ctrl-a',
+        'backspace',
+        ...text
+            .split('')
+            .map(
+              (c) =>
+                  c.contains(RegExp('[A-Z]')) ? 'shift-${c.toLowerCase()}' : c,
+            ),
+      ]) {
+        await host.diagnose('key', {'key': key});
+      }
+      return ServiceExtensionResponse.result(
+        jsonEncode({'source': 'gpui_key_dispatch'}),
+      );
+    });
     registerExtension('ext.gpuidart.repaint', (_, _) async {
       await pending;
       return ServiceExtensionResponse.result(

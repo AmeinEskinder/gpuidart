@@ -1,4 +1,4 @@
-use super::select_semantics::AccessibleSelect;
+use super::control_root::AccessibleSelect;
 use super::slider::SliderPresentation;
 use super::*;
 use crate::protocol::SelectOption;

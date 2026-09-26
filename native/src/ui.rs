@@ -147,7 +147,7 @@ impl TableDelegate for Rows {
         &mut self,
         row: usize,
         _: &mut Window,
-        _: &mut Context<TableState<Self>>,
+        cx: &mut Context<TableState<Self>>,
     ) -> Stateful<Div> {
         self.counters.rows.set(self.counters.rows.get() + 1);
         // Key real rows by source record so element identity survives view
@@ -159,6 +159,26 @@ impl TableDelegate for Rows {
                     .id(SharedString::from(key.clone()))
                     .accessibility_id(key)
                     .aria_row_index(row)
+                    .on_a11y_action(AccessibleAction::Click, {
+                        let table = cx.entity().downgrade();
+                        let source_key = self.record_key(source);
+                        move |_, _, cx| {
+                            let _ = table.update(cx, |table, cx| {
+                                // Resolve against the current view: an OS client may invoke
+                                // an old frame after a sort/filter has already been applied.
+                                let current = {
+                                    let rows = table.delegate();
+                                    rows.index
+                                        .borrow()
+                                        .iter()
+                                        .position(|&source| rows.record_key(source) == source_key)
+                                };
+                                if let Some(row) = current {
+                                    table.set_selected_row(row, cx);
+                                }
+                            });
+                        }
+                    })
             }
             None => div().id(("row-filler", row)),
         }
@@ -1086,16 +1106,18 @@ impl DartView {
             Node::Select { .. } => self.select_element(node, colors)?,
             Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
             Node::Input { id, .. } => apply_node_style(
-                Input::new(
-                    &self
-                        .inputs
-                        .get(id)
-                        .ok_or_else(|| format!("Missing retained input: {id}"))?
-                        .state,
-                )
-                .id(SharedString::from(id.clone()))
-                .accessibility_id(id.clone())
-                .aria_label(accessible_name(node)),
+                control_root::AccessibleInput(
+                    Input::new(
+                        &self
+                            .inputs
+                            .get(id)
+                            .ok_or_else(|| format!("Missing retained input: {id}"))?
+                            .state,
+                    )
+                    .id(SharedString::from(id.clone()))
+                    .accessibility_id(id.clone())
+                    .aria_label(accessible_name(node)),
+                ),
                 node,
                 colors,
             )
@@ -1246,8 +1268,8 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     element
 }
 
+mod control_root;
 mod controls;
-mod select_semantics;
 mod semantics;
 #[cfg(test)]
 mod semantics_tests;

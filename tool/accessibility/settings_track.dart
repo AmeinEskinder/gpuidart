@@ -50,7 +50,8 @@ Future<Map<String, dynamic>> settingsSemantics(
           final checked =
               check['checked'] == true ||
               check['checked'] == 'On' ||
-              check['value'] == 1;
+              check['value'] == 1 ||
+              check['value'] == true;
           final enabled = check['enabled'] == true;
           if (input['value'] == draft['name'] &&
               checked == draft['notifications'] &&
@@ -68,7 +69,11 @@ Future<Map<String, dynamic>> settingsSemantics(
         }[draft['accent']];
         if (select != null &&
             slider != null &&
-            select['value'] == expectedAccent &&
+            (select['value'] ??
+                    nodes
+                        .where((n) => n['id'] == '["accent","selected-value"]')
+                        .singleOrNull?['name']) ==
+                expectedAccent &&
             (slider['number'] ?? slider['value']) == draft['spacing'] &&
             slider['min'] == 8 &&
             slider['max'] == 24) {

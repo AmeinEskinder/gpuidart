@@ -11,10 +11,19 @@ impl StatefulInteractiveElement for RootProperties<'_> {}
 
 pub(super) fn control_properties(interactivity: &mut Interactivity, id: String, disabled: bool) {
     RootProperties(interactivity)
-        .accessibility_id(id)
+        .accessibility_id(id.clone())
         .a11y_synthetic_children(move |tree| {
             if disabled {
                 tree.parent_node().set_disabled();
+            }
+            if tree.parent_node().role() == Role::ComboBox {
+                if let Some(value) = tree.parent_node().value().map(str::to_owned) {
+                    let child_id = tree.synthetic_node_id("selected-value");
+                    let mut label = gpui::accesskit::Node::new(Role::Label);
+                    label.set_author_id(json!([id, "selected-value"]).to_string());
+                    label.set_value(value);
+                    tree.push_child(child_id, label);
+                }
             }
         });
 }
@@ -71,4 +80,25 @@ pub(super) fn annotate<T: StatefulInteractiveElement>(element: T, node: &Node) -
         element = element.aria_level(level);
     }
     element
+}
+
+/// Read the value Kit placed on this frame, so controlled writes and native
+/// editing share one source. No text is copied when accessibility is inactive.
+pub(super) fn input_text(interactivity: &mut Interactivity) {
+    RootProperties(interactivity).a11y_synthetic_children(|tree| {
+        let Some(value) = tree.parent_node().value().map(str::to_owned) else {
+            return;
+        };
+        let id = tree.synthetic_node_id("input-text");
+        let mut run = gpui::accesskit::Node::new(Role::TextRun);
+        // InputState's public selection API accepts UTF-8 scalar boundaries.
+        run.set_character_lengths(
+            value
+                .chars()
+                .map(|c| c.len_utf8() as u8)
+                .collect::<Vec<_>>(),
+        );
+        run.set_value(value);
+        tree.push_child(id, run);
+    });
 }

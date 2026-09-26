@@ -1,0 +1,501 @@
+{
+  "platform": "linux",
+  "scope": "External accessibility actions and state; no screen reader or visual claim.",
+  "steps": [
+    {
+      "step": "initial input and checkbox",
+      "tree": {
+        "api": "AT-SPI",
+        "process": 5476,
+        "nodes": [
+          {
+            "parent": null,
+            "name": "dartvm",
+            "role": "application",
+            "id": "",
+            "enabled": false,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible"
+            ]
+          },
+          {
+            "parent": 0,
+            "name": "Preferences",
+            "role": "frame",
+            "id": "",
+            "enabled": true,
+            "focused": true,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 1,
+            "name": "",
+            "role": "panel",
+            "id": "",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Preferences",
+            "role": "heading",
+            "id": "heading",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Make this workspace your own.",
+            "role": "label",
+            "id": "intro",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "General",
+            "role": "push button",
+            "id": "general",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Appearance",
+            "role": "push button",
+            "id": "appearance",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Your profile",
+            "role": "heading",
+            "id": "general-title",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "label",
+            "id": "name-label",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Display name",
+            "role": "entry",
+            "id": "name",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Enable workspace notifications",
+            "role": "check box",
+            "id": "notifications",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": true,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "A display name is required to enable notifications.",
+            "role": "label",
+            "id": "notification-note",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Changes stay in this application. Apply to save the draft.",
+            "role": "label",
+            "id": "status",
+            "enabled": true,
+            "focused": false,
+            "focusable": false,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Component"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Reset defaults",
+            "role": "push button",
+            "id": "reset",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "parent": 2,
+            "name": "Apply",
+            "role": "push button",
+            "id": "apply",
+            "enabled": true,
+            "focused": false,
+            "focusable": true,
+            "checked": false,
+            "selected": false,
+            "expanded": false,
+            "modal": false,
+            "interfaces": [
+              "Accessible",
+              "Action",
+              "Component"
+            ],
+            "actions": [
+              "click"
+            ]
+          }
+        ]
+      },
+      "failed": true
+    }
+  ],
+  "passed": false,
+  "failed_frame_debug": {
+    "active": true,
+    "tree": {
+      "root": "n",
+      "gpui_focus": null,
+      "active_descendant_focus": null,
+      "frame": {
+        "rendered_at": "2026-09-26T21:27:56.501+00:00",
+        "frame_number": 3,
+        "window_title": "Preferences",
+        "node_count": 14,
+        "tab_stop_count": 6,
+        "viewport_size": {
+          "width": 780.0,
+          "height": 670.0
+        },
+        "scale_factor": 1.0
+      },
+      "nodes": {
+        "a": {
+          "accesskit_id": "16925148900422194591",
+          "element_id": "Name(\"heading\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1014:26",
+          "aria": {
+            "role": "Heading",
+            "label": "Preferences",
+            "level": 1
+          }
+        },
+        "b": {
+          "accesskit_id": "13041079447395360195",
+          "element_id": "Name(\"intro\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1014:26",
+          "aria": {
+            "role": "Label",
+            "label": "Make this workspace your own.",
+            "value": "Make this workspace your own."
+          }
+        },
+        "c": {
+          "accesskit_id": "12656119924178692727",
+          "element_id": "Name(\"general\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "/home/runner/.cargo/git/checkouts/gpui-kit-ad7eb35d851fbd28/21622a7/crates/base/src/button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "General"
+          }
+        },
+        "d": {
+          "accesskit_id": "7069066646577866099",
+          "element_id": "Name(\"appearance\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "/home/runner/.cargo/git/checkouts/gpui-kit-ad7eb35d851fbd28/21622a7/crates/base/src/button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Appearance"
+          }
+        },
+        "e": {
+          "accesskit_id": "13763066250282839055",
+          "element_id": "Name(\"general-title\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1014:26",
+          "aria": {
+            "role": "Heading",
+            "label": "Your profile",
+            "level": 2
+          }
+        },
+        "f": {
+          "accesskit_id": "8590423425419726690",
+          "element_id": "Name(\"name-label\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1014:26",
+          "aria": {
+            "role": "Label",
+            "label": "Display name",
+            "value": "Display name"
+          }
+        },
+        "g": {
+          "accesskit_id": "8130597480482213788",
+          "element_id": "Name(\"name\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "/home/runner/.cargo/git/checkouts/gpui-kit-ad7eb35d851fbd28/21622a7/crates/base/src/input/base/mod.rs:140:19",
+          "aria": {
+            "role": "TextInput",
+            "on_action": [
+              "Focus",
+              "SetValue"
+            ],
+            "label": "Display name",
+            "value": "Dart user",
+            "placeholder": "Your display name"
+          }
+        },
+        "h": {
+          "accesskit_id": "16434734109565566911",
+          "element_id": "Name(\"notifications\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "/home/runner/.cargo/git/checkouts/gpui-kit-ad7eb35d851fbd28/21622a7/crates/base/src/checkbox.rs:67:19",
+          "aria": {
+            "role": "CheckBox",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Enable workspace notifications",
+            "toggled": "True"
+          }
+        },
+        "i": {
+          "accesskit_id": "13801714233616715583",
+          "element_id": "Name(\"notification-note\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1014:26",
+          "aria": {
+            "role": "Label",
+            "label": "A display name is required to enable notifications.",
+            "value": "A display name is required to enable notifications."
+          }
+        },
+        "j": {
+          "accesskit_id": "3099672305796883046",
+          "element_id": "Name(\"status\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1014:26",
+          "aria": {
+            "role": "Label",
+            "label": "Changes stay in this application. Apply to save the draft.",
+            "value": "Changes stay in this application. Apply to save the draft."
+          }
+        },
+        "k": {
+          "accesskit_id": "9261496907502167360",
+          "element_id": "Name(\"reset\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "/home/runner/.cargo/git/checkouts/gpui-kit-ad7eb35d851fbd28/21622a7/crates/base/src/button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Reset defaults"
+          }
+        },
+        "l": {
+          "accesskit_id": "4733219019830317053",
+          "element_id": "Name(\"apply\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "/home/runner/.cargo/git/checkouts/gpui-kit-ad7eb35d851fbd28/21622a7/crates/base/src/button.rs:41:19",
+          "aria": {
+            "role": "Button",
+            "on_action": [
+              "Click",
+              "Focus"
+            ],
+            "label": "Apply"
+          }
+        },
+        "m": {
+          "accesskit_id": "1456449300351094881",
+          "children": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l"
+          ],
+          "element_id": "Name(\"gpuidart\")",
+          "view": "gpuidart::ui::DartView",
+          "source_location": "native/src/ui.rs:1284:20",
+          "aria": {
+            "role": "Group"
+          }
+        },
+        "n": {
+          "accesskit_id": "0",
+          "children": [
+            "m"
+          ],
+          "aria": {
+            "role": "Window",
+            "label": "Preferences"
+          }
+        }
+      }
+    }
+  },
+  "error": "Bad state: Platform state did not settle: initial input and checkbox",
+  "stack": "#0      main.capture (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/controls.dart:43:7)\n<asynchronous suspension>\n#1      main (file:///home/runner/work/gpuidart/gpuidart/tool/accessibility/controls.dart:61:5)\n<asynchronous suspension>\n"
+}

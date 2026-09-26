@@ -103,11 +103,15 @@ class DevSession {
     }
   }
 
-  Future<Map<String, dynamic>> call(String method) async =>
+  Future<Map<String, dynamic>> call(
+    String method, {
+    Map<String, String>? parameters,
+  }) async =>
       (await service
               .callServiceExtension(
                 'ext.gpuidart.$method',
                 isolateId: isolateId,
+                args: parameters,
               )
               .timeout(const Duration(seconds: 10)))
           .json!;

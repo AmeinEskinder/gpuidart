@@ -106,3 +106,40 @@ Hosted checks for the full adapter/settings track are pending at this checkpoint
 
 No claims about screen readers, visual layout, hardware IME, Wayland, visible pixels
 or presentation latency. Parked hardware/signing/reload-disposition gates remain parked.
+
+## External text and table follow-up
+
+At `4cb3582`, all four existing SDK/lifecycle workflows passed, as did the expanded
+Windows accessibility job. The [accessibility run 36272919911](https://github.com/AmeinEskinder/gpuidart/actions/runs/36272919911)
+retains two hosted failures (`linux-controls-1.json`, `macos-controls-1.json`).
+macOS returned a Boolean checkbox value; the verifier incorrectly accepted only
+numeric 1. Linux exposed no Text interface for the input: the Kit root supplied a
+scalar value without the TextRun descendants required by AccessKit. The host now
+adds a synthetic TextRun to the real input root using that frame's native value.
+The initial checked downcast assumed Input deferred Base rendering; a headless
+test caught that it renders Base immediately. The corrected adapter decorates
+that actual element. Select adds a named selected-value child for AT-SPI clients,
+whose pinned adapter does not export its scalar string value.
+
+The pinned AT-SPI adapter has no EditableText interface. Linux verifiers therefore
+name their GPUI diagnostic-key text writes explicitly, then query actual AT-SPI
+Text. This is **not** an external AT-SPI text-write pass. Windows and macOS retain
+the external value-write checks. Rich text range geometry, cursor/selection
+navigation and editing through AT-SPI remain gaps.
+
+`watchlist-platform-1.json` and `watchlist-platform-2.json` retain failed attempts
+to select/invoke a row through UIA. AccessKit Windows explicitly excludes Row from
+SelectionItem support; its consumer also excludes selected-state nodes from Invoke.
+The binding preserves accurate Row/Cell roles and the selected flag rather than
+mislabeling rows. Windows uses the existing diagnostic selection path and inspect
+for selection assertions, with external UIA queries for record/cell identity and
+contents. The report lists unavailable patterns. Linux/macOS attempt real row
+activation against their platform adapters. Stale row actions resolve the record
+against the current view before selecting.
+
+`watchlist-platform-3.json` passes seven local Windows steps on 100,000 records:
+bounded initial platform tree, actual input filtering to one native row, selection,
+formatted incremental price, clear-filter retention, sort retention and removal.
+Only the selection action/state use the declared diagnostic path. Dataset messages
+increase by exactly one for the price edit; view changes do not republish records.
+No offscreen-cell retrieval or UIA Grid/Table pattern support is claimed.

@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'tool/accessibility/**'
+      - 'tool/verify_settings.dart'
+      - 'tool/src/dev_session.dart'
       - '.github/workflows/accessibility.yml'
       - 'native/**'
       - 'lib/**'
@@ -81,6 +83,7 @@ jobs:
           dart run tool/accessibility/controls.dart build/accessibility/controls.json
           dart run tool/accessibility/disabled.dart build/accessibility/disabled.json
           dart run tool/verify_settings.dart build/accessibility/settings.json --semantics
+          dart run tool/accessibility/watchlist.dart build/accessibility/watchlist.json
           PROBE
       - name: External control actions
         if: runner.os != 'Linux'
@@ -91,6 +94,9 @@ jobs:
       - name: Settings semantics at every verifier step
         if: runner.os != 'Linux'
         run: dart run tool/verify_settings.dart build/accessibility/settings.json --semantics
+      - name: Watchlist viewport semantics and record identity
+        if: runner.os != 'Linux'
+        run: dart run tool/accessibility/watchlist.dart build/accessibility/watchlist.json
       - name: Retain platform responses and failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

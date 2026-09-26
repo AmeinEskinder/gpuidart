@@ -70,7 +70,7 @@ func run() throws {
         let element = matches[0].0
         let result: AXError
         switch operation {
-        case "invoke", "toggle": result = AXUIElementPerformAction(element, "AXPress" as CFString)
+        case "invoke", "toggle", "select": result = AXUIElementPerformAction(element, "AXPress" as CFString)
         case "set-value": result = AXUIElementSetAttributeValue(element, "AXValue" as CFString, value as CFString)
         case "set-range":
             guard let number = Double(value) else { throw ProbeError.failure("Invalid number") }

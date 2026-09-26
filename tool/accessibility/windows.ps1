@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][int]$AppProcessId,
-    [ValidateSet('query','invoke','toggle','set-value','set-range','focus')][string]$Operation = 'query',
+    [ValidateSet('query','invoke','toggle','set-value','set-range','focus','select')][string]$Operation = 'query',
     [string]$Name = '',
     [string]$Value = '',
     [string]$Id = ''
@@ -23,6 +23,7 @@ if ($Operation -ne 'query') {
         set-value { $element.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($Value) }
         set-range { $element.GetCurrentPattern([System.Windows.Automation.RangeValuePattern]::Pattern).SetValue([double]::Parse($Value, [Globalization.CultureInfo]::InvariantCulture)) }
         focus { $element.SetFocus() }
+        select { $element.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select() }
     }
     @{ api = 'UIAutomationClient'; operation = $Operation; accepted = $true } | ConvertTo-Json -Compress
     exit
@@ -56,6 +57,12 @@ foreach ($element in $elements) {
     if ($element.TryGetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern, [ref]$pattern)) { $node.expanded = $pattern.Current.ExpandCollapseState.ToString() }
     $pattern = $null
     if ($element.TryGetCurrentPattern([System.Windows.Automation.WindowPattern]::Pattern, [ref]$pattern)) { $node.modal = $pattern.Current.IsModal }
+    $pattern = $null
+    if ($element.TryGetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern, [ref]$pattern)) { $node.selected = $pattern.Current.IsSelected }
+    $pattern = $null
+    if ($element.TryGetCurrentPattern([System.Windows.Automation.GridPattern]::Pattern, [ref]$pattern)) { $node.rows = $pattern.Current.RowCount; $node.columns = $pattern.Current.ColumnCount }
+    $pattern = $null
+    if ($element.TryGetCurrentPattern([System.Windows.Automation.GridItemPattern]::Pattern, [ref]$pattern)) { $node.row = $pattern.Current.Row; $node.column = $pattern.Current.Column }
     $nodes += $node
 }
 @{ api = 'UIAutomationClient'; process = $AppProcessId; nodes = $nodes } | ConvertTo-Json -Depth 8 -Compress

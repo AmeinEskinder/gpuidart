@@ -29,28 +29,52 @@ impl RenderOnce for AccessibleSelect {
             .unwrap_or_else(|_| {
                 panic!("Pinned GPUI Select root changed; update the accessibility adapter")
             });
-        SelectRoot {
+        ControlRoot {
             inner: *root,
-            id: self.id,
-            disabled: self.disabled,
+            decorate: Some(Box::new(move |root| {
+                super::semantics::control_properties(root, self.id, self.disabled);
+            })),
         }
     }
 }
 
-struct SelectRoot<E> {
-    inner: E,
-    id: String,
-    disabled: bool,
+/// Adds structured text to the actual input root. AT-SPI requires TextRun
+/// descendants for its Text interface; a scalar aria_value alone is insufficient.
+#[derive(IntoElement)]
+pub(super) struct AccessibleInput(pub Input);
+impl Styled for AccessibleInput {
+    fn style(&mut self) -> &mut StyleRefinement {
+        self.0.style()
+    }
+}
+impl RenderOnce for AccessibleInput {
+    fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let root: Box<dyn std::any::Any> =
+            Box::new(RenderOnce::render(self.0, window, cx).into_element());
+        let mut root = root
+            .downcast::<gpui_kit::base::ObservedElement<Stateful<Div>>>()
+            .unwrap_or_else(|_| {
+                panic!("Pinned Input root changed; update the accessibility adapter")
+            });
+        super::semantics::input_text(root.interactivity());
+        *root
+    }
 }
 
-impl<E: Element<RequestLayoutState = Option<AnyElement>>> IntoElement for SelectRoot<E> {
+type DecorateRoot = Box<dyn FnOnce(&mut Interactivity)>;
+struct ControlRoot<E> {
+    inner: E,
+    decorate: Option<DecorateRoot>,
+}
+
+impl<E: Element<RequestLayoutState = Option<AnyElement>>> IntoElement for ControlRoot<E> {
     type Element = Self;
     fn into_element(self) -> Self {
         self
     }
 }
 
-impl<E: Element<RequestLayoutState = Option<AnyElement>>> Element for SelectRoot<E> {
+impl<E: Element<RequestLayoutState = Option<AnyElement>>> Element for ControlRoot<E> {
     type RequestLayoutState = E::RequestLayoutState;
     type PrepaintState = E::PrepaintState;
     fn id(&self) -> Option<ElementId> {
@@ -72,9 +96,10 @@ impl<E: Element<RequestLayoutState = Option<AnyElement>>> Element for SelectRoot
             .and_then(|element| {
                 element.downcast_mut::<gpui_kit::base::ObservedElement<Stateful<Div>>>()
             })
-            .expect("Pinned Base Select element changed; update the accessibility adapter");
-        let disabled = self.disabled;
-        super::semantics::control_properties(root.interactivity(), self.id.clone(), disabled);
+            .expect("Pinned Base control element changed; update the accessibility adapter");
+        if let Some(decorate) = self.decorate.take() {
+            decorate(root.interactivity());
+        }
         (layout, state)
     }
     fn prepaint(

@@ -36,7 +36,7 @@ if operation != "query":
     if len(matches) != 1:
         raise RuntimeError(f"Expected one AT-SPI element named {name}, got {len(matches)}")
     element = matches[0]
-    if operation in ("invoke", "toggle"):
+    if operation in ("invoke", "toggle", "select"):
         action = element.get_action_iface()
         names = [action.get_action_name(i) for i in range(action.get_n_actions())]
         candidates = [i for i, n in enumerate(names) if n in ("click", "press", "toggle")]
@@ -82,5 +82,8 @@ else:
         if numeric:
             node.update(number=numeric.get_current_value(), min=numeric.get_minimum_value(),
                         max=numeric.get_maximum_value(), step=numeric.get_minimum_increment())
+        table = element.get_table_iface()
+        if table:
+            node.update(rows=table.get_n_rows(), columns=table.get_n_columns())
         nodes.append(node)
     print(json.dumps({"api": "AT-SPI", "process": process, "nodes": nodes}))

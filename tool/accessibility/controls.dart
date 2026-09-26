@@ -57,7 +57,10 @@ Future<void> main(List<String> args) async {
         .singleOrNull;
     bool checked(dynamic n) =>
         n != null &&
-        (n['checked'] == true || n['checked'] == 'On' || n['value'] == 1);
+        (n['checked'] == true ||
+            n['checked'] == 'On' ||
+            n['value'] == 1 ||
+            n['value'] == true);
     await capture(
       'initial input and checkbox',
       (nodes) =>
@@ -75,15 +78,26 @@ Future<void> main(List<String> args) async {
           !settings.draft.notifications &&
           !checked(named(nodes, 'Enable workspace notifications')),
     );
-    await platformQuery(
-      process,
-      operation: 'set-value',
-      name: 'Display name',
-      id: 'name',
-      value: 'Ada',
-    );
+    if (Platform.isLinux) {
+      report['unavailable'] = [
+        'AT-SPI EditableText is absent from the pinned adapter; text change uses GPUI diagnostic keys, followed by external AT-SPI Text read.',
+      ];
+      await settings.host.diagnose('focus', {'input': 'name'});
+      for (final key in ['ctrl-a', 'backspace', 'shift-a', 'd', 'a']) {
+        await settings.host.diagnose('key', {'key': key});
+      }
+    } else {
+      await platformQuery(
+        process,
+        operation: 'set-value',
+        id: 'name',
+        value: 'Ada',
+      );
+    }
     await capture(
-      'platform text write reaches Dart',
+      Platform.isLinux
+          ? 'GPUI text write observed through AT-SPI Text'
+          : 'platform text write reaches Dart',
       (nodes) =>
           settings.draft.name == 'Ada' &&
           named(nodes, 'Display name')?['value'] == 'Ada',
