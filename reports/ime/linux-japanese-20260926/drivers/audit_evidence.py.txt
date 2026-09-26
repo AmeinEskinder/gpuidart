@@ -1,0 +1,91 @@
+from pathlib import Path
+import hashlib
+import json
+import re
+import subprocess
+import tarfile
+
+root = Path('reports/ime/linux-japanese-20260926')
+read = lambda path: json.loads(path.read_text(encoding='utf-8-sig'))
+files = list(root.rglob('*.json'))
+for path in files: read(path)
+manifest = read(root / 'capture-manifest.json')['screenshots']
+assert len(manifest) == 46
+for entry in manifest:
+    assert hashlib.sha256((root / entry['path']).read_bytes()).hexdigest() == entry['sha256']
+    metadata = root / entry['metadata']
+    assert hashlib.sha256(metadata.read_bytes()).hexdigest() == entry['metadata_sha256']
+    assert read(metadata)['foreground'] is True
+index = {}
+for entry in subprocess.check_output(['git', 'ls-files', '--stage', '-z', str(root)], text=True).split('\0'):
+    if not entry: continue
+    info, name = entry.split('\t', 1)
+    index[name] = info.split()[1]
+for entry in manifest:
+    for key in ['path', 'metadata']:
+        path = root / entry[key]
+        data = path.read_bytes()
+        blob = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
+        assert index[path.as_posix()] == blob, f'Git changed captured bytes: {path}'
+verification = read(root / 'clean-attempt2/verification.json')
+assert verification['passed'] and verification['runtime_only']
+assert verification['environment_declared_by_operator'] == 'clean_vm'
+assert verification['application_exit_code'] == 0
+assert verification['manifest']['build']['source_dirty'] is False
+assert verification['manifest']['project_license'] == 'MIT'
+archive = Path('build/evaluation-4fca314/linux/Watchlist-linux-x64.tar.gz')
+assert hashlib.sha256(archive.read_bytes()).hexdigest() == read(root / 'environment.json')['aot_archive_sha256']
+with tarfile.open(archive) as package:
+    members = {Path(m.name).name: m for m in package.getmembers() if m.isfile()}
+    for entry in verification['manifest']['files']:
+        data = package.extractfile(members[entry['name']]).read()
+        assert len(data) == entry['bytes']
+        assert hashlib.sha256(data).hexdigest() == entry['sha256']
+for entry in verification['manifest']['build']['source_files']:
+    if entry['path'].startswith(('lib/', 'native/', 'launcher/', 'example/')):
+        data = subprocess.check_output(['git', 'show', '5a754c0:' + entry['path']])
+        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+jit = read(root / 'raw/jit-sequence-2.json')
+assert jit['passed'] and jit['native_process_exited'] and jit['source_restored']
+for field in ['inputs', 'tables']:
+    assert jit['retained_before']['state'][field] == jit['retained_after']['state'][field]
+assert jit['retained_after']['state']['tables']['watchlist']['scroll_y'] < 0
+assert jit['before']['state']['inputs'] == jit['after']['state']['inputs']
+assert jit['before']['state']['inputs']['search']['text'] == 'にほんご'
+assert jit['before']['query'] == jit['after']['query'] == jit['converted_state']['query'] == ''
+assert jit['converted_state']['state']['inputs']['search']['text'] == '日本語'
+assert jit['committed_state']['query'] == jit['committed_state']['state']['inputs']['search']['text'] == '日本語'
+assert jit['selected_before']['state']['inputs'] == jit['selected_after']['state']['inputs']
+for counter in ['data_messages', 'data_bytes']:
+    assert jit['before']['metrics'][counter] == jit['after']['metrics'][counter]
+assert read(root / 'raw/jit-sequence-1.json')['passed'] is False
+closed = read(root / 'raw/aot-close-and-phase.json')
+assert closed['pid_absent'] and not closed['remaining_package_processes']
+docs = ['README.md', 'docs/sdk.md', 'docs/unix-release-checks.md', 'reports/cross-platform/status.md', 'reports/release/README.md', str(root/'README.md')]
+links = 0
+for name in docs:
+    path = Path(name)
+    for target in re.findall(r'\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
+        if '://' in target or target.startswith('#'): continue
+        target = target.split('#')[0]
+        assert (path.parent / target).exists(), f'Missing link: {path}: {target}'
+        links += 1
+subprocess.run(['git', 'diff', '--exit-code', '--', 'lib', 'native', 'launcher', 'example', 'tool'], check=True)
+subprocess.run(['git', 'diff', '--check'], check=True)
+subprocess.run(['git', 'diff', '--cached', '--check'], check=True)
+summary = {
+    'passed': True,
+    'json_files_parsed': len(files),
+    'screenshots_and_metadata_with_matching_hashes': len(manifest),
+    'git_index_preserves_captured_bytes': True,
+    'archive_files_with_matching_hashes': len(verification['manifest']['files']),
+    'local_markdown_links_checked': links,
+    'jit_source_matches_packaged_sdk_source': True,
+    'clean_vm_and_closure_assertions': True,
+    'three_reload_assertions': True,
+    'failed_reload_harness_attempt_retained': True,
+    'sdk_source_unchanged': True,
+    'scope': 'Evidence consistency audit; agent visual observations are recorded in README.md',
+}
+(root/'evidence-audit.json').write_text(json.dumps(summary, indent=2)+'\n', encoding='utf-8')
+print(json.dumps(summary))

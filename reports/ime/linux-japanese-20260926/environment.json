@@ -1,0 +1,41 @@
+{
+  "observer": "agent, explicitly authorized by owner; no independent human observer",
+  "guest": "Ubuntu 24.04 x64, QEMU/KVM under WSL2; 2 vCPU and 4 GiB RAM",
+  "image": {
+    "url": "https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img",
+    "sha256": "612b2c0cc1bc413a6cb8c38fd611794caf0f2b436c50013d8b3794db12ad7354",
+    "bytes": 625256960
+  },
+  "kernel": "Linux gpuidart-clean-desktop 6.8.0-139-generic #139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+  "display": "Xorg 21.1.12, Openbox 3.6.1, virtio virtual display, 1280x800, no separate compositor",
+  "renderer": "Mesa 25.2.8 llvmpipe, LLVM 20.1.2, software Vulkan",
+  "native_window": {
+    "width": 959.9999389648438,
+    "height": 715.3845825195312,
+    "scale_factor": 1.0833333730697632,
+    "scroll_y": 0.0
+  },
+  "keyboard": "US layout; XTest key events via xdotool; Japanese Romaji input through Fcitx5/Mozc",
+  "fcitx5": "5.1.7-1build3",
+  "fcitx5_mozc": "2.28.4715.102+dfsg-2.2build7",
+  "ime_environment": {
+    "XMODIFIERS": "@im=fcitx",
+    "GTK_IM_MODULE": "fcitx",
+    "QT_IM_MODULE": "fcitx",
+    "LANG": "en_US.UTF-8"
+  },
+  "xim_config": {
+    "path": "~/.config/fcitx5/conf/xim.conf",
+    "UseOnTheSpot": true,
+    "applied": "Fresh guest desktop session after in-place IME restart stalled Openbox"
+  },
+  "aot_archive": "Watchlist-linux-x64.tar.gz",
+  "aot_archive_sha256": "42a071c884249a188daaf16648b0336619e0ee13492f78b1c8c40ccea5823a62",
+  "aot_source": "4fca3147806878bd3b8fbcff0a92676b8452727e",
+  "aot_source_dirty": false,
+  "jit_source": "5a754c0a48888067382b5975cabbc29d50b043de",
+  "jit_dart": "3.13.4",
+  "native_library_for_both": "The release libgpuidart.so from the AOT archive",
+  "clean_phase": "No Dart/Flutter/Rust or compiler commands at package verification. Git preflight failure retained; Git removed before clean-attempt2. GDB added later during window-manager diagnosis. Dart SDK/source added after AOT close for JIT observations.",
+  "scope": "Clean VM launch and configured Japanese XIM observation; no physical GPU/display, other IMEs, Wayland, macOS or presentation-latency claim"
+}

@@ -1,0 +1,86 @@
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root = Path('/work')
+base = 'https://cloud-images.ubuntu.com/releases/noble/release/'
+name = 'ubuntu-24.04-server-cloudimg-amd64.img'
+image = root / name
+if (root / 'guest.qcow2').exists():
+    raise SystemExit('Guest already exists; preserve it instead of reprovisioning')
+subprocess.run(['curl', '-4', '--fail', '--retry', '2', '--connect-timeout', '20', '-o', str(root / 'SHA256SUMS'), base + 'SHA256SUMS'], check=True)
+sums = (root / 'SHA256SUMS').read_bytes()
+expected = next(line.split()[0] for line in sums.decode().splitlines() if line.split()[-1].lstrip('*') == name)
+if not image.exists():
+    subprocess.run(['curl', '-4', '--fail', '--retry', '2', '--connect-timeout', '20', '-o', str(image), base + name], check=True)
+actual = hashlib.file_digest(image.open('rb'), 'sha256').hexdigest()
+if actual != expected:
+    raise SystemExit('Cloud image checksum mismatch')
+(root / 'image.json').write_text(json.dumps({'url': base + name, 'sha256': actual, 'bytes': image.stat().st_size}, indent=2))
+subprocess.run(['ssh-keygen', '-q', '-t', 'ed25519', '-N', '', '-f', '/work/guest-key'], check=True)
+public = (root / 'guest-key.pub').read_text().strip()
+session = '''#!/bin/sh
+export DISPLAY=:0
+export XMODIFIERS=@im=fcitx
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export LIBGL_ALWAYS_SOFTWARE=1
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+unset WAYLAND_DISPLAY ZED_HEADLESS
+mkdir -p /home/evaluator/evidence
+env > /home/evaluator/session.env
+fcitx5 --disable=wayland > /home/evaluator/evidence/fcitx.log 2>&1 &
+exec openbox > /home/evaluator/evidence/openbox.log 2>&1
+'''
+desktop = '''#!/bin/sh
+set -eu
+Xorg :0 -ac -nolisten tcp -noreset vt7 > /var/log/gpuidart-Xorg.log 2>&1 &
+for attempt in $(seq 1 60); do
+  if DISPLAY=:0 xdpyinfo >/dev/null 2>&1; then break; fi
+  sleep 1
+done
+exec runuser -u evaluator -- dbus-run-session /usr/local/bin/evaluator-session
+'''
+profile = '''[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=mozc
+
+[Groups/0/Items/0]
+Name=keyboard-us
+Layout=
+
+[Groups/0/Items/1]
+Name=mozc
+Layout=
+
+[GroupOrder]
+0=Default
+'''
+config = {
+    'hostname': 'gpuidart-clean-desktop',
+    'users': [{'name': 'evaluator', 'shell': '/bin/bash', 'sudo': 'ALL=(ALL) NOPASSWD:ALL', 'lock_passwd': True, 'ssh_authorized_keys': [public]}],
+    'ssh_pwauth': False,
+    'locale': 'en_US.UTF-8',
+    'package_update': True,
+    'apt': {'conf': 'Acquire::ForceIPv4 "true"; Acquire::http::Timeout "30";'},
+    'packages': ['libstdc++6', 'libfontconfig1', 'libfreetype6', 'libx11-6', 'libxcb1', 'libx11-xcb1', 'libxkbcommon0', 'libxkbcommon-x11-0', 'libwayland-client0', 'libglib2.0-0t64', 'libssl3t64', 'libzstd1', 'libvulkan1', 'mesa-vulkan-drivers', 'vulkan-tools', 'xserver-xorg', 'xserver-xorg-video-qxl', 'openbox', 'dbus-x11', 'xauth', 'xdotool', 'x11-utils', 'x11-xserver-utils', 'xterm', 'scrot', 'fonts-dejavu-core', 'fonts-noto-cjk', 'fcitx5', 'fcitx5-mozc', 'fcitx5-frontend-gtk3', 'locales'],
+    'write_files': [
+        {'path': '/usr/local/bin/evaluator-session', 'permissions': '0755', 'content': session},
+        {'path': '/usr/local/bin/gpuidart-desktop', 'permissions': '0755', 'content': desktop},
+        {'path': '/etc/systemd/system/gpuidart-desktop.service', 'content': '[Unit]\nAfter=network.target\n[Service]\nExecStart=/usr/local/bin/gpuidart-desktop\n[Install]\nWantedBy=multi-user.target\n'},
+        {'path': '/home/evaluator/.config/fcitx5/profile', 'content': profile, 'owner': 'evaluator:evaluator', 'defer': True},
+    ],
+    'runcmd': [
+        ['chown', '-R', 'evaluator:evaluator', '/home/evaluator/.config'],
+        ['systemctl', 'daemon-reload'],
+        ['systemctl', 'enable', '--now', 'gpuidart-desktop'],
+    ],
+}
+(root / 'user-data').write_text('#cloud-config\n' + json.dumps(config, indent=2) + '\n')
+(root / 'meta-data').write_text('instance-id: gpuidart-desktop-20260926-1\nlocal-hostname: gpuidart-clean-desktop\n')
+subprocess.run(['cloud-localds', '/work/seed.img', '/work/user-data', '/work/meta-data'], check=True)
+subprocess.run(['qemu-img', 'create', '-f', 'qcow2', '-F', 'qcow2', '-b', str(image), '/work/guest.qcow2', '12G'], check=True)
+print(json.dumps({'cloud_image_verified': True, 'sha256': actual, 'guest_created': True}))

@@ -1,0 +1,27 @@
+#!/bin/bash
+set -euo pipefail
+cd /home/evaluator
+mkdir -p evidence
+date -u --iso-8601=seconds > evidence/verification-started.txt
+uname -a > evidence/kernel.txt
+cat /etc/os-release > evidence/os-release.txt
+systemd-detect-virt > evidence/virtualization.txt
+lscpu > evidence/cpu.txt
+dpkg-query -W > evidence/runtime-packages.txt
+sha256sum package.tar.gz > evidence/package.sha256
+printf '%s  %s\n' 42a071c884249a188daaf16648b0336619e0ee13492f78b1c8c40ccea5823a62 package.tar.gz | sha256sum -c -
+for tool in dart rustc cargo gcc clang make flutter git; do
+  if command -v "$tool" >> evidence/developer-tools.txt; then
+    printf 'Unexpected development command: %s\n' "$tool" >&2
+    exit 1
+  fi
+  printf '%s: absent\n' "$tool" >> evidence/developer-tools.txt
+done
+xdpyinfo > evidence/x11.txt
+xrandr --verbose > evidence/display.txt
+vulkaninfo --summary > evidence/vulkan.txt 2>&1
+mkdir application
+tar -xzf package.tar.gz -C application
+cd application
+./verify --runtime-only --environment=clean_vm --report=../evidence/verification.json > ../evidence/verifier.stdout.log 2> ../evidence/verifier.stderr.log
+date -u --iso-8601=seconds > ../evidence/verification-finished.txt

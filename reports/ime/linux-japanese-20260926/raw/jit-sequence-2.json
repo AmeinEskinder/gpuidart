@@ -1,0 +1,1761 @@
+{
+  "passed": true,
+  "observer": "agent inspecting screenshots; XTest through Fcitx5/Mozc",
+  "started_utc": "2026-09-26T05:21:50.123755Z",
+  "source_commit": "5a754c0a48888067382b5975cabbc29d50b043de",
+  "dart_version": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
+  "native_library": "/home/evaluator/application/libgpuidart.so",
+  "initial": {
+    "state": {
+      "revision": 1,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "",
+          "selection": {
+            "start": 0,
+            "end": 0
+          },
+          "focused": false
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 0,
+            "end": 9
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 1,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 6086514543335466803
+          },
+          "selection": {
+            "row": null,
+            "record": null
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "No instrument selected",
+        "status": "Select a row to update its sample price or save it to your shortlist."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 3,
+        "rows_constructed": 33,
+        "cells_constructed": 168,
+        "data_records_checked": 0,
+        "data_cells_written": 0,
+        "view_recomputes": 0
+      },
+      "draw": {
+        "samples": 3,
+        "p50_us": 3119.103,
+        "p95_us": 8024.063,
+        "p99_us": 8024.063
+      },
+      "dirty_to_present_submit": {
+        "samples": 1,
+        "p50_us": 37552.127,
+        "p95_us": 37552.127,
+        "p99_us": 37552.127
+      },
+      "present_interval": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "",
+    "selected": null,
+    "ticks": 0,
+    "dataset_revision": 1,
+    "metrics": {
+      "description_builds": 1,
+      "encoded_snapshots": 0,
+      "encoded_bytes": 0,
+      "ffi_callbacks": 5,
+      "ui_callbacks": 0,
+      "diagnostic_callbacks": 3,
+      "description_build": {
+        "samples": 1,
+        "p50_us": 2048,
+        "p95_us": 2048,
+        "p99_us": 2048
+      },
+      "encode": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "publish_to_applied": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 0,
+      "data_bytes": 0,
+      "data_records_checked": 0,
+      "data_cells_written": 0,
+      "data_encode": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "data_publish_to_applied": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_data_parse": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_data_apply": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "native_snapshot_apply": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      }
+    }
+  },
+  "open": {
+    "time_unix": 1790400111.7821374,
+    "action": "bind",
+    "arguments": [
+      "17692"
+    ],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "",
+    "input_state": "0",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "direct-input": {
+    "time_unix": 1790400112.3195004,
+    "action": "ime-off",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "",
+    "input_state": "0",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "prepared": {
+    "revision": 5,
+    "native_process_id": 17692,
+    "inputs": {
+      "search": {
+        "entity": 4294967298,
+        "text": "0",
+        "selection": {
+          "start": 0,
+          "end": 1
+        },
+        "focused": true
+      }
+    },
+    "tables": {
+      "watchlist": {
+        "entity": 4294967300,
+        "visible_rows": {
+          "start": 17,
+          "end": 26
+        },
+        "row_count": 1000,
+        "dataset": "instruments",
+        "dataset_revision": 2,
+        "scroll_y": -555.6922607421875,
+        "view": {
+          "source_rows": 1000,
+          "view_rows": 1000,
+          "spec_hash": 556118766591525534
+        },
+        "selection": {
+          "row": 25,
+          "record": "BRK0025"
+        },
+        "focused": false
+      }
+    },
+    "labels": {
+      "title": "Market watch",
+      "source": "Sample instruments and prices. No live market feed.",
+      "summary": "1000 instruments shown · 0 saved",
+      "selection": "BRK0025 · Brookfield Labs · 101.82",
+      "status": "Updated BRK0025 to 101.82."
+    },
+    "window": {
+      "width": 959.9999389648438,
+      "height": 715.3845825195312,
+      "scale_factor": 1.0833333730697632,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 5,
+      "rows_constructed": 55,
+      "cells_constructed": 280,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "view_recomputes": 1
+    },
+    "draw": {
+      "samples": 5,
+      "p50_us": 3119.103,
+      "p95_us": 8024.063,
+      "p99_us": 8024.063
+    },
+    "dirty_to_present_submit": {
+      "samples": 3,
+      "p50_us": 38731.775,
+      "p95_us": 64585.727,
+      "p99_us": 64585.727
+    },
+    "present_interval": {
+      "samples": 1,
+      "p50_us": 64978.943,
+      "p95_us": 64978.943,
+      "p99_us": 64978.943
+    },
+    "input_to_frame": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    }
+  },
+  "prepared-scroll": {
+    "time_unix": 1790400112.968122,
+    "action": "capture",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "",
+    "input_state": "0",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "retained_before": {
+    "state": {
+      "revision": 5,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "0",
+          "selection": {
+            "start": 0,
+            "end": 1
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -555.6922607421875,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 556118766591525534
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 12,
+        "rows_constructed": 132,
+        "cells_constructed": 672,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 1
+      },
+      "draw": {
+        "samples": 12,
+        "p50_us": 2287.615,
+        "p95_us": 8024.063,
+        "p99_us": 8024.063
+      },
+      "dirty_to_present_submit": {
+        "samples": 10,
+        "p50_us": 37683.199,
+        "p95_us": 64585.727,
+        "p99_us": 64585.727
+      },
+      "present_interval": {
+        "samples": 7,
+        "p50_us": 39419.903,
+        "p95_us": 64978.943,
+        "p99_us": 64978.943
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "0",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 5,
+      "encoded_snapshots": 4,
+      "encoded_bytes": 5575,
+      "ffi_callbacks": 16,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 8,
+      "description_build": {
+        "samples": 5,
+        "p50_us": 474,
+        "p95_us": 2048,
+        "p99_us": 2048
+      },
+      "encode": {
+        "samples": 4,
+        "p50_us": 112,
+        "p95_us": 377,
+        "p99_us": 377
+      },
+      "publish_to_applied": {
+        "samples": 4,
+        "p50_us": 2624,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 4,
+        "p50_us": 23,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "retained_reload": {
+    "heading": "Market watch retained reload",
+    "selected": "BRK0025",
+    "query": "0",
+    "ticks": 1
+  },
+  "retained-after-reload": {
+    "time_unix": 1790400113.7139206,
+    "action": "capture",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "",
+    "input_state": "0",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "retained_after": {
+    "state": {
+      "revision": 6,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "0",
+          "selection": {
+            "start": 0,
+            "end": 1
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -555.6922607421875,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 556118766591525534
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch retained reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 15,
+        "rows_constructed": 165,
+        "cells_constructed": 840,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 1
+      },
+      "draw": {
+        "samples": 15,
+        "p50_us": 2287.615,
+        "p95_us": 8024.063,
+        "p99_us": 8024.063
+      },
+      "dirty_to_present_submit": {
+        "samples": 13,
+        "p50_us": 38731.775,
+        "p95_us": 64585.727,
+        "p99_us": 64585.727
+      },
+      "present_interval": {
+        "samples": 9,
+        "p50_us": 42565.631,
+        "p95_us": 293601.279,
+        "p99_us": 293601.279
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "0",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 6,
+      "encoded_snapshots": 5,
+      "encoded_bytes": 6956,
+      "ffi_callbacks": 21,
+      "ui_callbacks": 1,
+      "diagnostic_callbacks": 12,
+      "description_build": {
+        "samples": 6,
+        "p50_us": 644,
+        "p95_us": 2048,
+        "p99_us": 2048
+      },
+      "encode": {
+        "samples": 5,
+        "p50_us": 112,
+        "p95_us": 508,
+        "p99_us": 508
+      },
+      "publish_to_applied": {
+        "samples": 5,
+        "p50_us": 2432,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 5,
+        "p50_us": 20,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "focused-empty": {
+    "time_unix": 1790400114.8838003,
+    "action": "keys",
+    "arguments": [
+      "ctrl+f",
+      "ctrl+a",
+      "BackSpace"
+    ],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "keyboard-us",
+    "input_state": "1",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "japanese": {
+    "time_unix": 1790400115.444301,
+    "action": "ime",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "preedit": {
+    "time_unix": 1790400117.318316,
+    "action": "keys",
+    "arguments": [
+      "n",
+      "i",
+      "h",
+      "o",
+      "n",
+      "g",
+      "o"
+    ],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "before": {
+    "state": {
+      "revision": 7,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "にほんご",
+          "selection": {
+            "start": 12,
+            "end": 12
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -549.230712890625,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 6086514543335466803
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch retained reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 38,
+        "rows_constructed": 418,
+        "cells_constructed": 2128,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 2
+      },
+      "draw": {
+        "samples": 38,
+        "p50_us": 2482.175,
+        "p95_us": 111280.127,
+        "p99_us": 226623.487
+      },
+      "dirty_to_present_submit": {
+        "samples": 32,
+        "p50_us": 38731.775,
+        "p95_us": 195166.207,
+        "p99_us": 229638.143
+      },
+      "present_interval": {
+        "samples": 14,
+        "p50_us": 40304.639,
+        "p95_us": 482082.815,
+        "p99_us": 482082.815
+      },
+      "input_to_frame": {
+        "samples": 5,
+        "p50_us": 46989.311,
+        "p95_us": 441712.639,
+        "p99_us": 441712.639
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 7,
+      "encoded_snapshots": 6,
+      "encoded_bytes": 8286,
+      "ffi_callbacks": 28,
+      "ui_callbacks": 3,
+      "diagnostic_callbacks": 16,
+      "description_build": {
+        "samples": 7,
+        "p50_us": 474,
+        "p95_us": 2048,
+        "p99_us": 2048
+      },
+      "encode": {
+        "samples": 6,
+        "p50_us": 244,
+        "p95_us": 508,
+        "p99_us": 508
+      },
+      "publish_to_applied": {
+        "samples": 6,
+        "p50_us": 2432,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 6,
+        "p50_us": 23,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "reload": {
+    "heading": "Market watch live IME reload",
+    "selected": "BRK0025",
+    "query": "",
+    "ticks": 1
+  },
+  "after-reload": {
+    "time_unix": 1790400118.059457,
+    "action": "capture",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "after": {
+    "state": {
+      "revision": 8,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "にほんご",
+          "selection": {
+            "start": 12,
+            "end": 12
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -549.230712890625,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 6086514543335466803
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch live IME reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 41,
+        "rows_constructed": 451,
+        "cells_constructed": 2296,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 2
+      },
+      "draw": {
+        "samples": 41,
+        "p50_us": 2557.951,
+        "p95_us": 94896.127,
+        "p99_us": 226623.487
+      },
+      "dirty_to_present_submit": {
+        "samples": 35,
+        "p50_us": 39911.423,
+        "p95_us": 195166.207,
+        "p99_us": 229638.143
+      },
+      "present_interval": {
+        "samples": 16,
+        "p50_us": 40304.639,
+        "p95_us": 482082.815,
+        "p99_us": 482082.815
+      },
+      "input_to_frame": {
+        "samples": 5,
+        "p50_us": 46989.311,
+        "p95_us": 441712.639,
+        "p99_us": 441712.639
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 8,
+      "encoded_snapshots": 7,
+      "encoded_bytes": 9616,
+      "ffi_callbacks": 33,
+      "ui_callbacks": 3,
+      "diagnostic_callbacks": 20,
+      "description_build": {
+        "samples": 8,
+        "p50_us": 644,
+        "p95_us": 2048,
+        "p99_us": 2048
+      },
+      "encode": {
+        "samples": 7,
+        "p50_us": 244,
+        "p95_us": 515,
+        "p99_us": 515
+      },
+      "publish_to_applied": {
+        "samples": 7,
+        "p50_us": 2015,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 7,
+        "p50_us": 20,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "converted": {
+    "time_unix": 1790400118.7200613,
+    "action": "keys",
+    "arguments": [
+      "space"
+    ],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "converted_state": {
+    "state": {
+      "revision": 8,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "日本語",
+          "selection": {
+            "start": 9,
+            "end": 9
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": -549.230712890625,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "spec_hash": 6086514543335466803
+          },
+          "selection": {
+            "row": 25,
+            "record": "BRK0025"
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch live IME reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "BRK0025 · Brookfield Labs · 101.82",
+        "status": "Updated BRK0025 to 101.82."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 43,
+        "rows_constructed": 473,
+        "cells_constructed": 2408,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 2
+      },
+      "draw": {
+        "samples": 43,
+        "p50_us": 2519.039,
+        "p95_us": 94896.127,
+        "p99_us": 226623.487
+      },
+      "dirty_to_present_submit": {
+        "samples": 37,
+        "p50_us": 39911.423,
+        "p95_us": 195166.207,
+        "p99_us": 229638.143
+      },
+      "present_interval": {
+        "samples": 16,
+        "p50_us": 40304.639,
+        "p95_us": 482082.815,
+        "p99_us": 482082.815
+      },
+      "input_to_frame": {
+        "samples": 5,
+        "p50_us": 46989.311,
+        "p95_us": 441712.639,
+        "p99_us": 441712.639
+      }
+    },
+    "formatted": {
+      "price": {
+        "text": "100.00",
+        "color": null,
+        "icon": null
+      },
+      "change": {
+        "text": "-0.20",
+        "color": "token:danger",
+        "icon": "arrow_down"
+      }
+    },
+    "query": "",
+    "selected": "BRK0025",
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 8,
+      "encoded_snapshots": 7,
+      "encoded_bytes": 9616,
+      "ffi_callbacks": 36,
+      "ui_callbacks": 3,
+      "diagnostic_callbacks": 23,
+      "description_build": {
+        "samples": 8,
+        "p50_us": 644,
+        "p95_us": 2048,
+        "p99_us": 2048
+      },
+      "encode": {
+        "samples": 7,
+        "p50_us": 244,
+        "p95_us": 515,
+        "p99_us": 515
+      },
+      "publish_to_applied": {
+        "samples": 7,
+        "p50_us": 2015,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 7,
+        "p50_us": 20,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "committed": {
+    "time_unix": 1790400119.3868399,
+    "action": "keys",
+    "arguments": [
+      "Return"
+    ],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "committed_state": {
+    "state": {
+      "revision": 10,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "日本語",
+          "selection": {
+            "start": 9,
+            "end": 9
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 0,
+            "spec_hash": 217780559657167447
+          },
+          "selection": {
+            "row": null,
+            "record": null
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch live IME reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "0 instruments shown · 0 saved",
+        "selection": "No instrument selected",
+        "status": "No instruments match. Edit the search or show all instruments."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 46,
+        "rows_constructed": 484,
+        "cells_constructed": 2464,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 3
+      },
+      "draw": {
+        "samples": 46,
+        "p50_us": 2355.199,
+        "p95_us": 94896.127,
+        "p99_us": 226623.487
+      },
+      "dirty_to_present_submit": {
+        "samples": 40,
+        "p50_us": 38371.327,
+        "p95_us": 189267.967,
+        "p99_us": 229638.143
+      },
+      "present_interval": {
+        "samples": 16,
+        "p50_us": 40304.639,
+        "p95_us": 482082.815,
+        "p99_us": 482082.815
+      },
+      "input_to_frame": {
+        "samples": 5,
+        "p50_us": 46989.311,
+        "p95_us": 441712.639,
+        "p99_us": 441712.639
+      }
+    },
+    "formatted": {
+      "price": {
+        "error": "Invalid row"
+      },
+      "change": {
+        "error": "Invalid row"
+      }
+    },
+    "query": "日本語",
+    "selected": null,
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 10,
+      "encoded_snapshots": 9,
+      "encoded_bytes": 12447,
+      "ffi_callbacks": 43,
+      "ui_callbacks": 5,
+      "diagnostic_callbacks": 26,
+      "description_build": {
+        "samples": 10,
+        "p50_us": 878,
+        "p95_us": 2966,
+        "p99_us": 2966
+      },
+      "encode": {
+        "samples": 9,
+        "p50_us": 244,
+        "p95_us": 1423,
+        "p99_us": 1423
+      },
+      "publish_to_applied": {
+        "samples": 9,
+        "p50_us": 2015,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 9,
+        "p50_us": 20,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "selected": {
+    "time_unix": 1790400120.1640406,
+    "action": "keys",
+    "arguments": [
+      "shift+Left"
+    ],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "selected_before": {
+    "state": {
+      "revision": 10,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "日本語",
+          "selection": {
+            "start": 6,
+            "end": 9
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 0,
+            "spec_hash": 217780559657167447
+          },
+          "selection": {
+            "row": null,
+            "record": null
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch live IME reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "0 instruments shown · 0 saved",
+        "selection": "No instrument selected",
+        "status": "No instruments match. Edit the search or show all instruments."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 48,
+        "rows_constructed": 484,
+        "cells_constructed": 2464,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 3
+      },
+      "draw": {
+        "samples": 48,
+        "p50_us": 2287.615,
+        "p95_us": 94896.127,
+        "p99_us": 226623.487
+      },
+      "dirty_to_present_submit": {
+        "samples": 42,
+        "p50_us": 38371.327,
+        "p95_us": 189267.967,
+        "p99_us": 229638.143
+      },
+      "present_interval": {
+        "samples": 16,
+        "p50_us": 40304.639,
+        "p95_us": 482082.815,
+        "p99_us": 482082.815
+      },
+      "input_to_frame": {
+        "samples": 6,
+        "p50_us": 42696.703,
+        "p95_us": 441712.639,
+        "p99_us": 441712.639
+      }
+    },
+    "formatted": {
+      "price": {
+        "error": "Invalid row"
+      },
+      "change": {
+        "error": "Invalid row"
+      }
+    },
+    "query": "日本語",
+    "selected": null,
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 10,
+      "encoded_snapshots": 9,
+      "encoded_bytes": 12447,
+      "ffi_callbacks": 46,
+      "ui_callbacks": 5,
+      "diagnostic_callbacks": 29,
+      "description_build": {
+        "samples": 10,
+        "p50_us": 878,
+        "p95_us": 2966,
+        "p99_us": 2966
+      },
+      "encode": {
+        "samples": 9,
+        "p50_us": 244,
+        "p95_us": 1423,
+        "p99_us": 1423
+      },
+      "publish_to_applied": {
+        "samples": 9,
+        "p50_us": 2015,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 9,
+        "p50_us": 20,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "committed_reload": {
+    "heading": "Market watch committed IME reload",
+    "selected": null,
+    "query": "日本語",
+    "ticks": 1
+  },
+  "selected-after-reload": {
+    "time_unix": 1790400120.8277004,
+    "action": "capture",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "mozc",
+    "input_state": "2",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "selected_after": {
+    "state": {
+      "revision": 11,
+      "native_process_id": 17692,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "日本語",
+          "selection": {
+            "start": 6,
+            "end": 9
+          },
+          "focused": true
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 17,
+            "end": 26
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 2,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 0,
+            "spec_hash": 217780559657167447
+          },
+          "selection": {
+            "row": null,
+            "record": null
+          },
+          "focused": false
+        }
+      },
+      "labels": {
+        "title": "Market watch committed IME reload",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "0 instruments shown · 0 saved",
+        "selection": "No instrument selected",
+        "status": "No instruments match. Edit the search or show all instruments."
+      },
+      "window": {
+        "width": 959.9999389648438,
+        "height": 715.3845825195312,
+        "scale_factor": 1.0833333730697632,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 51,
+        "rows_constructed": 484,
+        "cells_constructed": 2464,
+        "data_records_checked": 1,
+        "data_cells_written": 1,
+        "view_recomputes": 3
+      },
+      "draw": {
+        "samples": 51,
+        "p50_us": 2258.943,
+        "p95_us": 94896.127,
+        "p99_us": 226623.487
+      },
+      "dirty_to_present_submit": {
+        "samples": 45,
+        "p50_us": 37683.199,
+        "p95_us": 189267.967,
+        "p99_us": 229638.143
+      },
+      "present_interval": {
+        "samples": 18,
+        "p50_us": 40304.639,
+        "p95_us": 482082.815,
+        "p99_us": 482082.815
+      },
+      "input_to_frame": {
+        "samples": 6,
+        "p50_us": 42696.703,
+        "p95_us": 441712.639,
+        "p99_us": 441712.639
+      }
+    },
+    "formatted": {
+      "price": {
+        "error": "Invalid row"
+      },
+      "change": {
+        "error": "Invalid row"
+      }
+    },
+    "query": "日本語",
+    "selected": null,
+    "ticks": 1,
+    "dataset_revision": 2,
+    "metrics": {
+      "description_builds": 11,
+      "encoded_snapshots": 10,
+      "encoded_bytes": 13861,
+      "ffi_callbacks": 51,
+      "ui_callbacks": 5,
+      "diagnostic_callbacks": 33,
+      "description_build": {
+        "samples": 11,
+        "p50_us": 878,
+        "p95_us": 2966,
+        "p99_us": 2966
+      },
+      "encode": {
+        "samples": 10,
+        "p50_us": 377,
+        "p95_us": 1423,
+        "p99_us": 1423
+      },
+      "publish_to_applied": {
+        "samples": 10,
+        "p50_us": 2015,
+        "p95_us": 33183,
+        "p99_us": 33183
+      },
+      "initial": {
+        "bytes": 63033,
+        "encode_us": 13901
+      },
+      "data_messages": 1,
+      "data_bytes": 151,
+      "data_records_checked": 1,
+      "data_cells_written": 1,
+      "data_encode": {
+        "samples": 1,
+        "p50_us": 21,
+        "p95_us": 21,
+        "p99_us": 21
+      },
+      "data_publish_to_applied": {
+        "samples": 1,
+        "p50_us": 631,
+        "p95_us": 631,
+        "p99_us": 631
+      },
+      "native_data_parse": {
+        "samples": 1,
+        "p50_us": 38,
+        "p95_us": 38,
+        "p99_us": 38
+      },
+      "native_data_apply": {
+        "samples": 1,
+        "p50_us": 16,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "native_snapshot_apply": {
+        "samples": 10,
+        "p50_us": 20,
+        "p95_us": 159,
+        "p99_us": 159
+      }
+    }
+  },
+  "restored-ime": {
+    "time_unix": 1790400121.3866725,
+    "action": "ime-off",
+    "arguments": [],
+    "pid": 17692,
+    "window": "6291457",
+    "geometry": "WINDOW=6291457\nX=2\nY=40\nWIDTH=1040\nHEIGHT=775\nSCREEN=0",
+    "foreground": true,
+    "input_method": "keyboard-us",
+    "input_state": "1",
+    "input_delivery": "XTest key events through xdotool; no Unicode text injection"
+  },
+  "native_process_exited": true,
+  "source_restored": true,
+  "finished_utc": "2026-09-26T05:22:01.454832Z"
+}

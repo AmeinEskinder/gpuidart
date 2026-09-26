@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+output=$1
+test "$output" = /home/evaluator/evidence/clean-attempt2
+mkdir "$output"
+cd "$output"
+date -u --iso-8601=seconds > verification-started.txt
+uname -a > kernel.txt
+cat /etc/os-release > os-release.txt
+systemd-detect-virt > virtualization.txt
+lscpu > cpu.txt
+dpkg-query -W > runtime-packages.txt
+sha256sum /home/evaluator/package.tar.gz > package.sha256
+printf '%s  %s\n' 42a071c884249a188daaf16648b0336619e0ee13492f78b1c8c40ccea5823a62 /home/evaluator/package.tar.gz | sha256sum -c -
+for tool in dart rustc cargo gcc clang make flutter git; do
+  if command -v "$tool" >> developer-tools.txt; then
+    printf 'Unexpected development command: %s\n' "$tool" >&2
+    exit 1
+  fi
+  printf '%s: absent\n' "$tool" >> developer-tools.txt
+done
+xdpyinfo > x11.txt
+xrandr --verbose > display.txt
+vulkaninfo --summary > vulkan.txt 2>&1
+mkdir /home/evaluator/application
+tar -xzf /home/evaluator/package.tar.gz -C /home/evaluator/application
+cd /home/evaluator/application
+./verify --runtime-only --environment=clean_vm --report="$output/verification.json" > "$output/verifier.stdout.log" 2> "$output/verifier.stderr.log"
+date -u --iso-8601=seconds > "$output/verification-finished.txt"

@@ -1,0 +1,126 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'src/dev_session.dart';
+
+Future<void> main(List<String> args) async {
+  final prefix = args.single;
+  if (!RegExp(r'^jit-sequence-[0-9]+$').hasMatch(prefix)) {
+    throw ArgumentError('Supply a fresh jit-sequence-N prefix');
+  }
+  final reportFile = File('/home/evaluator/evidence/$prefix.json');
+  if (reportFile.existsSync()) throw StateError('Retain the previous attempt');
+  final report = <String, dynamic>{
+    'passed': false,
+    'observer': 'agent inspecting screenshots; XTest through Fcitx5/Mozc',
+    'started_utc': DateTime.now().toUtc().toIso8601String(),
+    'source_commit': '5a754c0a48888067382b5975cabbc29d50b043de',
+    'dart_version': Platform.version,
+    'native_library': Platform.environment['GPUIDART_LIBRARY'],
+  };
+  final app = File('example/watchlist/app.dart');
+  final original = await app.readAsBytes();
+  DevSession? session;
+  int? nativePid;
+  Future<void> desktop(String action, String name, [List<String> values = const []]) async {
+    final result = await Process.run('python3', [
+      '/home/evaluator/observe.py', action, '$prefix-$name', ...values,
+    ]).timeout(const Duration(seconds: 40));
+    if (result.exitCode != 0) throw StateError('${result.stdout}\n${result.stderr}');
+    report[name] = jsonDecode('${result.stdout}'.trim());
+  }
+  void require(bool value, String message) {
+    if (!value) throw StateError(message);
+  }
+  void same(dynamic before, dynamic after, String message) {
+    require(jsonEncode(before) == jsonEncode(after), message);
+  }
+  try {
+    session = await DevSession.start(entry: 'example/watchlist/main.dart');
+    final initial = await session.call('inspect');
+    report['initial'] = initial;
+    nativePid = initial['state']['native_process_id'] as int;
+    await desktop('bind', 'open', ['$nativePid']);
+    await desktop('ime-off', 'direct-input');
+    report['prepared'] = await session.call('prepare');
+    await desktop('capture', 'prepared-scroll');
+    final retainedBefore = await session.call('inspect');
+    report['retained_before'] = retainedBefore;
+    require(retainedBefore['state']['tables']['watchlist']['scroll_y'] < 0, 'Preparation did not scroll');
+    require(retainedBefore['state']['inputs']['search']['focused'] == true, 'Preparation did not focus input');
+    await app.writeAsString(utf8.decode(original).replaceFirst("'Market watch'", "'Market watch retained reload'"));
+    report['retained_reload'] = await session.reload();
+    await session.call('repaint');
+    await desktop('capture', 'retained-after-reload');
+    final retainedAfter = await session.call('inspect');
+    report['retained_after'] = retainedAfter;
+    require(retainedAfter['state']['labels']['title'] == 'Market watch retained reload', 'Changed heading missing');
+    for (final field in ['inputs', 'tables']) {
+      same(retainedBefore['state'][field], retainedAfter['state'][field], 'Retained $field changed');
+    }
+    for (final field in ['query', 'selected', 'ticks', 'dataset_revision']) {
+      same(retainedBefore[field], retainedAfter[field], 'Application $field changed');
+    }
+    same(retainedBefore['metrics']['data_bytes'], retainedAfter['metrics']['data_bytes'], 'Retained reload sent table bytes');
+    await desktop('keys', 'focused-empty', ['ctrl+f', 'ctrl+a', 'BackSpace']);
+    await desktop('ime', 'japanese');
+    await desktop('keys', 'preedit', ['n', 'i', 'h', 'o', 'n', 'g', 'o']);
+    final before = await session.call('inspect');
+    report['before'] = before;
+    require(before['state']['inputs']['search']['text'] == 'にほんご', 'Expected live Japanese preedit');
+    require(before['query'] == '', 'Preedit committed before reload');
+    require(before['state']['inputs']['search']['focused'] == true, 'Search lost focus');
+    await app.writeAsString(utf8.decode(original).replaceFirst("'Market watch'", "'Market watch live IME reload'"));
+    report['reload'] = await session.reload();
+    await session.call('repaint');
+    await desktop('capture', 'after-reload');
+    final after = await session.call('inspect');
+    report['after'] = after;
+    require(after['state']['native_process_id'] == nativePid, 'Native process changed');
+    require(after['state']['labels']['title'] == 'Market watch live IME reload', 'Changed component code missing');
+    same(before['state']['inputs'], after['state']['inputs'], 'Input state changed during active composition reload');
+    require(after['query'] == '', 'Reload committed preedit');
+    same(before['metrics']['data_messages'], after['metrics']['data_messages'], 'Reload sent table data');
+    same(before['metrics']['data_bytes'], after['metrics']['data_bytes'], 'Reload sent table bytes');
+    await desktop('keys', 'converted', ['space']);
+    final converted = await session.call('inspect');
+    report['converted_state'] = converted;
+    require(converted['state']['inputs']['search']['text'] == '日本語', 'Composition did not convert after reload');
+    require(converted['query'] == '', 'Conversion committed before Enter');
+    await desktop('keys', 'committed', ['Return']);
+    final committed = await session.call('inspect');
+    report['committed_state'] = committed;
+    require(committed['state']['inputs']['search']['text'] == '日本語', 'IME commit duplicated or lost text');
+    require(committed['query'] == '日本語', 'Application did not receive committed text');
+    await desktop('keys', 'selected', ['shift+Left']);
+    final selected = await session.call('inspect');
+    report['selected_before'] = selected;
+    await app.writeAsString(utf8.decode(original).replaceFirst("'Market watch'", "'Market watch committed IME reload'"));
+    report['committed_reload'] = await session.reload();
+    await session.call('repaint');
+    await desktop('capture', 'selected-after-reload');
+    final selectedAfter = await session.call('inspect');
+    report['selected_after'] = selectedAfter;
+    same(selected['state']['inputs'], selectedAfter['state']['inputs'], 'Committed input state changed');
+    require(selectedAfter['state']['labels']['title'] == 'Market watch committed IME reload', 'Second IME code change missing');
+    report['passed'] = true;
+  } catch (error, stack) {
+    report['error'] = '$error';
+    report['stack'] = '$stack';
+    try { report['failure_state'] = await session?.call('inspect'); } catch (_) {}
+    exitCode = 1;
+  } finally {
+    await app.writeAsBytes(original);
+    try { await desktop('ime-off', 'restored-ime'); } catch (_) {}
+    await session?.close();
+    report['native_process_exited'] = nativePid != null && !File('/proc/$nativePid/exe').existsSync();
+    report['source_restored'] = base64Encode(await app.readAsBytes()) == base64Encode(original);
+    if (report['native_process_exited'] != true || report['source_restored'] != true) {
+      report['passed'] = false;
+      exitCode = 1;
+    }
+    report['finished_utc'] = DateTime.now().toUtc().toIso8601String();
+    await reportFile.writeAsString('${const JsonEncoder.withIndent('  ').convert(report)}\n');
+  }
+  stdout.writeln('Saved ${reportFile.path}: ${report['passed']}');
+}

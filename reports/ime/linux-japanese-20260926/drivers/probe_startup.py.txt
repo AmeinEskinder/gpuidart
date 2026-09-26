@@ -1,0 +1,40 @@
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import time
+
+root = Path('/home/evaluator')
+evidence = root / 'evidence'
+records = []
+for pid in [9044, 9659]:
+    path = Path(f'/proc/{pid}/exe')
+    if not path.exists():
+        continue
+    if path.resolve() != root / 'application/Watchlist':
+        raise SystemExit('Refuse to stop an unexpected process')
+    records.append({'pid': pid, 'status': Path(f'/proc/{pid}/status').read_text()})
+    os.kill(pid, signal.SIGTERM)
+(evidence / 'configured-unmapped-processes.json').write_text(json.dumps(records, indent=2))
+for line in (root / 'session.env').read_text().splitlines():
+    key, _, value = line.partition('=')
+    if key in {'DISPLAY', 'DBUS_SESSION_BUS_ADDRESS', 'XMODIFIERS', 'LANG', 'LC_ALL', 'LIBGL_ALWAYS_SOFTWARE'}:
+        os.environ[key] = value
+os.environ['XMODIFIERS'] = '@im=gpuidart-unavailable-control'
+log = (evidence / 'no-ime-startup.log').open('w')
+app = subprocess.Popen([str(root / 'application/Watchlist')], stdout=log, stderr=log, start_new_session=True)
+result = {'pid': app.pid, 'input_method_environment': os.environ['XMODIFIERS'], 'visible': False}
+for attempt in range(50):
+    found = subprocess.run(['xdotool', 'search', '--onlyvisible', '--pid', str(app.pid), '--name', '^Market watch$'], capture_output=True, text=True)
+    if found.returncode == 0:
+        result['visible'] = True
+        result['window'] = found.stdout.strip()
+        break
+    if app.poll() is not None:
+        result['exit_code'] = app.returncode
+        break
+    time.sleep(0.2)
+(evidence / 'no-ime-startup.json').write_text(json.dumps(result, indent=2))
+(root / 'app.pid').write_text(str(app.pid))
+print(json.dumps(result))

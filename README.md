@@ -6,11 +6,11 @@ An experimental desktop SDK using Dart application code and GPUI Kit's Rust cont
 | --- | --- |
 | Windows x64 | Reference host, local desktop checks and AOT packaging |
 | macOS 15 ARM64 | Hosted native-window lifecycle, JIT/AOT 100k workload and code reload; GPUI runs in a native main-thread companion |
-| Ubuntu 24.04 x64, X11 | Hosted Xvfb/Mesa window lifecycle, JIT/AOT 100k workload and code reload |
+| Ubuntu 24.04 x64, X11 | Hosted Xvfb/Mesa lifecycle, JIT/AOT 100k workload and reload; clean desktop VM and configured Japanese XIM observation |
 
 See [cross-platform acceptance](reports/cross-platform/status.md) for source revisions, package results and remaining gates. Native Wayland, Intel Macs, other Linux distributions and older macOS versions are unverified.
 
-The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include a successful clean Windows launch in Sandbox and [Windows Japanese IME verification by agent visual observation](reports/ime/windows-japanese-20260926/README.md), as requested by the owner. Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
+The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include clean Windows Sandbox and Linux desktop VM launches. Owner-authorized agent visual observation verified Japanese composition and reload on [Windows](reports/ime/windows-japanese-20260926/README.md) and [configured Linux Fcitx5/Mozc](reports/ime/linux-japanese-20260926/README.md). Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
 The SDK supports row/column layouts, text, buttons, native text inputs and virtualized tables, plus initial window options and table-selection events. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
@@ -48,7 +48,7 @@ dart run example/watchlist/main.dart
 
 The output is [build/gpuidart-windows-x64.zip](build/gpuidart-windows-x64.zip). Extract it and run `gpuidart.exe`; keep its DLLs beside it. The executable includes Dart's AOT runtime. The ZIP includes the native GPUI library and release Visual C++ runtime. On a machine without the project-local CRT archive, supply `-CrtDirectory` pointing to the Microsoft x64 redistributable folder.
 
-Verification extracts the ZIP outside the repository, changes to an unrelated working directory, restricts PATH to Windows directories and runs the watchlist's self-test. It checks loaded module paths, including Common Controls v6 and the sibling CRT, and the actual window's PerMonitorV2 awareness. The executable embeds a DPI manifest. A clean machine without an SDK has not yet been tested. The ZIP includes a standalone verifier and [manual release checks](docs/windows-release-checks.md).
+Verification extracts the ZIP outside the repository, changes to an unrelated working directory, restricts PATH to Windows directories and runs the watchlist's self-test. It checks loaded module paths, including Common Controls v6 and the sibling CRT, and the actual window's PerMonitorV2 awareness. The executable embeds a DPI manifest. The MIT package also passed in a [fresh Windows Sandbox without development SDKs](reports/release/README.md). The ZIP includes a standalone verifier and [manual release checks](docs/windows-release-checks.md).
 
 ## macOS and Linux
 

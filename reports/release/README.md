@@ -32,6 +32,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 
 ## Current evidence
 
+- [Linux desktop VM and Japanese IME observation](../ime/linux-japanese-20260926/README.md): the MIT AOT package passed clean-VM verification and normal search/save/update/close. Configured Fcitx5/Mozc passed composition, editing and actual JIT reload with screenshots and state assertions. Default XIM placement and window-manager restart failures are retained. The observer was an agent; physical display checks remain open.
 - [Windows Japanese IME observation](../ime/windows-japanese-20260926/README.md): real preedit, candidate navigation, commit/cancel, editing and active-composition reload passed using the MIT release DLL. The owner requested screenshot/tool verification; the observer was an agent. Interrupted attempts and scope limits are retained.
 - [Windows acceptance](bb6a894/windows/acceptance.json), [packaged execution](bb6a894/windows/package.json), [reload](bb6a894/windows/reload.json) and [500-update run](bb6a894/windows/stability.json).
 - [MIT package milestone](4fca314/README.md): all three archives include the project license, with matching source and file hashes. All six workflows passed at the implementation commit.
@@ -50,7 +51,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 | --- | --- | --- |
 | Windows x64 | [WatchlistMit4fca314-windows-x64.zip](../../build/WatchlistMit4fca314-windows-x64.zip) | MIT license included; local and fresh Sandbox AOT verification, Unicode reports, DLL identity and DPI; confirmed WARP configuration; Japanese IME visually observed on the host |
 | macOS ARM64 | [Watchlist-macos-arm64.tar.gz](../../build/evaluation-4fca314/macos/Watchlist-macos-arm64.tar.gz) | MIT license included; hosted macOS 15 execution and packaging |
-| Linux x64 | [Watchlist-linux-x64.tar.gz](../../build/evaluation-4fca314/linux/Watchlist-linux-x64.tar.gz) | MIT license included; hosted Ubuntu 24.04 X11 and fresh runtime container |
+| Linux x64 | [Watchlist-linux-x64.tar.gz](../../build/evaluation-4fca314/linux/Watchlist-linux-x64.tar.gz) | MIT license included; hosted Ubuntu 24.04 X11, fresh runtime container and clean desktop VM; configured Japanese XIM visually observed |
 
 Archives are build outputs and are not committed to Git. Unix downloads are also
 available as artifacts of the workflow linked above. The macOS application/UI
@@ -61,12 +62,12 @@ isolate its cost or establish cross-platform performance rankings.
 
 | Gate | Required evidence / decision |
 | --- | --- |
-| Other input/display backends | Windows Japanese IME passed by owner-authorized agent observation. macOS/Linux IME, AltGr, other IMEs, Retina/fractional/mixed-monitor observations remain open. Hosted checks retain their narrower scope. |
-| Other desktop launches | Clean macOS and Linux desktop/VM observations remain open. Hosted Mac execution and the clean Linux runtime container retain their narrower scope. |
+| Other input/display backends | Windows Japanese IME and configured Linux Fcitx5/Mozc passed by owner-authorized agent observation. macOS IME, AltGr, other IMEs, Retina/physical fractional/mixed-monitor observations remain open. Hosted checks retain their narrower scope. |
+| Other desktop launches | Clean macOS observation remains open. Windows Sandbox and Linux desktop VM launch passed; hosted Mac execution retains its narrower scope. |
 | Original Windows reload mismatch | The original `attempt-023eef4` remains unlocalized. Passing current checks and the separately proved preparation-race fix do not explain the missing historical values. |
 | macOS distribution | Developer ID signing/notarization and a quarantined clean-Mac launch remain pending. Project licensing is resolved as MIT. |
 
-These records establish current automated acceptance and the scoped Windows IME observation. The stable-release goal
+These records establish current automated acceptance and the scoped Windows/Linux IME observations. The stable-release goal
 remains open under `docs/mvp.md` and `docs/cross-platform.md`.
 
 The accepted clean-Windows run is

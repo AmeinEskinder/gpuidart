@@ -1,0 +1,35 @@
+import json
+import subprocess
+import time
+
+ssh = ['ssh', '-p', '22229', '-i', '/work/guest-key', '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes', '-o', 'UserKnownHostsFile=/work/known_hosts', 'evaluator@127.0.0.1']
+close_probe = r'''import json, pathlib, time
+root = pathlib.Path('/home/evaluator')
+output = root / 'evidence/aot-close-and-phase.json'
+if output.exists(): raise SystemExit('Retain previous evidence')
+remaining=[]
+for p in pathlib.Path('/proc').iterdir():
+ if not p.name.isdigit(): continue
+ try:
+  exe=str((p/'exe').resolve(strict=True))
+  if exe.startswith('/home/evaluator/application/'):
+   remaining.append({'pid':int(p.name),'exe':exe})
+ except (FileNotFoundError,PermissionError): pass
+record={'time_unix':time.time(),'closed_pid':12533,'pid_absent':not pathlib.Path('/proc/12533').exists(),'remaining_package_processes':remaining,'next_phase':'Installing Dart SDK and source only after clean AOT verification and observations; subsequent JIT environment is not clean.'}
+output.write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record))
+assert record['pid_absent'] and not remaining
+assert not (root/'dart-sdk').exists()
+(root/'jit').mkdir()
+'''
+subprocess.run([*ssh, 'python3 -'], input=close_probe.encode(), check=True)
+source = subprocess.Popen(['tar', '-C', '/work', '-cf', '-', 'dart-sdk'], stdout=subprocess.PIPE)
+try:
+    destination = subprocess.run([*ssh, 'tar -xf - -C /home/evaluator'], stdin=source.stdout)
+finally:
+    source.stdout.close()
+if source.wait() or destination.returncode:
+    raise SystemExit('SDK transfer failed')
+with open('/work/jit-source.tar','rb') as source:
+    subprocess.run([*ssh, 'tar -xf - -C /home/evaluator/jit'], stdin=source, check=True)
+subprocess.run([*ssh, 'cd /home/evaluator/jit && /home/evaluator/dart-sdk/bin/dart --version && /home/evaluator/dart-sdk/bin/dart pub get --enforce-lockfile'], check=True)

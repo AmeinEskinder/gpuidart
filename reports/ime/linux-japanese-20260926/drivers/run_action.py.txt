@@ -1,0 +1,14 @@
+from pathlib import Path
+import shlex
+import subprocess
+import sys
+
+container = 'gpuidart-desktop-20260926'
+action, name, *values = sys.argv[1:]
+remote = shlex.join(['python3', '/home/evaluator/observe.py', action, name, *values])
+subprocess.run(['podman', 'exec', container, 'python3', '/work/guest.py', 'exec', remote], check=True)
+if action != 'close':
+    for suffix in ['.png', '.json']:
+        file = name + suffix
+        subprocess.run(['podman', 'exec', container, 'python3', '/work/guest.py', 'get', '/home/evaluator/evidence/' + file, '/work/' + file], check=True)
+        subprocess.run(['podman', 'cp', container + ':/work/' + file, str(Path('.cache/linux-desktop') / file)], check=True)

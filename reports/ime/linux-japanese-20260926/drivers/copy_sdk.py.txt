@@ -1,0 +1,11 @@
+import subprocess
+
+source = subprocess.Popen(['podman', 'cp', 'gpuidart-platform-ubuntu2404:/opt/dart-sdk', '-'], stdout=subprocess.PIPE)
+try:
+    destination = subprocess.run(['podman', 'exec', '-i', 'gpuidart-desktop-20260926', 'tar', '-xf', '-', '-C', '/work'], stdin=source.stdout)
+finally:
+    source.stdout.close()
+source_code = source.wait()
+if source_code or destination.returncode:
+    raise SystemExit(f'Copy failed: source={source_code}, destination={destination.returncode}')
+print('Copied the existing Linux Dart SDK into the VM host container; guest remains unchanged.')

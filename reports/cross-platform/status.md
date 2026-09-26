@@ -22,8 +22,8 @@ all passed. Subsequent evidence-only commits do not change runtime code.
 | --- | --- | --- |
 | Backend and launcher feasibility | Proven on declared hosted targets; pin unchanged | Other hardware/backends unverified |
 | Host lifecycle and clocks | Full applicable contracts, JIT/AOT and actual reload passed | Physical presentation not measured |
-| Display/input integration | Native backends used; X11 geometry/resize verified at 1 and 1.25; Windows Japanese IME observed at 125% | macOS/Linux IME, other IMEs, Retina and physical/mixed-monitor checks |
-| Build/check/package/CI | Implemented; both extracted packages passed; fresh Ubuntu container passed | Clean Mac and desktop/VM launches; distribution signing |
+| Display/input integration | Native backends used; X11 geometry/resize verified at 1 and 1.25; Windows Japanese IME and configured Linux Fcitx5/Mozc visually observed | macOS IME, other IMEs, Retina and physical/mixed-monitor checks |
+| Build/check/package/CI | Implemented; both extracted packages passed; fresh Ubuntu container and desktop VM passed | Clean Mac launch; distribution signing |
 | Startup/memory baseline | Three JIT/AOT repetitions per host retained with stage/metric definitions | First useful display and presentation unmeasured |
 
 The remaining acceptance items require desktop access or owner decisions. The
@@ -35,7 +35,7 @@ complete work order is therefore still open; automated passes do not close it.
 | --- | --- | --- |
 | Windows x64 | Blocking native runner isolate | Windows 11 desktop; Windows Server 2022 headless CI |
 | macOS 15 ARM64 | Dart-owned companion; GPUI on its process main thread; lifecycle extension 2 | GitHub runner, Apple Paravirtual Metal, scale 1 |
-| Ubuntu 24.04 x64, glibc 2.39, X11 | Blocking native runner isolate | GitHub runner, Xvfb/Openbox, Mesa software Vulkan, scale 1 |
+| Ubuntu 24.04 x64, glibc 2.39, X11 | Blocking native runner isolate | GitHub runner with Xvfb; separate clean QEMU/KVM desktop with Xorg/Openbox, Mesa software Vulkan and configured Fcitx5/Mozc |
 
 Native Wayland, Intel Macs, older macOS and other Linux distributions are
 unverified. macOS uses separate application/UI processes; its extra transport
@@ -84,12 +84,15 @@ physical fractional-scaling or mixed-monitor verification.
 
 ## Gates that remain open
 
-- Clean macOS launch without development SDKs. [Clean Windows launch passed](../release/README.md). A clean Linux
-  container is a narrower automated target; clean desktop/VM checks remain.
+- Clean macOS launch without development SDKs. [Clean Windows launch passed](../release/README.md).
+  [Clean Linux desktop VM launch passed](../ime/linux-japanese-20260926/README.md)
+  with the MIT AOT package, virtual display and software Vulkan.
 - IME composition, candidate placement/commit/cancel, selection, scrolling and
-  window resizing on macOS/Linux. [Windows Japanese IME passed](../ime/windows-japanese-20260926/README.md)
+  window resizing on macOS. [Windows Japanese IME passed](../ime/windows-japanese-20260926/README.md)
   through owner-authorized agent visual observation with real IME key input,
-  screenshots and active-composition reload. Other IMEs and AltGr remain unverified.
+  screenshots and active-composition reload. [Linux Japanese XIM passed](../ime/linux-japanese-20260926/README.md)
+  with Fcitx5/Mozc and `UseOnTheSpot=True`, including actual composition reload;
+  the default configuration failure is retained. Other IMEs and AltGr remain unverified.
 - Retina, physical Linux fractional scaling and mixed-monitor movement. Hosted
   macOS checks cover scale 1; Linux additionally has forced-scale 1.25 geometry
   and resize checks.

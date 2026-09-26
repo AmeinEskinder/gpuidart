@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+cd /home/evaluator/jit
+export GPUIDART_LIBRARY=/home/evaluator/application/libgpuidart.so
+export GPUIDART_LAUNCHER=/home/evaluator/application/gpuidart-launcher
+exec sh /home/evaluator/guest-env.sh /home/evaluator/dart-sdk/bin/dart run tool/observe_ime.dart "$@"

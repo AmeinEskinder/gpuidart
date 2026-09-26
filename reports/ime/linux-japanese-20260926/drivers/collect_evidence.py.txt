@@ -1,0 +1,73 @@
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+cache = Path('.cache/linux-desktop')
+source = cache / 'evidence-final-1'
+target = Path('reports/ime/linux-japanese-20260926')
+target.mkdir(exist_ok=True)
+
+def copy(src, dst):
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    if dst.exists() and dst.read_bytes() != src.read_bytes():
+        raise SystemExit(f'Refusing to overwrite different evidence: {dst}')
+    shutil.copy2(src, dst)
+
+for src in source.rglob('*'):
+    if not src.is_file(): continue
+    relative = src.relative_to(source)
+    if src.suffix == '.png': dst = target / 'screenshots' / src.name
+    elif src.stem.startswith(('aot-', 'jit-sequence-2-')) and src.suffix == '.json' and src.stem != 'aot-close-and-phase':
+        dst = target / 'captures' / src.name
+    elif len(relative.parts) > 1: dst = target / relative
+    else: dst = target / 'raw' / src.name
+    copy(src, dst)
+for name in ['fcitx.log', 'openbox.log']:
+    copy(cache / 'guest-evidence-initial' / name, target / 'raw/initial-session' / name)
+for name in ['build.log', 'build-host-ipv4.log', 'apt-probe.log', 'cloud-init-wait.log', 'clean-verification.log', 'clean-verification2.log', 'remove-git.log', 'gdb-install.log', 'openbox-backtrace.log', 'startup-backtrace.log', 'qxl-unavailable.stderr.log', 'development-phase.log', 'development-phase-attempt2.log', 'jit-sequence-1.log', 'jit-sequence-2.log']:
+    copy(cache / name, target / 'raw' / name)
+for name in ['Dockerfile', 'provision.py', 'start-vm.sh', 'verify-clean.sh', 'verify-clean-v2.sh', 'configure_xim.py', 'probe_startup.py', 'restart_desktop.py', 'startup.gdb', 'advance_guest.py', 'guest.py', 'guest-env.sh', 'observe.py', 'run_action.py', 'reload_sequence.dart', 'run_jit.sh', 'copy_sdk.py', 'collect_evidence.py']:
+    copy(cache / name, target / 'drivers' / (name + '.txt'))
+copy(cache / 'image.json', target / 'image.json')
+records = []
+for screenshot in sorted((target / 'screenshots').glob('*.png')):
+    metadata = target / 'captures' / (screenshot.stem + '.json')
+    record = json.loads(metadata.read_text(encoding='utf-8'))
+    records.append({
+        'path': screenshot.relative_to(target).as_posix(),
+        'sha256': hashlib.file_digest(screenshot.open('rb'), 'sha256').hexdigest(),
+        'bytes': screenshot.stat().st_size,
+        'captured_utc': datetime.datetime.fromtimestamp(record['time_unix'], datetime.timezone.utc).isoformat(),
+        'metadata': metadata.relative_to(target).as_posix(),
+        'metadata_sha256': hashlib.file_digest(metadata.open('rb'), 'sha256').hexdigest(),
+    })
+(target / 'capture-manifest.json').write_text(json.dumps({'observer': 'agent', 'screenshots': records}, indent=2) + '\n', encoding='utf-8')
+verification = json.loads((source / 'clean-attempt2/verification.json').read_text(encoding='utf-8'))
+manifest = verification['manifest']
+environment = {
+    'observer': 'agent, explicitly authorized by owner; no independent human observer',
+    'guest': 'Ubuntu 24.04 x64, QEMU/KVM under WSL2; 2 vCPU and 4 GiB RAM',
+    'image': json.loads((cache / 'image.json').read_text(encoding='utf-8')),
+    'kernel': (source / 'clean-attempt2/kernel.txt').read_text().strip(),
+    'display': 'Xorg 21.1.12, Openbox 3.6.1, virtio virtual display, 1280x800, no separate compositor',
+    'renderer': 'Mesa 25.2.8 llvmpipe, LLVM 20.1.2, software Vulkan',
+    'native_window': verification['application']['native']['window'],
+    'keyboard': 'US layout; XTest key events via xdotool; Japanese Romaji input through Fcitx5/Mozc',
+    'fcitx5': '5.1.7-1build3',
+    'fcitx5_mozc': '2.28.4715.102+dfsg-2.2build7',
+    'ime_environment': {'XMODIFIERS': '@im=fcitx', 'GTK_IM_MODULE': 'fcitx', 'QT_IM_MODULE': 'fcitx', 'LANG': 'en_US.UTF-8'},
+    'xim_config': {'path': '~/.config/fcitx5/conf/xim.conf', 'UseOnTheSpot': True, 'applied': 'Fresh guest desktop session after in-place IME restart stalled Openbox'},
+    'aot_archive': 'Watchlist-linux-x64.tar.gz',
+    'aot_archive_sha256': hashlib.file_digest(Path('build/evaluation-4fca314/linux/Watchlist-linux-x64.tar.gz').open('rb'), 'sha256').hexdigest(),
+    'aot_source': manifest['build']['git_commit'],
+    'aot_source_dirty': manifest['build']['source_dirty'],
+    'jit_source': '5a754c0a48888067382b5975cabbc29d50b043de',
+    'jit_dart': '3.13.4',
+    'native_library_for_both': 'The release libgpuidart.so from the AOT archive',
+    'clean_phase': 'No Dart/Flutter/Rust or compiler commands at package verification. Git preflight failure retained; Git removed before clean-attempt2. GDB added later during window-manager diagnosis. Dart SDK/source added after AOT close for JIT observations.',
+    'scope': 'Clean VM launch and configured Japanese XIM observation; no physical GPU/display, other IMEs, Wayland, macOS or presentation-latency claim',
+}
+(target / 'environment.json').write_text(json.dumps(environment, indent=2) + '\n', encoding='utf-8')
+print(json.dumps({'screenshots': len(records), 'directory': str(target)}))

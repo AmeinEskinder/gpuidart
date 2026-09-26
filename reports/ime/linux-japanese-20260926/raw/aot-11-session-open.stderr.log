@@ -1,0 +1,17 @@
+
+thread '<unnamed>' (12083) panicked at /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-pre-linux-0.3.6/src/linux.rs:50:18:
+called `Result::unwrap()` on an `Err` value: Failed to initialize X11 client.
+
+Caused by:
+    Unknown connection error
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Unhandled exception:
+Bad state: Native UI panic: called `Result::unwrap()` on an `Err` value: Failed to initialize X11 client.
+
+Caused by:
+    Unknown connection error
+#0      GpuiHost._receive (package:gpuidart/src/host.dart:702)
+#1      GpuiHost.open.<anonymous closure> (package:gpuidart/src/host.dart)
+#2      _RootZone.runUnaryGuarded (dart:async/zone.dart:963)
+#3      _RootZone.bindUnaryCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1003)
+#4      _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:192)

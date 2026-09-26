@@ -47,6 +47,21 @@ authoritative list for each artifact. For the software-rendered container
 check, CI installs Mesa Vulkan plus Xvfb, Openbox, xauth and fonts. That check
 does not establish a physical GPU or desktop compositor result.
 
+### Japanese input with Fcitx5 on X11
+
+The [Ubuntu desktop VM observation](../reports/ime/linux-japanese-20260926/README.md)
+passed Japanese composition, editing and active-composition code reload with
+Fcitx5 5.1.7 and Mozc. Use `XMODIFIERS=@im=fcitx` and enable **Use On The Spot**
+in Fcitx's XIM frontend before starting the desktop session. Its config file is
+`~/.config/fcitx5/conf/xim.conf`, with `UseOnTheSpot=True`.
+
+The default setting in that environment left preedit outside the input and
+misplaced the candidates. Replacing Fcitx inside the running Openbox session
+then stalled the window manager's XIM teardown; a fresh guest desktop session
+with the setting already applied worked. Configure the option before logging
+in for this tested setup. This result does not establish IBus, other IMEs or
+native Wayland support.
+
 ## macOS distribution
 
 The evaluation bundle declares macOS 15 and high-resolution capability. Its
@@ -88,6 +103,9 @@ Dart FFI callbacks require.
 Linux CI also uses a fresh Ubuntu container without development SDKs, recording
 `clean_container`. This establishes that container's runtime dependency closure.
 It does not replace the clean desktop/VM check or its human observations.
+The separate [clean Ubuntu VM check](../reports/ime/linux-japanese-20260926/README.md#clean-launch)
+passed the MIT package on Xorg/Openbox, including normal search/save/update and
+window closure. It used a virtual display and software Vulkan.
 
 ## Human input and display observation sheet
 
@@ -98,15 +116,15 @@ fail or untested; include notes and captures for failures and composition.
 
 | Check | macOS 15 ARM64 | Ubuntu 24.04 X11 |
 | --- | --- | --- |
-| Normal launch and window close leave no companion | Untested | Untested |
-| Mouse selection, keyboard navigation, copy/paste and undo/redo | Untested | Untested |
-| IME preedit and candidate window follow the caret | Untested | Untested |
-| Candidate navigation and commit insert text exactly once | Untested | Untested |
-| Escape cancels composition without residual text | Untested | Untested |
-| Non-ASCII selection/replacement, Backspace/Delete and arrows | Untested | Untested |
-| Scroll and resize preserve usable controls and focus | Untested | Untested |
-| Code reload preserves committed input, focus, selection and scroll | Untested | Untested |
-| Reload during active composition, with actual outcome recorded | Untested | Untested |
+| Normal launch and window close leave no companion | Untested | Agent-observed pass in VM |
+| Mouse selection, keyboard navigation, copy/paste and undo/redo | Untested | Agent-observed pass in VM |
+| IME preedit and candidate window follow the caret | Untested | Pass with configured Fcitx5/Mozc; default failed |
+| Candidate navigation and commit insert text exactly once | Untested | Agent-observed pass with configured Fcitx5/Mozc |
+| Escape cancels composition without residual text | Untested | Agent-observed pass with configured Fcitx5/Mozc |
+| Non-ASCII selection/replacement, Backspace/Delete and arrows | Untested | Agent-observed pass with configured Fcitx5/Mozc |
+| Scroll and resize preserve usable controls and focus | Untested | Agent-observed pass at recorded VM sizes |
+| Code reload preserves committed input, focus, selection and scroll | Untested | Screenshots and state assertions passed |
+| Reload during active composition, with actual outcome recorded | Untested | Preedit survived; subsequent conversion and single commit passed |
 | Retina / fractional scaling and mixed-monitor movement | Untested | Untested |
 
 For macOS, use an installed Apple Japanese/Chinese/Korean input source and
@@ -115,5 +133,7 @@ XIM environment and input module in use. Starting an IME service or injecting
 Unicode does not establish composition support. Verify preedit, candidate
 placement, commit and cancellation through the actual input method.
 
-The project has no human pass recorded for these Unix sheets. Automated checks
-must not fill the table with inferred passes.
+The owner explicitly authorized screenshot/tool observation. The Linux entries
+above refer to [the retained agent observation](../reports/ime/linux-japanese-20260926/README.md),
+not an independent human observer or inferred passes from automated Unicode
+injection. Physical display checks and the macOS sheet remain open.

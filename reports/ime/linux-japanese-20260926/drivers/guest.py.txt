@@ -1,0 +1,13 @@
+import subprocess
+import sys
+
+options = ['-i', '/work/guest-key', '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/work/known_hosts']
+if sys.argv[1] == 'put':
+    command = ['scp', '-P', '22229', *options, sys.argv[2], 'evaluator@127.0.0.1:' + sys.argv[3]]
+elif sys.argv[1] == 'get':
+    command = ['scp', '-r', '-P', '22229', *options, 'evaluator@127.0.0.1:' + sys.argv[2], sys.argv[3]]
+elif sys.argv[1] == 'exec':
+    command = ['ssh', '-p', '22229', *options, 'evaluator@127.0.0.1', *sys.argv[2:]]
+else:
+    raise SystemExit('Use put, get or exec')
+raise SystemExit(subprocess.run(command).returncode)

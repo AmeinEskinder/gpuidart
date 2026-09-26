@@ -1,0 +1,7 @@
+#!/bin/sh
+export DISPLAY=:0
+export XMODIFIERS=@im=fcitx GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx
+export LIBGL_ALWAYS_SOFTWARE=1 LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+export DBUS_SESSION_BUS_ADDRESS="$(sed -n 's/^DBUS_SESSION_BUS_ADDRESS=//p' /home/evaluator/session.env)"
+unset WAYLAND_DISPLAY ZED_HEADLESS
+exec "$@"

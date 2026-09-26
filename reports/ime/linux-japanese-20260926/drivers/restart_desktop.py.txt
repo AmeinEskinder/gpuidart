@@ -1,0 +1,20 @@
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import time
+
+root = Path('/home/evaluator')
+pid = 10589
+path = Path(f'/proc/{pid}/exe')
+if path.exists():
+    if path.resolve() != root / 'application/Watchlist':
+        raise SystemExit('Unexpected process identity')
+    os.kill(pid, signal.SIGTERM)
+result = {'time_unix': time.time(), 'cause': 'Openbox blocked in XDestroyIC after Fcitx replacement; native event loop idle and explicit XMapWindow also left the window unmapped.', 'stopped_control_pid': pid, 'scope': 'Only the isolated guest desktop service is restarted. The VM and Windows host are not restarted.'}
+(root / 'evidence/desktop-restart.json').write_text(json.dumps(result, indent=2))
+subprocess.run(['sudo', 'systemctl', 'kill', '--signal=SIGKILL', 'gpuidart-desktop.service'], check=True)
+time.sleep(1)
+subprocess.run(['sudo', 'systemctl', 'start', 'gpuidart-desktop.service'], check=True)
+print(json.dumps(result))

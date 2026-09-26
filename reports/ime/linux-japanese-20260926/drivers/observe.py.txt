@@ -1,0 +1,83 @@
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+root = Path('/home/evaluator')
+evidence = root / 'evidence'
+evidence.mkdir(exist_ok=True)
+for line in (root / 'session.env').read_text().splitlines():
+    key, _, value = line.partition('=')
+    if key in {'DISPLAY', 'DBUS_SESSION_BUS_ADDRESS', 'XMODIFIERS', 'GTK_IM_MODULE', 'QT_IM_MODULE', 'LANG', 'LC_ALL', 'LIBGL_ALWAYS_SOFTWARE', 'XDG_RUNTIME_DIR'}:
+        os.environ[key] = value
+for key in ['WAYLAND_DISPLAY', 'ZED_HEADLESS']:
+    os.environ.pop(key, None)
+
+def command(*args):
+    return subprocess.check_output(args, text=True, stderr=subprocess.PIPE).strip()
+
+action, name, *values = sys.argv[1:]
+if not re.fullmatch('[a-z0-9-]+', name):
+    raise SystemExit('Use a safe, unique capture name')
+if any((evidence / (name + suffix)).exists() for suffix in ['.json', '.png']):
+    raise SystemExit('Retain the earlier capture; choose another name')
+if action == 'start':
+    app = subprocess.Popen([str(root / 'application' / 'Watchlist')], cwd=root, stdout=(evidence / (name + '.stdout.log')).open('w'), stderr=(evidence / (name + '.stderr.log')).open('w'), start_new_session=True)
+    (root / 'app.pid').write_text(str(app.pid))
+elif action == 'bind':
+    (root / 'app.pid').write_text(str(int(values[0])))
+pid = int((root / 'app.pid').read_text())
+deadline = time.monotonic() + 30
+while True:
+    try:
+        ids = command('xdotool', 'search', '--onlyvisible', '--pid', str(pid), '--name', '^Market watch$').splitlines()
+        if len(ids) == 1:
+            window = ids[0]
+            break
+    except subprocess.CalledProcessError:
+        pass
+    if time.monotonic() > deadline:
+        raise SystemExit('Expected exactly one visible application window')
+    time.sleep(0.2)
+command('xdotool', 'windowactivate', '--sync', window)
+if command('xdotool', 'getactivewindow') != window:
+    raise SystemExit('Application is not foreground')
+if action == 'keys':
+    command('xdotool', 'key', '--clearmodifiers', '--delay', '120', *values)
+elif action == 'click':
+    command('xdotool', 'mousemove', '--sync', '--window', window, *values, 'click', '1')
+elif action == 'resize':
+    command('xdotool', 'windowsize', '--sync', window, *values)
+elif action == 'ime':
+    command('fcitx5-remote', '-s', 'mozc')
+    command('fcitx5-remote', '-o')
+elif action == 'ime-off':
+    command('fcitx5-remote', '-c')
+elif action == 'wheel':
+    x, y, button, count = map(int, values)
+    if button not in {4, 5} or not 1 <= count <= 20:
+        raise SystemExit('Expected vertical wheel, at most 20 notches')
+    command('xdotool', 'mousemove', '--sync', '--window', window, str(x), str(y), 'click', '--repeat', str(count), '--delay', '120', str(button))
+elif action == 'close':
+    command('xdotool', 'key', '--clearmodifiers', 'alt+F4')
+    raise SystemExit(0)
+elif action not in {'start', 'capture', 'bind'}:
+    raise SystemExit('Unknown action')
+time.sleep(0.4)
+if command('xdotool', 'getactivewindow') != window:
+    raise SystemExit('Foreground changed; inspect the attempt before claiming a pass')
+command('scrot', str(evidence / (name + '.png')))
+record = {
+    'time_unix': time.time(), 'action': action, 'arguments': values,
+    'pid': pid, 'window': window,
+    'geometry': command('xdotool', 'getwindowgeometry', '--shell', window),
+    'foreground': command('xdotool', 'getactivewindow') == window,
+    'input_method': command('fcitx5-remote', '-n'),
+    'input_state': command('fcitx5-remote'),
+    'input_delivery': 'XTest key events through xdotool; no Unicode text injection',
+}
+(evidence / (name + '.json')).write_text(json.dumps(record, indent=2) + '\n')
+print(json.dumps(record))

@@ -1,0 +1,36 @@
+import json
+from pathlib import Path
+import subprocess
+import time
+
+output = Path('/work/cleanup.json')
+if output.exists(): raise SystemExit('Retain previous cleanup record')
+pid = int(Path('/work/qemu.pid').read_text())
+process = Path(f'/proc/{pid}')
+assert (process/'exe').resolve().name == 'qemu-system-x86_64'
+assert b'file=guest.qcow2' in (process/'cmdline').read_bytes()
+probe = r'''import json,pathlib
+remaining=[]
+for p in pathlib.Path('/proc').iterdir():
+ if not p.name.isdigit(): continue
+ try:
+  exe=str((p/'exe').resolve(strict=True))
+  if exe.startswith(('/home/evaluator/application/','/home/evaluator/dart-sdk/')):
+   remaining.append({'pid':int(p.name),'exe':exe})
+ except (FileNotFoundError,PermissionError): pass
+assert not remaining, remaining
+print(json.dumps({'remaining_application_or_dart_processes':remaining}))
+'''
+ssh = ['ssh', '-p', '22229', '-i', '/work/guest-key', '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes', '-o', 'UserKnownHostsFile=/work/known_hosts', 'evaluator@127.0.0.1']
+result = subprocess.run([*ssh,'python3 -'], input=probe, text=True, capture_output=True, check=True)
+record = {'started_unix':time.time(),'qemu_pid':pid,'guest_process_probe':json.loads(result.stdout),'scope':'Only the created gpuidart-desktop-20260926 QEMU guest; no Windows/WSL reboot or other containers stopped'}
+shutdown = subprocess.run([*ssh,'sudo shutdown -h now'],text=True,capture_output=True)
+record['shutdown_command']={'exit_code':shutdown.returncode,'stdout':shutdown.stdout,'stderr':shutdown.stderr}
+deadline=time.monotonic()+20
+while (process/'exe').exists() and time.monotonic()<deadline:
+ time.sleep(.25)
+record['qemu_exited']=not (process/'exe').exists()
+record['finished_unix']=time.time()
+output.write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record))
+assert record['qemu_exited']
