@@ -83,7 +83,7 @@ Future<void> main(List<String> args) async {
       'Reload republished data',
     );
     final mod = Platform.isMacOS ? 'cmd' : 'ctrl';
-    await session.call('key', parameters: {'key': '$mod+2'});
+    await session.call('key', parameters: {'key': '$mod-2'});
     final deadline = DateTime.now().add(const Duration(seconds: 10));
     Map<String, dynamic>? chart;
     do {

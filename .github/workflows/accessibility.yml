@@ -126,13 +126,6 @@ jobs:
       - name: Market terminal actual code reload
         if: runner.os != 'Linux'
         run: dart run tool/verify_terminal_reload.dart build/accessibility/terminal-reload.json
-      - name: Retain Windows host for matching local verification
-        if: always() && runner.os == 'Windows'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: terminal-windows-host
-          path: target/debug/gpuidart.dll
-          retention-days: 7
       - name: Retain platform responses and failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

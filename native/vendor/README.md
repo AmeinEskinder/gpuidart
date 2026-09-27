@@ -55,3 +55,15 @@ are copied; its development examples are omitted. The GPUI Apache-2.0 license an
 source copyright notices are retained and copied into evaluation packages.
 `tool/accessibility/verify_vendor.dart` checks all copied source and patched hashes
 on every SDK check. `.gitattributes` preserves vendor bytes on every OS.
+
+
+## Accessibility window bounds
+
+[window-bounds.patch](window-bounds.patch), applied after focus.patch, calls the
+existing platform `a11y_update_window_bounds` hook after adapter initialization
+and whenever a window moves/resizes. Pinned GPUI defined this hook but never called
+it. The Linux adapter consequently retained its default zero screen origin;
+AT-SPI Component.GetExtents(SCREEN) returned client-relative positions. The terminal
+hover verifier exposed the missing translation by moving the real pointer to those
+reported coordinates. The external tooltip check is the regression gate. The
+Windows/macOS default hook is a no-op; their adapters own the translation.

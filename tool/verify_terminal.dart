@@ -127,7 +127,7 @@ Future<void> main(List<String> args) async {
           s['native']['charts']['price-chart']?['points'].length == 20,
     );
     // Navigate through tabs so the focus handoff to the radio group is observed.
-    await key('$mod+1');
+    await key('$mod-1');
     await until(
       'global watchlist action',
       (s) => s['app']['page'] == 'watchlist',
@@ -196,7 +196,7 @@ Future<void> main(List<String> args) async {
         );
       }
     }
-    await key('$mod+1');
+    await key('$mod-1');
     await until('return to watchlist', (s) => s['app']['page'] == 'watchlist');
     await key('$mod-,');
     await until(

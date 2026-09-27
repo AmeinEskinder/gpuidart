@@ -15,7 +15,8 @@ bool _selected(dynamic node) =>
         node['value'] == 1 ||
         node['value'] == true);
 bool _tooltip(dynamic node) =>
-    _role(node, ['ControlType.ToolTip', 'AXHelpTag', 'tool tip']);
+    _role(node, ['ControlType.ToolTip', 'AXHelpTag', 'tool tip']) ||
+    (node['role'] == 'AXGroup' && node['subrole'] == 'AXUserInterfaceTooltip');
 bool _menu(dynamic node) => _role(node, ['ControlType.Menu', 'AXMenu', 'menu']);
 bool _item(dynamic node) => _role(node, [
   'ControlType.MenuItem',

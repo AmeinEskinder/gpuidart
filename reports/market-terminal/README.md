@@ -264,3 +264,30 @@ analyzer's focused fix corrected them; local analysis is clean. A downloaded
 Windows debug DLL failed before window creation because debug GPUI compiles HLSL
 from its build machine's absolute source path. It is not a portable test artifact;
 the local native rebuild is required. Release builds embed shader bytes.
+
+
+### Tooltip and shortcut localization
+
+The [second capture](attempts/76f0e01/) reached tooltip checks on all platforms.
+macOS did expose the popup, as AXGroup/AXUserInterfaceTooltip; the probe expected
+AXHelpTag. Windows local capture first found a null-ID lookup in the new description
+reader, then a coordinate mismatch. Moving with SetPhysicalCursorPos, matching
+UIA's physical screen bounds, passed popup appearance and dismissal. The third
+Windows capture also passed record-context-menu queries and invocation.
+
+Linux returned `[20, 215, 198, 32]` for the button's screen bounds, without the
+centered window's offset. Source inspection found that GPUI's existing
+`a11y_update_window_bounds` platform hook had no callers. The narrow
+[GPUI correction](../../native/vendor/window-bounds.patch) supplies bounds at
+adapter creation and window move/resize. Provenance and the vendor digest gate
+are updated; the hosted external hover rerun remains its acceptance gate.
+
+The next local failure was a verifier key string: diagnostic keystrokes use
+`ctrl-1`, while the public action declaration uses `ctrl+1`. The verifier used the
+latter for two navigation commands. The app's global action did not fire because
+the diagnostic parsed a different key, not because the menu lost its action.
+Both the interaction and reload verifiers now use GPUI's diagnostic syntax.
+
+A Python syntax check created a bytecode cache which was accidentally included
+in the probe-fix commit. It is removed and ignored. The debug-DLL CI artifact is
+also removed because its shader source dependency prevents portable local use.
