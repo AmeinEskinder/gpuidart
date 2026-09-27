@@ -61,12 +61,18 @@ Snapshot validation rejects malformed values before reconciliation.
 
 Checkbox/select/slider values are supplied by the application. Events request
 an application-state change; the application publishes the resulting snapshot.
-Native slider dragging and select popup state are retained for interaction.
-Snapshot writes are authoritative. Applications must process requests in
-delivery order; event revisions identify their source, and must not be used to
-discard valid requests merely because a newer snapshot was published. Disabled
-controls produce no change requests. Unrelated snapshots retain focus and
-existing entity identity and must not reopen or dismiss a select popup.
+The control shows the interaction at once: a checkbox toggles, a slider follows
+the drag and a select shows the pick, so feedback never waits for the
+application. Snapshot writes are authoritative: every publication shows its
+values, including a publication that repeats the previous value, which undoes
+an interaction the application did not accept. Applications must process
+requests in delivery order; event revisions identify their source, and must
+not be used to discard valid requests merely because a newer snapshot was
+published. A checkbox activated twice before the application publishes
+reports the toggle each time, so the second request carries the original
+value. Disabled controls produce no change requests. Unrelated snapshots retain
+focus and existing entity identity and must not reopen or dismiss a select
+popup.
 
 Keyboard behavior is part of each binding: Tab traversal and Space for the
 checkbox; arrows and Home/End for the slider; native select navigation,

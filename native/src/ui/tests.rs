@@ -147,11 +147,21 @@ fn checkbox_pointer_keyboard_disabled_and_focus_retention(cx: &mut TestAppContex
         assert_eq!(window.find("notifications").bounds().size.width, px(240.));
         window.click("notifications", cx);
         assert_eq!(changes(), [(1, "notifications".into(), true)]);
+        let shown = view.read(cx).inspect(window, cx)["controls"]["notifications"].clone();
+        assert_eq!(
+            (shown["checked"].clone(), shown["published"].clone()),
+            (serde_json::json!(true), serde_json::json!(false)),
+            "the toggle shows before the application publishes"
+        );
         window.focus_next(cx);
         let focus = window.focused(cx).expect("checkbox is a tab stop");
         press(window, "space", cx);
         assert_eq!(changes().len(), 2, "one event per activation");
-        assert_eq!(changes()[1], (1, "notifications".into(), true));
+        assert_eq!(
+            changes()[1],
+            (1, "notifications".into(), false),
+            "a second activation toggles the shown value back"
+        );
         view.update(cx, |view, cx| {
             view.publish(snapshot(2, true, false), window, cx)
         });

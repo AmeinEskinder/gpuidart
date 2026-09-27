@@ -108,7 +108,8 @@ impl DartView {
         }
         self.snapshot.root.visit(&mut |node| {
             if let Node::Checkbox { id, checked, disabled, .. } = node {
-                controls.insert(id.clone(),json!({"kind":"checkbox","checked":checked,"disabled":disabled}));
+                let shown = self.checkbox_shown.borrow().get(id).copied().unwrap_or(*checked);
+                controls.insert(id.clone(),json!({"kind":"checkbox","checked":shown,"published":checked,"disabled":disabled}));
             }
             if let Node::ConfirmDialog { id, disabled, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"confirm_dialog","disabled":disabled,

@@ -230,6 +230,9 @@ pub(crate) struct DartView {
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
+    /// Checkbox values toggled by the user since the last commit. Shown until
+    /// the next publication, whose values are authoritative.
+    checkbox_shown: Rc<RefCell<HashMap<String, bool>>>,
     tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
@@ -382,6 +385,7 @@ impl DartView {
             sliders: HashMap::new(),
             selects: HashMap::new(),
             active_dialog: Default::default(),
+            checkbox_shown: Default::default(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
@@ -477,6 +481,7 @@ impl DartView {
             return;
         }
         self.snapshot = snapshot;
+        self.checkbox_shown.borrow_mut().clear();
         if let Err(message) = self.reconcile(window, cx) {
             self.fail(message, cx);
             return;
@@ -1115,12 +1120,19 @@ impl DartView {
                 let events = self.events.clone();
                 let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
+                let shown = self
+                    .checkbox_shown
+                    .borrow()
+                    .get(node.id())
+                    .copied()
+                    .unwrap_or(*checked);
+                let displayed = self.checkbox_shown.clone();
                 apply_node_style(
                     Checkbox::new(id)
                         .accessibility_id(node.id().to_owned())
                         .accessibility_label(accessible_name(node))
                         .label(label.clone())
-                        .checked(*checked)
+                        .checked(shown)
                         .disabled(*disabled)
                         .a11y_synthetic_children({
                             let disabled = *disabled;
@@ -1130,7 +1142,9 @@ impl DartView {
                                 }
                             }
                         })
-                        .on_change(move |checked, _, _| {
+                        .on_change(move |checked, window, _| {
+                            displayed.borrow_mut().insert(event_id.clone(), *checked);
+                            window.refresh();
                             events.emit(Event::CheckboxChange {
                                 revision,
                                 id: event_id.clone(),
