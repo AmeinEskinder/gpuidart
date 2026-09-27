@@ -30,6 +30,40 @@ void main() {
     );
   });
 
+  test('grouped views encode the group column and aggregates', () {
+    const view = UiTableView(
+      group: UiGroup(
+        0,
+        aggregates: [
+          UiAggregate(1, UiAggregateOp.sum),
+          UiAggregate(1, UiAggregateOp.avg),
+        ],
+      ),
+    );
+    expect(jsonDecode(jsonEncode(view.toJson())), {
+      'group': {
+        'column': 0,
+        'aggregates': [
+          {'column': 1, 'op': 'sum'},
+          {'column': 1, 'op': 'avg'},
+        ],
+      },
+    });
+    expect(const UiTableView(group: UiGroup(2)).toJson(), {
+      'group': {'column': 2},
+    });
+    expect(const UiTableView(group: UiGroup(64)).toJson, throwsRangeError);
+    expect(
+      UiTableView(
+        group: UiGroup(
+          0,
+          aggregates: List.filled(9, const UiAggregate(1, UiAggregateOp.count)),
+        ),
+      ).toJson,
+      throwsArgumentError,
+    );
+  });
+
   test('table view validates term counts and column indices', () {
     expect(
       () => UiTableView(sort: List.generate(5, (i) => UiSort(i))).toJson(),

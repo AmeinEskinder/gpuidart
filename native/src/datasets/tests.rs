@@ -415,6 +415,7 @@ fn view_columns_must_exist_in_the_dataset() {
             column: 2,
             direction: crate::protocol::SortDirection::Asc,
         }],
+        group: None,
         filter: vec![],
     };
     let snapshot = crate::protocol::Snapshot {

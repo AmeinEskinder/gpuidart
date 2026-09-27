@@ -5,7 +5,8 @@ use crate::{
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
         FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, Node, ScrollAxis,
-        Size as StyleSize, Snapshot, Style, TabVariant, TableView, ThemeToken,
+        Size as StyleSize, Snapshot, Style, TabVariant, TableView, ThemeToken, ViewEntry,
+        ViewIndex,
     },
 };
 use async_channel::Receiver;
@@ -45,13 +46,31 @@ struct Rows {
     data: SharedDataset,
     /// View index: view row -> source row. Identity mapping when the table
     /// has no view.
-    index: Rc<RefCell<Vec<usize>>>,
+    index: Rc<RefCell<ViewIndex>>,
     counters: Rc<Counters>,
 }
 
 impl Rows {
-    fn source_row(&self, view_row: usize) -> usize {
-        self.index.borrow()[view_row]
+    fn entry(&self, view_row: usize) -> ViewEntry {
+        self.index.borrow().entries[view_row]
+    }
+
+    /// The text of a group header cell: the key with its count in the
+    /// grouped column, an aggregate in its column, nothing elsewhere.
+    fn group_cell(&self, group: usize, col: usize) -> String {
+        let index = self.index.borrow();
+        let summary = &index.groups[group];
+        if col == summary.column {
+            return format!("{} ({})", summary.key, summary.count);
+        }
+        let Some((_, text)) = summary.aggregates.iter().find(|(column, _)| *column == col) else {
+            return String::new();
+        };
+        let data = self.data.borrow();
+        match data.data.format.as_ref().and_then(|f| f.columns.get(&col)) {
+            Some(format) => format.apply(text).text,
+            None => text.clone(),
+        }
     }
 
     fn record_key(&self, source: usize) -> String {
@@ -68,7 +87,7 @@ impl TableDelegate for Rows {
         self.data.borrow().data.columns.len()
     }
     fn rows_count(&self, _: &App) -> usize {
-        self.index.borrow().len()
+        self.index.borrow().entries.len()
     }
     fn column(&self, index: usize, _: &App) -> Column {
         Column::new(
@@ -102,7 +121,24 @@ impl TableDelegate for Rows {
         cx: &mut Context<TableState<Self>>,
     ) -> impl IntoElement {
         self.counters.cells.set(self.counters.cells.get() + 1);
-        let source = self.source_row(row);
+        let source = match self.entry(row) {
+            ViewEntry::Record(source) => source,
+            ViewEntry::Group(group) => {
+                let text = self.group_cell(group, col);
+                let cell_id = json!([self.table_id, "group", group, "cell", col]).to_string();
+                return div()
+                    .id(SharedString::from(cell_id.clone()))
+                    .accessibility_id(cell_id)
+                    .role(Role::Cell)
+                    .test_support()
+                    .aria_row_index(row)
+                    .aria_column_index(col)
+                    .aria_label(text.clone())
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .child(text)
+                    .into_any_element();
+            }
+        };
         let data = self.data.borrow();
         let raw = data.data.rows[source][col].clone();
         let cell_id = json!([self.record_key(source), "cell", col]).to_string();
@@ -162,8 +198,13 @@ impl TableDelegate for Rows {
         self.counters.rows.set(self.counters.rows.get() + 1);
         // Key real rows by source record so element identity survives view
         // changes; the table also asks for filler rows past the view's end.
-        match self.index.borrow().get(row) {
-            Some(&source) => {
+        match self.index.borrow().entries.get(row) {
+            Some(&ViewEntry::Group(group)) => div()
+                .id(("group-row", group))
+                .accessibility_id(json!([self.table_id, "group", group]).to_string())
+                .aria_row_index(row)
+                .bg(cx.theme().muted),
+            Some(&ViewEntry::Record(source)) => {
                 let key = self.record_key(source);
                 div()
                     .id(SharedString::from(key.clone()))
@@ -178,10 +219,10 @@ impl TableDelegate for Rows {
                                 // an old frame after a sort/filter has already been applied.
                                 let current = {
                                     let rows = table.delegate();
-                                    rows.index
-                                        .borrow()
-                                        .iter()
-                                        .position(|&source| rows.record_key(source) == source_key)
+                                    rows.index.borrow().entries.iter().position(|entry| {
+                                        matches!(entry, ViewEntry::Record(source)
+                                            if rows.record_key(*source) == source_key)
+                                    })
                                 };
                                 if let Some(row) = current {
                                     table.set_selected_row(row, cx);
@@ -285,7 +326,8 @@ impl DartView {
                 let table = retained.state.read(cx);
                 let offset = table.vertical_scroll_handle.offset();
                 let source_rows = table.delegate().data.borrow().data.rows.len();
-                let view_rows = table.delegate().index.borrow().len();
+                let view_rows = table.delegate().index.borrow().entries.len();
+                let groups = table.delegate().index.borrow().groups.len();
                 let spec_hash = retained.view.as_ref().map(|view| {
                     use std::hash::{Hash, Hasher};
                     let mut hasher = std::collections::hash_map::DefaultHasher::new();
@@ -301,7 +343,7 @@ impl DartView {
                         "dataset": table.delegate().data.borrow().id,
                         "dataset_revision": table.delegate().data.borrow().revision,
                         "scroll_y": f32::from(offset.y),
-                        "view": {"source_rows": source_rows, "view_rows": view_rows, "spec_hash": spec_hash},
+                        "view": {"source_rows": source_rows, "view_rows": view_rows, "groups": groups, "spec_hash": spec_hash},
                         "selection": {"row": table.selected_row(), "record": retained.selected_record},
                         "focused": table.focus_handle(cx).is_focused(window),
                     }),
@@ -570,7 +612,8 @@ impl DartView {
             return json!({"error":"Unknown table"});
         };
         let delegate = retained.state.read(cx).delegate();
-        let Some(&source) = delegate.index.borrow().get(row) else {
+        let Some(ViewEntry::Record(source)) = delegate.index.borrow().entries.get(row).copied()
+        else {
             return json!({"error":"Invalid row"});
         };
         let data = delegate.data.borrow();
@@ -714,7 +757,7 @@ impl DartView {
         let (index, data, anchor_source) = {
             let state = table.read(cx);
             let anchor = state.visible_range().rows().start;
-            let anchor_source = state.delegate().index.borrow().get(anchor).copied();
+            let anchor_source = state.delegate().index.borrow().entries.get(anchor).copied();
             (
                 state.delegate().index.clone(),
                 state.delegate().data.clone(),
@@ -723,24 +766,20 @@ impl DartView {
         };
         let (new_index, selection, anchor_view) = {
             let data = data.borrow();
-            let new_index = match &spec {
-                Some(spec) => spec.compute_index(&data.data),
-                None => (0..data.data.rows.len()).collect::<Vec<_>>(),
-            };
+            let new_index = ViewIndex::compute(spec.as_ref(), &data.data);
             let selection = match (&selected_record, &data.data.ids) {
                 (Some(record), Some(ids)) => ids
                     .iter()
                     .position(|id| id == record)
-                    .and_then(|source| new_index.iter().position(|&row| row == source))
+                    .and_then(|source| new_index.row_of(ViewEntry::Record(source)))
                     .map_or(ViewSelection::Gone, ViewSelection::Keep),
                 _ if reset_scroll => ViewSelection::Clear,
                 _ => ViewSelection::Clamp,
             };
-            let anchor_view =
-                anchor_source.and_then(|source| new_index.iter().position(|&row| row == source));
+            let anchor_view = anchor_source.and_then(|entry| new_index.row_of(entry));
             (new_index, selection, anchor_view)
         };
-        let view_len = new_index.len();
+        let view_len = new_index.entries.len();
         *index.borrow_mut() = new_index;
         self.counters
             .view_recomputes
@@ -893,10 +932,8 @@ impl DartView {
                     let swapped = !Rc::ptr_eq(&retained.state.read(cx).delegate().data, &data);
                     if swapped {
                         let index = retained.state.read(cx).delegate().index.clone();
-                        *index.borrow_mut() = match view {
-                            Some(view) => view.compute_index(&data.borrow().data),
-                            None => (0..data.borrow().data.rows.len()).collect(),
-                        };
+                        *index.borrow_mut() =
+                            ViewIndex::compute(view.as_ref(), &data.borrow().data);
                         retained.state.update(cx, |table, cx| {
                             table.delegate_mut().data = data.clone();
                             table.clear_selection(cx);
@@ -916,10 +953,10 @@ impl DartView {
                         changed_views.push(id.clone());
                     }
                 } else {
-                    let index = Rc::new(RefCell::new(match view {
-                        Some(view) => view.compute_index(&data.borrow().data),
-                        None => (0..data.borrow().data.rows.len()).collect(),
-                    }));
+                    let index = Rc::new(RefCell::new(ViewIndex::compute(
+                        view.as_ref(),
+                        &data.borrow().data,
+                    )));
                     let table = cx.new(|cx| {
                         TableState::new(
                             Rows {
@@ -937,7 +974,18 @@ impl DartView {
                         let (row, record) = match event {
                             TableEvent::SelectRow(row) => {
                                 let delegate = table.read(cx).delegate();
-                                let source = delegate.index.borrow()[*row];
+                                let entry = delegate.index.borrow().entries[*row];
+                                let ViewEntry::Record(source) = entry else {
+                                    // Group headers are summaries, not records: undo the
+                                    // selection, and report nothing when none was selected.
+                                    if let Some(retained) = this.tables.get_mut(&event_id) {
+                                        if retained.selection_notified.is_none() {
+                                            retained.selection_notified = Some((None, None));
+                                        }
+                                    }
+                                    table.update(cx, |table, cx| table.clear_selection(cx));
+                                    return;
+                                };
                                 let record = delegate
                                     .data
                                     .borrow()
@@ -1496,7 +1544,7 @@ impl DartView {
                 let delegate = table.read(cx).delegate();
                 apply_node_style(
                     annotate(div().id(SharedString::from(id.clone())), node)
-                        .aria_row_count(delegate.index.borrow().len())
+                        .aria_row_count(delegate.index.borrow().entries.len())
                         .aria_column_count(delegate.data.borrow().data.columns.len())
                         .w_full()
                         .h(px(320.))

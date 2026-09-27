@@ -482,6 +482,111 @@ pub struct TableView {
     pub sort: Vec<SortKey>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub filter: Vec<FilterTerm>,
+    /// Groups the filtered, sorted records and inserts a header row per
+    /// group carrying the key, the count and native aggregates.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group: Option<Grouping>,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Grouping {
+    pub column: usize,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub aggregates: Vec<Aggregate>,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Aggregate {
+    pub column: usize,
+    pub op: AggregateOp,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AggregateOp {
+    Count,
+    Sum,
+    Avg,
+    Min,
+    Max,
+}
+
+/// One row of a table view: a record by source index, or a group header.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ViewEntry {
+    Record(usize),
+    Group(usize),
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct GroupSummary {
+    pub column: usize,
+    pub key: String,
+    pub count: usize,
+    /// Aggregate texts by column, in the grouping's order.
+    pub aggregates: Vec<(usize, String)>,
+}
+
+/// The rows a table shows, in order, with the summaries its headers show.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ViewIndex {
+    pub entries: Vec<ViewEntry>,
+    pub groups: Vec<GroupSummary>,
+}
+
+impl ViewIndex {
+    /// Every record in dataset order when there is no view.
+    pub fn compute(view: Option<&TableView>, data: &TableData) -> Self {
+        match view {
+            Some(view) => view.compute_view(data),
+            None => Self {
+                entries: (0..data.rows.len()).map(ViewEntry::Record).collect(),
+                groups: Vec::new(),
+            },
+        }
+    }
+
+    pub fn row_of(&self, entry: ViewEntry) -> Option<usize> {
+        self.entries
+            .iter()
+            .position(|candidate| *candidate == entry)
+    }
+
+    /// Source indices of the records in view order.
+    pub fn records(&self) -> impl Iterator<Item = usize> + '_ {
+        self.entries.iter().filter_map(|entry| match entry {
+            ViewEntry::Record(source) => Some(*source),
+            ViewEntry::Group(_) => None,
+        })
+    }
+}
+
+fn aggregate_text(op: AggregateOp, column: usize, members: &[usize], data: &TableData) -> String {
+    if op == AggregateOp::Count {
+        return members.len().to_string();
+    }
+    let values: Vec<f64> = members
+        .iter()
+        .filter_map(|&source| data.rows[source][column].parse::<f64>().ok())
+        .filter(|value| value.is_finite())
+        .collect();
+    if values.is_empty() {
+        return String::new();
+    }
+    let value = match op {
+        AggregateOp::Count => unreachable!(),
+        AggregateOp::Sum => values.iter().sum(),
+        AggregateOp::Avg => values.iter().sum::<f64>() / values.len() as f64,
+        AggregateOp::Min => values.iter().cloned().fold(f64::INFINITY, f64::min),
+        AggregateOp::Max => values.iter().cloned().fold(f64::NEG_INFINITY, f64::max),
+    };
+    if value.fract() == 0. && value.abs() < 1e15 {
+        format!("{}", value as i64)
+    } else {
+        format!("{value}")
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -523,9 +628,14 @@ impl TableView {
         if self.sort.len() > 4 || self.filter.len() > 8 {
             return Err("Table views allow at most 4 sort keys and 8 filter terms".into());
         }
-        if self.sort.iter().any(|key| key.column >= 64)
-            || self.filter.iter().any(|term| term.column >= 64)
+        if self
+            .group
+            .as_ref()
+            .is_some_and(|group| group.aggregates.len() > 8)
         {
+            return Err("Table views allow at most 8 aggregates".into());
+        }
+        if self.referenced_columns().iter().any(|column| *column >= 64) {
             return Err("Table view column must be below 64".into());
         }
         Ok(())
@@ -537,7 +647,56 @@ impl TableView {
             .iter()
             .map(|key| key.column)
             .chain(self.filter.iter().map(|term| term.column))
+            .chain(self.group.iter().flat_map(|group| {
+                std::iter::once(group.column)
+                    .chain(group.aggregates.iter().map(|aggregate| aggregate.column))
+            }))
             .collect()
+    }
+
+    /// The rows in order: filtered and sorted records, grouped under header
+    /// rows in order of first appearance when a grouping is set.
+    pub fn compute_view(&self, data: &TableData) -> ViewIndex {
+        let records = self.compute_index(data);
+        let Some(grouping) = &self.group else {
+            return ViewIndex {
+                entries: records.into_iter().map(ViewEntry::Record).collect(),
+                groups: Vec::new(),
+            };
+        };
+        let mut order: HashMap<&str, usize> = HashMap::new();
+        let mut members: Vec<(String, Vec<usize>)> = Vec::new();
+        for source in records {
+            let key = data.rows[source][grouping.column].as_str();
+            let group = *order.entry(key).or_insert_with(|| {
+                members.push((key.to_owned(), Vec::new()));
+                members.len() - 1
+            });
+            members[group].1.push(source);
+        }
+        let mut index = ViewIndex::default();
+        for (group, (key, sources)) in members.into_iter().enumerate() {
+            index.entries.push(ViewEntry::Group(group));
+            index
+                .entries
+                .extend(sources.iter().map(|&source| ViewEntry::Record(source)));
+            index.groups.push(GroupSummary {
+                column: grouping.column,
+                key,
+                count: sources.len(),
+                aggregates: grouping
+                    .aggregates
+                    .iter()
+                    .map(|aggregate| {
+                        (
+                            aggregate.column,
+                            aggregate_text(aggregate.op, aggregate.column, &sources, data),
+                        )
+                    })
+                    .collect(),
+            });
+        }
+        index
     }
 
     /// View row -> source row, filtered then stably sorted. The dataset is
@@ -2079,6 +2238,80 @@ mod tests {
     }
 
     #[test]
+    fn grouped_views_insert_headers_with_native_aggregates() {
+        let data = TableData {
+            columns: vec!["region".into(), "amount".into(), "note".into()],
+            rows: vec![
+                vec!["east".into(), "10".into(), "a".into()],
+                vec!["west".into(), "2.5".into(), "b".into()],
+                vec!["east".into(), "n/a".into(), "c".into()],
+                vec!["east".into(), "5".into(), "d".into()],
+                vec!["west".into(), "1".into(), "e".into()],
+            ],
+            ids: None,
+            format: None,
+        };
+        let view: TableView = serde_json::from_value(serde_json::json!({
+            "sort": [{"column": 1, "direction": "desc"}],
+            "group": {"column": 0, "aggregates": [
+                {"column": 1, "op": "sum"}, {"column": 1, "op": "avg"}, {"column": 1, "op": "count"},
+                {"column": 1, "op": "min"}, {"column": 1, "op": "max"}, {"column": 2, "op": "sum"}
+            ]}
+        }))
+        .unwrap();
+        assert!(view.validate().is_ok());
+        assert_eq!(view.referenced_columns(), [0, 1, 2].into_iter().collect());
+        let index = view.compute_view(&data);
+        // Descending by amount: the non-numeric cell sorts lexically above
+        // the numbers, so "n/a" leads its group.
+        assert_eq!(
+            index.entries,
+            [
+                ViewEntry::Group(0),
+                ViewEntry::Record(2),
+                ViewEntry::Record(0),
+                ViewEntry::Record(3),
+                ViewEntry::Group(1),
+                ViewEntry::Record(1),
+                ViewEntry::Record(4),
+            ],
+            "sorted first, then grouped in order of first appearance"
+        );
+        assert_eq!(index.records().collect::<Vec<_>>(), [2, 0, 3, 1, 4]);
+        assert_eq!(index.row_of(ViewEntry::Record(2)), Some(1));
+        let east = &index.groups[0];
+        assert_eq!((east.column, east.key.as_str(), east.count), (0, "east", 3));
+        assert_eq!(
+            east.aggregates,
+            [
+                (1, "15".into()),
+                (1, "7.5".into()),
+                (1, "3".into()),
+                (1, "5".into()),
+                (1, "10".into()),
+                (2, String::new()),
+            ],
+            "non-numeric cells are ignored except by count"
+        );
+        assert_eq!(index.groups[1].aggregates[0], (1, "3.5".into()));
+        let plain = ViewIndex::compute(None, &data);
+        assert_eq!(plain.entries.len(), 5);
+        assert!(plain.groups.is_empty());
+        for invalid in [
+            serde_json::json!({"group": {"column": 64}}),
+            serde_json::json!({"group": {"column": 0, "aggregates": [{"column": 64, "op": "sum"}]}}),
+            serde_json::json!({"group": {"column": 0, "aggregates": [{"column": 1, "op": "median"}]}}),
+            serde_json::json!({"group": {"column": 0, "aggregates": (0..9).map(|_| serde_json::json!({"column": 1, "op": "sum"})).collect::<Vec<_>>()}}),
+        ] {
+            let parsed = serde_json::from_value::<TableView>(invalid.clone());
+            assert!(
+                parsed.is_err() || parsed.unwrap().validate().is_err(),
+                "{invalid}"
+            );
+        }
+    }
+
+    #[test]
     fn view_index_filters_then_stably_sorts() {
         let data = TableData {
             columns: vec!["sym".into(), "price".into()],
@@ -2096,6 +2329,7 @@ mod tests {
                 column: 1,
                 direction: SortDirection::Desc,
             }],
+            group: None,
             filter: vec![FilterTerm {
                 column: 0,
                 op: FilterOp::Contains,
@@ -2125,6 +2359,7 @@ mod tests {
                 column: 0,
                 direction: SortDirection::Asc,
             }],
+            group: None,
             filter: vec![],
         };
         assert_eq!(view.compute_index(&ties), vec![1, 0, 2]);
@@ -2145,6 +2380,7 @@ mod tests {
                 column: 1,
                 direction: SortDirection::Desc,
             }],
+            group: None,
             filter: vec![FilterTerm {
                 column: 0,
                 op: FilterOp::Contains,

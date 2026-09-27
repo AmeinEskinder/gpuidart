@@ -111,6 +111,7 @@ UiTable(
 - At most 8 filter terms and 4 sort keys per table; column indices must be below 64 and within the dataset's width (the host rejects wider references at publish). Sorting is stable.
 - Rust keeps a view index per table and recomputes it when the view spec changes, on `replaceDataset`, or when an edit touches a sort/filter column; edits to unreferenced columns do not recompute it. Rendering and navigation follow the view order.
 - Selection by record ID follows the view; the scroll keeps the first visible record anchored across view changes when it remains in the view, and resets to the top otherwise. `replaceDataset` resets scroll unconditionally.
+- `group: UiGroup(column, aggregates: [UiAggregate(column, UiAggregateOp.sum)])` groups the filtered, sorted records by one column in order of first appearance and inserts a header row per group. The header shows the key and count in the grouped column and each aggregate in its column, formatted with that column's format when it has one. `count` counts records; `sum`, `avg`, `min` and `max` run over the numeric cells and show nothing when none parse. At most 8 aggregates. Header rows are summaries: selecting one clears the selection and emits nothing, and edits to the grouped or aggregated columns recompute the view like sort and filter columns do. Diagnostics report the group count beside the view row count.
 - Diagnostics report per-table source/view row counts, a spec hash, and the current selection.
 
 ## Declarative cell formatting

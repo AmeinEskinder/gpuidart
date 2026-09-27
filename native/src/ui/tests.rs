@@ -5,7 +5,7 @@ use crate::{
     protocol::{
         CellIcon, Color, ColumnFormat, DatasetFormat, Event, FilterOp, FilterTerm, FormatCondition,
         FormatRule, Node, NumberFormat, Snapshot, SortDirection, SortKey, TableData, TableView,
-        ThemeToken,
+        ThemeToken, ViewEntry,
     },
 };
 use gpui_kit::component::ActiveTheme;
@@ -592,6 +592,97 @@ fn tabs_report_picks_and_canvases_and_animations_render(cx: &mut TestAppContext)
         );
     })
     .unwrap();
+}
+
+#[gpui::test]
+fn grouped_tables_show_summary_rows_that_are_not_selectable(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let snapshot = Snapshot::parse(
+        br#"{"revision":1,"root":{"kind":"table","id":"table","dataset":"sales","view":{
+            "group":{"column":0,"aggregates":[{"column":1,"op":"sum"}]}}}}"#,
+    )
+    .unwrap();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot,
+                        datasets: vec![Upload {
+                            id: "sales".into(),
+                            revision: 1,
+                            data: TableData {
+                                columns: vec!["region".into(), "amount".into()],
+                                rows: vec![
+                                    vec!["east".into(), "10".into()],
+                                    vec!["west".into(), "2".into()],
+                                    vec!["east".into(), "5".into()],
+                                ],
+                                ids: Some(vec!["a".into(), "b".into(), "c".into()]),
+                                format: Some(DatasetFormat {
+                                    columns: [(
+                                        1,
+                                        ColumnFormat {
+                                            number: Some(NumberFormat { decimals: 2 }),
+                                            rules: Vec::new(),
+                                        },
+                                    )]
+                                    .into_iter()
+                                    .collect(),
+                                }),
+                            },
+                        }],
+                    },
+                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let selections = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::TableSelection { row, record, .. } => Some((*row, record.clone())),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let state = view.read(cx).inspect(window, cx);
+        assert_eq!(state["tables"]["table"]["view"]["view_rows"], 5);
+        assert_eq!(state["tables"]["table"]["view"]["groups"], 2);
+        let header = view.read(cx).formatted_cell("table", 0, 0, cx);
+        assert_eq!(
+            header["error"], "Invalid row",
+            "a header row is not a record"
+        );
+        let first = view.read(cx).formatted_cell("table", 1, 1, cx);
+        assert_eq!(first["text"], "10.00");
+        view.update(cx, |view, cx| {
+            view.select_table_row("table", 0, cx).unwrap()
+        });
+        window.render_frame(cx);
+    })
+    .unwrap();
+    // Subscriptions deliver after the update that raised them.
+    assert!(selections().is_empty(), "selecting a header emits nothing");
+    cx.update_window(handle, |_, window, cx| {
+        view.update(cx, |view, cx| {
+            view.select_table_row("table", 2, cx).unwrap()
+        });
+        window.render_frame(cx);
+    })
+    .unwrap();
+    assert_eq!(selections(), [(Some(2), Some("c".to_string()))]);
 }
 
 #[gpui::test]
@@ -1211,6 +1302,7 @@ fn initial_with_ids() -> Initial {
                 column: 1,
                 direction: SortDirection::Desc,
             }],
+            group: None,
             filter: vec![],
         })),
         datasets: vec![Upload {
@@ -1308,8 +1400,12 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
             .index
             .borrow()
             .clone();
-        assert_eq!(index.len(), 100);
-        assert_eq!(index[0], 0, "descending price keeps source order");
+        assert_eq!(index.entries.len(), 100);
+        assert_eq!(
+            index.entries[0],
+            ViewEntry::Record(0),
+            "descending price keeps source order"
+        );
         let inspect = view.read(cx).inspect(window, cx);
         assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], 100);
         assert_eq!(inspect["tables"]["table"]["view"]["source_rows"], 100);
@@ -1349,6 +1445,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
                     column: 1,
                     direction: SortDirection::Asc,
                 }],
+                group: None,
                 filter: vec![],
             },
             window,
@@ -1371,7 +1468,11 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
             .index
             .borrow()
             .clone();
-        assert_eq!(index[0], 99, "ascending price reverses the order");
+        assert_eq!(
+            index.entries[0],
+            ViewEntry::Record(99),
+            "ascending price reverses the order"
+        );
     })
     .unwrap();
 
@@ -1385,6 +1486,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
                     column: 1,
                     direction: SortDirection::Asc,
                 }],
+                group: None,
                 filter: vec![FilterTerm {
                     column: 0,
                     op: FilterOp::Contains,
@@ -1415,6 +1517,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
             4,
             TableView {
                 sort: vec![],
+                group: None,
                 filter: vec![FilterTerm {
                     column: 0,
                     op: FilterOp::Contains,
@@ -1470,6 +1573,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
                     column: 1,
                     direction: SortDirection::Desc,
                 }],
+                group: None,
                 filter: vec![],
             },
             window,
@@ -1495,6 +1599,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
                     column: 1,
                     direction: SortDirection::Asc,
                 }],
+                group: None,
                 filter: vec![FilterTerm {
                     column: 0,
                     op: FilterOp::Contains,
@@ -1521,6 +1626,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
             7,
             TableView {
                 sort: vec![],
+                group: None,
                 filter: vec![FilterTerm {
                     column: 0,
                     op: FilterOp::Contains,
@@ -1547,6 +1653,7 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
                     column: 1,
                     direction: SortDirection::Desc,
                 }],
+                group: None,
                 filter: vec![],
             },
             window,
@@ -1575,8 +1682,12 @@ fn views_sort_select_anchor_and_recompute(cx: &mut TestAppContext) {
             .index
             .borrow()
             .clone();
-        assert_eq!(index[0], 1, "R000 sank to the bottom after its price edit");
-        assert_eq!(index[99], 0);
+        assert_eq!(
+            index.entries[0],
+            ViewEntry::Record(1),
+            "R000 sank to the bottom after its price edit"
+        );
+        assert_eq!(index.entries[99], ViewEntry::Record(0));
     })
     .unwrap();
 }

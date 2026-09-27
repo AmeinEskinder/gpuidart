@@ -129,10 +129,8 @@ pub fn validate_views(
         {
             let width = columns(dataset).unwrap_or(0);
             let column = view
-                .sort
-                .iter()
-                .map(|key| key.column)
-                .chain(view.filter.iter().map(|term| term.column))
+                .referenced_columns()
+                .into_iter()
                 .find(|column| *column >= width);
             if let Some(column) = column {
                 error = Some(format!(
