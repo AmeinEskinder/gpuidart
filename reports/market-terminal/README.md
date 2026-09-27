@@ -100,3 +100,52 @@ was not supported. Hosted verification is the next independent check while local
 capacity is constrained. The headless menu tests themselves passed both before
 and after the failed DLL build attempts. A Dart lint check also caught three
 missing statement braces, corrected before this commit.
+
+### Hosted menu follow-up
+
+Commit `7b40185` passed all five workflows, including the new live FFI tests on
+Windows/macOS/Linux: [accessibility + live navigation](https://github.com/AmeinEskinder/gpuidart/actions/runs/36280450498),
+[Windows](https://github.com/AmeinEskinder/gpuidart/actions/runs/36280450416),
+[Linux](https://github.com/AmeinEskinder/gpuidart/actions/runs/36280450436),
+[macOS](https://github.com/AmeinEskinder/gpuidart/actions/runs/36280450423),
+[Unix lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36280450469).
+The hosted pass closes the menu live-bridge check; local linker failures remain
+in the record. The complete local native suite also passed 63 tests at that tip.
+
+## Row context menus
+
+Kit's table hook receives a row index and its built-in popup opens in a deferred
+callback. It has no public keyboard-open method. A narrow host-owned session
+therefore captures record identity from the rendered row and uses Kit PopupMenu
+for pointer/keyboard activation and dismissal. A row capture handler suppresses
+the table's built-in empty popup (the test asserts exactly one Menu). Shift+F10
+uses the selected record; its popup anchors at the window center and snaps inside
+the window. Pointer popups anchor at the click.
+
+A session retains the table entity, dataset identity, replacement generation,
+source index and record ID. Edits preserve the generation; replacement advances
+it. Sort/filter changes cannot retarget the captured record. A filtered-out
+record remains a valid target while it exists in the same dataset generation.
+Replacement/removal or a changed context-menu descriptor cancels the popup;
+callbacks validate independently before emitting `row_action`, including before
+the next draw. Events report the current dataset revision and stable record ID.
+No full-dataset search or Dart callback is required to render menu entries.
+
+Windows: 65 native tests passed, including real right-click/Shift+F10, native menu
+roles, focus restoration, sorting, incremental edits, disabled commands, stale
+callbacks before repaint, replacement cancellation and initial identity rejection.
+Dart wire test passed; direct SDK `dart analyze --fatal-infos` clean. The new live
+row-command test is queued in hosted verification; no local live pass is claimed.
+
+Retained failures/findings:
+
+- The first Escape assertion ran before GPUI flushed the DismissEvent subscriber.
+  It failed, then passed when checked in the next app update. Native key dispatch
+  itself was unchanged; the verifier now observes the asynchronous contract.
+- While checking dataset replacement, source inspection showed that an existing
+  sort/filter could reference a column removed by replacement. Replacement now
+  validates consumer columns and record-ID requirements before changing data.
+  The regression asserts rejection leaves revision and column count unchanged.
+- One local analyzer launch failed with a PowerShell out-of-memory error in
+  Flutter's Dart wrapper. Running the installed Dart SDK executable directly
+  completed analysis; the failed wrapper launch is not counted as a pass.

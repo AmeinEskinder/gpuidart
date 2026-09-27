@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'style.dart';
+import 'menus.dart';
 import 'semantics.dart';
 import 'table_view.dart';
 
@@ -295,11 +296,15 @@ final class UiTable extends UiNode {
     super.semantics,
     required this.dataset,
     this.view,
+    this.contextMenu = const [],
   });
   final String dataset;
 
   /// Presentation-only sort/filter view over the dataset.
   final UiTableView? view;
+
+  /// Row commands require dataset record IDs. Right-click or Shift+F10 opens.
+  final List<UiMenuEntry> contextMenu;
   @override
   Map<String, Object> toJson() => {
     'kind': 'table',
@@ -308,6 +313,7 @@ final class UiTable extends UiNode {
     if (style != null) 'style': style!.toJson(),
     'dataset': dataset,
     if (view != null) 'view': view!.toJson(),
+    if (contextMenu.isNotEmpty) 'context_menu': _encodeContextMenu(contextMenu),
   };
 }
 
@@ -371,4 +377,9 @@ final class UiTabs extends UiNode {
       if (semantics != null) 'semantics': semantics!.toJson('tabs'),
     };
   }
+}
+
+List<Map<String, Object>> _encodeContextMenu(List<UiMenuEntry> entries) {
+  validateMenuEntries(entries);
+  return entries.map((entry) => entry.toJson()).toList();
 }

@@ -228,6 +228,8 @@ pub enum Node {
         dataset: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         view: Option<TableView>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        context_menu: Vec<MenuEntry>,
     },
 }
 
@@ -733,6 +735,18 @@ impl Node {
         }
     }
 
+    pub fn find(&self, id: &str) -> Option<&Self> {
+        if self.id() == id {
+            return Some(self);
+        }
+        match self {
+            Self::Column { children, .. } | Self::Row { children, .. } => {
+                children.iter().find_map(|child| child.find(id))
+            }
+            _ => None,
+        }
+    }
+
     pub fn visit(&self, f: &mut impl FnMut(&Node)) {
         f(self);
         if let Self::Column { children, .. } | Self::Row { children, .. } = self {
@@ -780,7 +794,15 @@ impl Snapshot {
                         validate(child, depth + 1, ids)?;
                     }
                 }
-                Node::Table { dataset, view, .. } => {
+                Node::Table {
+                    dataset,
+                    view,
+                    context_menu,
+                    ..
+                } => {
+                    if !context_menu.is_empty() {
+                        menus::validate_entries(context_menu)?;
+                    }
                     if dataset.is_empty() {
                         return Err("Table dataset ID must be nonempty".into());
                     }
@@ -977,6 +999,14 @@ pub enum Event {
         revision: u64,
         name: String,
         context: String,
+    },
+    RowAction {
+        revision: u64,
+        id: String,
+        dataset: String,
+        dataset_revision: u64,
+        record: String,
+        action: String,
     },
     TableSelection {
         revision: u64,

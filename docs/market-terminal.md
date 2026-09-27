@@ -170,3 +170,12 @@ Custom overrides use Kit's configuration resolver, then synchronize Component
 and Base. Overriding primary/secondary/status backgrounds recalculates their
 hover/active fallbacks. Explicit component-specific colors in the built-in theme
 remain in effect; this is not an exposure of Kit's full theme-file schema.
+
+### Row context-menu implementation note
+
+The host captures identity before Kit's deferred row-index hook could be affected
+by another view update. It owns one PopupMenu session for pointer and Shift+F10
+entry paths. Keyboard opening anchors at the window center; pointer opening uses
+the click position. Sort/filter changes leave the captured record valid while it
+remains in the dataset generation, even if the filter hides it. Dataset
+replacement, table removal/rebinding or changed menu entries cancel the session.

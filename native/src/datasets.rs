@@ -64,6 +64,11 @@ impl Initial {
             upload.data.validate()?;
         }
         validate_references(&self.snapshot, |id| ids.contains(id))?;
+        validate_context_menus(&self.snapshot, |id| {
+            self.datasets
+                .iter()
+                .any(|u| u.id == id && u.data.ids.is_some())
+        })?;
         validate_views(&self.snapshot, |id| {
             self.datasets
                 .iter()
@@ -144,6 +149,28 @@ pub fn validate_views(
     error.map_or(Ok(()), Err)
 }
 
+pub fn validate_context_menus(
+    snapshot: &Snapshot,
+    has_ids: impl Fn(&str) -> bool,
+) -> Result<(), String> {
+    let mut missing = None;
+    snapshot.root.visit(&mut |node| {
+        if let Node::Table {
+            dataset,
+            context_menu,
+            ..
+        } = node
+        {
+            if !context_menu.is_empty() && !has_ids(dataset) {
+                missing = Some(dataset.clone());
+            }
+        }
+    });
+    missing.map_or(Ok(()), |id| {
+        Err(format!("Row context menus require stable record IDs: {id}"))
+    })
+}
+
 pub fn validate_references(
     snapshot: &Snapshot,
     contains: impl Fn(&str) -> bool,
@@ -208,6 +235,8 @@ impl Update {
 }
 
 pub struct Dataset {
+    /// The replacement revision. Cell/row edits preserve this generation.
+    pub generation: u64,
     pub id: String,
     pub revision: u64,
     pub data: TableData,
@@ -237,6 +266,7 @@ impl Store {
                 Rc::new(RefCell::new(Dataset {
                     id: upload.id,
                     revision: upload.revision,
+                    generation: upload.revision,
                     data: upload.data,
                 })),
             );
@@ -265,6 +295,7 @@ impl Store {
                 };
                 if let Some(current) = current {
                     let mut current = current.borrow_mut();
+                    current.generation = update.revision;
                     current.data = data;
                     current.revision = update.revision;
                 } else {
@@ -274,6 +305,7 @@ impl Store {
                         Rc::new(RefCell::new(Dataset {
                             id: update.id,
                             revision: update.revision,
+                            generation: update.revision,
                             data,
                         })),
                     );

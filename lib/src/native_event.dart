@@ -83,6 +83,12 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         }
         if (value['record'] != null) string('record');
       }
+    case 'row_action':
+      integer('revision', minimum: 1);
+      integer('dataset_revision', minimum: 1);
+      for (final key in ['id', 'dataset', 'record', 'action']) {
+        string(key);
+      }
     case 'action':
       integer('revision', minimum: 1);
       string('name');

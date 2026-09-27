@@ -136,6 +136,17 @@ final class GpuiEvent {
         )
       : null;
 
+  /// A context-menu action bound to a stable dataset record.
+  RowActionEvent? get rowAction => type == 'row_action'
+      ? RowActionEvent._(
+          data['id'] as String,
+          data['dataset'] as String,
+          data['dataset_revision'] as int,
+          data['record'] as String,
+          data['action'] as String,
+        )
+      : null;
+
   /// A matched action binding. Native never executes commands; the
   /// application decides what [ActionEvent.name] means.
   ActionEvent? get action => type == 'action'
@@ -147,6 +158,21 @@ final class GpuiEvent {
       : null;
   @override
   String toString() => jsonEncode(data);
+}
+
+final class RowActionEvent {
+  const RowActionEvent._(
+    this.table,
+    this.dataset,
+    this.datasetRevision,
+    this.record,
+    this.action,
+  );
+  final String table;
+  final String dataset;
+  final int datasetRevision;
+  final String record;
+  final String action;
 }
 
 /// A matched key binding from the snapshot's `actions` list.
@@ -749,6 +775,7 @@ final class GpuiHost {
           event.type == 'input' ||
           event.type == 'action' ||
           event.type == 'table_selection' ||
+          event.type == 'row_action' ||
           event.type == 'checkbox_change' ||
           event.type == 'slider_change' ||
           event.type == 'select_change' ||

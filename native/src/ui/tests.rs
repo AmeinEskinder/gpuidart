@@ -49,6 +49,7 @@ fn description(revision: u64) -> Snapshot {
                 },
                 Node::Table {
                     id: "table".into(),
+                    context_menu: Vec::new(),
                     semantics: None,
                     style: None,
                     dataset: "records".into(),
@@ -457,6 +458,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                 view.materialize(
                     &Node::Table {
                         id: "missing-table".into(),
+                        context_menu: Vec::new(),
                         semantics: None,
                         style: None,
                         dataset: "records".into(),
@@ -785,6 +787,7 @@ fn initial_with_ids() -> Initial {
         actions: Vec::new(),
         root: Node::Table {
             id: "table".into(),
+            context_menu: Vec::new(),
             semantics: None,
             style: None,
             dataset: "records".into(),
@@ -833,6 +836,7 @@ fn publish_table_view(
                 actions: Vec::new(),
                 root: Node::Table {
                     id: "table".into(),
+                    context_menu: Vec::new(),
                     semantics: None,
                     style: None,
                     dataset: "records".into(),
@@ -1247,6 +1251,7 @@ fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
             actions: Vec::new(),
             root: Node::Table {
                 id: "table".into(),
+                context_menu: Vec::new(),
                 semantics: None,
                 style: None,
                 dataset: "records".into(),

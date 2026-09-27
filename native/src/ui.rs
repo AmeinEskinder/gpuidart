@@ -31,6 +31,8 @@ use std::{
 };
 
 struct Rows {
+    owner: WeakEntity<DartView>,
+    has_context_menu: bool,
     table_id: String,
     data: SharedDataset,
     /// View index: view row -> source row. Identity mapping when the table
@@ -155,7 +157,7 @@ impl TableDelegate for Rows {
         match self.index.borrow().get(row) {
             Some(&source) => {
                 let key = self.record_key(source);
-                div()
+                let row_element = div()
                     .id(SharedString::from(key.clone()))
                     .accessibility_id(key)
                     .aria_row_index(row)
@@ -178,7 +180,8 @@ impl TableDelegate for Rows {
                                 }
                             });
                         }
-                    })
+                    });
+                self.context_row(row_element, source, cx)
             }
             None => div().id(("row-filler", row)),
         }
@@ -234,6 +237,8 @@ pub(crate) struct DartView {
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
+    row_menu: Option<row_menus::Session>,
+    next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
@@ -362,6 +367,18 @@ impl DartView {
         let key_interceptor = cx.intercept_keystrokes(move |event, window, cx| {
             let view = this.read(cx);
             let Some((name, context)) = view.match_action(&event.keystroke, window, cx) else {
+                if event.keystroke.key == "f10"
+                    && event.keystroke.modifiers.shift
+                    && !event.keystroke.modifiers.control
+                    && !event.keystroke.modifiers.alt
+                    && !event.keystroke.modifiers.platform
+                {
+                    let opened = this.update(cx, |view, cx| view.keyboard_row_menu(window, cx));
+                    if opened {
+                        window.prevent_default();
+                        cx.stop_propagation();
+                    }
+                }
                 return;
             };
             view.events.emit(Event::Action {
@@ -390,6 +407,8 @@ impl DartView {
             sliders: HashMap::new(),
             selects: HashMap::new(),
             active_dialog: Default::default(),
+            row_menu: None,
+            next_row_menu: 0,
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
@@ -427,6 +446,14 @@ impl DartView {
             .and_then(|_| {
                 datasets::validate_references(&snapshot, |id| {
                     self.datasets.entries.contains_key(id)
+                })
+            })
+            .and_then(|_| {
+                datasets::validate_context_menus(&snapshot, |id| {
+                    self.datasets
+                        .entries
+                        .get(id)
+                        .is_some_and(|data| data.borrow().data.ids.is_some())
                 })
             })
             .and_then(|_| {
@@ -568,6 +595,35 @@ impl DartView {
                     request,
                     message: "Remove dataset references from the view before releasing it".into(),
                 });
+                return;
+            }
+        }
+        if let Change::Replace { data } = &update.change {
+            let validation = datasets::validate_views(&self.snapshot, |name| {
+                if name == id {
+                    Some(data.columns.len())
+                } else {
+                    self.datasets
+                        .entries
+                        .get(name)
+                        .map(|d| d.borrow().data.columns.len())
+                }
+            })
+            .and_then(|_| {
+                datasets::validate_context_menus(&self.snapshot, |name| {
+                    if name == id {
+                        data.ids.is_some()
+                    } else {
+                        self.datasets
+                            .entries
+                            .get(name)
+                            .is_some_and(|d| d.borrow().data.ids.is_some())
+                    }
+                })
+            });
+            if let Err(message) = validation {
+                self.events
+                    .emit(Event::DatasetRejected { request, message });
                 return;
             }
         }
@@ -730,6 +786,7 @@ impl DartView {
         self.reconcile_tabs(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
+        let owner = cx.entity().downgrade();
         let mut changed_views = Vec::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
@@ -808,7 +865,11 @@ impl DartView {
                 }
             }
             Node::Table {
-                id, dataset, view, ..
+                id,
+                dataset,
+                view,
+                context_menu,
+                ..
             } => {
                 let Some(data) = self.datasets.entries.get(dataset).cloned() else {
                     failure = Some(format!("Missing retained dataset: {dataset}"));
@@ -816,6 +877,14 @@ impl DartView {
                 };
                 table_ids.insert(id.clone());
                 if let Some(retained) = self.tables.get_mut(id) {
+                    if retained.state.read(cx).delegate().has_context_menu
+                        != !context_menu.is_empty()
+                    {
+                        retained.state.update(cx, |table, cx| {
+                            table.delegate_mut().has_context_menu = !context_menu.is_empty();
+                            cx.notify();
+                        });
+                    }
                     let swapped = !Rc::ptr_eq(&retained.state.read(cx).delegate().data, &data);
                     if swapped {
                         let index = retained.state.read(cx).delegate().index.clone();
@@ -849,6 +918,8 @@ impl DartView {
                     let table = cx.new(|cx| {
                         TableState::new(
                             Rows {
+                                owner: owner.clone(),
+                                has_context_menu: !context_menu.is_empty(),
                                 table_id: id.clone(),
                                 data: data.clone(),
                                 index,
@@ -919,6 +990,7 @@ impl DartView {
         for id in changed_views {
             self.recompute_table_view(&id, false, cx);
         }
+        self.reconcile_row_menu(window, cx);
         Ok(())
     }
 
@@ -1293,6 +1365,7 @@ mod controls;
 mod menus;
 #[cfg(test)]
 mod menus_tests;
+mod row_menus;
 mod semantics;
 #[cfg(test)]
 mod semantics_tests;
@@ -1314,7 +1387,8 @@ mod inputs;
 mod tests;
 
 impl Render for DartView {
-    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        self.reconcile_row_menu(window, cx);
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);
@@ -1353,7 +1427,8 @@ impl Render for DartView {
                     .map(|bar| div().h_8().w_full().child(bar.clone())),
             )
             .child(div().w_full().p_5().child(content))
-            .vertical_scrollbar(&self.scroll);
+            .vertical_scrollbar(&self.scroll)
+            .children(self.row_menu_element());
         #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
         let root = crate::input_trace::observe(root);
         match &self.trace {
