@@ -27,11 +27,12 @@ foreach ($name in 'PATH', 'INCLUDE', 'LIB', 'CC', 'CXX', 'AR', 'CARGO_HOME', 'RU
     $environment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
 }
 
-$sides = @(
+$candidates = @(
     @{ name = 'trunk'; root = [IO.Path]::GetFullPath($Baseline) },
     @{ name = 'head'; root = $head }
-) | Where-Object { $Sides -contains $_.name }
-foreach ($side in $sides) {
+)
+foreach ($side in $candidates) {
+    if ($Sides -notcontains $side.name) { continue }
     if (Test-Path -LiteralPath (Join-Path $Output $side.name)) { throw "Retain the previous $($side.name) series in $Output" }
     foreach ($entry in $environment.GetEnumerator()) {
         [Environment]::SetEnvironmentVariable($entry.Key, $entry.Value, 'Process')
