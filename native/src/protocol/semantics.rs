@@ -19,6 +19,8 @@ pub enum SemanticRole {
     RadioGroup,
     ProgressBar,
     Separator,
+    TabList,
+    Image,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -61,6 +63,8 @@ impl Semantics {
                 Node::RadioGroup { .. } => role == RadioGroup,
                 Node::Progress { .. } => role == ProgressBar,
                 Node::Separator { .. } => role == Separator,
+                Node::Tabs { .. } => role == TabList,
+                Node::Canvas { .. } => role == Image,
             };
             if !valid {
                 return Err(format!(

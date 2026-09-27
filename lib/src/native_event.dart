@@ -93,7 +93,7 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (value['checked'] is! bool) {
         throw const FormatException('Invalid toggle checked value');
       }
-    case 'radio_change':
+    case 'radio_change' || 'tab_change':
       integer('revision', minimum: 1);
       string('id');
       string('selected');

@@ -277,6 +277,216 @@ final class UiSeparator extends UiNode {
   }
 }
 
+enum UiTabVariant {
+  underline('underline'),
+  pill('pill'),
+  segmented('segmented');
+
+  const UiTabVariant(this.wire);
+  final String wire;
+}
+
+/// A tab strip. Publish `tab_change` event.selected to accept a choice; the
+/// strip shows the pick at once. Tabs follow [UiSelectOption]'s bounds.
+final class UiTabs extends UiNode {
+  UiTabs(
+    super.id, {
+    required List<UiSelectOption> tabs,
+    required this.selected,
+    this.variant = UiTabVariant.underline,
+    super.style,
+    super.semantics,
+  }) : tabs = List.unmodifiable(tabs);
+  final List<UiSelectOption> tabs;
+  final String selected;
+  final UiTabVariant variant;
+
+  @override
+  Map<String, Object> props() {
+    _validateOptions(tabs, selected);
+    return {
+      'kind': 'tabs',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('tabs'),
+      if (style != null) 'style': style!.toJson(),
+      'tabs': tabs.map((tab) => tab.toJson()).toList(),
+      'selected': selected,
+      if (variant != UiTabVariant.underline) 'variant': variant.wire,
+    };
+  }
+}
+
+/// A retained draw list painted natively inside the node's bounds. Give the
+/// node a size through its style. Coordinates are logical pixels from the top
+/// left; at most 4,096 commands.
+final class UiCanvas extends UiNode {
+  UiCanvas(super.id, List<UiDraw> commands, {super.style, super.semantics})
+    : commands = List.unmodifiable(commands);
+  final List<UiDraw> commands;
+
+  @override
+  Map<String, Object> props() {
+    if (commands.length > 4096) {
+      throw ArgumentError('A canvas allows at most 4096 commands');
+    }
+    return {
+      'kind': 'canvas',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('canvas'),
+      if (style != null) 'style': style!.toJson(),
+      'commands': commands.map((command) => command.toJson()).toList(),
+    };
+  }
+}
+
+/// One canvas command. Coordinates within 8,192 px; stroke widths 0–512.
+sealed class UiDraw {
+  const UiDraw();
+  Map<String, Object> toJson();
+}
+
+double _coordinate(double value, String name) {
+  if (!value.isFinite || value.abs() > 8192) {
+    throw ArgumentError.value(value, name, 'Within 8192 px');
+  }
+  return value;
+}
+
+double _extent(double value, double max, String name) {
+  if (!value.isFinite || value < 0 || value > max) {
+    throw ArgumentError.value(value, name, '0 to $max');
+  }
+  return value;
+}
+
+final class UiRect extends UiDraw {
+  const UiRect(
+    this.x,
+    this.y,
+    this.width,
+    this.height, {
+    this.fill,
+    this.stroke,
+    this.strokeWidth = 1,
+    this.radius = 0,
+  });
+  final double x;
+  final double y;
+  final double width;
+  final double height;
+  final UiColor? fill;
+  final UiColor? stroke;
+  final double strokeWidth;
+  final double radius;
+
+  @override
+  Map<String, Object> toJson() => {
+    'op': 'rect',
+    'x': _coordinate(x, 'x'),
+    'y': _coordinate(y, 'y'),
+    'width': _extent(width, 8192, 'width'),
+    'height': _extent(height, 8192, 'height'),
+    if (fill != null) 'fill': fill!.toJson(),
+    if (stroke != null) 'stroke': stroke!.toJson(),
+    if (strokeWidth != 1)
+      'stroke_width': _extent(strokeWidth, 512, 'strokeWidth'),
+    if (radius != 0) 'radius': _extent(radius, 8192, 'radius'),
+  };
+}
+
+final class UiCircle extends UiDraw {
+  const UiCircle(
+    this.cx,
+    this.cy,
+    this.radius, {
+    this.fill,
+    this.stroke,
+    this.strokeWidth = 1,
+  });
+  final double cx;
+  final double cy;
+  final double radius;
+  final UiColor? fill;
+  final UiColor? stroke;
+  final double strokeWidth;
+
+  @override
+  Map<String, Object> toJson() => {
+    'op': 'circle',
+    'cx': _coordinate(cx, 'cx'),
+    'cy': _coordinate(cy, 'cy'),
+    'radius': _extent(radius, 8192, 'radius'),
+    if (fill != null) 'fill': fill!.toJson(),
+    if (stroke != null) 'stroke': stroke!.toJson(),
+    if (strokeWidth != 1)
+      'stroke_width': _extent(strokeWidth, 512, 'strokeWidth'),
+  };
+}
+
+final class UiLine extends UiDraw {
+  const UiLine(
+    this.x1,
+    this.y1,
+    this.x2,
+    this.y2,
+    this.color, {
+    this.width = 1,
+  });
+  final double x1;
+  final double y1;
+  final double x2;
+  final double y2;
+  final UiColor color;
+  final double width;
+
+  @override
+  Map<String, Object> toJson() => {
+    'op': 'line',
+    'x1': _coordinate(x1, 'x1'),
+    'y1': _coordinate(y1, 'y1'),
+    'x2': _coordinate(x2, 'x2'),
+    'y2': _coordinate(y2, 'y2'),
+    'color': color.toJson(),
+    if (width != 1) 'width': _extent(width, 512, 'width'),
+  };
+}
+
+/// A stroked or filled polyline through 2 to 4,096 points.
+final class UiPolyline extends UiDraw {
+  UiPolyline(
+    List<(double, double)> points, {
+    this.stroke,
+    this.width = 1,
+    this.fill,
+    this.close = false,
+  }) : points = List.unmodifiable(points);
+  final List<(double, double)> points;
+  final UiColor? stroke;
+  final double width;
+  final UiColor? fill;
+  final bool close;
+
+  @override
+  Map<String, Object> toJson() {
+    if (points.length < 2 || points.length > 4096) {
+      throw ArgumentError('A polyline needs 2 to 4096 points');
+    }
+    if (stroke == null && fill == null) {
+      throw ArgumentError('A polyline needs a stroke or a fill');
+    }
+    return {
+      'op': 'polyline',
+      'points': [
+        for (final (x, y) in points) [_coordinate(x, 'x'), _coordinate(y, 'y')],
+      ],
+      if (stroke != null) 'stroke': stroke!.toJson(),
+      if (width != 1) 'width': _extent(width, 512, 'width'),
+      if (fill != null) 'fill': fill!.toJson(),
+      if (close) 'close': true,
+    };
+  }
+}
+
 void _validateOptions(List<UiSelectOption> options, String? selected) {
   if (options.isEmpty || options.length > 256) {
     throw ArgumentError('Options require 1..256 entries');

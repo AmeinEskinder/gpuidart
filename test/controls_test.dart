@@ -84,6 +84,127 @@ void main() {
     );
   });
 
+  test('tabs, canvases and animations encode and validate', () {
+    final tabs = UiTabs(
+      'pages',
+      tabs: const [UiSelectOption('a', 'A'), UiSelectOption('b', 'B')],
+      selected: 'b',
+      variant: UiTabVariant.pill,
+    );
+    expect(tabs.toJson(), {
+      'kind': 'tabs',
+      'id': 'pages',
+      'tabs': [
+        {'id': 'a', 'label': 'A'},
+        {'id': 'b', 'label': 'B'},
+      ],
+      'selected': 'b',
+      'variant': 'pill',
+    });
+    expect(
+      UiTabs(
+        't',
+        tabs: const [UiSelectOption('a', 'A')],
+        selected: 'missing',
+      ).toJson,
+      throwsArgumentError,
+    );
+    final canvas = UiCanvas('chart', [
+      const UiRect(
+        0,
+        0,
+        50,
+        20,
+        fill: UiColor.token(ThemeToken.primary),
+        radius: 4,
+      ),
+      UiPolyline(const [(0, 100), (50, 20)], stroke: UiColor.hex('#ff0000')),
+      const UiLine(0, 0, 10, 10, UiColor.token(ThemeToken.border), width: 2),
+      const UiCircle(5, 5, 3, fill: UiColor.token(ThemeToken.danger)),
+    ], style: const UiStyle(width: UiSize.px(200), height: UiSize.px(100)));
+    final encoded = jsonDecode(jsonEncode(canvas.toJson()));
+    expect(encoded['kind'], 'canvas');
+    expect(encoded['commands'], [
+      {
+        'op': 'rect',
+        'x': 0,
+        'y': 0,
+        'width': 50,
+        'height': 20,
+        'fill': 'token:primary',
+        'radius': 4,
+      },
+      {
+        'op': 'polyline',
+        'points': [
+          [0, 100],
+          [50, 20],
+        ],
+        'stroke': '#ff0000',
+      },
+      {
+        'op': 'line',
+        'x1': 0,
+        'y1': 0,
+        'x2': 10,
+        'y2': 10,
+        'color': 'token:border',
+        'width': 2,
+      },
+      {'op': 'circle', 'cx': 5, 'cy': 5, 'radius': 3, 'fill': 'token:danger'},
+    ]);
+    expect(const UiRect(0, 0, -1, 1).toJson, throwsArgumentError);
+    expect(const UiRect(9000, 0, 1, 1).toJson, throwsArgumentError);
+    expect(UiPolyline(const [(0, 0)]).toJson, throwsArgumentError);
+    expect(UiPolyline(const [(0, 0), (1, 1)]).toJson, throwsArgumentError);
+    expect(
+      UiCanvas('c', List.filled(4097, const UiRect(0, 0, 1, 1))).toJson,
+      throwsArgumentError,
+    );
+    const animation = UiAnimation(
+      duration: Duration(milliseconds: 300),
+      easing: UiEasing.linear,
+      repeat: true,
+      key: 'in',
+      opacity: (0, 1),
+      offset: ((0, 0), (100, 0)),
+    );
+    expect(jsonDecode(jsonEncode(animation.toJson())), {
+      'duration_ms': 300,
+      'easing': 'linear',
+      'repeat': true,
+      'key': 'in',
+      'opacity': [0, 1],
+      'offset': [
+        [0, 0],
+        [100, 0],
+      ],
+    });
+    expect(
+      const UiStyle(
+        animation: UiAnimation(
+          duration: Duration(milliseconds: 200),
+          opacity: (0, 1),
+        ),
+      ).toJson()['animation'],
+      {
+        'duration_ms': 200,
+        'opacity': [0.0, 1.0],
+      },
+    );
+    for (final invalid in [
+      const UiAnimation(duration: Duration.zero, opacity: (0, 1)),
+      const UiAnimation(duration: Duration(milliseconds: 100)),
+      const UiAnimation(duration: Duration(milliseconds: 100), opacity: (0, 2)),
+      const UiAnimation(
+        duration: Duration(milliseconds: 100),
+        offset: ((0, 0), (9000, 0)),
+      ),
+    ]) {
+      expect(invalid.toJson, throwsArgumentError);
+    }
+  });
+
   test('switch and radio events decode with their values', () {
     Map<String, dynamic> decode(Map<String, Object?> event) =>
         decodeNativeEvent(utf8.encode(jsonEncode(event)));

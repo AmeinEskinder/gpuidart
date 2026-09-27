@@ -17,13 +17,16 @@ enum UiRole {
   toggle,
   radioGroup,
   progressBar,
-  separator;
+  separator,
+  tabList,
+  image;
 
   String get wire => switch (this) {
     listItem => 'list_item',
     toggle => 'switch',
     radioGroup => 'radio_group',
     progressBar => 'progress_bar',
+    tabList => 'tab_list',
     _ => name,
   };
 }
@@ -60,6 +63,8 @@ final class UiSemantics {
       'radio_group' => {UiRole.radioGroup},
       'progress' => {UiRole.progressBar},
       'separator' => {UiRole.separator},
+      'tabs' => {UiRole.tabList},
+      'canvas' => {UiRole.image},
       _ => throw ArgumentError.value(kind, 'kind'),
     };
     if (role != null && !allowed.contains(role)) {

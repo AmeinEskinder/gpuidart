@@ -20,6 +20,7 @@ final class UiStyle {
     this.minHeight,
     this.maxHeight,
     this.inset,
+    this.animation,
   });
 
   /// Logical pixels: top, right, bottom, left. Each edge 0–512.
@@ -55,6 +56,10 @@ final class UiStyle {
   /// Absolute placement inside the nearest [UiStack]. Ignored elsewhere.
   final UiInset? inset;
 
+  /// A native timeline over this node's opacity or offset. GPUI interpolates
+  /// it every frame; the application publishes nothing while it runs.
+  final UiAnimation? animation;
+
   Map<String, Object> toJson() {
     final padding = this.padding;
     if (padding != null && padding.length != 4) {
@@ -83,6 +88,75 @@ final class UiStyle {
       if (minHeight != null) 'min_height': minHeight!.toJson(),
       if (maxHeight != null) 'max_height': maxHeight!.toJson(),
       if (inset != null) 'inset': inset!.toJson(),
+      if (animation != null) 'animation': animation!.toJson(),
+    };
+  }
+}
+
+enum UiEasing {
+  linear('linear'),
+  easeInOut('ease_in_out'),
+  easeOutQuint('ease_out_quint'),
+  bounce('bounce');
+
+  const UiEasing(this.wire);
+  final String wire;
+}
+
+/// A native timeline: [opacity] runs from its first value to its second and
+/// [offset] moves the node from its first point to its second, in logical
+/// pixels, over [duration]. Changing [key] restarts the timeline on the next
+/// publication; [repeat] loops it.
+final class UiAnimation {
+  const UiAnimation({
+    required this.duration,
+    this.easing = UiEasing.easeInOut,
+    this.repeat = false,
+    this.key = '',
+    this.opacity,
+    this.offset,
+  });
+  final Duration duration;
+  final UiEasing easing;
+  final bool repeat;
+  final String key;
+  final (double, double)? opacity;
+  final ((double, double), (double, double))? offset;
+
+  Map<String, Object> toJson() {
+    final milliseconds = duration.inMilliseconds;
+    if (milliseconds < 1 || milliseconds > 60000) {
+      throw ArgumentError.value(duration, 'duration', '1 ms to 60 s');
+    }
+    final fade = opacity;
+    final move = offset;
+    if (fade == null && move == null) {
+      throw ArgumentError('An animation needs an opacity or an offset range');
+    }
+    if (fade != null &&
+        [fade.$1, fade.$2].any((v) => !v.isFinite || v < 0 || v > 1)) {
+      throw ArgumentError.value(fade, 'opacity', 'Values are 0..1');
+    }
+    if (move != null &&
+        [
+          move.$1.$1,
+          move.$1.$2,
+          move.$2.$1,
+          move.$2.$2,
+        ].any((v) => !v.isFinite || v.abs() > 8192)) {
+      throw ArgumentError.value(move, 'offset', 'Within 8192 px');
+    }
+    return {
+      'duration_ms': milliseconds,
+      if (easing != UiEasing.easeInOut) 'easing': easing.wire,
+      if (repeat) 'repeat': true,
+      if (key.isNotEmpty) 'key': key,
+      if (fade != null) 'opacity': [fade.$1, fade.$2],
+      if (move != null)
+        'offset': [
+          [move.$1.$1, move.$1.$2],
+          [move.$2.$1, move.$2.$2],
+        ],
     };
   }
 }

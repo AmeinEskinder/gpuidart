@@ -514,6 +514,87 @@ fn switches_and_radio_groups_show_the_pick_before_publication(cx: &mut TestAppCo
 }
 
 #[gpui::test]
+fn tabs_report_picks_and_canvases_and_animations_render(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let snapshot = |revision: u64, selected: &str| {
+        Snapshot::parse(
+            format!(
+                r##"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"tabs","id":"pages","tabs":[{{"id":"first","label":"First"}},{{"id":"second","label":"Second"}}],"selected":"{selected}"}},
+                {{"kind":"canvas","id":"chart","style":{{"width":{{"px":200}},"height":{{"px":100}}}},"commands":[
+                    {{"op":"rect","x":0,"y":0,"width":50,"height":20,"fill":"token:primary"}},
+                    {{"op":"circle","cx":80,"cy":50,"radius":10,"stroke":"#ff0000"}},
+                    {{"op":"polyline","points":[[0,100],[50,20],[100,80]],"stroke":"token:danger","fill":"token:muted","close":true}}
+                ]}},
+                {{"kind":"text","id":"slide","text":"Sliding","style":{{"animation":{{"duration_ms":150,"easing":"linear","offset":[[0,0],[100,0]],"opacity":[1,0.5]}}}}}}
+            ]}}}}"##
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, "first"),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let picks = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::TabChange { id, selected, .. } => Some((id.clone(), selected.clone())),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert_eq!(window.find("chart").bounds().size, size(px(200.), px(100.)));
+        let start = window.find("slide").bounds().origin.x;
+        std::thread::sleep(std::time::Duration::from_millis(80));
+        window.render_frame(cx);
+        let moved = window.find("slide").bounds().origin.x;
+        assert!(
+            moved > start,
+            "the offset animation advanced: {start:?} -> {moved:?}"
+        );
+        // Tab items are keyed by position, like radio items.
+        window.click(1usize, cx);
+        window.render_frame(cx);
+        assert_eq!(picks(), [("pages".to_string(), "second".to_string())]);
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(controls["pages"]["selected"], "second");
+        assert_eq!(controls["pages"]["published"], "first");
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(2, "first"), window, cx)
+        });
+        window.render_frame(cx);
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(
+            controls["pages"]["selected"], "first",
+            "a publication is authoritative"
+        );
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let trace = Arc::new(crate::trace::Trace::default());

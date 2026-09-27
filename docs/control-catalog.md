@@ -145,3 +145,9 @@ horizontal or vertical rule with an optional centered label. Buttons accept a
 `tooltip` of at most 1024 UTF-8 bytes. Option lists, labels and tooltips keep
 the select and dialog bounds, and semantics roles are `switch`,
 `radio_group`, `progress_bar` and `separator`.
+
+`UiTabs` takes the same option list as a select plus a required `selected`
+tab ID and an `underline`, `pill` or `segmented` variant. The strip shows the
+pick at once and reports `tab_change` with the tab ID; its semantics role is
+`tab_list`. Canvases and native animation are described in
+[canvas and animation](canvas-animation.md).

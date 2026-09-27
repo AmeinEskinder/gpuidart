@@ -116,11 +116,15 @@ impl DartView {
                 controls.insert(id.clone(),json!({"kind":"switch","checked":shown,"published":checked,"disabled":disabled}));
             }
             if let Node::RadioGroup { id, selected, disabled, .. } = node {
-                let shown = self.radio_shown.borrow().get(id).cloned().or_else(|| selected.clone());
+                let shown = self.choice_shown.borrow().get(id).cloned().or_else(|| selected.clone());
                 controls.insert(id.clone(),json!({"kind":"radio_group","selected":shown,"published":selected,"disabled":disabled}));
             }
             if let Node::Progress { id, value, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"progress","value":value}));
+            }
+            if let Node::Tabs { id, selected, .. } = node {
+                let shown = self.choice_shown.borrow().get(id).cloned().unwrap_or_else(|| selected.clone());
+                controls.insert(id.clone(),json!({"kind":"tabs","selected":shown,"published":selected}));
             }
             if let Node::ConfirmDialog { id, disabled, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"confirm_dialog","disabled":disabled,

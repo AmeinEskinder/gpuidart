@@ -287,6 +287,170 @@ pub enum Node {
         #[serde(default)]
         children: Vec<Node>,
     },
+    /// A tab strip; `tab_change` carries the chosen tab ID.
+    Tabs {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        tabs: Vec<SelectOption>,
+        selected: String,
+        #[serde(default)]
+        variant: TabVariant,
+    },
+    /// A retained draw list painted natively inside the node's bounds.
+    /// Coordinates are logical px from the node's top left.
+    Canvas {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        commands: Vec<Draw>,
+    },
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TabVariant {
+    #[default]
+    Underline,
+    Pill,
+    Segmented,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum Draw {
+    Rect {
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        fill: Option<Color>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        stroke: Option<Color>,
+        #[serde(default = "one")]
+        stroke_width: f32,
+        #[serde(default)]
+        radius: f32,
+    },
+    Circle {
+        cx: f32,
+        cy: f32,
+        radius: f32,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        fill: Option<Color>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        stroke: Option<Color>,
+        #[serde(default = "one")]
+        stroke_width: f32,
+    },
+    Line {
+        x1: f32,
+        y1: f32,
+        x2: f32,
+        y2: f32,
+        color: Color,
+        #[serde(default = "one")]
+        width: f32,
+    },
+    Polyline {
+        points: Vec<[f32; 2]>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        stroke: Option<Color>,
+        #[serde(default = "one")]
+        width: f32,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        fill: Option<Color>,
+        #[serde(default)]
+        close: bool,
+    },
+}
+
+fn one() -> f32 {
+    1.
+}
+
+impl Draw {
+    fn validate(&self) -> Result<(), String> {
+        fn coordinate(value: f32) -> Result<(), String> {
+            if !value.is_finite() || value.abs() > 8192. {
+                return Err("Canvas coordinates must be within 8192 px".into());
+            }
+            Ok(())
+        }
+        fn extent(value: f32, max: f32, what: &str) -> Result<(), String> {
+            if !value.is_finite() || value < 0. || value > max {
+                return Err(format!("Canvas {what} must be between 0 and {max}"));
+            }
+            Ok(())
+        }
+        match self {
+            Self::Rect {
+                x,
+                y,
+                width,
+                height,
+                stroke_width,
+                radius,
+                ..
+            } => {
+                coordinate(*x)?;
+                coordinate(*y)?;
+                extent(*width, 8192., "size")?;
+                extent(*height, 8192., "size")?;
+                extent(*stroke_width, 512., "stroke width")?;
+                extent(*radius, 8192., "radius")
+            }
+            Self::Circle {
+                cx,
+                cy,
+                radius,
+                stroke_width,
+                ..
+            } => {
+                coordinate(*cx)?;
+                coordinate(*cy)?;
+                extent(*radius, 8192., "radius")?;
+                extent(*stroke_width, 512., "stroke width")
+            }
+            Self::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                width,
+                ..
+            } => {
+                for value in [x1, y1, x2, y2] {
+                    coordinate(*value)?;
+                }
+                extent(*width, 512., "stroke width")
+            }
+            Self::Polyline {
+                points,
+                width,
+                stroke,
+                fill,
+                ..
+            } => {
+                if points.len() < 2 || points.len() > 4096 {
+                    return Err("Canvas polylines need 2 to 4096 points".into());
+                }
+                if stroke.is_none() && fill.is_none() {
+                    return Err("Canvas polylines need a stroke or a fill".into());
+                }
+                for [x, y] in points {
+                    coordinate(*x)?;
+                    coordinate(*y)?;
+                }
+                extent(*width, 512., "stroke width")
+            }
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -463,6 +627,70 @@ pub struct Style {
     pub max_height: Option<Size>,
     /// Absolute placement inside the nearest stack, logical px from each edge.
     pub inset: Option<Inset>,
+    /// A native timeline that interpolates this node's opacity or offset
+    /// every frame without involving the application.
+    pub animation: Option<NodeAnimation>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct NodeAnimation {
+    pub duration_ms: u32,
+    #[serde(default)]
+    pub easing: Easing,
+    #[serde(default)]
+    pub repeat: bool,
+    /// Changing the key restarts the animation on the next publication.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub key: String,
+    /// From and to, 0 to 1.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opacity: Option<[f32; 2]>,
+    /// From and to offsets in logical px, `[[x0, y0], [x1, y1]]`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offset: Option<[[f32; 2]; 2]>,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Easing {
+    Linear,
+    #[default]
+    EaseInOut,
+    EaseOutQuint,
+    Bounce,
+}
+
+impl NodeAnimation {
+    fn validate(&self) -> Result<(), String> {
+        if !(1..=60_000).contains(&self.duration_ms) {
+            return Err("Animation duration must be 1 to 60000 ms".into());
+        }
+        if self.key.len() > 64 {
+            return Err("Animation key exceeds 64 UTF-8 bytes".into());
+        }
+        if self.opacity.is_none() && self.offset.is_none() {
+            return Err("Animation needs an opacity or an offset range".into());
+        }
+        if let Some(opacity) = self.opacity {
+            if opacity
+                .iter()
+                .any(|value| !value.is_finite() || !(0. ..=1.).contains(value))
+            {
+                return Err("Animation opacity must be between 0 and 1".into());
+            }
+        }
+        if let Some(offset) = self.offset {
+            if offset
+                .iter()
+                .flatten()
+                .any(|value| !value.is_finite() || value.abs() > 8192.)
+            {
+                return Err("Animation offsets must be within 8192 px".into());
+            }
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
@@ -659,6 +887,9 @@ impl Style {
                 bounded(edge, 8192., "inset")?;
             }
         }
+        if let Some(animation) = &self.animation {
+            animation.validate()?;
+        }
         if let Some(size) = self.font_size {
             if !size.is_finite() || !(8. ..=96.).contains(&size) {
                 return Err("Style font_size must be between 8 and 96".into());
@@ -805,7 +1036,9 @@ impl Node {
             | Self::Switch { id, .. }
             | Self::RadioGroup { id, .. }
             | Self::Progress { id, .. }
-            | Self::Separator { id, .. } => id,
+            | Self::Separator { id, .. }
+            | Self::Tabs { id, .. }
+            | Self::Canvas { id, .. } => id,
         }
     }
 
@@ -826,7 +1059,9 @@ impl Node {
             | Self::Switch { style, .. }
             | Self::RadioGroup { style, .. }
             | Self::Progress { style, .. }
-            | Self::Separator { style, .. } => style.as_ref(),
+            | Self::Separator { style, .. }
+            | Self::Tabs { style, .. }
+            | Self::Canvas { style, .. } => style.as_ref(),
         }
     }
 
@@ -847,7 +1082,9 @@ impl Node {
             | Self::Switch { semantics, .. }
             | Self::RadioGroup { semantics, .. }
             | Self::Progress { semantics, .. }
-            | Self::Separator { semantics, .. } => semantics.as_ref(),
+            | Self::Separator { semantics, .. }
+            | Self::Tabs { semantics, .. }
+            | Self::Canvas { semantics, .. } => semantics.as_ref(),
         }
     }
 
@@ -996,6 +1233,15 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
         }
         Node::Separator { label, .. } if label.len() > 1024 => {
             return Err("Separator label exceeds 1024 UTF-8 bytes".into());
+        }
+        Node::Tabs { tabs, selected, .. } => validate_options(tabs, Some(selected), "Tabs")?,
+        Node::Canvas { commands, .. } => {
+            if commands.len() > 4096 {
+                return Err("Canvas allows at most 4096 commands".into());
+            }
+            for command in commands {
+                command.validate()?;
+            }
         }
         Node::Progress {
             value: Some(value), ..
@@ -1333,6 +1579,11 @@ pub enum Event {
         checked: bool,
     },
     RadioChange {
+        revision: u64,
+        id: String,
+        selected: String,
+    },
+    TabChange {
         revision: u64,
         id: String,
         selected: String,
@@ -2175,6 +2426,53 @@ mod tests {
             format!(r#"{{"kind":"button","id":"b","label":"Go","tooltip":"{}"}}"#, "y".repeat(1025)),
             r#"{"kind":"switch","id":"s","label":"Wi-Fi","checked":true,"semantics":{"role":"checkbox"}}"#.into(),
             r#"{"kind":"progress","id":"p","semantics":{"role":"slider"}}"#.into(),
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
+        }
+    }
+
+    #[test]
+    fn tabs_canvases_and_animations_validate() {
+        let snapshot = Snapshot::parse(
+            br##"{"revision":1,"root":{"kind":"column","id":"root","children":[
+                {"kind":"tabs","id":"pages","tabs":[{"id":"first","label":"First"},{"id":"second","label":"Second"}],"selected":"second","variant":"pill","semantics":{"role":"tab_list"}},
+                {"kind":"canvas","id":"chart","style":{"width":{"px":200},"height":{"px":100}},"semantics":{"role":"image","label":"Chart"},"commands":[
+                    {"op":"rect","x":0,"y":0,"width":50,"height":20,"fill":"token:primary","radius":4},
+                    {"op":"circle","cx":80,"cy":50,"radius":10,"stroke":"#ff0000","stroke_width":2},
+                    {"op":"line","x1":0,"y1":0,"x2":200,"y2":100,"color":"token:border"},
+                    {"op":"polyline","points":[[0,100],[50,20],[100,80]],"stroke":"token:danger","width":3}
+                ]},
+                {"kind":"text","id":"fade","text":"Fading","style":{"animation":{"duration_ms":300,"opacity":[0,1],"repeat":true,"easing":"linear","key":"in"}}},
+                {"kind":"text","id":"slide","text":"Sliding","style":{"animation":{"duration_ms":300,"offset":[[0,0],[100,0]]}}}
+            ]}}"##,
+        )
+        .unwrap();
+        let children = snapshot.root.children().unwrap();
+        assert!(
+            matches!(&children[0], Node::Tabs { variant: TabVariant::Pill, selected, .. } if selected == "second")
+        );
+        assert!(matches!(&children[1], Node::Canvas { commands, .. } if commands.len() == 4));
+        for invalid in [
+            r#"{"kind":"tabs","id":"t","tabs":[{"id":"a","label":"A"}],"selected":"b"}"#.into(),
+            r#"{"kind":"tabs","id":"t","tabs":[],"selected":"a"}"#.into(),
+            r#"{"kind":"tabs","id":"t","tabs":[{"id":"a","label":"A"}],"selected":"a","variant":"round"}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[{"op":"rect","x":0,"y":0,"width":-1,"height":1}]}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[{"op":"rect","x":9000,"y":0,"width":1,"height":1}]}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[{"op":"line","x1":0,"y1":0,"x2":1,"y2":1,"color":"token:border","width":600}]}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[{"op":"polyline","points":[[0,0]],"stroke":"token:border"}]}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[{"op":"polyline","points":[[0,0],[1,1]]}]}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[{"op":"triangle"}]}"#.into(),
+            format!(
+                r#"{{"kind":"canvas","id":"c","commands":[{}]}}"#,
+                vec![r#"{"op":"rect","x":0,"y":0,"width":1,"height":1}"#; 4097].join(",")
+            ),
+            r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":0,"opacity":[0,1]}}}"#.into(),
+            r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":100}}}"#.into(),
+            r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":100,"opacity":[0,2]}}}"#.into(),
+            r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":100,"offset":[[0,0],[9000,0]]}}}"#.into(),
+            r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":100,"opacity":[0,1],"easing":"elastic"}}}"#.into(),
+            r#"{"kind":"canvas","id":"c","commands":[],"semantics":{"role":"button"}}"#.into(),
         ] {
             let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
             assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");

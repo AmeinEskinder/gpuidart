@@ -3,9 +3,9 @@ use crate::diagnostics::Counters;
 use crate::{
     Command, Events,
     protocol::{
-        Align as StyleAlign, CellIcon, Color as StyleColor, Event, FontWeight as StyleFontWeight,
-        Justify as StyleJustify, KeystrokeSpec, Node, ScrollAxis, Size as StyleSize, Snapshot,
-        Style, TableView, ThemeToken,
+        Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
+        FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, Node, ScrollAxis,
+        Size as StyleSize, Snapshot, Style, TabVariant, TableView, ThemeToken,
     },
 };
 use async_channel::Receiver;
@@ -22,7 +22,12 @@ use gpui_kit::component::{
     scroll::ScrollableElement,
     separator::Separator,
     switch::Switch,
+    tab::{Tab, TabBar},
     table::{Column, DataTable, TableDelegate, TableEvent, TableState},
+};
+use gpui_kit::gpui::{
+    Animation, AnimationExt, BorderStyle, PathBuilder, bounce, canvas, ease_in_out, ease_out_quint,
+    linear, quad,
 };
 use gpui_kit::prelude::FluentBuilder;
 use gpui_kit::*;
@@ -32,7 +37,7 @@ use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
     sync::Arc,
-    time::Instant,
+    time::{Duration, Instant},
 };
 
 struct Rows {
@@ -238,8 +243,8 @@ pub(crate) struct DartView {
     /// Checkbox and switch values toggled by the user since the last commit.
     /// Shown until the next publication, whose values are authoritative.
     checkbox_shown: Rc<RefCell<HashMap<String, bool>>>,
-    /// Radio options chosen by the user since the last commit, by group.
-    radio_shown: Rc<RefCell<HashMap<String, String>>>,
+    /// Radio options and tabs chosen by the user since the last commit, by node.
+    choice_shown: Rc<RefCell<HashMap<String, String>>>,
     /// Scroll containers keep their offset by ID across publications.
     scrolls: HashMap<String, ScrollHandle>,
     tables: HashMap<String, RetainedTable>,
@@ -406,7 +411,7 @@ impl DartView {
             selects: HashMap::new(),
             active_dialog: Default::default(),
             checkbox_shown: Default::default(),
-            radio_shown: Default::default(),
+            choice_shown: Default::default(),
             scrolls: HashMap::new(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
@@ -504,7 +509,7 @@ impl DartView {
         }
         self.snapshot = snapshot;
         self.checkbox_shown.borrow_mut().clear();
-        self.radio_shown.borrow_mut().clear();
+        self.choice_shown.borrow_mut().clear();
         if let Err(message) = self.reconcile(window, cx) {
             self.fail(message, cx);
             return;
@@ -1233,7 +1238,7 @@ impl DartView {
                 let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
                 let shown = self
-                    .radio_shown
+                    .choice_shown
                     .borrow()
                     .get(node.id())
                     .cloned()
@@ -1242,7 +1247,7 @@ impl DartView {
                     .as_ref()
                     .and_then(|choice| options.iter().position(|option| option.id == *choice));
                 let ids: Vec<String> = options.iter().map(|option| option.id.clone()).collect();
-                let displayed = self.radio_shown.clone();
+                let displayed = self.choice_shown.clone();
                 let group = RadioGroup::new(SharedString::from(format!("{}-radios", node.id())))
                     .layout(if *horizontal {
                         Axis::Horizontal
@@ -1307,6 +1312,70 @@ impl DartView {
                 };
                 apply_node_style(
                     annotate(div().id(id), node).test_support().child(rule),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Tabs {
+                tabs,
+                selected,
+                variant,
+                ..
+            } => {
+                let events = self.events.clone();
+                let event_id = node.id().to_owned();
+                let revision = self.snapshot.revision;
+                let shown = self
+                    .choice_shown
+                    .borrow()
+                    .get(node.id())
+                    .cloned()
+                    .unwrap_or_else(|| selected.clone());
+                let selected_index = tabs.iter().position(|tab| tab.id == shown).unwrap_or(0);
+                let ids: Vec<String> = tabs.iter().map(|tab| tab.id.clone()).collect();
+                let displayed = self.choice_shown.clone();
+                let bar = TabBar::new(SharedString::from(format!("{}-tabs", node.id())))
+                    .children(tabs.iter().map(|tab| Tab::new().label(tab.label.clone())))
+                    .selected_index(selected_index)
+                    .on_click(move |index, window, _| {
+                        let Some(choice) = ids.get(*index) else {
+                            return;
+                        };
+                        displayed
+                            .borrow_mut()
+                            .insert(event_id.clone(), choice.clone());
+                        window.refresh();
+                        events.emit(Event::TabChange {
+                            revision,
+                            id: event_id.clone(),
+                            selected: choice.clone(),
+                        });
+                    });
+                let bar = match variant {
+                    TabVariant::Underline => bar.underline(),
+                    TabVariant::Pill => bar.pill(),
+                    TabVariant::Segmented => bar.segmented(),
+                };
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(bar),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Canvas { commands, .. } => {
+                let draws: Vec<ResolvedDraw> = commands
+                    .iter()
+                    .map(|command| resolve_draw(command, colors))
+                    .collect();
+                let surface = canvas(
+                    |_, _, _| (),
+                    move |bounds, _, window, _| paint_draws(&draws, bounds, window),
+                )
+                .size_full();
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(surface),
                     node,
                     colors,
                 )
@@ -1438,6 +1507,7 @@ impl DartView {
                 .into_any_element()
             }
         };
+        let materialized = animate(node, materialized);
         #[cfg(all(test, feature = "snapshot-experiment"))]
         if let Some(bounds) = &self.experiment_bounds {
             return Ok(experiment::BoundsProbe {
@@ -1448,6 +1518,204 @@ impl DartView {
             .into_any_element());
         }
         Ok(materialized)
+    }
+}
+
+/// Wraps an element in a native timeline when its style asks for one. GPUI
+/// drives the frames; the application is never involved.
+fn animate(node: &Node, element: AnyElement) -> AnyElement {
+    let Some(motion) = node.style().and_then(|style| style.animation.as_ref()) else {
+        return element;
+    };
+    let mut animation = Animation::new(Duration::from_millis(u64::from(motion.duration_ms)));
+    if motion.repeat {
+        animation = animation.repeat();
+    }
+    animation = match motion.easing {
+        Easing::Linear => animation.with_easing(linear),
+        Easing::EaseInOut => animation.with_easing(ease_in_out),
+        Easing::EaseOutQuint => animation.with_easing(ease_out_quint()),
+        Easing::Bounce => animation.with_easing(bounce(ease_in_out)),
+    };
+    let opacity = motion.opacity;
+    let offset = motion.offset;
+    div()
+        .id(SharedString::from(format!("{}:animation", node.id())))
+        .child(element)
+        .with_animation(
+            SharedString::from(format!("{}:{}", node.id(), motion.key)),
+            animation,
+            move |wrapper, delta| {
+                let mut wrapper = wrapper;
+                if let Some([from, to]) = opacity {
+                    wrapper = wrapper.opacity(from + (to - from) * delta);
+                }
+                if let Some([[x0, y0], [x1, y1]]) = offset {
+                    wrapper = wrapper
+                        .relative()
+                        .left(px(x0 + (x1 - x0) * delta))
+                        .top(px(y0 + (y1 - y0) * delta));
+                }
+                wrapper
+            },
+        )
+        .into_any_element()
+}
+
+/// A canvas command with its colors resolved against the theme, relative to
+/// the canvas origin.
+enum ResolvedDraw {
+    Rect {
+        origin: Point<Pixels>,
+        size: Size<Pixels>,
+        fill: Option<Hsla>,
+        stroke: Option<Hsla>,
+        stroke_width: Pixels,
+        radius: Pixels,
+    },
+    Path {
+        points: Vec<Point<Pixels>>,
+        close: bool,
+        fill: Option<Hsla>,
+        stroke: Option<Hsla>,
+        width: Pixels,
+    },
+}
+
+fn resolve_draw(command: &Draw, colors: &ThemeColor) -> ResolvedDraw {
+    let color = |value: &Option<StyleColor>| value.map(|color| resolve_color(color, colors));
+    match command {
+        Draw::Rect {
+            x,
+            y,
+            width,
+            height,
+            fill,
+            stroke,
+            stroke_width,
+            radius,
+        } => ResolvedDraw::Rect {
+            origin: point(px(*x), px(*y)),
+            size: size(px(*width), px(*height)),
+            fill: color(fill),
+            stroke: color(stroke),
+            stroke_width: px(*stroke_width),
+            radius: px(*radius),
+        },
+        Draw::Circle {
+            cx,
+            cy,
+            radius,
+            fill,
+            stroke,
+            stroke_width,
+        } => ResolvedDraw::Rect {
+            origin: point(px(cx - radius), px(cy - radius)),
+            size: size(px(radius * 2.), px(radius * 2.)),
+            fill: color(fill),
+            stroke: color(stroke),
+            stroke_width: px(*stroke_width),
+            radius: px(*radius),
+        },
+        Draw::Line {
+            x1,
+            y1,
+            x2,
+            y2,
+            color: stroke,
+            width,
+        } => ResolvedDraw::Path {
+            points: vec![point(px(*x1), px(*y1)), point(px(*x2), px(*y2))],
+            close: false,
+            fill: None,
+            stroke: Some(resolve_color(*stroke, colors)),
+            width: px(*width),
+        },
+        Draw::Polyline {
+            points,
+            stroke,
+            width,
+            fill,
+            close,
+        } => ResolvedDraw::Path {
+            points: points.iter().map(|[x, y]| point(px(*x), px(*y))).collect(),
+            close: *close,
+            fill: color(fill),
+            stroke: color(stroke),
+            width: px(*width),
+        },
+    }
+}
+
+fn paint_draws(draws: &[ResolvedDraw], bounds: Bounds<Pixels>, window: &mut Window) {
+    let origin = bounds.origin;
+    for draw in draws {
+        match draw {
+            ResolvedDraw::Rect {
+                origin: offset,
+                size,
+                fill,
+                stroke,
+                stroke_width,
+                radius,
+            } => {
+                let rect = Bounds {
+                    origin: origin + *offset,
+                    size: *size,
+                };
+                if let Some(fill) = fill {
+                    window.paint_quad(quad(
+                        rect,
+                        *radius,
+                        *fill,
+                        Edges::default(),
+                        Hsla::transparent_black(),
+                        BorderStyle::Solid,
+                    ));
+                }
+                if let Some(stroke) = stroke {
+                    window.paint_quad(quad(
+                        rect,
+                        *radius,
+                        Hsla::transparent_black(),
+                        Edges::all(*stroke_width),
+                        *stroke,
+                        BorderStyle::Solid,
+                    ));
+                }
+            }
+            ResolvedDraw::Path {
+                points,
+                close,
+                fill,
+                stroke,
+                width,
+            } => {
+                let trace = |mut builder: PathBuilder| {
+                    let mut points = points.iter().map(|p| origin + *p);
+                    if let Some(first) = points.next() {
+                        builder.move_to(first);
+                    }
+                    for next in points {
+                        builder.line_to(next);
+                    }
+                    if *close {
+                        builder.close();
+                    }
+                    builder.build().ok()
+                };
+                if let Some(fill) = fill {
+                    if let Some(path) = trace(PathBuilder::fill()) {
+                        window.paint_path(path, *fill);
+                    }
+                }
+                if let Some(stroke) = stroke {
+                    if let Some(path) = trace(PathBuilder::stroke(*width)) {
+                        window.paint_path(path, *stroke);
+                    }
+                }
+            }
+        }
     }
 }
 

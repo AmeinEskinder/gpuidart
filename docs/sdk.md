@@ -86,6 +86,9 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiInput | Native-retained by default. `controlled: true` enables guarded text/selection writes; native remains authoritative during composition. See [controlled inputs](controlled-inputs.md). |
 | UiCheckbox / UiSwitch / UiRadioGroup / UiSlider / UiSelect | Application values with native change-request events (`checkbox_change`, `switch_change`, `radio_change`, `slider_change`, `select_change`). The control shows the interaction immediately; the next publication's value is authoritative, so publish the accepted value. See the [settings controls contract](control-catalog.md). |
 | UiProgress / UiSeparator | A determinate or indeterminate progress bar; a horizontal or vertical rule with an optional label. Display only. |
+| UiTabs | A tab strip over named tabs with `tab_change` events; underline, pill or segmented. The strip shows the pick at once and the next publication is authoritative. |
+| UiCanvas | A retained draw list (rectangles, circles, lines, polylines) painted natively inside the node's bounds; the list travels as node fields, so a change sends only that node. See [canvas and animation](canvas-animation.md). |
+| UiStyle.animation | A native timeline over a node's opacity or offset with a duration, easing and optional repeat. GPUI interpolates every frame; Dart publishes nothing while it runs. |
 | UiConfirmDialog | Native confirmation modal with one result, focus trapping and cancellation when its trigger is removed or disabled. |
 | UiSemantics | Optional bounded names and compatible roles on every node; native controls supply their states. See [accessibility and platform gaps](accessibility.md). |
 | UiTable | References a registered dataset ID. Cells contain strings and render in Rust. |
