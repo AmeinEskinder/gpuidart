@@ -120,6 +120,7 @@ the order. `tool/performance/bench_diff.dart` times describe and diff alone.
 ran the snapshot gate at trunk and head on the same machine with release
 artifacts per side. At 2,048 properties a change moves 201 bytes instead of
 273,772, the encode and decode stages fall from about 6 ms to under 50 us,
-and publish-to-ack improves for every change kind at 512 and 2,048 nodes.
-The Dart describe plus diff and the native clone plus revalidation are the
-remaining costs, which is why a binary wire is not the next step.
+and publish-to-ack improves for every change kind at every size, 0.46 of
+trunk for a property change at 2,048 nodes. The Dart describe plus diff and
+the native clone plus revalidation are the remaining costs, which is why a
+binary wire is not the next step.

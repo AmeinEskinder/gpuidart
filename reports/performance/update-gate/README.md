@@ -2,13 +2,14 @@
 
 Trunk-versus-head run of the snapshot gate for
 [retained description updates](../../../docs/retained-tree.md). Trunk is the
-unmodified `dev` head the change was built on (`e5345e5`); head is `f5bc802`,
-which carries operation updates plus the checkbox and structural-edit commits
-that follow it and do not touch the publish path. Both sides compiled their
-own AOT capture and their own release native library, so each side runs its
-own SDK code end to end. `trunk/metadata.json` and `head/metadata.json` record
-the source revision, a clean working tree and the native library hash for each
-side.
+unmodified `dev` head the change was built on (`e5345e5`). Head is `b3f0c56`,
+which carries operation updates, the diff optimization, and the checkbox and
+structural-edit commits that do not touch the publish path. An earlier head
+run at `f5bc802`, before the diff optimization, is kept under `head-f5bc802`.
+Both sides compiled their own AOT capture and their own release native
+library, so each side runs its own SDK code end to end. `trunk/metadata.json`
+and `head/metadata.json` record the source revision, a clean working tree and
+the native library hash for each side.
 
 ## Method
 
@@ -22,52 +23,57 @@ of `tool/performance/compare_update_gate.dart` over the two summaries: medians
 across runs of each run's median, and the head-over-trunk ratio. The workload
 is unchanged: eight unchanged, property, reorder, insert and remove
 publications per size through `rebuild`, with a retained input and a retained
-table checked after every publication. All 36 runs passed on both sides.
+table checked after every publication. All 36 runs passed on every series.
 
-Sides ran one after the other, trunk first, on the same machine in one
-session (`environment.json`). The head build ran once more after a gate-runner
-fix; the trunk series is the first run's.
+Sides ran one after the other on the same machine in one session
+(`environment.json`): trunk first, then the `f5bc802` head, then the `b3f0c56`
+head with `-Sides head` against the same trunk series.
 
-## Result, AOT, 2,048 properties
+## Result, AOT
 
-| Operation | Metric | Trunk | Head | Head / trunk |
+| Fields, operation | Metric | Trunk | Head | Head / trunk |
 | --- | --- | ---: | ---: | ---: |
-| property | Bytes | 273,772 | 201 | 0.00 |
-| property | Describe, us | 399 | 589 | 1.47 |
-| property | Diff, us | | 2,765 | |
-| property | Encode/copy, us | 2,837 | 18 | 0.01 |
-| property | Native decode/validate, us | 3,176 | 28 | 0.01 |
-| property | Native dispatch, us | 541 | 1,260 | 2.33 |
-| property | Publish to ack, us | 7,197 | 5,324 | 0.74 |
-| reorder | Bytes | 273,772 | 941 | 0.00 |
-| reorder | Publish to ack, us | 7,742 | 5,125 | 0.66 |
-| insert | Bytes | 274,002 | 132 | 0.00 |
-| insert | Publish to ack, us | 7,665 | 5,730 | 0.75 |
-| remove | Bytes | 273,951 | 73 | 0.00 |
-| remove | Publish to ack, us | 23,652 | 8,050 | 0.34 |
-| unchanged | Bytes | 273,771 | 41 | 0.00 |
-| unchanged | Publish to ack, us | 10,311 | 17,171 | 1.67 |
+| 2,048 property | Bytes | 273,772 | 201 | 0.00 |
+| 2,048 property | Describe, us | 399 | 510 | 1.28 |
+| 2,048 property | Diff, us | | 1,252 | |
+| 2,048 property | Encode/copy, us | 2,837 | 18 | 0.01 |
+| 2,048 property | Native decode/validate, us | 3,176 | 28 | 0.01 |
+| 2,048 property | Native dispatch, us | 541 | 1,222 | 2.26 |
+| 2,048 property | Publish to ack, us | 7,197 | 3,317 | 0.46 |
+| 2,048 reorder | Publish to ack, us | 7,742 | 4,526 | 0.58 |
+| 2,048 insert | Publish to ack, us | 7,665 | 3,988 | 0.52 |
+| 2,048 remove | Publish to ack, us | 23,652 | 3,680 | 0.16 |
+| 512 property | Publish to ack, us | 2,059 | 1,048 | 0.51 |
+| 512 reorder | Publish to ack, us | 1,850 | 1,105 | 0.60 |
+| 512 insert | Publish to ack, us | 1,838 | 1,146 | 0.62 |
+| 512 remove | Publish to ack, us | 1,866 | 827 | 0.44 |
+| 128 property | Publish to ack, us | 690 | 626 | 0.91 |
+| 128 reorder | Publish to ack, us | 736 | 335 | 0.46 |
+| 128 insert | Publish to ack, us | 691 | 433 | 0.63 |
+| 128 remove | Publish to ack, us | 611 | 372 | 0.61 |
 
-At 128 properties the publish-to-ack medians are within 5 percent of each
-other for property changes (690 versus 715 us) and lower on head for insert
-and remove (691 to 566 us, 611 to 476 us); the diff costs about 200 us there.
-At 512 properties every change kind acknowledges faster on head (0.68 to 0.94
-of trunk). JIT rows follow the same shape; see `comparison.md`.
+Bytes per change are 73 to 941 on head at every size against 16,886 to
+274,002 on trunk. JIT rows follow the same shape; see `comparison.md`.
+
+Before the diff optimization (`comparison-f5bc802.md`), the 2,048-property
+diff cost 2,765 us and publish to ack was 5,324 us (0.74 of trunk); the
+optimization brought the diff to 1,252 us and the acknowledgement to 3,317 us.
 
 ## Reading
 
 - The transfer and the two serialization stages are gone from the change
-  path. What remains on head is the Dart describe plus diff, 3.4 ms at 2,048
+  path. What remains on head is the Dart describe plus diff, 1.8 ms at 2,048
   nodes, and a native dispatch that doubled because the update is applied on
   a clone of the tree and the result is validated in full.
-- The Dart diff is now the largest stage. It costs about 1.3 us per node,
-  which is hash-map work: two indexes over the trees, a parent map and
-  several lookups per node. That is the next target; a binary wire would
-  save at most the 18 us of encoding and 28 us of decoding left on head.
+- The Dart diff pairs children by position before touching a hash index, so
+  the property workload never builds one; reorder and insert do, which is why
+  their diff is 0.4 to 0.6 ms higher than property at 2,048 nodes.
+- A binary wire would save at most the 18 us of encoding and 28 us of
+  decoding left on head. The next native target is the clone plus full
+  revalidation inside dispatch.
 - The unchanged group is not a signal. It runs first in every process, while
   the window is still settling after its first paint, and its run medians
-  swing between 7.6 and 18.8 ms on head and between 8.4 and 14.5 ms on trunk
-  with p95 values of 26 to 48 ms on both sides.
+  swing by a factor of two on both sides with p95 values of 26 to 48 ms.
 - Request to first CPU content paint moves with the same noise (35 to 59 ms
   on both sides) and remains scene construction, not presentation.
 
