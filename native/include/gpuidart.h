@@ -19,7 +19,9 @@ uint32_t gd_abi_version(void);
    gd_destroy releases the process-wide host reservation. */
 GdHost *gd_create(const uint8_t *bytes, size_t len, GdEventCallback callback);
 
-/* Blocks on the calling thread until the native application closes. Call once. */
+/* Blocks on the calling thread until the native application closes. Call once.
+   On Windows and Linux the UI loop runs on a dedicated native thread with a
+   64 MiB stack reservation, so the caller's stack size does not matter. */
 int32_t gd_run(const GdHost *host);
 
 /* 0 = queued, -1 = invalid pointer/size, -2 = invalid description,

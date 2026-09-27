@@ -287,16 +287,38 @@ pub unsafe extern "C" fn gd_run(host: *const Host) -> i32 {
     boundary::call(-4, || unsafe { run(host) })
 }
 
+/// Stack reserved for the thread that runs GPUI. Dart isolate threads get 1 MiB
+/// on Windows, which unoptimized table rendering can exhaust; the overflow then
+/// shows up as an access violation on an unrelated thread. The reservation is
+/// virtual and only touched pages are committed.
+const UI_THREAD_STACK_BYTES: usize = 64 << 20;
+
 unsafe fn run(host: *const Host) -> i32 {
     unsafe {
         run_with(host, |host, initial| {
-            ui::run(
-                initial,
-                host.receiver.clone(),
-                host.events.clone(),
-                host.trace.clone(),
-                None,
-            )
+            let receiver = host.receiver.clone();
+            let events = host.events.clone();
+            let trace = host.trace.clone();
+            #[cfg(target_os = "macos")]
+            {
+                // GPUI needs the process main thread here; the companion
+                // launcher provides it with the platform's default stack.
+                ui::run(initial, receiver, events, trace, None)
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                let worker = std::thread::Builder::new()
+                    .name("gpuidart-ui".into())
+                    .stack_size(UI_THREAD_STACK_BYTES)
+                    .spawn(move || boundary::catch(|| ui::run(initial, receiver, events, trace, None)))
+                    .map_err(|error| format!("Could not start the UI thread: {error}"))?;
+                match worker.join() {
+                    Ok(Ok(result)) => result,
+                    // Re-raise on the caller so the boundary reports -4 as before.
+                    Ok(Err(message)) => std::panic::resume_unwind(Box::new(message)),
+                    Err(payload) => std::panic::resume_unwind(payload),
+                }
+            }
         })
     }
 }

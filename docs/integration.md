@@ -40,7 +40,7 @@ flowchart LR
     UI -->|"NativeCallable.listener events"| Dart
 ```
 
-GPUI runs on the thread that enters `gd_run`. The Dart worker isolate stays in that native call until the window closes. The application isolate continues processing its normal event loop. Commands wake a GPUI foreground task through an asynchronous channel; there is no frame polling or Dart render callback.
+On Windows and Linux, `gd_run` starts GPUI on a dedicated native thread with a 64 MiB stack reservation and blocks the calling thread on it; Dart isolate threads carry a 1 MiB stack on Windows, which an unoptimized table render overflowed once the grouped-views change grew its frames, and the overflow surfaced as access violations on unrelated threads. On macOS GPUI runs on the companion's main thread. The Dart worker isolate stays in the native call until the window closes. The application isolate continues processing its normal event loop. Commands wake a GPUI foreground task through an asynchronous channel; there is no frame polling or Dart render callback.
 
 Every accepted description has an increasing revision. Native button events carry the revision that installed the callback. Input events carry the live description revision. The typed Dart API exposes both IDs and revisions, so applications can decide whether an event belongs to their current state.
 
