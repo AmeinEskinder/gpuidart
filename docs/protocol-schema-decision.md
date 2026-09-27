@@ -6,8 +6,8 @@ maintenance choice, not a claim that generation cannot help.
 
 ## What would be generated
 
-The adapter now has ten node kinds: row, column, text, button, input, table,
-checkbox, slider, select and confirmation dialog. Their wire contract also
+At the settings milestone, the adapter had ten node kinds: row, column, text,
+button, input, table, checkbox, slider, select and confirmation dialog. Their wire contract also
 includes styles, actions, table views and formats. Datasets and input commands
 have separate transaction protocols. Rust serde models define accepted message
 shapes; Dart wrappers encode them and validate caller values. Dart also validates
@@ -69,3 +69,8 @@ and migration before accepting generated models as the source of truth.
 Evidence: [control-catalog report](../reports/control-catalog/README.md),
 `native/src/protocol.rs`, `native/src/input_control.rs`, `lib/src/nodes.dart`,
 `lib/src/input_state.dart`, and the controls/input/fault-peer test suites.
+
+Market-terminal update: tabs, radio groups and charts bring the count to thirteen;
+menus and themes add snapshot properties. This work keeps the codec decision and
+its rules above. Structural additions include matching native/Dart bounds and wire
+tests, and the terminal exercises events through real hosts on all three platforms.

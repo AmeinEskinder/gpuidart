@@ -127,13 +127,6 @@ jobs:
       - name: Market terminal actual code reload
         if: runner.os != 'Linux'
         run: dart run tool/verify_terminal_reload.dart build/accessibility/terminal-reload.json
-      - name: Retain Linux host for local diagnostic reproduction
-        if: always() && runner.os == 'Linux'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: terminal-linux-host
-          path: target/debug/libgpuidart.so
-          retention-days: 7
       - name: Retain platform responses and failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -38,6 +38,9 @@ if ($Operation -ne 'query') {
             $details.bounds = @($bounds.X, $bounds.Y, $bounds.Width, $bounds.Height)
             if ($bounds.IsEmpty -or $bounds.Width -le 0 -or $bounds.Height -le 0) { throw 'Hover target has no bounds' }
             [void][TerminalPointer]::SetForegroundWindow([IntPtr]$window.Current.NativeWindowHandle)
+            if ([TerminalPointer]::ForegroundProcess() -ne $AppProcessId) {
+                throw "Owned window did not gain foreground access; context=$(PointerObservation | ConvertTo-Json -Compress)"
+            }
             if (-not [TerminalPointer]::SetPhysicalCursorPos([int]($bounds.X + $bounds.Width / 2), [int]($bounds.Y + $bounds.Height / 2))) { throw "Pointer move failed: Win32=$([Runtime.InteropServices.Marshal]::GetLastWin32Error()); bounds=$($details.bounds); context=$(PointerObservation | ConvertTo-Json -Compress)" }
         }
         invoke { $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke() }

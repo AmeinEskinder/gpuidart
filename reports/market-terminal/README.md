@@ -1,7 +1,93 @@
-# Market terminal milestone ? implementation evidence
+# Market terminal implementation evidence
 
-Work order: [design](../../docs/market-terminal.md). This report is in progress;
-feature checks below do not establish the complete milestone acceptance bar.
+Work order: [design](../../docs/market-terminal.md). The terminal acceptance track
+passes on Windows x64, macOS 15 ARM64 and Ubuntu 24.04 x64/X11 at `5390bd1`.
+All five workflows passed at that source revision. This archive records those
+captures; the final evidence commit is checked again by the same workflows.
+
+## Recorded terminal acceptance
+
+[Hosted run 36285478437](https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478437)
+produced the exact reports indexed by [SHA-256 manifest](acceptance/5390bd1/manifest.json).
+All use 100,000 fictitious source records and the debug native library. AOT here
+means the Dart application/verifier executable, not a release Rust benchmark.
+
+| Platform and external client | JIT interaction + semantics | AOT interaction | Actual Dart-code reload |
+| --- | --- | --- | --- |
+| Windows x64, UIA | [15 steps passed](acceptance/5390bd1/windows/jit.json) | [15 passed](acceptance/5390bd1/windows/aot.json) | [Passed](acceptance/5390bd1/windows/reload.json) |
+| macOS 15 ARM64, AX | [15 steps passed](acceptance/5390bd1/macos/jit.json) | [15 passed](acceptance/5390bd1/macos/aot.json) | [Passed](acceptance/5390bd1/macos/reload.json) |
+| Ubuntu 24.04 x64/X11, AT-SPI | [15 steps passed](acceptance/5390bd1/linux/jit.json) | [15 passed](acceptance/5390bd1/linux/aot.json) | [Passed](acceptance/5390bd1/linux/reload.json) |
+
+The sequence covers selected-record history, a price tick, tooltip appearance and
+dismissal, the table row menu, tab and radio keyboard navigation, 20/48-point
+line/bar projections and matching OS text alternatives, actual application-menu
+invocation, controlled drafts, light/dark/custom themes, and tab remount. An
+unchanged snapshot preserves mounted native input state and sends no dataset data.
+GPUI diagnostic keys supply keyboard interaction; tooltip movement uses the OS
+pointer API and queried OS bounds. UIA Invoke, AT-SPI Action and AXPress dispatch
+the Settings menu command. macOS queries the real native menu bar.
+
+The code-reload test changes the component heading and observes the new text.
+Dark/custom theme, page, application draft, native text/focus/selection, selected
+record and dataset revisions survive. Data-publication bytes have zero delta
+across reload. Instrument charts still render afterward. This is distinct from
+the unchanged-snapshot check.
+
+The numeric foreground/background and primary/foreground token checks exceed
+4.5:1 in this fixture's three tested palettes. They do not establish rendered text
+contrast, all component states, visual quality or accessibility compliance.
+
+## Existing SDK checks and 100k smoke
+
+The same source passed [Windows SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478395),
+[macOS SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478386),
+[Linux SDK checks](https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478378)
+and [Unix process lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478416),
+alongside the accessibility workflow above. These include the existing native,
+Dart, settings and watchlist checks applicable to each job.
+
+The original 100,000-row publication smoke also passed in JIT and Dart AOT on all
+three platforms. Each capture completed 30 single-cell edits and 30 counter
+snapshots, with 30 records checked, 30 cells written and 4,584 dataset bytes sent
+after startup. All captures are complete and have 30 successful acknowledgements
+per operation. Counter snapshots reference retained data. They do not upload the
+dataset again.
+
+| Platform | JIT trace records | AOT trace records | Capture source |
+| --- | ---: | ---: | --- |
+| Windows | 982 | 979 | Local source at `5390bd1`, debug DLL |
+| macOS | 987 | 985 | Hosted macOS SDK run above |
+| Linux | 984 | 982 | Hosted Linux SDK run above |
+
+The [manifest](acceptance/5390bd1/manifest.json) indexes the exact trace/log bytes,
+the local Windows DLL digest, dependency pin, Cargo lockfile Git-blob digest and
+patched vendor source digests. Timings in these raw instrumented/debug captures
+are smoke observations and support no comparative performance claim. The archive
+step initially read a PowerShell UTF-16 log as UTF-8; it now detects the BOM and
+preserves the original bytes. No capture was rerun or modified for that correction.
+
+## Limits and parked gates
+
+- One window; flat application/row menus; button tooltips; controlled tabs/radios;
+  read-only single-series line/bar charts with at most 512 candidate points.
+- Charts expose Group plus bounded summary/point Labels because the pinned
+  AccessKit version has no Chart role. Offscreen source records are not exported.
+- Input drafts survive tab unmount through application save/restore. Native entity
+  identity is retained only while a control remains mounted.
+- Programmatic platform passes do not establish human screen-reader usability,
+  IME behavior, physical scaling, visual chart quality or presented pixels.
+- Mac hardware/signing, the historical reload disposition, human visual/screen-reader
+  sessions and presentation-latency work remain parked. No runtime-performance
+  conclusion follows from these instrumented correctness runs.
+- Local Windows checks found desktop/foreground constraints. Hosted UIA is the
+  complete platform pass; failed local attempts remain below. An earlier local
+  missing-window observation stays unlocalized rather than being called a driver bug.
+
+## Milestone chronology and retained failures
+
+The sections below record the evidence available at each implementation step.
+Statements that a later acceptance check was pending describe that earlier state;
+the table above records the completed terminal checks.
 
 ## Theme as snapshot data
 
@@ -271,9 +357,10 @@ the local native rebuild is required. Release builds embed shader bytes.
 The [second capture](attempts/76f0e01/) reached tooltip checks on all platforms.
 macOS did expose the popup, as AXGroup/AXUserInterfaceTooltip; the probe expected
 AXHelpTag. Windows local capture first found a null-ID lookup in the new description
-reader, then a coordinate mismatch. Moving with SetPhysicalCursorPos, matching
-UIA's physical screen bounds, passed popup appearance and dismissal. The third
-Windows capture also passed record-context-menu queries and invocation.
+reader, then timed out on hover. SetPhysicalCursorPos makes the coordinate contract
+explicit; a following run passed popup appearance/dismissal and record-context-menu
+queries. Pointer context was not recorded before that timeout, so DPI virtualization
+is not established as its cause.
 
 Linux returned `[20, 215, 198, 32]` for the button's screen bounds, without the
 centered window's offset. Source inspection found that GPUI's existing
@@ -352,3 +439,21 @@ one missing tooltip. They are failed runs, not replacement passes. The Windows
 probe now records foreground PID and physical cursor coordinates, and reports
 Win32 failure details on a rejected move. Those fields describe test conditions;
 they do not retry input or turn a failed assertion into success.
+
+
+### Local foreground diagnostic
+
+The [last local Windows attempt](attempts/5390bd1/terminal-local-attempt10.json)
+failed before pointer injection: the owned window did not gain foreground access,
+and the captured foreground PID differed from the application. The probe now
+checks that precondition explicitly. This local run is not a pass, and its result
+does not retroactively classify earlier unlocalized attempts. The hosted Windows
+capture passed the full sequence with foreground PID matching the owned process.
+
+The local Linux source run passed its interaction/AOT commands, then could not
+start the reload child because that ad-hoc container lacked the Unix launcher.
+The [log](attempts/5390bd1/local-linux-source.log) records the failure. Hosted CI
+builds the launcher and passed reload; no substitute launcher was used locally.
+The container service subsequently became unavailable, so the inner reports could
+not be copied out. This local run is not the acceptance evidence. The diagnostic
+Linux library upload is removed from future CI now that reproduction is complete.

@@ -108,3 +108,13 @@ provider defects, verifier failures and the narrow pinned dependency corrections
 Human screen-reader sessions, offscreen virtual-table navigation, Linux EditableText
 and live announcements remain outside the verified surface. This milestone does
 not close the parked release gates or justify a production patch protocol.
+
+Market-terminal follow-up: [themes, navigation and charts](navigation-and-charts.md)
+are implemented without changing the snapshot/dataset architecture. The
+[terminal](../example/terminal/README.md) uses light/dark/custom token palettes,
+tabs, radios, native/in-window application menus, record-bound row menus, button
+tooltips and bounded dataset line/bar charts. The [acceptance report](../reports/market-terminal/README.md)
+records 100k JIT/AOT interaction, external UIA/AT-SPI/AX checks and actual Dart-code
+reload on three platforms, with retained failures and narrow dependency patches.
+Editor binding, general virtual lists, presentation correlation and parked human
+hardware/signing checks remain separate work. No public patch protocol is adopted.
