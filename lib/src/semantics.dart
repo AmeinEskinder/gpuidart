@@ -53,7 +53,7 @@ final class UiSemantics {
       'stack' ||
       'scroll' => {UiRole.group, UiRole.list, UiRole.listItem},
       'text' => {UiRole.label, UiRole.heading},
-      'button' || 'confirm_dialog' => {UiRole.button},
+      'button' || 'confirm_dialog' || 'menu_button' => {UiRole.button},
       'checkbox' => {UiRole.checkbox},
       'slider' => {UiRole.slider},
       'input' => {UiRole.textbox},

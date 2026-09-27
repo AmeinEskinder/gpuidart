@@ -1,8 +1,10 @@
 use crate::{Events, protocol::Event, ui::DartView};
-use gpui_kit::{App, Entity, KeyUpEvent, Keystroke, PlatformInput, Window};
+use gpui_kit::{
+    App, Entity, KeyUpEvent, Keystroke, PathPromptOptions, PlatformInput, SharedString, Window,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use std::cell::Cell;
+use std::{cell::Cell, path::Path};
 
 #[derive(Default)]
 pub(crate) struct Counters {
@@ -70,6 +72,36 @@ pub(crate) enum Request {
         table: String,
         row: usize,
     },
+    /// Native file or folder chooser; replies with the chosen paths, or null
+    /// when the user cancelled, once the dialog closes.
+    PromptPaths {
+        request: u64,
+        #[serde(default)]
+        files: bool,
+        #[serde(default)]
+        directories: bool,
+        #[serde(default)]
+        multiple: bool,
+        #[serde(default)]
+        prompt: Option<String>,
+    },
+    /// Native save dialog starting in `directory`.
+    PromptSavePath {
+        request: u64,
+        directory: String,
+        #[serde(default)]
+        suggested_name: Option<String>,
+    },
+    /// Opens an http, https or mailto URL with the OS handler.
+    OpenUrl {
+        request: u64,
+        url: String,
+    },
+    /// Shows a path in the OS file manager.
+    RevealPath {
+        request: u64,
+        path: String,
+    },
 }
 
 impl Request {
@@ -84,7 +116,11 @@ impl Request {
             | Self::Semantics { request }
             | Self::Key { request, .. }
             | Self::Repaint { request, .. }
-            | Self::Prepare { request, .. } => *request,
+            | Self::Prepare { request, .. }
+            | Self::PromptPaths { request, .. }
+            | Self::PromptSavePath { request, .. }
+            | Self::OpenUrl { request, .. }
+            | Self::RevealPath { request, .. } => *request,
         }
     }
 }
@@ -97,6 +133,74 @@ pub(crate) fn handle(
     cx: &mut App,
 ) {
     match request {
+        Request::PromptPaths {
+            request,
+            files,
+            directories,
+            multiple,
+            prompt,
+        } => {
+            let receiver = cx.prompt_for_paths(PathPromptOptions {
+                files,
+                directories,
+                multiple,
+                prompt: prompt.map(SharedString::from),
+            });
+            let events = events.clone();
+            cx.spawn(async move |_| {
+                let data = match receiver.await {
+                    Ok(Ok(Some(paths))) => json!({
+                        "paths": paths.iter().map(|path| path.to_string_lossy()).collect::<Vec<_>>()
+                    }),
+                    Ok(Ok(None)) => json!({"paths": Value::Null}),
+                    Ok(Err(error)) => json!({"error": error.to_string()}),
+                    Err(_) => json!({"error": "The path prompt closed without a result"}),
+                };
+                events.emit(Event::Diagnostic { request, data });
+            })
+            .detach();
+        }
+        Request::PromptSavePath {
+            request,
+            directory,
+            suggested_name,
+        } => {
+            let receiver = cx.prompt_for_new_path(Path::new(&directory), suggested_name.as_deref());
+            let events = events.clone();
+            cx.spawn(async move |_| {
+                let data = match receiver.await {
+                    Ok(Ok(Some(path))) => json!({"path": path.to_string_lossy()}),
+                    Ok(Ok(None)) => json!({"path": Value::Null}),
+                    Ok(Err(error)) => json!({"error": error.to_string()}),
+                    Err(_) => json!({"error": "The save prompt closed without a result"}),
+                };
+                events.emit(Event::Diagnostic { request, data });
+            })
+            .detach();
+        }
+        Request::OpenUrl { request, url } => {
+            let allowed = ["http://", "https://", "mailto:"]
+                .iter()
+                .any(|scheme| url.starts_with(scheme));
+            if allowed {
+                cx.open_url(&url);
+            }
+            events.emit(Event::Diagnostic {
+                request,
+                data: if allowed {
+                    json!({"opened": true})
+                } else {
+                    json!({"error": "Only http, https and mailto URLs open"})
+                },
+            });
+        }
+        Request::RevealPath { request, path } => {
+            cx.reveal_path(Path::new(&path));
+            events.emit(Event::Diagnostic {
+                request,
+                data: json!({"revealed": true}),
+            });
+        }
         Request::Semantics { request } => {
             let tree = window
                 .debug_a11y_tree_json()

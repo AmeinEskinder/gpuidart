@@ -151,3 +151,12 @@ tab ID and an `underline`, `pill` or `segmented` variant. The strip shows the
 pick at once and reports `tab_change` with the tab ID; its semantics role is
 `tab_list`. Canvases and native animation are described in
 [canvas and animation](canvas-animation.md).
+
+`UiMenuButton` is a button that opens a native popup menu of one to 64
+entries: items with a unique ID, label and optional `disabled` and `checked`
+flags, or dividers. Choosing an item reports `menu_select` with the item ID.
+The host also exposes the platform's file and folder choosers, save dialog,
+URL handler and file manager through `pickPaths`, `pickSavePath`, `openUrl`
+and `revealPath`; dialogs resolve when they close and `openUrl` only accepts
+http, https and mailto. The headless platform leaves these unimplemented, so
+they are covered by protocol tests and manual runs only.

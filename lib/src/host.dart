@@ -136,6 +136,9 @@ final class GpuiEvent {
   /// Requested option ID on `select_change`; null means no selection.
   String? get selected => data['selected'] as String?;
 
+  /// The chosen menu item ID on `menu_select`.
+  String? get item => data['item'] as String?;
+
   /// Whether the user confirmed a `dialog_result`; false means cancelled.
   bool? get confirmed => data['confirmed'] as bool?;
 
@@ -865,6 +868,50 @@ final class GpuiHost {
   }
 
   /// Opt-in native inspection and test control; no commands run during repaint.
+  /// Opens the native file or folder chooser. Resolves to the chosen paths,
+  /// or null when the user cancelled, once the dialog closes.
+  Future<List<String>?> pickPaths({
+    bool files = true,
+    bool directories = false,
+    bool multiple = false,
+    String? prompt,
+  }) async {
+    final reply = await diagnose('prompt_paths', {
+      'files': files,
+      'directories': directories,
+      'multiple': multiple,
+      'prompt': ?prompt,
+    });
+    _checkReply(reply);
+    return (reply['paths'] as List?)?.cast<String>();
+  }
+
+  /// Opens the native save dialog in [directory]. Resolves to the chosen
+  /// path, or null when the user cancelled.
+  Future<String?> pickSavePath(
+    String directory, {
+    String? suggestedName,
+  }) async {
+    final reply = await diagnose('prompt_save_path', {
+      'directory': directory,
+      'suggested_name': ?suggestedName,
+    });
+    _checkReply(reply);
+    return reply['path'] as String?;
+  }
+
+  /// Opens an http, https or mailto URL with the operating system's handler.
+  Future<void> openUrl(String url) async =>
+      _checkReply(await diagnose('open_url', {'url': url}));
+
+  /// Shows [path] in the operating system's file manager.
+  Future<void> revealPath(String path) async =>
+      _checkReply(await diagnose('reveal_path', {'path': path}));
+
+  static void _checkReply(Map<String, dynamic> reply) {
+    if (reply['error'] case final String error) throw StateError(error);
+  }
+
   Future<Map<String, dynamic>> diagnose(
     String op, [
     Map<String, Object> arguments = const {},

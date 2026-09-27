@@ -686,6 +686,99 @@ fn grouped_tables_show_summary_rows_that_are_not_selectable(cx: &mut TestAppCont
 }
 
 #[gpui::test]
+fn menu_buttons_render_and_host_requests_reply(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let snapshot = Snapshot::parse(
+        br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
+            {"kind":"menu_button","id":"file","label":"File","items":[{"id":"open","label":"Open"},{"divider":true},{"id":"save","label":"Save"}]}
+        ]}}"#,
+    )
+    .unwrap();
+    let emitter = Events(Arc::new(move |event| collected.lock().unwrap().push(event)));
+    let (handle, view) = cx.update(|cx| {
+        let emitter = emitter.clone();
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot,
+                        datasets: vec![],
+                    },
+                    emitter,
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let replies = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::Diagnostic { request, data } => Some((*request, data.clone())),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    let request = |json: serde_json::Value| {
+        serde_json::from_value::<crate::diagnostics::Request>(json).unwrap()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.find("file").bounds().size.width > px(0.));
+        window.click("file-trigger", cx);
+        window.render_frame(cx);
+        crate::diagnostics::handle(
+            request(serde_json::json!({"op":"open_url","request":7,"url":"https://example.com"})),
+            &view,
+            &emitter,
+            window,
+            cx,
+        );
+        crate::diagnostics::handle(
+            request(serde_json::json!({"op":"open_url","request":8,"url":"file:///etc/passwd"})),
+            &view,
+            &emitter,
+            window,
+            cx,
+        );
+    })
+    .unwrap();
+    let replies = replies();
+    assert_eq!(replies[0], (7, serde_json::json!({"opened": true})));
+    assert_eq!(
+        replies[1].1["error"],
+        "Only http, https and mailto URLs open"
+    );
+    // The headless platform leaves reveal_path unimplemented; only its wire
+    // shape is checked here.
+    assert!(
+        serde_json::from_value::<crate::diagnostics::Request>(serde_json::json!({
+            "op":"reveal_path","request":9,"path":"."
+        }))
+        .is_ok()
+    );
+    assert!(
+        serde_json::from_value::<crate::diagnostics::Request>(serde_json::json!({
+            "op":"prompt_paths","request":10,"files":true,"multiple":true,"prompt":"Pick"
+        }))
+        .is_ok()
+    );
+    assert!(
+        serde_json::from_value::<crate::diagnostics::Request>(serde_json::json!({
+            "op":"prompt_save_path","request":11,"directory":"C:/","suggested_name":"a.txt"
+        }))
+        .is_ok()
+    );
+}
+
+#[gpui::test]
 fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let trace = Arc::new(crate::trace::Trace::default());

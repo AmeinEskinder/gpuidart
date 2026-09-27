@@ -97,6 +97,10 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       integer('revision', minimum: 1);
       string('id');
       string('selected');
+    case 'menu_select':
+      integer('revision', minimum: 1);
+      string('id');
+      string('item');
     case 'slider_change':
       integer('revision', minimum: 1);
       string('id');

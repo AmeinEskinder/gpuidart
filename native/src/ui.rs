@@ -4,9 +4,9 @@ use crate::{
     Command, Events,
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
-        FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, Node, ScrollAxis,
-        Size as StyleSize, Snapshot, Style, TabVariant, TableView, ThemeToken, ViewEntry,
-        ViewIndex,
+        FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, MenuEntry, Node,
+        ScrollAxis, Size as StyleSize, Snapshot, Style, TabVariant, TableView, ThemeToken,
+        ViewEntry, ViewIndex,
     },
 };
 use async_channel::Receiver;
@@ -15,9 +15,10 @@ use gpui_kit::base::{ScrollbarHandle, TestSupportExt};
 use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
     ActiveTheme, Disableable, Icon, StyledExt,
-    button::{Button, ButtonVariants},
+    button::{Button, ButtonVariants, DropdownButton},
     checkbox::Checkbox,
     input::{Input, InputEvent, InputState},
+    menu::PopupMenuItem,
     progress::Progress,
     radio::{Radio, RadioGroup},
     scroll::ScrollableElement,
@@ -1424,6 +1425,55 @@ impl DartView {
                 .size_full();
                 apply_node_style(
                     annotate(div().id(id), node).test_support().child(surface),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::MenuButton { label, items, .. } => {
+                let events = self.events.clone();
+                let event_id = node.id().to_owned();
+                let revision = self.snapshot.revision;
+                let entries = items.clone();
+                let button = DropdownButton::new(SharedString::from(format!("{}-menu", node.id())))
+                    .button(
+                        Button::new(SharedString::from(format!("{}-trigger", node.id())))
+                            .accessibility_id(node.id().to_owned())
+                            .accessibility_label(accessible_name(node))
+                            .label(label.clone()),
+                    )
+                    .dropdown_menu(move |mut menu, _, _| {
+                        for entry in &entries {
+                            menu = match entry {
+                                MenuEntry::Divider { .. } => menu.separator(),
+                                MenuEntry::Item {
+                                    id: item_id,
+                                    label,
+                                    disabled,
+                                    checked,
+                                } => {
+                                    let events = events.clone();
+                                    let event_id = event_id.clone();
+                                    let item_id = item_id.clone();
+                                    menu.item(
+                                        PopupMenuItem::new(label.clone())
+                                            .disabled(*disabled)
+                                            .checked(*checked)
+                                            .on_click(move |_, _, _| {
+                                                events.emit(Event::MenuSelect {
+                                                    revision,
+                                                    id: event_id.clone(),
+                                                    item: item_id.clone(),
+                                                });
+                                            }),
+                                    )
+                                }
+                            };
+                        }
+                        menu
+                    });
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(button),
                     node,
                     colors,
                 )

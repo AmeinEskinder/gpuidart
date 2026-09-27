@@ -277,6 +277,87 @@ final class UiSeparator extends UiNode {
   }
 }
 
+/// One entry of a [UiMenuButton] menu.
+sealed class UiMenuEntry {
+  const UiMenuEntry();
+  Map<String, Object> toJson();
+}
+
+final class UiMenuItem extends UiMenuEntry {
+  const UiMenuItem(
+    this.id,
+    this.label, {
+    this.disabled = false,
+    this.checked = false,
+  });
+  final String id;
+  final String label;
+  final bool disabled;
+  final bool checked;
+
+  @override
+  Map<String, Object> toJson() {
+    if (id.isEmpty ||
+        utf8.encode(id).length > 256 ||
+        label.isEmpty ||
+        utf8.encode(label).length > 1024) {
+      throw ArgumentError(
+        'Menu items need an ID of 1..256 and a label of 1..1024 UTF-8 bytes',
+      );
+    }
+    return {
+      'id': id,
+      'label': label,
+      if (disabled) 'disabled': true,
+      if (checked) 'checked': true,
+    };
+  }
+}
+
+final class UiMenuDivider extends UiMenuEntry {
+  const UiMenuDivider();
+  @override
+  Map<String, Object> toJson() => const {'divider': true};
+}
+
+/// A button that opens a native popup menu. `menu_select` carries the chosen
+/// item ID in [GpuiEvent.item]. One to 64 entries with unique item IDs.
+final class UiMenuButton extends UiNode {
+  UiMenuButton(
+    super.id,
+    this.label, {
+    required List<UiMenuEntry> items,
+    super.style,
+    super.semantics,
+  }) : items = List.unmodifiable(items);
+  final String label;
+  final List<UiMenuEntry> items;
+
+  @override
+  Map<String, Object> props() {
+    if (label.isEmpty || utf8.encode(label).length > 1024) {
+      throw ArgumentError.value(label, 'label', '1..1024 UTF-8 bytes');
+    }
+    if (items.isEmpty || items.length > 64) {
+      throw ArgumentError('Menu buttons carry 1..64 items');
+    }
+    final ids = <String>{};
+    for (final item in items.whereType<UiMenuItem>()) {
+      if (!ids.add(item.id)) {
+        throw ArgumentError.value(item.id, 'id', 'Duplicate menu item');
+      }
+    }
+    return {
+      'kind': 'menu_button',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('menu_button'),
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      'items': items.map((item) => item.toJson()).toList(),
+    };
+  }
+}
+
 enum UiTabVariant {
   underline('underline'),
   pill('pill'),

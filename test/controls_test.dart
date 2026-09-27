@@ -205,6 +205,65 @@ void main() {
     }
   });
 
+  test('menu buttons encode entries and menu selections decode', () {
+    final menu = UiMenuButton(
+      'file',
+      'File',
+      items: const [
+        UiMenuItem('open', 'Open'),
+        UiMenuDivider(),
+        UiMenuItem('save', 'Save', disabled: true),
+        UiMenuItem('wrap', 'Word wrap', checked: true),
+      ],
+    );
+    expect(menu.toJson(), {
+      'kind': 'menu_button',
+      'id': 'file',
+      'label': 'File',
+      'items': [
+        {'id': 'open', 'label': 'Open'},
+        {'divider': true},
+        {'id': 'save', 'label': 'Save', 'disabled': true},
+        {'id': 'wrap', 'label': 'Word wrap', 'checked': true},
+      ],
+    });
+    expect(
+      UiMenuButton('m', 'File', items: const []).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      UiMenuButton(
+        'm',
+        'File',
+        items: const [UiMenuItem('a', 'A'), UiMenuItem('a', 'B')],
+      ).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      UiMenuButton('m', '', items: const [UiMenuItem('a', 'A')]).toJson,
+      throwsArgumentError,
+    );
+    final event = decodeNativeEvent(
+      utf8.encode(
+        jsonEncode({
+          'type': 'menu_select',
+          'revision': 1,
+          'id': 'file',
+          'item': 'save',
+        }),
+      ),
+    );
+    expect(event['item'], 'save');
+    expect(
+      () => decodeNativeEvent(
+        utf8.encode(
+          jsonEncode({'type': 'menu_select', 'revision': 1, 'id': 'file'}),
+        ),
+      ),
+      throwsFormatException,
+    );
+  });
+
   test('switch and radio events decode with their values', () {
     Map<String, dynamic> decode(Map<String, Object?> event) =>
         decodeNativeEvent(utf8.encode(jsonEncode(event)));

@@ -41,7 +41,8 @@ pub(super) fn accessible_name(node: &Node) -> String {
         Node::Text { text, .. } => text.clone(),
         Node::Button { label, .. }
         | Node::Checkbox { label, .. }
-        | Node::ConfirmDialog { label, .. } => label.clone(),
+        | Node::ConfirmDialog { label, .. }
+        | Node::MenuButton { label, .. } => label.clone(),
         Node::Input { placeholder, .. } | Node::Select { placeholder, .. }
             if !placeholder.is_empty() =>
         {

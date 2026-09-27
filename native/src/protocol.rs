@@ -309,6 +309,33 @@ pub enum Node {
         semantics: Option<Semantics>,
         commands: Vec<Draw>,
     },
+    /// A button that opens a native popup menu; `menu_select` carries the
+    /// chosen item ID.
+    MenuButton {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        label: String,
+        items: Vec<MenuEntry>,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged, deny_unknown_fields)]
+pub enum MenuEntry {
+    Divider {
+        divider: bool,
+    },
+    Item {
+        id: String,
+        label: String,
+        #[serde(default)]
+        disabled: bool,
+        #[serde(default)]
+        checked: bool,
+    },
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -1197,7 +1224,8 @@ impl Node {
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
             | Self::Tabs { id, .. }
-            | Self::Canvas { id, .. } => id,
+            | Self::Canvas { id, .. }
+            | Self::MenuButton { id, .. } => id,
         }
     }
 
@@ -1220,7 +1248,8 @@ impl Node {
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
             | Self::Tabs { style, .. }
-            | Self::Canvas { style, .. } => style.as_ref(),
+            | Self::Canvas { style, .. }
+            | Self::MenuButton { style, .. } => style.as_ref(),
         }
     }
 
@@ -1243,7 +1272,8 @@ impl Node {
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
             | Self::Tabs { semantics, .. }
-            | Self::Canvas { semantics, .. } => semantics.as_ref(),
+            | Self::Canvas { semantics, .. }
+            | Self::MenuButton { semantics, .. } => semantics.as_ref(),
         }
     }
 
@@ -1400,6 +1430,34 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
             }
             for command in commands {
                 command.validate()?;
+            }
+        }
+        Node::MenuButton { label, items, .. } => {
+            if label.is_empty() || label.len() > 1024 {
+                return Err("Menu button label must contain 1..1024 UTF-8 bytes".into());
+            }
+            if items.is_empty() || items.len() > 64 {
+                return Err("Menu buttons carry 1..64 items".into());
+            }
+            let mut keys = HashSet::new();
+            for entry in items {
+                match entry {
+                    MenuEntry::Divider { divider } => {
+                        if !divider {
+                            return Err("Menu dividers are written as divider: true".into());
+                        }
+                    }
+                    MenuEntry::Item { id, label, .. } => {
+                        if id.is_empty()
+                            || id.len() > 256
+                            || !keys.insert(id)
+                            || label.is_empty()
+                            || label.len() > 1024
+                        {
+                            return Err("Invalid or duplicate menu item".into());
+                        }
+                    }
+                }
             }
         }
         Node::Progress {
@@ -1746,6 +1804,11 @@ pub enum Event {
         revision: u64,
         id: String,
         selected: String,
+    },
+    MenuSelect {
+        revision: u64,
+        id: String,
+        item: String,
     },
     SliderChange {
         revision: u64,
@@ -2709,6 +2772,41 @@ mod tests {
             r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":100,"offset":[[0,0],[9000,0]]}}}"#.into(),
             r#"{"kind":"text","id":"t","text":"x","style":{"animation":{"duration_ms":100,"opacity":[0,1],"easing":"elastic"}}}"#.into(),
             r#"{"kind":"canvas","id":"c","commands":[],"semantics":{"role":"button"}}"#.into(),
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
+        }
+    }
+
+    #[test]
+    fn menu_buttons_validate_their_items() {
+        let snapshot = Snapshot::parse(
+            br#"{"revision":1,"root":{"kind":"menu_button","id":"file","label":"File","semantics":{"role":"button"},"items":[
+                {"id":"open","label":"Open"},
+                {"divider":true},
+                {"id":"save","label":"Save","disabled":true,"checked":false},
+                {"id":"wrap","label":"Word wrap","checked":true}
+            ]}}"#,
+        )
+        .unwrap();
+        let Node::MenuButton { items, .. } = &snapshot.root else {
+            panic!("menu button");
+        };
+        assert_eq!(items.len(), 4);
+        assert!(matches!(&items[1], MenuEntry::Divider { divider: true }));
+        assert!(matches!(&items[2], MenuEntry::Item { disabled: true, .. }));
+        for invalid in [
+            r#"{"kind":"menu_button","id":"m","label":"","items":[{"id":"a","label":"A"}]}"#.to_string(),
+            r#"{"kind":"menu_button","id":"m","label":"File","items":[]}"#.into(),
+            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A"},{"id":"a","label":"B"}]}"#.into(),
+            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"","label":"A"}]}"#.into(),
+            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"divider":false}]}"#.into(),
+            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A","icon":"x"}]}"#.into(),
+            format!(
+                r#"{{"kind":"menu_button","id":"m","label":"File","items":[{}]}}"#,
+                (0..65).map(|i| format!(r#"{{"id":"i{i}","label":"I"}}"#)).collect::<Vec<_>>().join(",")
+            ),
+            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A"}],"semantics":{"role":"switch"}}"#.into(),
         ] {
             let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
             assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");

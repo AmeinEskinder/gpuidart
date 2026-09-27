@@ -65,6 +65,7 @@ impl Semantics {
                 Node::Separator { .. } => role == Separator,
                 Node::Tabs { .. } => role == TabList,
                 Node::Canvas { .. } => role == Image,
+                Node::MenuButton { .. } => role == Button,
             };
             if !valid {
                 return Err(format!(
