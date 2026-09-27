@@ -10,19 +10,33 @@ sealed class UiNode {
   final String id;
   final UiStyle? style;
   final UiSemantics? semantics;
-  Map<String, Object> toJson();
+
+  /// Child nodes. Only [UiColumn] and [UiRow] have any.
+  List<UiNode> get children => const [];
+
+  /// This node's own fields without [children]. Throws [ArgumentError] when a
+  /// field is outside the protocol's bounds.
+  Map<String, Object> props();
+
+  /// The complete description of this node and its descendants.
+  Map<String, Object> toJson() => props();
 }
 
 final class UiColumn extends UiNode {
   UiColumn(super.id, List<UiNode> children, {super.style, super.semantics})
     : children = List.unmodifiable(children);
+  @override
   final List<UiNode> children;
   @override
-  Map<String, Object> toJson() => {
+  Map<String, Object> props() => {
     'kind': 'column',
     'id': id,
     if (semantics != null) 'semantics': semantics!.toJson('column'),
     if (style != null) 'style': style!.toJson(),
+  };
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
     'children': children.map((child) => child.toJson()).toList(),
   };
 }
@@ -31,13 +45,18 @@ final class UiColumn extends UiNode {
 final class UiRow extends UiNode {
   UiRow(super.id, List<UiNode> children, {super.style, super.semantics})
     : children = List.unmodifiable(children);
+  @override
   final List<UiNode> children;
   @override
-  Map<String, Object> toJson() => {
+  Map<String, Object> props() => {
     'kind': 'row',
     'id': id,
     if (semantics != null) 'semantics': semantics!.toJson('row'),
     if (style != null) 'style': style!.toJson(),
+  };
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
     'children': children.map((child) => child.toJson()).toList(),
   };
 }
@@ -46,7 +65,7 @@ final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;
   @override
-  Map<String, Object> toJson() => {
+  Map<String, Object> props() => {
     'kind': 'text',
     'id': id,
     if (semantics != null) 'semantics': semantics!.toJson('text'),
@@ -59,7 +78,7 @@ final class UiButton extends UiNode {
   const UiButton(super.id, this.label, {super.style, super.semantics});
   final String label;
   @override
-  Map<String, Object> toJson() => {
+  Map<String, Object> props() => {
     'kind': 'button',
     'id': id,
     if (semantics != null) 'semantics': semantics!.toJson('button'),
@@ -84,7 +103,7 @@ final class UiCheckbox extends UiNode {
   final bool disabled;
 
   @override
-  Map<String, Object> toJson() {
+  Map<String, Object> props() {
     if (utf8.encode(label).length > 1024) {
       throw ArgumentError.value(label, 'label', 'Maximum 1024 UTF-8 bytes');
     }
@@ -122,7 +141,7 @@ final class UiSlider extends UiNode {
   final bool disabled;
 
   @override
-  Map<String, Object> toJson() {
+  Map<String, Object> props() {
     final native = Float32List.fromList([min, max, step, number]);
     final stepped = Float32List.fromList([
       native[0] + native[2],
@@ -181,7 +200,7 @@ final class UiSelect extends UiNode {
   final bool disabled;
 
   @override
-  Map<String, Object> toJson() {
+  Map<String, Object> props() {
     if (options.isEmpty ||
         options.length > 256 ||
         utf8.encode(placeholder).length > 1024) {
@@ -238,7 +257,7 @@ final class UiConfirmDialog extends UiNode {
   final String cancelLabel;
   final bool disabled;
   @override
-  Map<String, Object> toJson() {
+  Map<String, Object> props() {
     if ([
           label,
           title,
@@ -277,7 +296,7 @@ final class UiInput extends UiNode {
   final String placeholder;
   final bool controlled;
   @override
-  Map<String, Object> toJson() => {
+  Map<String, Object> props() => {
     'kind': 'input',
     'id': id,
     if (semantics != null) 'semantics': semantics!.toJson('input'),
@@ -301,7 +320,7 @@ final class UiTable extends UiNode {
   /// Presentation-only sort/filter view over the dataset.
   final UiTableView? view;
   @override
-  Map<String, Object> toJson() => {
+  Map<String, Object> props() => {
     'kind': 'table',
     'id': id,
     if (semantics != null) 'semantics': semantics!.toJson('table'),
