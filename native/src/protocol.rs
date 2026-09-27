@@ -111,6 +111,7 @@ pub enum Node {
         style: Option<Style>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         semantics: Option<Semantics>,
+        #[serde(default)]
         children: Vec<Node>,
     },
     Row {
@@ -119,6 +120,7 @@ pub enum Node {
         style: Option<Style>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         semantics: Option<Semantics>,
+        #[serde(default)]
         children: Vec<Node>,
     },
     Text {
@@ -734,108 +736,113 @@ impl Snapshot {
             return Err("Revision must be positive".into());
         }
         let mut ids = HashSet::new();
-        fn validate(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result<(), String> {
-            if depth > 32 || ids.len() >= 4096 {
-                return Err("Snapshot is too large or deeply nested".into());
-            }
-            if node.id().is_empty() || !ids.insert(node.id().to_owned()) {
-                return Err(format!("Empty or duplicate node ID: {}", node.id()));
-            }
-            if let Some(style) = node.style() {
-                style.validate(matches!(node, Node::Text { .. }))?;
-            }
-            if let Some(semantics) = node.semantics() {
-                semantics.validate(node)?;
-            }
-            match node {
-                Node::Column { children, .. } | Node::Row { children, .. } => {
-                    for child in children {
-                        validate(child, depth + 1, ids)?;
-                    }
-                }
-                Node::Table { dataset, view, .. } => {
-                    if dataset.is_empty() {
-                        return Err("Table dataset ID must be nonempty".into());
-                    }
-                    if let Some(view) = view {
-                        view.validate()?;
-                    }
-                }
-                Node::Checkbox { label, .. } if label.len() > 1024 => {
-                    return Err("Checkbox label exceeds 1024 UTF-8 bytes".into());
-                }
-                Node::Slider {
-                    min,
-                    max,
-                    step,
-                    number,
-                    ..
-                } => {
-                    if ![min, max, step, number].iter().all(|v| v.is_finite())
-                        || min.abs() > 1_000_000.
-                        || max.abs() > 1_000_000.
-                        || min >= max
-                        || *step <= 0.
-                        || *step > max - min
-                        || min + step <= *min
-                        || max - step >= *max
-                        || number < min
-                        || number > max
-                    {
-                        return Err("Invalid slider range, step or number".into());
-                    }
-                }
-                Node::Select {
-                    options,
-                    selected,
-                    placeholder,
-                    ..
-                } => {
-                    if options.is_empty() || options.len() > 256 || placeholder.len() > 1024 {
-                        return Err("Select requires 1..256 options and a placeholder of at most 1024 UTF-8 bytes".into());
-                    }
-                    let mut keys = HashSet::new();
-                    for option in options {
-                        if option.id.is_empty()
-                            || option.id.len() > 256
-                            || !keys.insert(&option.id)
-                            || option.label.is_empty()
-                            || option.label.len() > 1024
-                        {
-                            return Err("Invalid or duplicate select option".into());
-                        }
-                    }
-                    if selected.as_ref().is_some_and(|id| !keys.contains(id)) {
-                        return Err("Select selected ID is not an option".into());
-                    }
-                }
-                Node::ConfirmDialog {
-                    label,
-                    title,
-                    message,
-                    confirm_label,
-                    cancel_label,
-                    ..
-                } => {
-                    if [label, title, confirm_label, cancel_label]
-                        .iter()
-                        .any(|s| s.is_empty() || s.len() > 1024)
-                        || message.len() > 8192
-                    {
-                        return Err(
-                            "Dialog labels must contain 1..1024 UTF-8 bytes; message at most 8192"
-                                .into(),
-                        );
-                    }
-                }
-                _ => {}
-            }
-            Ok(())
-        }
-        validate(&self.root, 0, &mut ids)?;
+        validate_tree(&self.root, 0, &mut ids)?;
         self.validate_actions(&ids)
     }
+}
 
+fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result<(), String> {
+    if depth > 32 || ids.len() >= 4096 {
+        return Err("Snapshot is too large or deeply nested".into());
+    }
+    if node.id().is_empty() || !ids.insert(node.id().to_owned()) {
+        return Err(format!("Empty or duplicate node ID: {}", node.id()));
+    }
+    if let Some(style) = node.style() {
+        style.validate(matches!(node, Node::Text { .. }))?;
+    }
+    if let Some(semantics) = node.semantics() {
+        semantics.validate(node)?;
+    }
+    match node {
+        Node::Column { children, .. } | Node::Row { children, .. } => {
+            for child in children {
+                validate_tree(child, depth + 1, ids)?;
+            }
+        }
+        Node::Table { dataset, view, .. } => {
+            if dataset.is_empty() {
+                return Err("Table dataset ID must be nonempty".into());
+            }
+            if let Some(view) = view {
+                view.validate()?;
+            }
+        }
+        Node::Checkbox { label, .. } if label.len() > 1024 => {
+            return Err("Checkbox label exceeds 1024 UTF-8 bytes".into());
+        }
+        Node::Slider {
+            min,
+            max,
+            step,
+            number,
+            ..
+        } => {
+            if ![min, max, step, number].iter().all(|v| v.is_finite())
+                || min.abs() > 1_000_000.
+                || max.abs() > 1_000_000.
+                || min >= max
+                || *step <= 0.
+                || *step > max - min
+                || min + step <= *min
+                || max - step >= *max
+                || number < min
+                || number > max
+            {
+                return Err("Invalid slider range, step or number".into());
+            }
+        }
+        Node::Select {
+            options,
+            selected,
+            placeholder,
+            ..
+        } => {
+            if options.is_empty() || options.len() > 256 || placeholder.len() > 1024 {
+                return Err(
+                    "Select requires 1..256 options and a placeholder of at most 1024 UTF-8 bytes"
+                        .into(),
+                );
+            }
+            let mut keys = HashSet::new();
+            for option in options {
+                if option.id.is_empty()
+                    || option.id.len() > 256
+                    || !keys.insert(&option.id)
+                    || option.label.is_empty()
+                    || option.label.len() > 1024
+                {
+                    return Err("Invalid or duplicate select option".into());
+                }
+            }
+            if selected.as_ref().is_some_and(|id| !keys.contains(id)) {
+                return Err("Select selected ID is not an option".into());
+            }
+        }
+        Node::ConfirmDialog {
+            label,
+            title,
+            message,
+            confirm_label,
+            cancel_label,
+            ..
+        } => {
+            if [label, title, confirm_label, cancel_label]
+                .iter()
+                .any(|s| s.is_empty() || s.len() > 1024)
+                || message.len() > 8192
+            {
+                return Err(
+                    "Dialog labels must contain 1..1024 UTF-8 bytes; message at most 8192".into(),
+                );
+            }
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+impl Snapshot {
     fn validate_actions(&self, ids: &HashSet<String>) -> Result<(), String> {
         if self.actions.len() > 256 {
             return Err("At most 256 action bindings per snapshot".into());
@@ -868,6 +875,224 @@ impl Snapshot {
         }
         Ok(())
     }
+}
+
+/// Operations against the applied description, submitted through `gd_update`.
+/// The batch is atomic: any failing operation rejects the whole update and the
+/// applied description stays as it was.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Update {
+    pub revision: u64,
+    /// The applied revision this batch was computed against.
+    pub base_revision: u64,
+    pub ops: Vec<Op>,
+    /// Replaces the bindings like a snapshot does; omission clears them.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub actions: Vec<ActionBinding>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum Op {
+    /// Appends a subtree whose IDs are all new.
+    Insert { parent: String, node: Node },
+    /// Detaches an existing subtree and appends it to `parent`.
+    Reparent { id: String, parent: String },
+    /// Detaches and drops a subtree.
+    Remove { id: String },
+    /// Replaces a node's own fields. The kind stays and children are kept.
+    Set { id: String, node: Node },
+    /// Reorders a container's children; lists each current child exactly once.
+    Children { id: String, children: Vec<String> },
+}
+
+const MAX_OPS: usize = 4096;
+
+impl Update {
+    pub fn parse(bytes: &[u8]) -> Result<Self, String> {
+        if bytes.len() > MAX_MESSAGE_BYTES {
+            return Err("Update exceeds 16 MiB".into());
+        }
+        let update: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+        update.validate()?;
+        Ok(update)
+    }
+
+    /// Everything checkable without the applied description.
+    pub fn validate(&self) -> Result<(), String> {
+        if self.base_revision == 0 || self.revision <= self.base_revision {
+            return Err("Update revision must follow a positive base revision".into());
+        }
+        if self.ops.len() > MAX_OPS {
+            return Err("At most 4096 operations per update".into());
+        }
+        for op in &self.ops {
+            match op {
+                Op::Insert { parent, node } => {
+                    if parent.is_empty() {
+                        return Err("Insert parent ID must be nonempty".into());
+                    }
+                    validate_tree(node, 0, &mut HashSet::new())?;
+                }
+                Op::Set { id, node } => {
+                    if node.id() != id {
+                        return Err(format!("Set node ID differs from its target: {id}"));
+                    }
+                    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+                        if !children.is_empty() {
+                            return Err("Set carries own fields only, not children".into());
+                        }
+                    }
+                    validate_tree(node, 0, &mut HashSet::new())?;
+                }
+                Op::Reparent { id, parent } => {
+                    if id.is_empty() || parent.is_empty() {
+                        return Err("Reparent IDs must be nonempty".into());
+                    }
+                }
+                Op::Remove { id } => {
+                    if id.is_empty() {
+                        return Err("Remove ID must be nonempty".into());
+                    }
+                }
+                Op::Children { id, children } => {
+                    if id.is_empty() || children.len() > MAX_OPS {
+                        return Err("Invalid children order".into());
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Snapshot {
+    /// The description after `update`, or the first failing operation. `self`
+    /// is never modified. The caller checks `base_revision` against the
+    /// applied revision first.
+    pub fn apply(&self, update: &Update) -> Result<Snapshot, String> {
+        let mut root = self.root.clone();
+        let mut ids = HashSet::new();
+        root.visit(&mut |node| {
+            ids.insert(node.id().to_owned());
+        });
+        for op in &update.ops {
+            match op {
+                Op::Insert { parent, node } => {
+                    let mut inserted = Vec::new();
+                    node.visit(&mut |node| inserted.push(node.id().to_owned()));
+                    for id in inserted {
+                        if !ids.insert(id.clone()) {
+                            return Err(format!("Insert repeats an existing node ID: {id}"));
+                        }
+                    }
+                    let target = find_mut(&mut root, parent)
+                        .ok_or_else(|| format!("Insert parent is missing: {parent}"))?;
+                    children_mut(target)
+                        .ok_or_else(|| format!("Insert parent has no children: {parent}"))?
+                        .push(node.clone());
+                }
+                Op::Reparent { id, parent } => {
+                    let node = detach(&mut root, id)
+                        .ok_or_else(|| format!("Reparent target is missing or the root: {id}"))?;
+                    let target = find_mut(&mut root, parent).ok_or_else(|| {
+                        format!("Reparent parent is missing or inside the moved subtree: {parent}")
+                    })?;
+                    children_mut(target)
+                        .ok_or_else(|| format!("Reparent parent has no children: {parent}"))?
+                        .push(node);
+                }
+                Op::Remove { id } => {
+                    let node = detach(&mut root, id)
+                        .ok_or_else(|| format!("Remove target is missing or the root: {id}"))?;
+                    node.visit(&mut |node| {
+                        ids.remove(node.id());
+                    });
+                }
+                Op::Set { id, node } => {
+                    let target = find_mut(&mut root, id)
+                        .ok_or_else(|| format!("Set target is missing: {id}"))?;
+                    if std::mem::discriminant(target) != std::mem::discriminant(node) {
+                        return Err(format!("Set changes the kind of node: {id}"));
+                    }
+                    let mut replacement = node.clone();
+                    if let Node::Column { children: old, .. } | Node::Row { children: old, .. } =
+                        target
+                    {
+                        if let Node::Column { children: new, .. }
+                        | Node::Row { children: new, .. } = &mut replacement
+                        {
+                            *new = std::mem::take(old);
+                        }
+                    }
+                    *target = replacement;
+                }
+                Op::Children { id, children } => {
+                    let target = find_mut(&mut root, id)
+                        .ok_or_else(|| format!("Children target is missing: {id}"))?;
+                    let current = children_mut(target)
+                        .ok_or_else(|| format!("Children target has no children: {id}"))?;
+                    if current.len() != children.len() {
+                        return Err(format!("Children order must list every child once: {id}"));
+                    }
+                    let mut by_id: HashMap<String, Node> = std::mem::take(current)
+                        .into_iter()
+                        .map(|node| (node.id().to_owned(), node))
+                        .collect();
+                    for child in children {
+                        current.push(by_id.remove(child).ok_or_else(|| {
+                            format!("Children order names a node that is not a child: {child}")
+                        })?);
+                    }
+                }
+            }
+        }
+        let snapshot = Snapshot {
+            revision: update.revision,
+            actions: update.actions.clone(),
+            root,
+        };
+        snapshot.validate()?;
+        Ok(snapshot)
+    }
+}
+
+pub(crate) fn find_mut<'a>(node: &'a mut Node, id: &str) -> Option<&'a mut Node> {
+    if node.id() == id {
+        return Some(node);
+    }
+    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+        for child in children {
+            if let Some(found) = find_mut(child, id) {
+                return Some(found);
+            }
+        }
+    }
+    None
+}
+
+pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
+    match node {
+        Node::Column { children, .. } | Node::Row { children, .. } => Some(children),
+        _ => None,
+    }
+}
+
+/// Removes and returns the node with `id` from below `node`. The root itself
+/// is never detached.
+pub(crate) fn detach(node: &mut Node, id: &str) -> Option<Node> {
+    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+        if let Some(index) = children.iter().position(|child| child.id() == id) {
+            return Some(children.remove(index));
+        }
+        for child in children {
+            if let Some(found) = detach(child, id) {
+                return Some(found);
+            }
+        }
+    }
+    None
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -1652,6 +1877,146 @@ mod tests {
         assert_eq!(
             encoded,
             serde_json::json!({"kind":"text","id":"t","text":"x"})
+        );
+    }
+
+    fn applied() -> Snapshot {
+        Snapshot::parse(
+            br#"{"revision":4,"actions":[{"name":"save","keys":"ctrl+s","context":"name"}],"root":{"kind":"column","id":"root","children":[
+                {"kind":"text","id":"a","text":"A"},
+                {"kind":"input","id":"name","placeholder":"Name"},
+                {"kind":"row","id":"r","children":[{"kind":"text","id":"c","text":"C"}]}
+            ]}}"#,
+        )
+        .unwrap()
+    }
+
+    fn update(json: serde_json::Value) -> Result<Update, String> {
+        Update::parse(&serde_json::to_vec(&json).unwrap())
+    }
+
+    #[test]
+    fn update_parse_checks_shape_and_static_bounds() {
+        assert!(update(serde_json::json!({"revision":5,"base_revision":4,"ops":[]})).is_ok());
+        for invalid in [
+            serde_json::json!({"revision":4,"base_revision":4,"ops":[]}),
+            serde_json::json!({"revision":5,"base_revision":0,"ops":[]}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[],"extra":1}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"paint","id":"a"}]}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"set","id":"a","node":{"kind":"text","id":"b","text":"B"}}]}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"set","id":"r","node":{"kind":"row","id":"r","children":[{"kind":"text","id":"x","text":"X"}]}}]}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"insert","parent":"root","node":{"kind":"text","id":"","text":"X"}}]}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"insert","parent":"root","node":{"kind":"checkbox","id":"x","label":"y".repeat(1025),"checked":true}}]}),
+            serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"remove","id":""}]}),
+        ] {
+            assert!(update(invalid.clone()).is_err(), "{invalid}");
+        }
+        let too_many = serde_json::json!({"revision":5,"base_revision":4,"ops":(0..4097).map(|i| serde_json::json!({"op":"remove","id":format!("n{i}")})).collect::<Vec<_>>()});
+        assert!(update(too_many).is_err());
+    }
+
+    #[test]
+    fn apply_runs_every_operation_and_leaves_the_original() {
+        let before = applied();
+        let batch = update(serde_json::json!({
+            "revision":5,"base_revision":4,
+            "actions":[{"name":"save","keys":"ctrl+enter","context":"global"}],
+            "ops":[
+                {"op":"insert","parent":"root","node":{"kind":"row","id":"r2","children":[{"kind":"text","id":"d","text":"D"}]}},
+                {"op":"reparent","id":"name","parent":"r2"},
+                {"op":"remove","id":"c"},
+                {"op":"set","id":"a","node":{"kind":"text","id":"a","text":"A2","style":{"gap":4}}},
+                {"op":"set","id":"r2","node":{"kind":"row","id":"r2","style":{"gap":8}}},
+                {"op":"children","id":"root","children":["r2","r","a"]}
+            ]
+        }))
+        .unwrap();
+        let after = before.apply(&batch).unwrap();
+        assert_eq!(after.revision, 5);
+        assert_eq!(after.actions.len(), 1);
+        assert_eq!(after.actions[0].keys, "ctrl+enter");
+        let expected = Snapshot::parse(
+            br#"{"revision":5,"root":{"kind":"column","id":"root","children":[
+                {"kind":"row","id":"r2","style":{"gap":8},"children":[
+                    {"kind":"text","id":"d","text":"D"},
+                    {"kind":"input","id":"name","placeholder":"Name"}
+                ]},
+                {"kind":"row","id":"r","children":[]},
+                {"kind":"text","id":"a","text":"A2","style":{"gap":4}}
+            ]}}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::to_value(&after.root).unwrap(),
+            serde_json::to_value(&expected.root).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(&before.root).unwrap(),
+            serde_json::to_value(&applied().root).unwrap()
+        );
+        assert_eq!(before.revision, 4);
+    }
+
+    #[test]
+    fn apply_rejects_bad_targets_and_resulting_descriptions() {
+        let before = applied();
+        for (ops, expected) in [
+            (
+                serde_json::json!([{"op":"insert","parent":"root","node":{"kind":"text","id":"a","text":"dup"}}]),
+                "existing node ID",
+            ),
+            (
+                serde_json::json!([{"op":"insert","parent":"missing","node":{"kind":"text","id":"x","text":"X"}}]),
+                "parent is missing",
+            ),
+            (
+                serde_json::json!([{"op":"insert","parent":"a","node":{"kind":"text","id":"x","text":"X"}}]),
+                "no children",
+            ),
+            (
+                serde_json::json!([{"op":"reparent","id":"root","parent":"r"}]),
+                "missing or the root",
+            ),
+            (
+                serde_json::json!([{"op":"reparent","id":"r","parent":"c"}]),
+                "inside the moved subtree",
+            ),
+            (
+                serde_json::json!([{"op":"remove","id":"missing"}]),
+                "missing or the root",
+            ),
+            (
+                serde_json::json!([{"op":"set","id":"a","node":{"kind":"button","id":"a","label":"A"}}]),
+                "changes the kind",
+            ),
+            (
+                serde_json::json!([{"op":"children","id":"root","children":["a","name"]}]),
+                "every child once",
+            ),
+            (
+                serde_json::json!([{"op":"children","id":"root","children":["a","name","name"]}]),
+                "not a child",
+            ),
+            (
+                serde_json::json!([{"op":"remove","id":"name"}]),
+                "Action context",
+            ),
+        ] {
+            let batch = update(serde_json::json!({"revision":5,"base_revision":4,"ops":ops,"actions":[{"name":"save","keys":"ctrl+s","context":"name"}]})).unwrap();
+            let error = before.apply(&batch).unwrap_err();
+            assert!(error.contains(expected), "{ops}: {error}");
+        }
+        // Thirty-three levels parse on their own and exceed the bound once
+        // they hang below the root.
+        let mut deep = serde_json::json!({"kind":"text","id":"leaf","text":"x"});
+        for depth in 0..32 {
+            deep = serde_json::json!({"kind":"column","id":format!("d{depth}"),"children":[deep]});
+        }
+        let batch = update(serde_json::json!({"revision":5,"base_revision":4,"ops":[{"op":"insert","parent":"root","node":deep}]})).unwrap();
+        assert!(before.apply(&batch).unwrap_err().contains("deeply nested"));
+        assert_eq!(
+            serde_json::to_value(&before.root).unwrap(),
+            serde_json::to_value(&applied().root).unwrap()
         );
     }
 }

@@ -43,6 +43,7 @@ impl Events {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub(crate) enum Command {
     Publish(Snapshot),
+    Update(protocol::Update),
     Dataset(datasets::Update, u64),
     Diagnostic(diagnostics::Request),
     Input(input_control::Request),
@@ -55,6 +56,10 @@ impl Command {
             Self::Publish(snapshot) => trace::Key {
                 operation: "snapshot",
                 request: snapshot.revision,
+            },
+            Self::Update(update) => trace::Key {
+                operation: "snapshot",
+                request: update.revision,
             },
             Self::Dataset(update, _) => trace::Key {
                 operation: "dataset",
@@ -374,6 +379,38 @@ unsafe fn publish(host: *const Host, bytes: *const u8, len: usize) -> i32 {
     let started = host.trace.start();
     match Snapshot::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
         Ok(snapshot) => submit(host, Command::Publish(snapshot), len, started),
+        Err(_) => {
+            host.trace.complete(
+                "native.parse",
+                trace::Key {
+                    operation: "snapshot",
+                    request: 0,
+                },
+                started,
+                Some(len),
+                Some(-2),
+            );
+            -2
+        }
+    }
+}
+
+/// Copies and validates operations against the applied description. Same
+/// statuses as `gd_publish`; a stale base revision or a failing operation is
+/// reported asynchronously as `rejected` and leaves the applied description.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_update(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    boundary::call(-4, || unsafe { update(host, bytes, len) })
+}
+
+unsafe fn update(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
+        return -1;
+    }
+    let host = unsafe { &*host };
+    let started = host.trace.start();
+    match protocol::Update::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
+        Ok(update) => submit(host, Command::Update(update), len, started),
         Err(_) => {
             host.trace.complete(
                 "native.parse",

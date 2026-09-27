@@ -414,21 +414,61 @@ impl DartView {
             });
             return;
         }
-        if let Err(message) = snapshot
-            .validate()
-            .and_then(|_| {
-                datasets::validate_references(&snapshot, |id| {
-                    self.datasets.entries.contains_key(id)
+        if let Err(message) = snapshot.validate() {
+            self.events.emit(Event::Rejected {
+                revision: snapshot.revision,
+                message,
+            });
+            return;
+        }
+        self.commit(snapshot, timer, window, cx);
+    }
+
+    /// Applies operations computed against the applied revision. A stale base
+    /// or a failing operation rejects the update and leaves the description.
+    fn apply_update(
+        &mut self,
+        update: crate::protocol::Update,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let timer = Instant::now();
+        if update.base_revision != self.snapshot.revision {
+            self.events.emit(Event::Rejected {
+                revision: update.revision,
+                message: format!(
+                    "Stale base revision {}; the applied revision is {}",
+                    update.base_revision, self.snapshot.revision
+                ),
+            });
+            return;
+        }
+        match self.snapshot.apply(&update) {
+            Ok(snapshot) => self.commit(snapshot, timer, window, cx),
+            Err(message) => self.events.emit(Event::Rejected {
+                revision: update.revision,
+                message,
+            }),
+        }
+    }
+
+    fn commit(
+        &mut self,
+        snapshot: Snapshot,
+        timer: Instant,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Err(message) =
+            datasets::validate_references(&snapshot, |id| self.datasets.entries.contains_key(id))
+                .and_then(|_| {
+                    datasets::validate_views(&snapshot, |id| {
+                        self.datasets
+                            .entries
+                            .get(id)
+                            .map(|data| data.borrow().data.columns.len())
+                    })
                 })
-            })
-            .and_then(|_| {
-                datasets::validate_views(&snapshot, |id| {
-                    self.datasets
-                        .entries
-                        .get(id)
-                        .map(|data| data.borrow().data.columns.len())
-                })
-            })
         {
             self.events.emit(Event::Rejected {
                 revision: snapshot.revision,
@@ -1451,6 +1491,18 @@ pub(crate) fn run(
                             if handle
                                 .update(cx, |_, window, cx| {
                                     view.update(cx, |view, cx| view.publish(snapshot, window, cx))
+                                })
+                                .is_err()
+                            {
+                                break;
+                            }
+                        }
+                        Command::Update(update) => {
+                            if handle
+                                .update(cx, |_, window, cx| {
+                                    view.update(cx, |view, cx| {
+                                        view.apply_update(update, window, cx)
+                                    })
                                 })
                                 .is_err()
                             {

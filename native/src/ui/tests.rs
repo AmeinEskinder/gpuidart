@@ -178,6 +178,125 @@ fn checkbox_pointer_keyboard_disabled_and_focus_retention(cx: &mut TestAppContex
 }
 
 #[gpui::test]
+fn updates_apply_operations_atomically_and_retain_native_entities(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    initial(10),
+                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let update = |json: serde_json::Value| {
+        crate::protocol::Update::parse(&serde_json::to_vec(&json).unwrap()).unwrap()
+    };
+    let outcomes = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::Applied { revision, .. } => Some((*revision, None)),
+                Event::Rejected { revision, message } => Some((*revision, Some(message.clone()))),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let before = view.read(cx).inspect(window, cx);
+        let input_entity = before["inputs"]["name"]["entity"].clone();
+        let table_entity = before["tables"]["table"]["entity"].clone();
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({
+                    "revision": 2, "base_revision": 1,
+                    "ops": [
+                        {"op":"set","id":"label","node":{"kind":"text","id":"label","text":"Updated"}},
+                        {"op":"insert","parent":"root","node":{"kind":"text","id":"extra","text":"Extra"}},
+                        {"op":"children","id":"root","children":["extra","label","increment","name","table"]}
+                    ]
+                })),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        let after = view.read(cx).inspect(window, cx);
+        assert_eq!(after["revision"], 2);
+        assert_eq!(after["labels"]["label"], "Updated");
+        assert_eq!(after["labels"]["extra"], "Extra");
+        assert_eq!(after["inputs"]["name"]["entity"], input_entity);
+        assert_eq!(after["tables"]["table"]["entity"], table_entity);
+        assert_eq!(outcomes(), [(2, None)]);
+
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision":3,"base_revision":1,"ops":[]})),
+                window,
+                cx,
+            )
+        });
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision":3,"base_revision":2,"ops":[
+                    {"op":"set","id":"label","node":{"kind":"text","id":"label","text":"Never"}},
+                    {"op":"remove","id":"missing"}
+                ]})),
+                window,
+                cx,
+            )
+        });
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision":3,"base_revision":2,"ops":[
+                    {"op":"insert","parent":"root","node":{"kind":"table","id":"orphan","dataset":"missing"}}
+                ]})),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        let unchanged = view.read(cx).inspect(window, cx);
+        assert_eq!(unchanged["revision"], 2);
+        assert_eq!(unchanged["labels"]["label"], "Updated");
+        let rejected = outcomes();
+        assert_eq!(rejected.len(), 4);
+        assert!(rejected[1].1.as_deref().unwrap().contains("Stale base revision"));
+        assert!(rejected[2].1.as_deref().unwrap().contains("Remove target"));
+        assert!(rejected[3].1.as_deref().unwrap().contains("Unknown dataset"));
+
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision":3,"base_revision":2,"ops":[
+                    {"op":"insert","parent":"root","node":{"kind":"row","id":"row","children":[]}},
+                    {"op":"reparent","id":"name","parent":"row"},
+                    {"op":"remove","id":"extra"}
+                ]})),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        let moved = view.read(cx).inspect(window, cx);
+        assert_eq!(moved["revision"], 3);
+        assert_eq!(moved["inputs"]["name"]["entity"], input_entity);
+        assert!(moved["labels"].get("extra").is_none());
+        assert_eq!(outcomes().len(), 5);
+        assert_eq!(outcomes()[4], (3, None));
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let trace = Arc::new(crate::trace::Trace::default());

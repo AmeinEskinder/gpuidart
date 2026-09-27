@@ -25,6 +25,10 @@ int32_t gd_run(const GdHost *host);
 /* 0 = queued, -1 = invalid pointer/size, -2 = invalid description,
    -3 = queue closed or full. The applied event acknowledges native application. */
 int32_t gd_publish(const GdHost *host, const uint8_t *bytes, size_t len);
+/* Operations against the applied description, computed against base_revision.
+   Same statuses as gd_publish. A stale base or a failing operation arrives as
+   a rejected event and leaves the applied description unchanged. */
+int32_t gd_update(const GdHost *host, const uint8_t *bytes, size_t len);
 /* Revisioned dataset replacement, record edits or release. dataset_applied or
    dataset_rejected completes the request. No records occur in gd_publish. */
 int32_t gd_dataset(const GdHost *host, const uint8_t *bytes, size_t len);

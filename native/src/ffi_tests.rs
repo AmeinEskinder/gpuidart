@@ -36,8 +36,16 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
         assert_eq!(gd_input(host, null(), 0), -1);
         assert_eq!(gd_input(host, b"{".as_ptr(), 1), -2);
         assert_eq!(gd_input(host, initial.as_ptr(), MAX_MESSAGE_BYTES + 1), -1);
+        assert_eq!(gd_update(host, null(), 0), -1);
+        assert_eq!(gd_update(host, b"{".as_ptr(), 1), -2);
+        let stale = br#"{"revision":1,"base_revision":1,"ops":[]}"#;
+        assert_eq!(gd_update(host, stale.as_ptr(), stale.len()), -2);
+        let unknown = br#"{"revision":2,"base_revision":1,"ops":[{"op":"paint","id":"a"}]}"#;
+        assert_eq!(gd_update(host, unknown.as_ptr(), unknown.len()), -2);
+        let update = br#"{"revision":2,"base_revision":1,"ops":[{"op":"set","id":"a","node":{"kind":"text","id":"a","text":"b"}}]}"#;
+        assert_eq!(gd_update(host, update.as_ptr(), update.len()), 0);
         let snapshot = br#"{"revision":2,"root":{"kind":"text","id":"a","text":"b"}}"#;
-        for _ in 0..64 {
+        for _ in 0..63 {
             assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), 0);
         }
         assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), -3);
