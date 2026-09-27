@@ -147,6 +147,6 @@ Feasibility verdicts recorded on this machine:
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
 
-Verification at the end of the series: 74 native tests, 82 Dart tests
-including the live-window suite, on the debug library, plus the full check
-gate.
+Verification at the end of the series: 75 native tests and 83 Dart tests
+including the live-window suite, on the debug library, plus the repository's
+full check gate.
