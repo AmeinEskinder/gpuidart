@@ -8,8 +8,9 @@ import 'accessibility/terminal_track.dart';
 Future<void> main(List<String> args) async {
   final semantics = args.contains('--semantics');
   final output = File(args.first);
-  if (output.existsSync())
+  if (output.existsSync()) {
     throw StateError('Refusing to replace ${output.path}');
+  }
   output.parent.createSync(recursive: true);
   final rows = int.parse(
     args.where((a) => a.startsWith('--rows=')).firstOrNull?.substring(7) ??
@@ -35,8 +36,9 @@ Future<void> main(List<String> args) async {
         (await host.diagnose('inspect'))['native_process_id'] as int;
     Future<Map<String, dynamic>> observe() async {
       await terminal.idle;
-      if (terminal.failure != null)
+      if (terminal.failure != null) {
         throw StateError('App failure: ${terminal.failure}');
+      }
       return {
         'app': terminal.describe(),
         'native': await host.diagnose('inspect'),
@@ -53,8 +55,9 @@ Future<void> main(List<String> args) async {
       do {
         last = await observe();
         if (ready(last)) {
-          if (semantics)
+          if (semantics) {
             last['platform'] = await terminalSemantics(process, last);
+          }
           steps.add({'step': name, 'observed': last});
           return last;
         }
@@ -79,8 +82,9 @@ Future<void> main(List<String> args) async {
       (s) => s['native']['tables']['watchlist']['row_count'] == rows,
     );
     final visible = initial['native']['tables']['watchlist']['visible_rows'];
-    if ((visible['end'] as int) - (visible['start'] as int) >= 100)
+    if ((visible['end'] as int) - (visible['start'] as int) >= 100) {
       throw StateError('Table viewport exceeded bound');
+    }
     await host.diagnose('select_row', {'table': 'watchlist', 'row': 25});
     await until(
       'stable selected record loads history once',
@@ -108,11 +112,12 @@ Future<void> main(List<String> args) async {
       (s) => s['native']['tables']['watchlist']['focused'] == true,
     );
     await key('shift-f10');
-    if (semantics)
+    if (semantics) {
       report['context_menu'] = await terminalMenuSemantics(
         process,
         context: true,
       );
+    }
     await key('down');
     await key('enter');
     await until(
@@ -143,8 +148,9 @@ Future<void> main(List<String> args) async {
           s['app']['period'] == '48' &&
           s['native']['charts']['volume-chart']?['points'].length == 48,
     );
-    if (all['app']['history_revision'] != 3)
+    if (all['app']['history_revision'] != 3) {
       throw StateError('Range navigation republished history');
+    }
     if (semantics) {
       report['app_menu'] = await invokeTerminalSettingsMenu(process);
     } else {

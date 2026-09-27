@@ -245,3 +245,22 @@ worker thread. Windows then reported under 1 GiB free commit capacity; no app te
 ran in that attempt. Hosted checks and a retained matching Windows DLL provide an
 independent verification path. Terminal acceptance is pending, not inferred from
 the prior control-family passes.
+
+
+### First terminal acceptance attempt
+
+[Run 36283050958](https://github.com/AmeinEskinder/gpuidart/actions/runs/36283050958)
+failed on all three terminal tracks at `1925c41`; prior fixture checks passed.
+The [raw reports](attempts/1925c41/) retain each failure. Windows queried HelpText,
+which this AccessKit adapter uses for placeholders, instead of FullDescription
+for descriptions. The PowerShell .NET UIA registry predates that property, so the
+probe now reads it using native IUIAutomation. macOS returned Boolean AXValue for
+selected tabs; the assertion accepted numeric 1 but omitted true. Linux reached
+three interaction checks, then timed out waiting for the hover tooltip. That
+failure remains under investigation, with queried pointer bounds now recorded.
+
+The SDK analyzers also rejected 22 missing braces in the new Dart files. The
+analyzer's focused fix corrected them; local analysis is clean. A downloaded
+Windows debug DLL failed before window creation because debug GPUI compiles HLSL
+from its build machine's absolute source path. It is not a portable test artifact;
+the local native rebuild is required. Release builds embed shader bytes.

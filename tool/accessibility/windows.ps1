@@ -37,12 +37,15 @@ if ($Operation -ne 'query') {
     @{ api = 'UIAutomationClient'; operation = $Operation; accepted = $true } | ConvertTo-Json -Compress
     exit
 }
+Add-Type -Path (Join-Path $PSScriptRoot 'windows_description.cs')
+$descriptions = [NativeUiaDescriptions]::Read([IntPtr]$window.Current.NativeWindowHandle)
 $nodes = @()
 foreach ($element in $elements) {
     $current = $element.Current
     $node = [ordered]@{
         name = $current.Name
-        description = $current.HelpText
+        description = $descriptions[$current.AutomationId]
+        help = $current.HelpText
         role = $current.ControlType.ProgrammaticName
         id = $current.AutomationId
         enabled = $current.IsEnabled

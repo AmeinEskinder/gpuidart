@@ -44,6 +44,7 @@ def run():
 
     visit(apps[0])
     if operation != "query":
+        details = {}
         matches = [e for e, _ in elements if (e.get_accessible_id() == identifier if identifier else e.get_name() == name)]
         if operation == "invoke-menu":
             matches = [e for e in matches if e.get_role() in (Atspi.Role.MENU_ITEM, Atspi.Role.CHECK_MENU_ITEM, Atspi.Role.RADIO_MENU_ITEM)]
@@ -61,6 +62,7 @@ def run():
             rect = element.get_component_iface().get_extents(Atspi.CoordType.SCREEN)
             if rect.width <= 0 or rect.height <= 0:
                 raise RuntimeError("Hover target has no bounds")
+            details["bounds"] = [rect.x, rect.y, rect.width, rect.height]
             accepted = Atspi.generate_mouse_event(rect.x + rect.width // 2, rect.y + rect.height // 2, "abs")
         elif operation == "set-value":
             accepted = element.get_editable_text_iface().set_text_contents(value)
@@ -72,7 +74,7 @@ def run():
             raise ValueError(operation)
         if not accepted:
             raise RuntimeError(f"AT-SPI rejected {operation}")
-        print(json.dumps({"api": "AT-SPI", "operation": operation, "accepted": accepted}))
+        print(json.dumps({"api": "AT-SPI", "operation": operation, "accepted": accepted, **details}))
     else:
         nodes = []
         for element, parent in elements:

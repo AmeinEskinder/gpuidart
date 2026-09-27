@@ -12,7 +12,8 @@ bool _selected(dynamic node) =>
     (node['selected'] == true ||
         node['checked'] == true ||
         node['checked'] == 'On' ||
-        node['value'] == 1);
+        node['value'] == 1 ||
+        node['value'] == true);
 bool _tooltip(dynamic node) =>
     _role(node, ['ControlType.ToolTip', 'AXHelpTag', 'tool tip']);
 bool _menu(dynamic node) => _role(node, ['ControlType.Menu', 'AXMenu', 'menu']);
@@ -50,13 +51,15 @@ Future<Map<String, dynamic>> terminalSemantics(
   return _wait(process, '${app['page']} state', (nodes) {
     final tabs = _find(nodes, 'pages');
     if (!_role(tabs, ['ControlType.Tab', 'AXTabGroup', 'page tab list']) ||
-        tabs['name'] != 'Terminal pages')
+        tabs['name'] != 'Terminal pages') {
       return false;
+    }
     for (final page in ['watchlist', 'instrument', 'settings']) {
       final node = _find(nodes, jsonEncode(['pages', 'tab', page]));
       if (!_role(node, ['ControlType.TabItem', 'AXRadioButton', 'page tab']) ||
-          _selected(node) != (app['page'] == page))
+          _selected(node) != (app['page'] == page)) {
         return false;
+      }
     }
     if (app['page'] == 'watchlist') {
       final search = _find(nodes, 'search');
@@ -69,8 +72,9 @@ Future<Map<String, dynamic>> terminalSemantics(
     if (app['page'] == 'settings') {
       final name = _find(nodes, 'display-name');
       if (!hasPlatformRole(name, 'input') ||
-          name['value'] != app['display_name'])
+          name['value'] != app['display_name']) {
         return false;
+      }
       for (final mode in ['light', 'dark']) {
         final radio = _find(nodes, jsonEncode(['theme', 'radio', mode]));
         if (!_role(radio, [
@@ -78,21 +82,24 @@ Future<Map<String, dynamic>> terminalSemantics(
               'AXRadioButton',
               'radio button',
             ]) ||
-            _selected(radio) != (app['theme'] == mode))
+            _selected(radio) != (app['theme'] == mode)) {
           return false;
+        }
       }
       final accent = _find(nodes, 'custom-accent');
       return hasPlatformRole(accent, 'checkbox') &&
           _selected(accent) == app['custom_accent'];
     }
-    if (app['selected'] == null)
+    if (app['selected'] == null) {
       return _find(nodes, 'empty-instrument') != null;
+    }
     for (final chart in ['price-chart', 'volume-chart']) {
       final state = native['charts'][chart];
       final summary = _find(nodes, jsonEncode([chart, 'summary']));
       if (_find(nodes, chart) == null ||
-          (summary?['value'] ?? summary?['name']) != state['summary'])
+          (summary?['value'] ?? summary?['name']) != state['summary']) {
         return false;
+      }
       for (final point in state['points'] as List) {
         final node = _find(
           nodes,
@@ -117,10 +124,11 @@ String _number(num value) => value == value.roundToDouble()
     : value.toString();
 
 Future<Map<String, Object?>> verifyTerminalTooltip(int process) async {
-  await platformQuery(process, operation: 'hover', id: 'tick');
+  await platformQuery(process, operation: 'hover', id: 'search');
+  final hover = await platformQuery(process, operation: 'hover', id: 'tick');
   final appeared = await _wait(
     process,
-    'hover popup',
+    'hover popup; operation=$hover',
     (nodes) =>
         nodes.any(_tooltip) &&
         _find(nodes, 'tick')?['name'] == 'Simulate price update',

@@ -47,8 +47,9 @@ Future<void> main(List<String> args) async {
         await Future<void>.delayed(const Duration(milliseconds: 25));
         await app.idle;
       }
-      if (app.market.selectedSymbol != 'BRK0025')
+      if (app.market.selectedSymbol != 'BRK0025') {
         throw StateError('Selection did not settle');
+      }
       await app.navigate('settings');
       await app.host.diagnose('focus', {'input': 'display-name'});
       for (final key in [

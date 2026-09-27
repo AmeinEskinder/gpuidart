@@ -33,8 +33,9 @@ final class TerminalApplication {
   Future<void> get idle => _pending;
 
   static Future<TerminalApplication> open({int rows = 1000}) async {
-    if (rows < 26 || rows > 100000)
+    if (rows < 26 || rows > 100000) {
       throw ArgumentError('Rows must be 26..100000');
+    }
     final app = TerminalApplication._(rows);
     app.host = await GpuiHost.openView(
       app.build,
@@ -66,8 +67,9 @@ final class TerminalApplication {
         'table_selection',
         'row_action',
         'action',
-      ].contains(event.type))
+      ].contains(event.type)) {
         return;
+      }
       app.eventCounts.update(event.type, (n) => n + 1, ifAbsent: () => 1);
       app._pending = app._pending
           .then((_) async {
@@ -222,11 +224,12 @@ final class TerminalApplication {
 
   UiNode _instrument() {
     final selected = market.selected;
-    if (selected == null)
+    if (selected == null) {
       return const UiText(
         'empty-instrument',
         'Select an instrument in Watchlist first.',
       );
+    }
     final view = UiTableView(
       filter: [UiFilter(3, UiFilterOp.ge, period == '20' ? '29' : '1')],
     );
@@ -306,8 +309,9 @@ final class TerminalApplication {
 
   Future<void> navigate(String target) async {
     if (target == page ||
-        !['watchlist', 'instrument', 'settings'].contains(target))
+        !['watchlist', 'instrument', 'settings'].contains(target)) {
       return;
+    }
     final input = page == 'watchlist'
         ? 'search'
         : page == 'settings'
@@ -383,8 +387,9 @@ final class TerminalApplication {
         await navigate('settings');
       case 'app.search':
         await navigate('watchlist');
-        if (page == 'watchlist')
+        if (page == 'watchlist') {
           await host.diagnose('focus', {'input': 'search'});
+        }
       case 'app.quit':
         _closing = true;
         await host.close();
@@ -412,11 +417,13 @@ final class TerminalApplication {
       if (previous != null &&
           (state.generation < previous.generation ||
               (state.generation == previous.generation &&
-                  state.editRevision < previous.editRevision)))
+                  state.editRevision < previous.editRevision))) {
         return;
+      }
       if ((event.id == 'search' && page != 'watchlist') ||
-          (event.id == 'display-name' && page != 'settings'))
+          (event.id == 'display-name' && page != 'settings')) {
         return;
+      }
       _inputStates[event.id!] = state;
       if (event.id == 'search') {
         if (!state.composing) await market.filter(host, query: state.value);
@@ -426,8 +433,9 @@ final class TerminalApplication {
     } else if (event.tableSelection case final selection?) {
       if (page == 'watchlist' &&
           selection.dataset == market.dataset.id &&
-          selection.datasetRevision == market.dataset.revision)
+          selection.datasetRevision == market.dataset.revision) {
         await _select(selection.record);
+      }
     } else if (event.rowAction case final command?) {
       if (command.dataset == market.dataset.id &&
           command.datasetRevision == market.dataset.revision) {

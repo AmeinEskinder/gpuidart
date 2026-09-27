@@ -5,8 +5,9 @@ import 'src/dev_session.dart';
 
 Future<void> main(List<String> args) async {
   final output = File(args.single);
-  if (output.existsSync())
+  if (output.existsSync()) {
     throw StateError('Refusing to replace ${output.path}');
+  }
   output.parent.createSync(recursive: true);
   final fixture = await Directory('.cache').createTemp('terminal-reload-');
   await Directory('${fixture.path}/terminal').create();
