@@ -142,6 +142,27 @@ pub fn validate_views(
 ) -> Result<(), String> {
     let mut error = None;
     snapshot.root.visit(&mut |node| {
+        if let Node::List {
+            dataset,
+            column,
+            view,
+            ..
+        } = node
+        {
+            let width = columns(dataset).unwrap_or(0);
+            let over = (*column >= width).then_some(*column).or_else(|| {
+                view.as_ref().and_then(|view| {
+                    view.referenced_columns()
+                        .into_iter()
+                        .find(|column| *column >= width)
+                })
+            });
+            if let Some(column) = over {
+                error = Some(format!(
+                    "List references column {column} beyond the {width} columns of {dataset}"
+                ));
+            }
+        }
         if let Node::Table {
             dataset,
             view: Some(view),
@@ -169,7 +190,7 @@ pub fn validate_references(
 ) -> Result<(), String> {
     let mut missing = None;
     snapshot.root.visit(&mut |node| {
-        if let Node::Table { dataset, .. } = node {
+        if let Node::Table { dataset, .. } | Node::List { dataset, .. } = node {
             if !contains(dataset) {
                 missing = Some(dataset.clone());
             }

@@ -59,6 +59,7 @@ final class UiSemantics {
       'input' => {UiRole.textbox},
       'select' => {UiRole.combobox},
       'table' => {UiRole.table},
+      'list' => {UiRole.list},
       'switch' => {UiRole.toggle},
       'radio_group' => {UiRole.radioGroup},
       'progress' => {UiRole.progressBar},

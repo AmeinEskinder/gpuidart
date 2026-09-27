@@ -309,6 +309,22 @@ pub enum Node {
         semantics: Option<Semantics>,
         commands: Vec<Draw>,
     },
+    /// A virtualized list over one dataset column, in the order of an
+    /// optional view; `list_select` carries the chosen record ID. The
+    /// dataset must carry record IDs.
+    List {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        dataset: String,
+        column: usize,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        view: Option<TableView>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        selected: Option<String>,
+    },
     /// A button that opens a native popup menu; `menu_select` carries the
     /// chosen item ID.
     MenuButton {
@@ -1226,7 +1242,8 @@ impl Node {
             | Self::Separator { id, .. }
             | Self::Tabs { id, .. }
             | Self::Canvas { id, .. }
-            | Self::MenuButton { id, .. } => id,
+            | Self::MenuButton { id, .. }
+            | Self::List { id, .. } => id,
         }
     }
 
@@ -1250,7 +1267,8 @@ impl Node {
             | Self::Separator { style, .. }
             | Self::Tabs { style, .. }
             | Self::Canvas { style, .. }
-            | Self::MenuButton { style, .. } => style.as_ref(),
+            | Self::MenuButton { style, .. }
+            | Self::List { style, .. } => style.as_ref(),
         }
     }
 
@@ -1274,7 +1292,8 @@ impl Node {
             | Self::Separator { semantics, .. }
             | Self::Tabs { semantics, .. }
             | Self::Canvas { semantics, .. }
-            | Self::MenuButton { semantics, .. } => semantics.as_ref(),
+            | Self::MenuButton { semantics, .. }
+            | Self::List { semantics, .. } => semantics.as_ref(),
         }
     }
 
@@ -1372,6 +1391,32 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
             }
             if let Some(view) = view {
                 view.validate()?;
+            }
+        }
+        Node::List {
+            dataset,
+            column,
+            view,
+            selected,
+            ..
+        } => {
+            if dataset.is_empty() {
+                return Err("List dataset ID must be nonempty".into());
+            }
+            if *column >= 64 {
+                return Err("List column must be below 64".into());
+            }
+            if let Some(view) = view {
+                view.validate()?;
+                if view.group.is_some() {
+                    return Err("Lists do not group".into());
+                }
+            }
+            if selected
+                .as_ref()
+                .is_some_and(|record| record.is_empty() || record.len() > 1024)
+            {
+                return Err("List selection must be a record ID of 1..1024 UTF-8 bytes".into());
             }
         }
         Node::Checkbox { label, .. } if label.len() > 1024 => {
@@ -1810,6 +1855,15 @@ pub enum Event {
         revision: u64,
         id: String,
         item: String,
+    },
+    ListSelect {
+        revision: u64,
+        id: String,
+        dataset: String,
+        dataset_revision: u64,
+        /// View row index, for debugging; consumers key on `record`.
+        row: usize,
+        record: String,
     },
     WindowOpened {
         request: u64,
@@ -2826,6 +2880,32 @@ mod tests {
                 (0..65).map(|i| format!(r#"{{"id":"i{i}","label":"I"}}"#)).collect::<Vec<_>>().join(",")
             ),
             r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A"}],"semantics":{"role":"switch"}}"#.into(),
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
+        }
+    }
+
+    #[test]
+    fn lists_validate_dataset_column_view_and_selection() {
+        let snapshot = Snapshot::parse(
+            br#"{"revision":1,"root":{"kind":"list","id":"names","dataset":"people","column":1,"selected":"p2","semantics":{"role":"list"},"view":{"sort":[{"column":1,"direction":"asc"}]}}}"#,
+        )
+        .unwrap();
+        let Node::List {
+            column, selected, ..
+        } = &snapshot.root
+        else {
+            panic!("list");
+        };
+        assert_eq!((*column, selected.as_deref()), (1, Some("p2")));
+        for invalid in [
+            r#"{"kind":"list","id":"l","dataset":"","column":0}"#,
+            r#"{"kind":"list","id":"l","dataset":"d","column":64}"#,
+            r#"{"kind":"list","id":"l","dataset":"d","column":0,"selected":""}"#,
+            r#"{"kind":"list","id":"l","dataset":"d","column":0,"view":{"group":{"column":0}}}"#,
+            r#"{"kind":"list","id":"l","dataset":"d","column":0,"semantics":{"role":"table"}}"#,
+            r#"{"kind":"list","id":"l","dataset":"d","column":0,"children":[]}"#,
         ] {
             let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
             assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");

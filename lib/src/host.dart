@@ -222,6 +222,17 @@ final class GpuiEvent {
         )
       : null;
 
+  /// The record a `list_select` event chose, with its dataset revision.
+  TableSelection? get listSelection => type == 'list_select'
+      ? TableSelection._(
+          data['id'] as String,
+          data['dataset'] as String,
+          data['dataset_revision'] as int,
+          data['row'] as int,
+          data['record'] as String,
+        )
+      : null;
+
   /// A matched action binding. Native never executes commands; the
   /// application decides what [ActionEvent.name] means.
   ActionEvent? get action => type == 'action'
@@ -959,6 +970,7 @@ final class GpuiHost {
           event.type == 'radio_change' ||
           event.type == 'tab_change' ||
           event.type == 'menu_select' ||
+          event.type == 'list_select' ||
           event.type == 'dialog_result') {
         metrics.uiCallbacks++;
       }

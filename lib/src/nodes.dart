@@ -277,6 +277,55 @@ final class UiSeparator extends UiNode {
   }
 }
 
+/// A virtualized list over one column of a registered dataset. Items follow
+/// the optional [view] (filter and sort; lists do not group) and the dataset
+/// must carry record IDs. A click reports `list_select` with the record in
+/// [GpuiEvent.listSelection]; the item shows the pick at once and the next
+/// publication's [selected] record is authoritative.
+final class UiList extends UiNode {
+  const UiList(
+    super.id, {
+    required this.dataset,
+    required this.column,
+    this.view,
+    this.selected,
+    super.style,
+    super.semantics,
+  });
+  final String dataset;
+  final int column;
+  final UiTableView? view;
+
+  /// The selected record ID, or null for no selection.
+  final String? selected;
+
+  @override
+  Map<String, Object> props() {
+    if (dataset.isEmpty) {
+      throw ArgumentError.value(dataset, 'dataset', 'Must be nonempty');
+    }
+    if (column < 0 || column >= 64) {
+      throw ArgumentError.value(column, 'column', 'Must be below 64');
+    }
+    if (view?.group != null) throw ArgumentError('Lists do not group');
+    final selected = this.selected;
+    if (selected != null &&
+        (selected.isEmpty || utf8.encode(selected).length > 1024)) {
+      throw ArgumentError.value(selected, 'selected', '1..1024 UTF-8 bytes');
+    }
+    return {
+      'kind': 'list',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('list'),
+      if (style != null) 'style': style!.toJson(),
+      'dataset': dataset,
+      'column': column,
+      if (view != null) 'view': view!.toJson(),
+      'selected': ?selected,
+    };
+  }
+}
+
 /// One entry of a [UiMenuButton] menu.
 sealed class UiMenuEntry {
   const UiMenuEntry();

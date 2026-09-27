@@ -557,8 +557,8 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         expect(
           events
-            .where((event) => event.window == child.id)
-            .map((event) => event.type),
+              .where((event) => event.window == child.id)
+              .map((event) => event.type),
           containsAll([
             'applied',
             'dataset_applied',

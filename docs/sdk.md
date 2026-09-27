@@ -94,6 +94,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiConfirmDialog | Native confirmation modal with one result, focus trapping and cancellation when its trigger is removed or disabled. |
 | UiSemantics | Optional bounded names and compatible roles on every node; native controls supply their states. See [accessibility and platform gaps](accessibility.md). |
 | UiTable | References a registered dataset ID. Cells contain strings and render in Rust. |
+| UiList | A virtualized list over one column of a dataset with record IDs, in an optional filter/sort view; `list_select` carries the chosen record in `GpuiEvent.listSelection`, the item shows the pick at once and the next publication's `selected` is authoritative. See [datasets](datasets.md#lists). |
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. This is not a presentation fence. |

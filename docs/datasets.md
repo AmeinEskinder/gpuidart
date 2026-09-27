@@ -114,6 +114,34 @@ UiTable(
 - `group: UiGroup(column, aggregates: [UiAggregate(column, UiAggregateOp.sum)])` groups the filtered, sorted records by one column in order of first appearance and inserts a header row per group. The header shows the key and count in the grouped column and each aggregate in its column, formatted with that column's format when it has one. `count` counts records; `sum`, `avg`, `min` and `max` run over the numeric cells and show nothing when none parse. At most 8 aggregates. Header rows are summaries: selecting one clears the selection and emits nothing, and edits to the grouped or aggregated columns recompute the view like sort and filter columns do. Diagnostics report the group count beside the view row count.
 - Diagnostics report per-table source/view row counts, a spec hash, and the current selection.
 
+## Lists
+
+`UiList` shows one column of a dataset as a virtualized list, like Flutter's
+`ListView.builder` over the same records a table can show.
+
+```dart
+UiList(
+  'symbols',
+  dataset: 'quotes-data',
+  column: 0,
+  view: const UiTableView(sort: [UiSort(0)]),
+  selected: 'ACME',
+)
+```
+
+- The dataset must carry record IDs; publishing a list over a dataset
+  without them fails. `column` must be below the dataset's width.
+- `view` accepts the table view's filter and sort; grouping is rejected.
+  Rust keeps a view index per list and recomputes it under the same rules as
+  a table's, and only the visible items are built.
+- `selected` is a record ID owned by the application. Clicking an item
+  reports `list_select` with the record ID, row and dataset revision; the
+  item highlights at once and the next publication's `selected` is
+  authoritative, like the other controls.
+- The list's semantics role is `list`; its items are list items named by
+  their text. Diagnostics report each list's dataset, revision, view row
+  count and the selection shown.
+
 ## Declarative cell formatting
 
 Datasets accept optional per-column formats at construction and on `replaceDataset` (edits cannot change them).

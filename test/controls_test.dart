@@ -541,4 +541,92 @@ void main() {
       expect(() => decode(invalid), throwsFormatException);
     }
   });
+  test('lists encode their binding and list selections decode', () {
+    const list = UiList(
+      'names',
+      dataset: 'people',
+      column: 1,
+      view: UiTableView(sort: [UiSort(1)]),
+      selected: 'p2',
+    );
+    expect(jsonDecode(jsonEncode(list.toJson())), {
+      'kind': 'list',
+      'id': 'names',
+      'dataset': 'people',
+      'column': 1,
+      'view': {
+        'sort': [
+          {'column': 1, 'direction': 'asc'},
+        ],
+      },
+      'selected': 'p2',
+    });
+    expect(
+      const UiList(
+        'l',
+        dataset: 'd',
+        column: 0,
+      ).toJson().containsKey('selected'),
+      isFalse,
+    );
+    expect(
+      const UiList('l', dataset: '', column: 0).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiList('l', dataset: 'd', column: 64).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiList('l', dataset: 'd', column: 0, selected: '').toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiList(
+        'l',
+        dataset: 'd',
+        column: 0,
+        view: UiTableView(group: UiGroup(0)),
+      ).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiList(
+        'l',
+        dataset: 'd',
+        column: 0,
+        semantics: UiSemantics(role: UiRole.table),
+      ).toJson,
+      throwsArgumentError,
+    );
+    final event = decodeNativeEvent(
+      utf8.encode(
+        jsonEncode({
+          'type': 'list_select',
+          'revision': 3,
+          'id': 'names',
+          'dataset': 'people',
+          'dataset_revision': 2,
+          'row': 1,
+          'record': 'p3',
+        }),
+      ),
+    );
+    expect(event['record'], 'p3');
+    expect(
+      () => decodeNativeEvent(
+        utf8.encode(
+          jsonEncode({
+            'type': 'list_select',
+            'revision': 3,
+            'id': 'names',
+            'dataset': 'people',
+            'dataset_revision': 2,
+            'row': 1,
+          }),
+        ),
+      ),
+      throwsFormatException,
+    );
+  });
 }

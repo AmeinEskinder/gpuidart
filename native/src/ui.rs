@@ -10,6 +10,7 @@ use crate::{
     },
 };
 use async_channel::Receiver;
+use gpui::{ScrollStrategy, UniformListScrollHandle, uniform_list};
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{ScrollbarHandle, TestSupportExt};
 use gpui_kit::component::theme::ThemeColor;
@@ -257,6 +258,15 @@ struct RetainedTable {
     selection_notified: Option<(Option<usize>, Option<String>)>,
 }
 
+/// A list over one dataset column: the shared records, the view index its
+/// items follow and the scroll position retained by node ID.
+struct RetainedList {
+    data: SharedDataset,
+    index: Rc<RefCell<ViewIndex>>,
+    view: Option<TableView>,
+    scroll: UniformListScrollHandle,
+}
+
 /// Selection decision for a view recompute.
 enum ViewSelection {
     /// Keep the selected record at this view row.
@@ -290,6 +300,7 @@ pub(crate) struct DartView {
     /// Scroll containers keep their offset by ID across publications.
     scrolls: HashMap<String, ScrollHandle>,
     tables: HashMap<String, RetainedTable>,
+    lists: HashMap<String, RetainedList>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
     datasets: Store,
@@ -381,7 +392,22 @@ impl DartView {
         }
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
-        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
+        let lists = self
+            .lists
+            .iter()
+            .map(|(id, list)| {
+                (
+                    id.clone(),
+                    json!({
+                        "dataset": list.data.borrow().id,
+                        "dataset_revision": list.data.borrow().revision,
+                        "view_rows": list.index.borrow().entries.len(),
+                        "selected_shown": self.choice_shown.borrow().get(id),
+                    }),
+                )
+            })
+            .collect::<serde_json::Map<String, Value>>();
+        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -457,6 +483,7 @@ impl DartView {
             choice_shown: Default::default(),
             scrolls: HashMap::new(),
             tables: HashMap::new(),
+            lists: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
             counters: Rc::new(Counters::default()),
@@ -672,7 +699,7 @@ impl DartView {
         if matches!(&update.change, Change::Release) {
             let mut referenced = false;
             self.snapshot.root.visit(&mut |node| {
-                if let Node::Table { dataset, .. } = node {
+                if let Node::Table { dataset, .. } | Node::List { dataset, .. } = node {
                     referenced |= dataset == &id;
                 }
             });
@@ -712,6 +739,34 @@ impl DartView {
                         let state = self.tables[&table_id].state.clone();
                         state.update(cx, |_, cx| cx.notify());
                     }
+                }
+                let mut list_changed = false;
+                for retained in self.lists.values_mut() {
+                    if retained.data.borrow().id != id {
+                        continue;
+                    }
+                    list_changed = true;
+                    let recompute = replace
+                        || structural
+                        || match (&retained.view, &touched) {
+                            (Some(view), Some(touched)) => view
+                                .referenced_columns()
+                                .iter()
+                                .any(|column| touched.contains(column)),
+                            _ => false,
+                        };
+                    if recompute {
+                        *retained.index.borrow_mut() = ViewIndex::compute(
+                            retained.view.as_ref(),
+                            &retained.data.borrow().data,
+                        );
+                        if replace {
+                            retained.scroll.scroll_to_item(0, ScrollStrategy::Top);
+                        }
+                    }
+                }
+                if list_changed {
+                    cx.notify();
                 }
                 self.counters
                     .data_records_checked
@@ -837,6 +892,7 @@ impl DartView {
         self.reconcile_controls(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
+        let mut list_ids = HashSet::new();
         let mut scroll_ids = HashSet::new();
         let mut changed_views = Vec::new();
         let mut failure = None;
@@ -1030,12 +1086,52 @@ impl DartView {
                     );
                 }
             }
+            Node::List {
+                id, dataset, view, ..
+            } => {
+                let Some(data) = self.datasets.entries.get(dataset).cloned() else {
+                    failure = Some(format!("Missing retained dataset: {dataset}"));
+                    return;
+                };
+                if data.borrow().data.ids.is_none() {
+                    failure = Some(format!("List {id} requires a dataset with record IDs"));
+                    return;
+                }
+                list_ids.insert(id.clone());
+                match self.lists.get_mut(id) {
+                    Some(retained)
+                        if Rc::ptr_eq(&retained.data, &data) && retained.view == *view => {}
+                    Some(retained) => {
+                        let swapped = !Rc::ptr_eq(&retained.data, &data);
+                        retained.data = data.clone();
+                        retained.view = view.clone();
+                        *retained.index.borrow_mut() =
+                            ViewIndex::compute(view.as_ref(), &data.borrow().data);
+                        if swapped {
+                            retained.scroll.scroll_to_item(0, ScrollStrategy::Top);
+                        }
+                    }
+                    None => {
+                        let index = ViewIndex::compute(view.as_ref(), &data.borrow().data);
+                        self.lists.insert(
+                            id.clone(),
+                            RetainedList {
+                                data,
+                                index: Rc::new(RefCell::new(index)),
+                                view: view.clone(),
+                                scroll: UniformListScrollHandle::new(),
+                            },
+                        );
+                    }
+                }
+            }
             _ => {}
         });
         if let Some(message) = failure {
             return Err(message);
         }
         self.inputs.retain(|id, _| input_ids.contains(id));
+        self.lists.retain(|id, _| list_ids.contains(id));
         self.scrolls.retain(|id, _| scroll_ids.contains(id));
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
@@ -1425,6 +1521,97 @@ impl DartView {
                 .size_full();
                 apply_node_style(
                     annotate(div().id(id), node).test_support().child(surface),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::List {
+                column, selected, ..
+            } => {
+                let retained = self
+                    .lists
+                    .get(node.id())
+                    .ok_or_else(|| format!("Missing retained list: {}", node.id()))?;
+                let data = retained.data.clone();
+                let index = retained.index.clone();
+                let count = index.borrow().entries.len();
+                let shown = self
+                    .choice_shown
+                    .borrow()
+                    .get(node.id())
+                    .cloned()
+                    .or_else(|| selected.clone());
+                let events = self.events.clone();
+                let displayed = self.choice_shown.clone();
+                let event_id = node.id().to_owned();
+                let revision = self.snapshot.revision;
+                let column = *column;
+                let items = uniform_list(
+                    SharedString::from(format!("{}-items", node.id())),
+                    count,
+                    move |range, _, cx| {
+                        let index = index.borrow();
+                        let data = data.borrow();
+                        range
+                            .map(|row| {
+                                let ViewEntry::Record(source) = index.entries[row] else {
+                                    return div().id(("list-gap", row)).into_any_element();
+                                };
+                                let text = data.data.rows[source]
+                                    .get(column)
+                                    .cloned()
+                                    .unwrap_or_default();
+                                let record = data
+                                    .data
+                                    .ids
+                                    .as_ref()
+                                    .map_or_else(String::new, |ids| ids[source].clone());
+                                let is_selected = shown.as_deref() == Some(record.as_str());
+                                let events = events.clone();
+                                let displayed = displayed.clone();
+                                let event_id = event_id.clone();
+                                let dataset = data.id.clone();
+                                let dataset_revision = data.revision;
+                                let item_id = format!("{event_id}:{record}");
+                                div()
+                                    .id(SharedString::from(item_id.clone()))
+                                    .accessibility_id(item_id)
+                                    .role(Role::ListItem)
+                                    .aria_label(text.clone())
+                                    .test_support()
+                                    .px_3()
+                                    .py_1()
+                                    .when(is_selected, |item| item.bg(cx.theme().accent))
+                                    .child(text)
+                                    .on_click(move |_, window, _| {
+                                        displayed
+                                            .borrow_mut()
+                                            .insert(event_id.clone(), record.clone());
+                                        window.refresh();
+                                        events.emit(Event::ListSelect {
+                                            revision,
+                                            id: event_id.clone(),
+                                            dataset: dataset.clone(),
+                                            dataset_revision,
+                                            row,
+                                            record: record.clone(),
+                                        });
+                                    })
+                                    .into_any_element()
+                            })
+                            .collect()
+                    },
+                )
+                .track_scroll(&retained.scroll)
+                .h_full()
+                .w_full();
+                apply_node_style(
+                    annotate(div().id(id), node)
+                        .test_support()
+                        .w_full()
+                        .h(px(320.))
+                        .child(items),
                     node,
                     colors,
                 )

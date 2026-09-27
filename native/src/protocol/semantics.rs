@@ -66,6 +66,7 @@ impl Semantics {
                 Node::Tabs { .. } => role == TabList,
                 Node::Canvas { .. } => role == Image,
                 Node::MenuButton { .. } => role == Button,
+                Node::List { .. } => role == List,
             };
             if !valid {
                 return Err(format!(

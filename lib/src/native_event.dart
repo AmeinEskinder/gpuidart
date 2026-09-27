@@ -102,6 +102,13 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       integer('revision', minimum: 1);
       string('id');
       string('item');
+    case 'list_select':
+      integer('revision', minimum: 1);
+      string('id');
+      string('dataset');
+      integer('dataset_revision', minimum: 1);
+      integer('row');
+      string('record');
     case 'window_opened':
       integer('request', minimum: 1);
       integer('window', minimum: 1);

@@ -1984,3 +1984,125 @@ fn formatted_cells_keep_viewport_constant_construction(cx: &mut TestAppContext) 
         std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
     }
 }
+
+#[gpui::test]
+fn lists_show_view_ordered_records_report_picks_and_follow_edits(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let list = |revision: u64, selected: Option<&str>| {
+        let selected = selected.map_or(String::new(), |s| format!(r#","selected":"{s}""#));
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                    {{"kind":"list","id":"names","dataset":"people","column":1,"view":{{"sort":[{{"column":1,"direction":"asc"}}]}}{selected}}}
+                ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let people = |ids: bool| Upload {
+        id: "people".into(),
+        revision: 1,
+        data: TableData {
+            columns: vec!["id".into(), "name".into()],
+            rows: vec![
+                vec!["1".into(), "Cleo".into()],
+                vec!["2".into(), "Ann".into()],
+                vec!["3".into(), "Bo".into()],
+            ],
+            ids: ids.then(|| vec!["p1".into(), "p2".into(), "p3".into()]),
+            format: None,
+        },
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: list(1, Some("p1")),
+                        datasets: vec![people(true)],
+                    },
+                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["lists"]["names"]["view_rows"], 3);
+        assert_eq!(inspect["lists"]["names"]["selected_shown"], serde_json::Value::Null);
+        // Items follow the view: Ann, Bo, Cleo.
+        let ann = window.find("names:p2").bounds();
+        let cleo = window.find("names:p1").bounds();
+        assert!(ann.origin.y < cleo.origin.y, "sorted ascending by name");
+        window.click("names:p3", cx);
+        window.render_frame(cx);
+        assert_eq!(
+            view.read(cx).inspect(window, cx)["lists"]["names"]["selected_shown"],
+            "p3"
+        );
+        // An edit on the sort column recomputes the order: Cleo becomes Aaron.
+        let edit = serde_json::json!({
+            "request": 2, "id": "people", "base_revision": 1, "revision": 2,
+            "change": {"op": "edit", "edits": [{"kind": "cell", "row": 0, "column": 1, "value": "Aaron"}]}
+        });
+        let update = crate::datasets::Update::parse(&serde_json::to_vec(&edit).unwrap()).unwrap();
+        view.update(cx, |view, cx| view.update_dataset(update, 0, cx));
+        window.render_frame(cx);
+        let aaron = window.find("names:p1").bounds();
+        let ann = window.find("names:p2").bounds();
+        assert!(aaron.origin.y < ann.origin.y, "recomputed after the edit");
+        // The next publication owns the selection again.
+        view.update(cx, |view, cx| view.publish(list(2, Some("p3")), window, cx));
+        window.render_frame(cx);
+        assert_eq!(
+            view.read(cx).inspect(window, cx)["lists"]["names"]["selected_shown"],
+            serde_json::Value::Null
+        );
+    })
+    .unwrap();
+    let picks = events
+        .lock()
+        .unwrap()
+        .iter()
+        .filter_map(|event| match event {
+            Event::ListSelect {
+                record,
+                row,
+                dataset_revision,
+                ..
+            } => Some((record.clone(), *row, *dataset_revision)),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(picks, vec![("p3".to_string(), 1, 1)]);
+    // Lists need record IDs.
+    let (_, without_ids) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: list(1, None),
+                        datasets: vec![people(false)],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    assert!(
+        cx.update(|cx| without_ids.read(cx).failure.clone())
+            .is_some_and(|message| message.contains("record IDs"))
+    );
+}
