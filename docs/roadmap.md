@@ -78,8 +78,11 @@ gate. The [three-strategy comparison](../reports/performance/strategies/README.m
 completed 162 normal and 54 allocation-profile runs on three platforms. Cached
 subviews reduce property-update work in the fixed-section fixture, with reorder,
 allocation and state-migration tradeoffs. Patches reduce bytes but retain full
-build/diff, staging/validation and rendering work; they are not adopted.
-The production snapshot/dataset protocol remains unchanged.
+build/diff, staging/validation and rendering work; they were not adopted as
+prototyped. [Retained description updates](retained-tree.md) later replaced
+whole-snapshot publication with operations applied to the tree native already
+holds, gated by the same snapshot-gate workload at trunk and head. The dataset
+protocol remains unchanged.
 
 Step 5 outcome: [keep direct UTF-8 JSON encoding](../reports/performance/encoding/host-results.md).
 Matched host captures reduced the 100k AOT encode/copy stage on all three

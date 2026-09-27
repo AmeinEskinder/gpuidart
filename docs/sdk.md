@@ -71,7 +71,7 @@ try {
 }
 ```
 
-Put the application object outside its build method. Register its existing build method with openView; rebuild executes that method and publishes a whole-view snapshot. registerGpuiReload supplies the development launcher's reassemble/close extensions and does nothing in product AOT builds. Reload does not rerun main or field initializers.
+Put the application object outside its build method. Register its existing build method with openView; rebuild executes that method and publishes the result, as [operations against the previous tree](retained-tree.md) when the host can compute them and as the whole description otherwise. registerGpuiReload supplies the development launcher's reassemble/close extensions and does nothing in product AOT builds. Reload does not rerun main or field initializers.
 
 Serialise asynchronous UI handlers that touch the same dataset. The watchlist's event queue is an example. Every dataset transaction must finish before the next one begins. Surface failures to the application; do not discard publication Futures. Stop timers/subscriptions during shutdown, and await close or done before exiting.
 
@@ -88,13 +88,13 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiTable | References a registered dataset ID. Cells contain strings and render in Rust. |
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
-| publish / rebuild | Completes after native application of a snapshot. This is not a presentation fence. |
+| publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. This is not a presentation fence. |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. See [datasets](datasets.md). |
 | close / done | Close is idempotent. Normal completion follows native teardown. Failure can precede teardown on a shutdown timeout; native memory stays alive until the runner returns. Pending requests settle with success or an error. A paused event subscriber does not delay done. |
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.
 
-Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size. Datasets have at most 100,000 rows and 64 columns. The native command queue has 64 slots. Invalid descriptions, stale revisions, a full/closed queue and overlapping transactions are errors. Await or handle the returned Future.
+Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size; an operation update carries at most 4,096 operations and its result meets the same bounds. Datasets have at most 100,000 rows and 64 columns. The native command queue has 64 slots. Invalid descriptions, stale revisions, a full/closed queue and overlapping transactions are errors. Await or handle the returned Future.
 
 Native acknowledgements have a 30-second deadline; shutdown reporting has a 10-second deadline. Configure these with `requestTimeout` and `shutdownTimeout` when opening the host. Missing acknowledgements, malformed events and caught native panics close the host and settle pending requests. See [failure handling and its limits](failures.md).
 

@@ -53,6 +53,7 @@ Future<void> main(List<String> args) async {
         for (final name in [
           'dart.build',
           'dart.describe',
+          if (stages.any((r) => r['name'] == 'dart.diff')) 'dart.diff',
           'dart.encode',
           if (stages.any((r) => r['name'] == 'dart.json_utf8'))
             'dart.json_utf8'

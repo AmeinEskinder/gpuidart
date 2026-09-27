@@ -12,7 +12,7 @@ See [cross-platform acceptance](reports/cross-platform/status.md) for source rev
 
 The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include clean Windows Sandbox and Linux desktop VM launches. Owner-authorized agent visual observation verified Japanese composition and reload on [Windows](reports/ime/windows-japanese-20260926/README.md) and [configured Linux Fcitx5/Mozc](reports/ime/linux-japanese-20260926/README.md). Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
 
-The SDK supports row/column layouts, text, buttons, native text inputs, virtualized tables, checkboxes, sliders, selects and confirmation dialogs. Typed styles, scoped keyboard actions and guarded controlled-input writes share the existing host. Dart submits a whole UI description through FFI. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
+The SDK supports row/column layouts, text, buttons, native text inputs, virtualized tables, checkboxes, sliders, selects and confirmation dialogs. Typed styles, scoped keyboard actions and guarded controlled-input writes share the existing host. Dart submits a UI description through FFI, whole or as [operations against the tree Rust already holds](docs/retained-tree.md). Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
 Table datasets upload once. View snapshots reference them by ID; cell and row edits transfer only changed data. See [the dataset API](docs/datasets.md) and [100,000-record acceptance measurements](reports/data-publication.md).
 
@@ -137,7 +137,7 @@ await host.done;
 
 Node IDs must be nonempty and unique throughout one description. An input or table keeps its native entity when the same ID and control kind appear in the next description. Removing it drops the retained entity and subscription. Inputs are native-retained by default; [controlled inputs](docs/controlled-inputs.md) opt into acknowledged text/selection writes with composition and stale-state guards.
 
-`publish` completes when Rust applies the description. It does not measure when the GPU presents the frame. The native queue holds up to 64 commands and rejects submissions when full. Callers must await or handle publication failures.
+`publish` completes when Rust applies the description. The host sends the operations that turn the previous tree into the new one when it can, and the whole description otherwise; native applies either atomically at the new revision. It does not measure when the GPU presents the frame. The native queue holds up to 64 commands and rejects submissions when full. Callers must await or handle publication failures.
 
 ## Current limits
 
@@ -146,7 +146,7 @@ The Windows release checks have a [setup guide](docs/windows-test-setup.md), an 
 The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 
 - One application host with one window. Windows and Linux X11 use a blocking native runner isolate; macOS uses a native companion process whose main thread owns GPUI.
-- One whole-view snapshot per publication. No signals, node patches, child-view snapshots or Rust executable embedding the Dart VM.
+- One description per publication, sent whole or as operations against the applied tree. No signals, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks are not implemented. Sorting and filtering are native views over the dataset; stable record identity is supported through optional `rowIds`, and table selection follows the record ID when present (row indices otherwise).
 - The adapter exposes ten node kinds and a bounded typed style/theme-token API. It is not the full GPUI Kit catalog. Confirmation content is title/message/buttons; radio groups, tabs and arbitrary dialog content are not bound. [Typed semantics and native accessibility adapters](docs/accessibility.md) pass external UIA, X11 AT-SPI and macOS AX checks in Settings and Watchlist. Human screen-reader behavior, offscreen table navigation and Linux editable text remain unverified or unsupported; see the [evidence and limits](reports/accessibility/README.md).
