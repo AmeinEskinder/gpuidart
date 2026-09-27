@@ -58,6 +58,24 @@ final class TableDataset {
       },
   };
   Map<String, Object> _upload() => {'id': id, 'revision': 1, 'data': _data()};
+
+  /// The columns and formats with no records, for a deferred upload.
+  Map<String, Object> _uploadSchema() => {
+    'id': id,
+    'revision': 1,
+    'data': {
+      'columns': _columns,
+      'rows': const <List<String>>[],
+      if (_rowIds != null) 'ids': const <String>[],
+      if (_formats != null)
+        'format': {
+          'columns': {
+            for (final MapEntry(:key, :value) in _formats!.entries)
+              '$key': value.toJson(),
+          },
+        },
+    },
+  };
 }
 
 void _validateIds(List<String>? rowIds, int rowCount) {

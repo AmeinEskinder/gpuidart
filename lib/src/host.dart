@@ -271,6 +271,7 @@ final class GpuiHost {
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
     GpuiTrace? trace,
+    bool deferDatasets = false,
   }) async {
     trace?._ensureUnclaimed();
     final timer = Stopwatch()..start();
@@ -287,6 +288,7 @@ final class GpuiHost {
       requestTimeout: requestTimeout,
       shutdownTimeout: shutdownTimeout,
       trace: trace,
+      deferDatasets: deferDatasets,
     );
     host._builder = builder;
     host._viewActions = List.unmodifiable(actions);
@@ -317,6 +319,7 @@ final class GpuiHost {
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
     GpuiTrace? trace,
+    bool deferDatasets = false,
   }) async {
     if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
       throw UnsupportedError(
@@ -357,7 +360,12 @@ final class GpuiHost {
         if (actions.isNotEmpty)
           'actions': actions.map((action) => action.toJson()).toList(),
       },
-      'datasets': datasets.map((dataset) => dataset._upload()).toList(),
+      'datasets': datasets
+          .map(
+            (dataset) =>
+                deferDatasets ? dataset._uploadSchema() : dataset._upload(),
+          )
+          .toList(),
       'window': windowDescription,
     };
     if (describeStart != null) {
@@ -447,6 +455,17 @@ final class GpuiHost {
     unawaited(host.done.catchError((Object _) {}));
     try {
       await host._withDeadline(host._ready.future, 'startup');
+      if (deferDatasets) {
+        // The window is up with empty tables; the records follow as ordinary
+        // replacements so the first frame never waits for them.
+        await Future.wait([
+          for (final dataset in datasets)
+            host._transact(dataset, {
+              'op': 'replace',
+              'data': dataset._data(),
+            }, () {}),
+        ]);
+      }
     } catch (_) {
       await host.done.catchError((Object _) {});
       rethrow;

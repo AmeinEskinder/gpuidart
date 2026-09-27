@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:gpuidart/gpuidart.dart';
+import 'package:gpuidart/tracing.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -345,6 +346,45 @@ void main() {
     },
     timeout: const Timeout(Duration(seconds: 30)),
   );
+
+  test('deferred datasets paint before their records arrive', () async {
+    final dataset = TableDataset(
+      'records',
+      columns: ['ID', 'Value'],
+      rows: List.generate(20000, (i) => ['$i', 'Row $i']),
+      rowIds: List.generate(20000, (i) => 'r$i'),
+    );
+    final trace = GpuiTrace(capacity: 512);
+    final host = await GpuiHost.open(
+      const UiTable('table', dataset: 'records'),
+      datasets: [dataset],
+      trace: trace,
+      deferDatasets: true,
+    );
+    try {
+      expect(dataset.revision, 2);
+      final state = await host.diagnose('inspect');
+      expect(state['tables']['table']['row_count'], 20000);
+      expect(state['tables']['table']['dataset_revision'], 2);
+      await host.editDataset(dataset, [const CellEdit(5, 1, 'edited')]);
+      expect(dataset.revision, 3);
+    } finally {
+      await host.close();
+    }
+    final records = (trace.toJson()['records'] as List).cast<Map>();
+    final firstPaint = records.firstWhere(
+      (r) => r['name'] == 'native.content_paint',
+    );
+    final upload = records.firstWhere(
+      (r) => r['operation'] == 'dataset' && r['name'] == 'dart.request',
+    );
+    expect(
+      (firstPaint['start'] as int) < (upload['start'] as int),
+      isTrue,
+      reason: 'the first content paint precedes the record upload',
+    );
+    expect(host.metrics.initialBytes, lessThan(2048));
+  }, timeout: const Timeout(Duration(seconds: 60)));
 
   test('structural edits keep record identity, views and selection', () async {
     final dataset = TableDataset(

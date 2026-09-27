@@ -43,6 +43,7 @@ await host.replaceDataset(
 | Operation | Transfer and native work |
 | --- | --- |
 | `openView(..., datasets: [...])` | Upload and validate each initial dataset once |
+| `openView(..., deferDatasets: true)` | Upload only columns and formats before the first frame; the records follow as replacements once the window is ready, and `open` returns after they applied at revision 2 |
 | `registerDataset(dataset)` | Upload a new dataset under an unused ID at revision 1 |
 | `publish` / `rebuild` | Send the whole view with dataset references, validate references and reconcile controls |
 | `CellEdit` | Send row index, column index and value; replace one indexed string |
