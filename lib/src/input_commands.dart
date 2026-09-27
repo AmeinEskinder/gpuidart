@@ -25,17 +25,24 @@ extension InputCommands on GpuiHost {
     });
   }
 
-  Future<UiInputState> _inputCommand(String id, Map<String, Object> operation) {
+  Future<UiInputState> _inputCommand(
+    String id,
+    Map<String, Object> operation, {
+    int window = 0,
+  }) {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     if (id.isEmpty) throw ArgumentError.value(id, 'id', 'Must be nonempty');
     final request = ++_request;
-    _trace?._point('dart.request', 'input_control', request);
+    if (window == 0) _trace?._point('dart.request', 'input_control', request);
     final completion = Completer<UiInputState>();
     final status = _withMessage(
       {'request': request, 'id': id, 'operation': operation},
       'input_control',
       request,
-      (bytes, length) => _bindings.input(_handle, bytes, length),
+      (bytes, length) => window == 0
+          ? _bindings.input(_handle, bytes, length)
+          : _bindings.windows!.input(_handle, window, bytes, length),
+      traced: window == 0,
     );
     if (status != 0) {
       final error = StateError('Input command failed: $status');

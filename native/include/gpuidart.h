@@ -39,6 +39,21 @@ int32_t gd_dataset(const GdHost *host, const uint8_t *bytes, size_t len);
 int32_t gd_diagnostic(const GdHost *host, const uint8_t *bytes, size_t len);
 void gd_close(const GdHost *host);
 
+/* Secondary windows. gd_window_open takes {"request", "id", "initial"} where
+   initial is the object gd_create takes and id is 1 or above; window_opened
+   or window_rejected completes the request and window_closed reports the
+   window closing. The addressed variants take the payloads of their
+   unaddressed counterparts for the window with that id (0 is the main
+   window) and return the same statuses. Events from a secondary window carry
+   a "window" field. */
+int32_t gd_window_open(const GdHost *host, const uint8_t *bytes, size_t len);
+int32_t gd_window_close(const GdHost *host, uint32_t window);
+int32_t gd_window_publish(const GdHost *host, uint32_t window, const uint8_t *bytes, size_t len);
+int32_t gd_window_update(const GdHost *host, uint32_t window, const uint8_t *bytes, size_t len);
+int32_t gd_window_dataset(const GdHost *host, uint32_t window, const uint8_t *bytes, size_t len);
+int32_t gd_window_diagnostic(const GdHost *host, uint32_t window, const uint8_t *bytes, size_t len);
+int32_t gd_window_input(const GdHost *host, uint32_t window, const uint8_t *bytes, size_t len);
+
 /* Wait for gd_run to return and the closed callback before destroying the host
    or releasing the callback. No other host API call may be in flight. */
 void gd_destroy(GdHost *host);

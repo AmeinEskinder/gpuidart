@@ -44,11 +44,26 @@ fn ffi_rejects_bad_messages_bounds_queues_and_reports_unwind() {
         assert_eq!(gd_update(host, unknown.as_ptr(), unknown.len()), -2);
         let update = br#"{"revision":2,"base_revision":1,"ops":[{"op":"set","id":"a","node":{"kind":"text","id":"a","text":"b"}}]}"#;
         assert_eq!(gd_update(host, update.as_ptr(), update.len()), 0);
+        assert_eq!(gd_window_open(host, null(), 0), -1);
+        assert_eq!(gd_window_open(host, b"{".as_ptr(), 1), -2);
+        let child = br#"{"request":1,"id":0,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}}"#;
+        assert_eq!(gd_window_open(host, child.as_ptr(), child.len()), -2);
+        let child = br#"{"request":1,"id":3,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}}"#;
+        assert_eq!(gd_window_open(host, child.as_ptr(), child.len()), 0);
+        assert_eq!(gd_window_publish(host, 3, null(), 0), -1);
+        assert_eq!(gd_window_publish(host, 3, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_window_update(host, 3, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_window_dataset(host, 3, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_window_diagnostic(host, 3, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_window_input(host, 3, b"{".as_ptr(), 1), -2);
+        assert_eq!(gd_window_close(null(), 3), -1);
+        assert_eq!(gd_window_close(host, 3), 0);
         let snapshot = br#"{"revision":2,"root":{"kind":"text","id":"a","text":"b"}}"#;
-        for _ in 0..63 {
+        for _ in 0..61 {
             assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), 0);
         }
         assert_eq!(gd_publish(host, snapshot.as_ptr(), snapshot.len()), -3);
+        assert_eq!(gd_window_close(host, 3), -3);
         let input_read = br#"{"request":1,"id":"a","operation":{"op":"read"}}"#;
         assert_eq!(gd_input(host, input_read.as_ptr(), input_read.len()), -3);
         let mut length = 0;

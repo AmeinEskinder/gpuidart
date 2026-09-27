@@ -38,40 +38,63 @@ impl Events {
     pub(crate) fn emit(&self, event: Event) {
         (self.0)(event);
     }
+
+    /// An emitter whose events carry `window` once they reach Dart.
+    pub(crate) fn for_window(&self, window: u32) -> Events {
+        let inner = self.clone();
+        Events(Arc::new(move |event| {
+            inner.emit(Event::InWindow {
+                window,
+                event: Box::new(event),
+            })
+        }))
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
+/// Commands address a window: 0 is the main window, secondary windows carry
+/// the ID Dart assigned when it opened them.
 pub(crate) enum Command {
-    Publish(Snapshot),
-    Update(protocol::Update),
-    Dataset(datasets::Update, u64),
-    Diagnostic(diagnostics::Request),
-    Input(input_control::Request),
+    Publish(u32, Snapshot),
+    Update(u32, protocol::Update),
+    Dataset(u32, datasets::Update, u64),
+    Diagnostic(u32, diagnostics::Request),
+    Input(u32, input_control::Request),
+    OpenWindow(datasets::WindowOpen),
+    CloseWindow(u32),
     Close,
 }
 
 impl Command {
     fn trace_key(&self) -> trace::Key {
         match self {
-            Self::Publish(snapshot) => trace::Key {
+            Self::Publish(_, snapshot) => trace::Key {
                 operation: "snapshot",
                 request: snapshot.revision,
             },
-            Self::Update(update) => trace::Key {
+            Self::Update(_, update) => trace::Key {
                 operation: "snapshot",
                 request: update.revision,
             },
-            Self::Dataset(update, _) => trace::Key {
+            Self::Dataset(_, update, _) => trace::Key {
                 operation: "dataset",
                 request: update.request,
             },
-            Self::Diagnostic(request) => trace::Key {
+            Self::Diagnostic(_, request) => trace::Key {
                 operation: "diagnostic",
                 request: request.id(),
             },
-            Self::Input(request) => trace::Key {
+            Self::Input(_, request) => trace::Key {
                 operation: "input_control",
                 request: request.request,
+            },
+            Self::OpenWindow(open) => trace::Key {
+                operation: "window",
+                request: open.request,
+            },
+            Self::CloseWindow(window) => trace::Key {
+                operation: "window",
+                request: u64::from(*window),
             },
             Self::Close => trace::Key {
                 operation: "close",
@@ -85,14 +108,29 @@ impl Command {
 /// The host and readable input buffer must be live for the duration of the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_input(host: *const Host, bytes: *const u8, len: usize) -> i32 {
-    boundary::call(-4, || {
+    boundary::call(-4, || unsafe { input(host, 0, bytes, len) })
+}
+
+/// `gd_input` addressed to a secondary window.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_input(
+    host: *const Host,
+    window: u32,
+    bytes: *const u8,
+    len: usize,
+) -> i32 {
+    boundary::call(-4, || unsafe { input(host, window, bytes, len) })
+}
+
+unsafe fn input(host: *const Host, window: u32, bytes: *const u8, len: usize) -> i32 {
+    {
         if host.is_null() || bytes.is_null() || len == 0 || len > MAX_MESSAGE_BYTES {
             return -1;
         }
         let host = unsafe { &*host };
         let started = host.trace.start();
         match input_control::Request::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
-            Ok(request) => submit(host, Command::Input(request), len, started),
+            Ok(request) => submit(host, Command::Input(window, request), len, started),
             Err(_) => {
                 host.trace.complete(
                     "native.parse",
@@ -107,7 +145,7 @@ pub unsafe extern "C" fn gd_input(host: *const Host, bytes: *const u8, len: usiz
                 -2
             }
         }
-    })
+    }
 }
 
 fn submit(host: &Host, command: Command, len: usize, started: Option<clock::Stamp>) -> i32 {
@@ -127,10 +165,21 @@ fn submit(host: &Host, command: Command, len: usize, started: Option<clock::Stam
 /// Queues an opt-in diagnostic request. Input is copied before returning.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_diagnostic(host: *const Host, bytes: *const u8, len: usize) -> i32 {
-    boundary::call(-4, || unsafe { diagnostic(host, bytes, len) })
+    boundary::call(-4, || unsafe { diagnostic(host, 0, bytes, len) })
 }
 
-unsafe fn diagnostic(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+/// `gd_diagnostic` addressed to a secondary window.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_diagnostic(
+    host: *const Host,
+    window: u32,
+    bytes: *const u8,
+    len: usize,
+) -> i32 {
+    boundary::call(-4, || unsafe { diagnostic(host, window, bytes, len) })
+}
+
+unsafe fn diagnostic(host: *const Host, window: u32, bytes: *const u8, len: usize) -> i32 {
     if host.is_null() || bytes.is_null() || len > 4096 {
         return -1;
     }
@@ -149,7 +198,7 @@ unsafe fn diagnostic(host: *const Host, bytes: *const u8, len: usize) -> i32 {
         );
         return -2;
     };
-    submit(host, Command::Diagnostic(request), len, started)
+    submit(host, Command::Diagnostic(window, request), len, started)
 }
 
 pub struct Host {
@@ -245,9 +294,15 @@ unsafe fn create(
     };
     let event_trace = trace.clone();
     let events = Events(Arc::new(move |event| {
-        let bytes = serde_json::to_vec(&event)
-            .expect("event serialization")
-            .into_boxed_slice();
+        let encoded = match &event {
+            Event::InWindow { window, event } => {
+                let mut value = serde_json::to_value(&**event).expect("event serialization");
+                value["window"] = serde_json::Value::from(*window);
+                serde_json::to_vec(&value)
+            }
+            _ => serde_json::to_vec(&event),
+        };
+        let bytes = encoded.expect("event serialization").into_boxed_slice();
         let len = bytes.len();
         if !event_trace.is_remote()
             && let Some(key) = event.trace_key()
@@ -310,7 +365,9 @@ unsafe fn run(host: *const Host) -> i32 {
                 let worker = std::thread::Builder::new()
                     .name("gpuidart-ui".into())
                     .stack_size(UI_THREAD_STACK_BYTES)
-                    .spawn(move || boundary::catch(|| ui::run(initial, receiver, events, trace, None)))
+                    .spawn(move || {
+                        boundary::catch(|| ui::run(initial, receiver, events, trace, None))
+                    })
                     .map_err(|error| format!("Could not start the UI thread: {error}"))?;
                 match worker.join() {
                     Ok(Ok(result)) => result,
@@ -390,17 +447,28 @@ unsafe fn run_with(
 /// -4: a Rust panic was caught; discard the host after closing it.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_publish(host: *const Host, bytes: *const u8, len: usize) -> i32 {
-    boundary::call(-4, || unsafe { publish(host, bytes, len) })
+    boundary::call(-4, || unsafe { publish(host, 0, bytes, len) })
 }
 
-unsafe fn publish(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+/// `gd_publish` addressed to a secondary window.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_publish(
+    host: *const Host,
+    window: u32,
+    bytes: *const u8,
+    len: usize,
+) -> i32 {
+    boundary::call(-4, || unsafe { publish(host, window, bytes, len) })
+}
+
+unsafe fn publish(host: *const Host, window: u32, bytes: *const u8, len: usize) -> i32 {
     if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
         return -1;
     }
     let host = unsafe { &*host };
     let started = host.trace.start();
     match Snapshot::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
-        Ok(snapshot) => submit(host, Command::Publish(snapshot), len, started),
+        Ok(snapshot) => submit(host, Command::Publish(window, snapshot), len, started),
         Err(_) => {
             host.trace.complete(
                 "native.parse",
@@ -422,17 +490,28 @@ unsafe fn publish(host: *const Host, bytes: *const u8, len: usize) -> i32 {
 /// reported asynchronously as `rejected` and leaves the applied description.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_update(host: *const Host, bytes: *const u8, len: usize) -> i32 {
-    boundary::call(-4, || unsafe { update(host, bytes, len) })
+    boundary::call(-4, || unsafe { update(host, 0, bytes, len) })
 }
 
-unsafe fn update(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+/// `gd_update` addressed to a secondary window.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_update(
+    host: *const Host,
+    window: u32,
+    bytes: *const u8,
+    len: usize,
+) -> i32 {
+    boundary::call(-4, || unsafe { update(host, window, bytes, len) })
+}
+
+unsafe fn update(host: *const Host, window: u32, bytes: *const u8, len: usize) -> i32 {
     if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
         return -1;
     }
     let host = unsafe { &*host };
     let started = host.trace.start();
     match protocol::Update::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
-        Ok(update) => submit(host, Command::Update(update), len, started),
+        Ok(update) => submit(host, Command::Update(window, update), len, started),
         Err(_) => {
             host.trace.complete(
                 "native.parse",
@@ -452,10 +531,66 @@ unsafe fn update(host: *const Host, bytes: *const u8, len: usize) -> i32 {
 /// Copies a revisioned dataset transaction. Application/rejection is asynchronous.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn gd_dataset(host: *const Host, bytes: *const u8, len: usize) -> i32 {
-    boundary::call(-4, || unsafe { dataset(host, bytes, len) })
+    boundary::call(-4, || unsafe { dataset(host, 0, bytes, len) })
 }
 
-unsafe fn dataset(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+/// `gd_dataset` addressed to a secondary window.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_dataset(
+    host: *const Host,
+    window: u32,
+    bytes: *const u8,
+    len: usize,
+) -> i32 {
+    boundary::call(-4, || unsafe { dataset(host, window, bytes, len) })
+}
+
+/// Opens a secondary window from `{request, id, initial}`. Statuses match
+/// gd_publish; window_opened or window_rejected completes the request.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_open(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    boundary::call(-4, || unsafe { window_open(host, bytes, len) })
+}
+
+unsafe fn window_open(host: *const Host, bytes: *const u8, len: usize) -> i32 {
+    if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
+        return -1;
+    }
+    let host = unsafe { &*host };
+    let started = host.trace.start();
+    match datasets::WindowOpen::parse(unsafe { slice::from_raw_parts(bytes, len) }) {
+        Ok(open) => submit(host, Command::OpenWindow(open), len, started),
+        Err(_) => {
+            host.trace.complete(
+                "native.parse",
+                trace::Key {
+                    operation: "window",
+                    request: 0,
+                },
+                started,
+                Some(len),
+                Some(-2),
+            );
+            -2
+        }
+    }
+}
+
+/// Asks native to close a secondary window; window_closed follows. Closing
+/// window 0 closes the application like gd_close. -1 for a null host, -3
+/// when the queue is closed or full.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn gd_window_close(host: *const Host, window: u32) -> i32 {
+    boundary::call(-4, || {
+        if host.is_null() {
+            return -1;
+        }
+        let host = unsafe { &*host };
+        submit(host, Command::CloseWindow(window), 0, host.trace.start())
+    })
+}
+
+unsafe fn dataset(host: *const Host, window: u32, bytes: *const u8, len: usize) -> i32 {
     if host.is_null() || bytes.is_null() || len > MAX_MESSAGE_BYTES {
         return -1;
     }
@@ -476,7 +611,12 @@ unsafe fn dataset(host: *const Host, bytes: *const u8, len: usize) -> i32 {
         return -2;
     };
     let parse_us = timer.elapsed().as_micros() as u64;
-    submit(host, Command::Dataset(update, parse_us), len, started)
+    submit(
+        host,
+        Command::Dataset(window, update, parse_us),
+        len,
+        started,
+    )
 }
 
 /// Close is delivered even when the command queue is full.

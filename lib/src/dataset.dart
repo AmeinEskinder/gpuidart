@@ -32,6 +32,9 @@ final class TableDataset {
   Map<int, UiColumnFormat>? _formats;
   int _revision = 0;
   GpuiHost? _owner;
+
+  /// The window this dataset belongs to; 0 is the main window.
+  int _window = 0;
   bool _busy = false;
 
   int get revision => _revision;
@@ -291,6 +294,7 @@ extension _DatasetTransactions on GpuiHost {
     Map<String, Object> change,
     void Function() commit, {
     bool create = false,
+    int window = 0,
   }) async {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     if (dataset._busy) {
@@ -301,6 +305,7 @@ extension _DatasetTransactions on GpuiHost {
         : dataset._owner != this) {
       throw StateError('Dataset is not available for this transaction');
     }
+    final target = create ? window : dataset._window;
     final base = create ? 0 : dataset._revision;
     final revision = base + 1;
     final request = ++_request;
@@ -324,7 +329,10 @@ extension _DatasetTransactions on GpuiHost {
         },
         'dataset',
         request,
-        (bytes, length) => _bindings.dataset(_handle, bytes, length),
+        (bytes, length) => target == 0
+            ? _bindings.dataset(_handle, bytes, length)
+            : _bindings.windows!.dataset(_handle, target, bytes, length),
+        traced: target == 0,
       );
       if (status != 0) {
         final error = StateError('Dataset submission failed: $status');
@@ -339,6 +347,7 @@ extension _DatasetTransactions on GpuiHost {
       dataset._revision = revision;
       if (create) {
         dataset._owner = this;
+        dataset._window = window;
         _datasets[dataset.id] = dataset;
       }
       _trace?._point('dart.commit', 'dataset', request);

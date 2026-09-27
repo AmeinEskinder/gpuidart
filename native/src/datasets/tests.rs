@@ -491,3 +491,22 @@ fn cell_format_validates_columns_decimals_and_rule_counts() {
         .is_err()
     );
 }
+
+#[test]
+fn window_open_requests_validate_their_identity_and_initial_description() {
+    let open = WindowOpen::parse(
+        br#"{"request":4,"id":2,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[],"window":{"title":"Child","width":400,"height":300}}}"#,
+    )
+    .unwrap();
+    assert_eq!((open.request, open.id), (4, 2));
+    assert_eq!(open.initial.window.title, "Child");
+    for invalid in [
+        r#"{"request":4,"id":0,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}}"#,
+        r#"{"request":0,"id":2,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}}"#,
+        r#"{"request":4,"id":2,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[],"window":{"title":"","width":400,"height":300}}}"#,
+        r#"{"request":4,"id":2,"initial":{"snapshot":{"revision":1,"root":{"kind":"table","id":"t","dataset":"missing"}},"datasets":[]}}"#,
+        r#"{"request":4,"id":2,"extra":true,"initial":{"snapshot":{"revision":1,"root":{"kind":"text","id":"a","text":"a"}},"datasets":[]}}"#,
+    ] {
+        assert!(WindowOpen::parse(invalid.as_bytes()).is_err(), "{invalid}");
+    }
+}

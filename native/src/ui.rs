@@ -2018,6 +2018,108 @@ impl Render for DartView {
     }
 }
 
+type Opened = (
+    gpui::WindowHandle<gpui_kit::component::Root>,
+    Entity<DartView>,
+);
+
+/// The windows the application holds, by the ID Dart addresses (0 is the
+/// main window) and by GPUI's window ID for the close observer.
+#[derive(Default)]
+struct Windows {
+    by_id: HashMap<u32, Opened>,
+    ids: HashMap<gpui::WindowId, u32>,
+}
+
+impl Windows {
+    fn insert(
+        &mut self,
+        window: u32,
+        handle: gpui::WindowHandle<gpui_kit::component::Root>,
+        view: Entity<DartView>,
+    ) {
+        self.ids
+            .insert(gpui::AnyWindowHandle::from(handle).window_id(), window);
+        self.by_id.insert(window, (handle, view));
+    }
+
+    fn get(&self, window: u32) -> Option<Opened> {
+        self.by_id.get(&window).cloned()
+    }
+
+    fn remove_by_window_id(&mut self, id: gpui::WindowId) -> Option<u32> {
+        let window = self.ids.remove(&id)?;
+        self.by_id.remove(&window);
+        Some(window)
+    }
+}
+
+/// Opens a secondary window with its own view and reports the outcome to
+/// Dart. Every event from that view carries the window ID.
+fn open_secondary(
+    cx: &mut gpui::AsyncApp,
+    windows: &Rc<RefCell<Windows>>,
+    events: &Events,
+    open: crate::datasets::WindowOpen,
+) {
+    let request = open.request;
+    let id = open.id;
+    let reject = |message: String| {
+        events.emit(Event::WindowRejected {
+            request,
+            window: id,
+            message,
+        });
+    };
+    if windows.borrow().by_id.contains_key(&id) {
+        reject("Window ID is already open".into());
+        return;
+    }
+    let tagged = events.for_window(id);
+    let initial = open.initial;
+    let opened = cx.update(|cx| {
+        let options = WindowOptions {
+            window_bounds: Some(WindowBounds::centered(
+                size(px(initial.window.width), px(initial.window.height)),
+                cx,
+            )),
+            titlebar: Some(TitlebarOptions {
+                title: Some(initial.window.title.clone().into()),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let mut content = None;
+        let handle = cx.open_window(options, |window, cx| {
+            let view = cx.new(|cx| DartView::new(initial, tagged, window, cx));
+            content = Some(view.clone());
+            cx.new(|cx| gpui_kit::component::Root::new(view, window, cx))
+        });
+        handle.map(|handle| (handle, content))
+    });
+    let (handle, view) = match opened {
+        Ok((handle, Some(view))) => (handle, view),
+        Ok((_, None)) => {
+            reject("Window opened without view content".into());
+            return;
+        }
+        Err(error) => {
+            reject(error.to_string());
+            return;
+        }
+    };
+    if let Some(message) = cx.update(|cx| view.read(cx).failure.clone()) {
+        let _ = handle.update(cx, |_, window, _| window.remove_window());
+        reject(message);
+        return;
+    }
+    windows.borrow_mut().insert(id, handle, view);
+    events.emit(Event::WindowOpened {
+        request,
+        window: id,
+    });
+}
+
 pub(crate) fn run(
     initial: Initial,
     receiver: Receiver<Command>,
@@ -2112,9 +2214,25 @@ pub(crate) fn run(
                 return;
             }
             trace.point("native.window_opened", initial_key, None, None);
-            cx.on_window_closed(|cx, _| {
-                if cx.windows().is_empty() {
-                    cx.quit();
+            let windows = Rc::new(RefCell::new(Windows::default()));
+            windows.borrow_mut().insert(0, handle, view.clone());
+            let closing = windows.clone();
+            let closed_events = events.clone();
+            cx.on_window_closed(move |cx, window_id| {
+                match closing.borrow_mut().remove_by_window_id(window_id) {
+                    // The main window owns the application.
+                    Some(0) => cx.quit(),
+                    Some(window) => {
+                        closed_events.emit(Event::WindowClosed { window });
+                        if cx.windows().is_empty() {
+                            cx.quit();
+                        }
+                    }
+                    None => {
+                        if cx.windows().is_empty() {
+                            cx.quit();
+                        }
+                    }
                 }
             })
             .detach();
@@ -2127,31 +2245,64 @@ pub(crate) fn run(
                 while let Ok(command) = receiver.recv().await {
                     trace.point("native.dequeue", command.trace_key(), None, None);
                     let _dispatch = trace.dispatch(command.trace_key());
+                    // A failing update on the main window means the
+                    // application is quitting; on a secondary window it means
+                    // that window closed first and its command is dropped.
                     match command {
-                        Command::Publish(snapshot) => {
+                        Command::Publish(window, snapshot) => {
+                            let Some((handle, view)) = windows.borrow().get(window) else {
+                                events.for_window(window).emit(Event::Rejected {
+                                    revision: snapshot.revision,
+                                    message: "Unknown window".into(),
+                                });
+                                continue;
+                            };
                             if handle
-                                .update(cx, |_, window, cx| {
-                                    view.update(cx, |view, cx| view.publish(snapshot, window, cx))
+                                .update(cx, |_, w, cx| {
+                                    view.update(cx, |view, cx| view.publish(snapshot, w, cx))
                                 })
                                 .is_err()
+                                && window == 0
                             {
                                 break;
                             }
                         }
-                        Command::Update(update) => {
+                        Command::Update(window, update) => {
+                            let Some((handle, view)) = windows.borrow().get(window) else {
+                                events.for_window(window).emit(Event::Rejected {
+                                    revision: update.revision,
+                                    message: "Unknown window".into(),
+                                });
+                                continue;
+                            };
                             if handle
-                                .update(cx, |_, window, cx| {
-                                    view.update(cx, |view, cx| {
-                                        view.apply_update(update, window, cx)
-                                    })
+                                .update(cx, |_, w, cx| {
+                                    view.update(cx, |view, cx| view.apply_update(update, w, cx))
                                 })
                                 .is_err()
+                                && window == 0
                             {
                                 break;
                             }
                         }
-                        Command::Close => break,
-                        Command::Dataset(update, parse_us) => {
+                        Command::Close | Command::CloseWindow(0) => break,
+                        Command::CloseWindow(window) => {
+                            // Removing the window runs the close observer,
+                            // which borrows the registry: hold no borrow here.
+                            let target = windows.borrow().get(window);
+                            if let Some((handle, _)) = target {
+                                let _ = handle.update(cx, |_, w, _| w.remove_window());
+                            }
+                        }
+                        Command::OpenWindow(open) => open_secondary(cx, &windows, &events, open),
+                        Command::Dataset(window, update, parse_us) => {
+                            let Some((handle, view)) = windows.borrow().get(window) else {
+                                events.for_window(window).emit(Event::DatasetRejected {
+                                    request: update.request,
+                                    message: "Unknown window".into(),
+                                });
+                                continue;
+                            };
                             if handle
                                 .update(cx, |_, _, cx| {
                                     view.update(cx, |view, cx| {
@@ -2159,30 +2310,52 @@ pub(crate) fn run(
                                     })
                                 })
                                 .is_err()
+                                && window == 0
                             {
                                 break;
                             }
                         }
-                        Command::Diagnostic(request) => {
+                        Command::Diagnostic(window, request) => {
+                            let Some((handle, view)) = windows.borrow().get(window) else {
+                                events.for_window(window).emit(Event::Diagnostic {
+                                    request: request.id(),
+                                    data: json!({"error": "Unknown window"}),
+                                });
+                                continue;
+                            };
+                            let tagged = if window == 0 {
+                                events.clone()
+                            } else {
+                                events.for_window(window)
+                            };
                             // Keyboard dispatch may update the Root (Tab/modal
                             // handlers), so do not borrow it through handle.update.
                             if cx
-                                .update_window(handle.into(), |_, window, cx| {
-                                    crate::diagnostics::handle(request, &view, &events, window, cx)
+                                .update_window(handle.into(), |_, w, cx| {
+                                    crate::diagnostics::handle(request, &view, &tagged, w, cx)
                                 })
                                 .is_err()
+                                && window == 0
                             {
                                 break;
                             }
                         }
-                        Command::Input(request) => {
+                        Command::Input(window, request) => {
+                            let Some((handle, view)) = windows.borrow().get(window) else {
+                                events.for_window(window).emit(Event::InputResult {
+                                    request: request.request,
+                                    id: request.id.clone(),
+                                    status: crate::input_control::Status::Missing,
+                                    state: None,
+                                });
+                                continue;
+                            };
                             if handle
-                                .update(cx, |_, window, cx| {
-                                    view.update(cx, |view, cx| {
-                                        view.input_command(request, window, cx)
-                                    })
+                                .update(cx, |_, w, cx| {
+                                    view.update(cx, |view, cx| view.input_command(request, w, cx))
                                 })
                                 .is_err()
+                                && window == 0
                             {
                                 break;
                             }

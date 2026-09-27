@@ -280,6 +280,10 @@ impl crate::protocol::Event {
                 operation: "failure",
                 request: 0,
             },
+            WindowOpened { request, .. } | WindowRejected { request, .. } => Key {
+                operation: "window",
+                request: *request,
+            },
             _ => return None,
         })
     }

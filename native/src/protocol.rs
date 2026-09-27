@@ -582,6 +582,7 @@ impl ViewIndex {
     }
 
     /// Source indices of the records in view order.
+    #[cfg(test)]
     pub fn records(&self) -> impl Iterator<Item = usize> + '_ {
         self.entries.iter().filter_map(|entry| match entry {
             ViewEntry::Record(source) => Some(*source),
@@ -1809,6 +1810,24 @@ pub enum Event {
         revision: u64,
         id: String,
         item: String,
+    },
+    WindowOpened {
+        request: u64,
+        window: u32,
+    },
+    WindowRejected {
+        request: u64,
+        window: u32,
+        message: String,
+    },
+    WindowClosed {
+        window: u32,
+    },
+    /// An event from a secondary window. The host callback flattens it into
+    /// the inner event plus a `window` field before it reaches Dart.
+    InWindow {
+        window: u32,
+        event: Box<Event>,
     },
     SliderChange {
         revision: u64,

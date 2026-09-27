@@ -33,6 +33,27 @@ impl Default for WindowConfig {
     }
 }
 
+/// A request to open a secondary window with its own initial description.
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct WindowOpen {
+    pub request: u64,
+    /// The window ID Dart assigned; 1 or above, unique while the window lives.
+    pub id: u32,
+    pub initial: Initial,
+}
+
+impl WindowOpen {
+    pub fn parse(bytes: &[u8]) -> Result<Self, String> {
+        let open: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+        if open.id == 0 || open.request == 0 {
+            return Err("Window requests need a nonzero request and window ID".into());
+        }
+        open.initial.validate()?;
+        Ok(open)
+    }
+}
+
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Upload {

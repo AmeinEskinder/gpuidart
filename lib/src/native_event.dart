@@ -25,6 +25,7 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
   if (value.containsKey('id')) string('id');
   if (value.containsKey('revision')) integer('revision', minimum: 1);
   if (value.containsKey('value')) string('value');
+  if (value.containsKey('window')) integer('window', minimum: 1);
   switch (value['type']) {
     case 'ready' || 'closed':
       break;
@@ -101,6 +102,15 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       integer('revision', minimum: 1);
       string('id');
       string('item');
+    case 'window_opened':
+      integer('request', minimum: 1);
+      integer('window', minimum: 1);
+    case 'window_rejected':
+      integer('request', minimum: 1);
+      integer('window', minimum: 1);
+      string('message');
+    case 'window_closed':
+      integer('window', minimum: 1);
     case 'slider_change':
       integer('revision', minimum: 1);
       string('id');

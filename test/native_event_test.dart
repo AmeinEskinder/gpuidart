@@ -121,4 +121,40 @@ void main() {
       expect(action['context'], 'quotes-table');
     },
   );
+  test('window events decode with their window tag', () {
+    Map<String, dynamic> decode(Map<String, Object> value) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(value)));
+    expect(
+      decode({'type': 'window_opened', 'request': 3, 'window': 1})['window'],
+      1,
+    );
+    expect(
+      decode({
+        'type': 'window_rejected',
+        'request': 3,
+        'window': 1,
+        'message': 'no',
+      })['message'],
+      'no',
+    );
+    expect(decode({'type': 'window_closed', 'window': 2})['window'], 2);
+    expect(
+      decode({
+        'type': 'applied',
+        'revision': 2,
+        'native_apply_us': 1,
+        'window': 1,
+      })['window'],
+      1,
+    );
+    for (final invalid in <Map<String, Object>>[
+      {'type': 'window_opened', 'request': 3},
+      {'type': 'window_opened', 'request': 3, 'window': 0},
+      {'type': 'window_closed'},
+      {'type': 'window_rejected', 'request': 3, 'window': 1},
+      {'type': 'click', 'revision': 1, 'id': 'a', 'window': 'x'},
+    ]) {
+      expect(() => decode(invalid), throwsFormatException, reason: '$invalid');
+    }
+  });
 }

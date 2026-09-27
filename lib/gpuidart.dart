@@ -3,6 +3,7 @@ library;
 export 'src/host.dart'
     show
         GpuiHost,
+        GpuiWindow,
         InputCommands,
         GpuiEvent,
         ActionEvent,

@@ -476,4 +476,105 @@ void main() {
       await host.close();
     }
   }, timeout: const Timeout(Duration(seconds: 30)));
+  test(
+    'secondary windows publish, route datasets and close on their own',
+    () async {
+      final host = await GpuiHost.open(const UiText('main', 'Main'));
+      final events = <GpuiEvent>[];
+      final subscription = host.events.listen(events.add);
+      try {
+        await expectLater(
+          host.openWindow(const UiTable('orphan', dataset: 'missing')),
+          throwsStateError,
+        );
+        final details = TableDataset(
+          'details',
+          columns: ['k', 'v'],
+          rows: [
+            ['a', '1'],
+          ],
+        );
+        UiNode build(String title) => UiColumn('root', [
+          UiText('title', title),
+          const UiTable('table', dataset: 'details'),
+        ]);
+        final child = await host.openWindow(
+          build('Child'),
+          options: const GpuiWindowOptions(
+            title: 'Child',
+            width: 400,
+            height: 300,
+          ),
+          datasets: [details],
+        );
+        // The rejected request consumed an ID; IDs are never reused.
+        expect(child.id, 2);
+        final before = host.metrics.operationPublications;
+        await child.publish(build('Child updated'));
+        expect(host.metrics.operationPublications, before + 1);
+        await host.editDataset(details, [const CellEdit(0, 1, '2')]);
+        expect(details.revision, 2);
+        expect(
+          (await child.diagnose('cell', {
+            'dataset': 'details',
+            'row': 0,
+            'column': 1,
+          }))['value'],
+          '2',
+        );
+        expect(
+          (await host.diagnose('cell', {
+            'dataset': 'details',
+            'row': 0,
+            'column': 1,
+          }))['error'],
+          isA<String>(),
+        );
+        final extra = TableDataset(
+          'extra',
+          columns: ['x'],
+          rows: [
+            ['y'],
+          ],
+        );
+        await child.registerDataset(extra);
+        await child.publish(
+          UiColumn('root', [
+            const UiText('title', 'Two tables'),
+            const UiTable('table', dataset: 'details'),
+            const UiTable('extra-table', dataset: 'extra'),
+          ]),
+        );
+        await host.publish(const UiText('main', 'Main still publishes'));
+        await child.close();
+        await child.done;
+        expect(() => child.publish(build('Closed')), throwsStateError);
+        await expectLater(
+          host.editDataset(details, [const CellEdit(0, 1, '3')]),
+          throwsStateError,
+        );
+        await host.publish(const UiText('main', 'Main after child closed'));
+        await Future<void>.delayed(Duration.zero);
+        expect(
+          events
+            .where((event) => event.window == child.id)
+            .map((event) => event.type),
+          containsAll([
+            'applied',
+            'dataset_applied',
+            'diagnostic',
+            'window_closed',
+          ]),
+        );
+        expect(
+          events.where((event) => event.type == 'applied' && event.window == 0),
+          isNotEmpty,
+        );
+      } finally {
+        await subscription.cancel();
+        await host.close();
+      }
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
 }
