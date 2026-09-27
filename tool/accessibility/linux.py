@@ -45,16 +45,23 @@ def run():
     visit(apps[0])
     if operation != "query":
         matches = [e for e, _ in elements if (e.get_accessible_id() == identifier if identifier else e.get_name() == name)]
+        if operation == "invoke-menu":
+            matches = [e for e in matches if e.get_role() in (Atspi.Role.MENU_ITEM, Atspi.Role.CHECK_MENU_ITEM, Atspi.Role.RADIO_MENU_ITEM)]
         if len(matches) != 1:
             raise RuntimeError(f"Expected one AT-SPI element named {name}, got {len(matches)}")
         element = matches[0]
-        if operation in ("invoke", "toggle", "select"):
+        if operation in ("invoke", "toggle", "select", "invoke-menu"):
             action = element.get_action_iface()
             names = [action.get_action_name(i) for i in range(action.get_n_actions())]
             candidates = [i for i, n in enumerate(names) if n in ("click", "press", "toggle")]
             if len(candidates) != 1:
                 raise RuntimeError(f"Expected one click action, got {names}")
             accepted = action.do_action(candidates[0])
+        elif operation == "hover":
+            rect = element.get_component_iface().get_extents(Atspi.CoordType.SCREEN)
+            if rect.width <= 0 or rect.height <= 0:
+                raise RuntimeError("Hover target has no bounds")
+            accepted = Atspi.generate_mouse_event(rect.x + rect.width // 2, rect.y + rect.height // 2, "abs")
         elif operation == "set-value":
             accepted = element.get_editable_text_iface().set_text_contents(value)
         elif operation == "set-range":
@@ -73,6 +80,7 @@ def run():
             node = {
                 "parent": parent,
                 "name": element.get_name(),
+                "description": element.get_description(),
                 "role": element.get_role_name(),
                 "id": element.get_accessible_id(),
                 "enabled": state.contains(Atspi.StateType.ENABLED),

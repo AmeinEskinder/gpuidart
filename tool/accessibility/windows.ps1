@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][int]$AppProcessId,
-    [ValidateSet('query','invoke','toggle','set-value','set-range','focus','select')][string]$Operation = 'query',
+    [ValidateSet('query','invoke','toggle','set-value','set-range','focus','select','hover','invoke-menu')][string]$Operation = 'query',
     [string]$Name = '',
     [string]$Value = '',
     [string]$Id = ''
@@ -15,9 +15,18 @@ $elements = $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [Sys
 if ($elements.Count -gt 4096) { throw "UIA tree exceeds probe bound: $($elements.Count)" }
 if ($Operation -ne 'query') {
     $matches = @($elements | Where-Object { if ($Id) { $_.Current.AutomationId -ceq $Id } else { $_.Current.Name -ceq $Name } })
+    if ($Operation -eq 'invoke-menu') { $matches = @($matches | Where-Object { $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::MenuItem }) }
     if ($matches.Count -ne 1) { throw "Expected one UIA element named '$Name', got $($matches.Count)" }
     $element = $matches[0]
     switch ($Operation) {
+        invoke-menu { $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke() }
+        hover {
+            Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public static class TerminalPointer { [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y); [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }'
+            $bounds = $element.Current.BoundingRectangle
+            if ($bounds.IsEmpty -or $bounds.Width -le 0 -or $bounds.Height -le 0) { throw 'Hover target has no bounds' }
+            [void][TerminalPointer]::SetForegroundWindow([IntPtr]$window.Current.NativeWindowHandle)
+            if (-not [TerminalPointer]::SetCursorPos([int]($bounds.X + $bounds.Width / 2), [int]($bounds.Y + $bounds.Height / 2))) { throw 'Pointer move failed' }
+        }
         invoke { $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke() }
         toggle { $element.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern).Toggle() }
         set-value { $element.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($Value) }
@@ -33,6 +42,7 @@ foreach ($element in $elements) {
     $current = $element.Current
     $node = [ordered]@{
         name = $current.Name
+        description = $current.HelpText
         role = $current.ControlType.ProgrammaticName
         id = $current.AutomationId
         enabled = $current.IsEnabled

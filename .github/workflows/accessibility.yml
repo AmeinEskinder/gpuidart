@@ -5,6 +5,7 @@ on:
     paths:
       - 'tool/accessibility/**'
       - 'tool/verify_settings.dart'
+      - 'tool/verify_terminal*.dart'
       - 'tool/src/dev_session.dart'
       - '.github/workflows/accessibility.yml'
       - 'Cargo.toml'
@@ -92,6 +93,10 @@ jobs:
           dart run tool/accessibility/disabled.dart build/accessibility/disabled.json
           dart run tool/verify_settings.dart build/accessibility/settings.json --semantics
           dart run tool/accessibility/watchlist.dart build/accessibility/watchlist.json
+          dart run tool/verify_terminal.dart build/accessibility/terminal-jit.json --semantics
+          dart compile exe tool/verify_terminal.dart -o build/accessibility/terminal
+          build/accessibility/terminal build/accessibility/terminal-aot.json
+          dart run tool/verify_terminal_reload.dart build/accessibility/terminal-reload.json
           PROBE
       - name: External control actions
         if: runner.os != 'Linux'
@@ -105,6 +110,29 @@ jobs:
       - name: Watchlist viewport semantics and record identity
         if: runner.os != 'Linux'
         run: dart run tool/accessibility/watchlist.dart build/accessibility/watchlist.json
+      - name: Market terminal interaction and external semantics
+        if: runner.os != 'Linux'
+        run: dart run tool/verify_terminal.dart build/accessibility/terminal-jit.json --semantics
+      - name: Market terminal Windows AOT
+        if: runner.os == 'Windows'
+        run: |
+          dart compile exe tool/verify_terminal.dart -o build/accessibility/terminal.exe
+          ./build/accessibility/terminal.exe build/accessibility/terminal-aot.json
+      - name: Market terminal macOS AOT
+        if: runner.os == 'macOS'
+        run: |
+          dart compile exe tool/verify_terminal.dart -o build/accessibility/terminal
+          build/accessibility/terminal build/accessibility/terminal-aot.json
+      - name: Market terminal actual code reload
+        if: runner.os != 'Linux'
+        run: dart run tool/verify_terminal_reload.dart build/accessibility/terminal-reload.json
+      - name: Retain Windows host for matching local verification
+        if: always() && runner.os == 'Windows'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terminal-windows-host
+          path: target/debug/gpuidart.dll
+          retention-days: 7
       - name: Retain platform responses and failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

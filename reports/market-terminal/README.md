@@ -225,3 +225,23 @@ Retained implementation failures: the first nested JSON fixture needed parenthes
 around its mapped array expression. Dart's sealed UiNode also required the chart
 declaration to be a part of its library rather than an independent subclass file;
 analysis caught this before live execution.
+
+### Hosted chart follow-up
+
+All five workflows passed at `dfa65ae`, including line/bar live dataset edits on
+Windows/macOS/Linux. The SDK jobs also kept existing 100k and settings fixtures green.
+
+## Terminal assembly: verification in progress
+
+The terminal now assembles all three tracks. The new verifier runs 100k-record
+interaction and external platform semantics, an AOT interaction pass, and actual
+Dart-code reload on all three hosted platforms. Each report starts failed and only
+passes after its declared assertions. The external clients gain accessible help
+reads and OS pointer movement to the owned element's queried bounds for tooltip
+appearance/dismissal. macOS explicitly queries AXMenuBar.
+
+Local analysis was attempted after assembly but the Dart VM could not start a
+worker thread. Windows then reported under 1 GiB free commit capacity; no app test
+ran in that attempt. Hosted checks and a retained matching Windows DLL provide an
+independent verification path. Terminal acceptance is pending, not inferred from
+the prior control-family passes.
