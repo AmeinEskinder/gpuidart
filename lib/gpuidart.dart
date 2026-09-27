@@ -10,7 +10,10 @@ export 'src/host.dart'
         TableDataset,
         TableEdit,
         CellEdit,
-        RowEdit;
+        RowEdit,
+        InsertRow,
+        DeleteRow,
+        MoveRow;
 export 'src/actions.dart';
 export 'src/format.dart';
 export 'src/nodes.dart';

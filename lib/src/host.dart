@@ -717,8 +717,9 @@ final class GpuiHost {
     if (batch.isEmpty) {
       throw ArgumentError('Dataset edit batch must be nonempty');
     }
+    final shape = _DatasetShape(dataset);
     for (final edit in batch) {
-      edit._validate(dataset);
+      edit._validate(shape);
     }
     return _transact(
       dataset,

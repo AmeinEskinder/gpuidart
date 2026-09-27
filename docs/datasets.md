@@ -47,6 +47,9 @@ await host.replaceDataset(
 | `publish` / `rebuild` | Send the whole view with dataset references, validate references and reconcile controls |
 | `CellEdit` | Send row index, column index and value; replace one indexed string |
 | `RowEdit` | Send row index and replacement values; replace one row |
+| `InsertRow` | Send the index, values and record ID; insert one record and recompute views |
+| `DeleteRow` | Send the index; drop one record and recompute views |
+| `MoveRow` | Send the index and destination; reorder one record and recompute views |
 | `replaceDataset` | Validate and replace the complete dataset and schema |
 | `releaseDataset` | Drop the host's reference to an unused dataset |
 
@@ -59,7 +62,19 @@ await host.releaseDataset(quotes);
 
 Released IDs cannot be reused within the same host, preventing delayed commands from addressing a new dataset under an old ID. Shutdown releases remaining native datasets. Dart can retain application records after native release.
 
-Edits preserve table identity, selection and scroll position. Explicit replacement or binding an existing table to another dataset clears its selection and resets scrolling. Input controls retain their own state. Rows use indices; inserting, deleting or reordering records requires replacement.
+Edits preserve table identity, selection and scroll position. Explicit replacement or binding an existing table to another dataset clears its selection and resets scrolling. Input controls retain their own state.
+
+Rows use indices. `InsertRow`, `DeleteRow` and `MoveRow` change which records exist without a replacement:
+
+```dart
+await host.editDataset(quotes, [
+  InsertRow(0, ['NEW', 'New instrument', '10.00'], id: 'NEW'),
+  const DeleteRow(3),
+  const MoveRow(0, 2),
+]);
+```
+
+Steps in a batch apply in order, so each index refers to the records as the previous steps left them, and both sides validate the whole batch against that running shape before anything is written. An insert carries a record ID exactly when the dataset has record IDs; the ID must be nonempty and unused, and an ID deleted earlier in the same batch stays reserved until the next batch. A batch may not grow the dataset past 100,000 rows. Structural edits recompute every view over the dataset. With record IDs the selection follows its record, clears when the record is deleted, and the scroll keeps the first visible record anchored; without IDs the selected view row keeps its index.
 
 ## Stable record IDs
 

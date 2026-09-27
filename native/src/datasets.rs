@@ -177,6 +177,8 @@ pub enum Change {
     Release,
 }
 
+/// One step of an edit batch. Steps apply in order, so a row index refers to
+/// the records as the previous steps left them.
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Edit {
@@ -189,6 +191,31 @@ pub enum Edit {
         row: usize,
         values: Vec<String>,
     },
+    /// Inserts a record before index `at`; `at` equal to the row count
+    /// appends. `id` is required exactly when the dataset has record IDs.
+    Insert {
+        at: usize,
+        values: Vec<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
+    },
+    Delete {
+        row: usize,
+    },
+    /// Moves the record at `row` so that it sits at index `to` afterwards.
+    Move {
+        row: usize,
+        to: usize,
+    },
+}
+
+impl Edit {
+    pub fn is_structural(&self) -> bool {
+        matches!(
+            self,
+            Self::Insert { .. } | Self::Delete { .. } | Self::Move { .. }
+        )
+    }
 }
 
 impl Update {
@@ -285,15 +312,54 @@ impl Store {
                 if edits.is_empty() {
                     return Err("Dataset edit batch must be nonempty".into());
                 }
-                // Validate every edit before taking ownership of any replacement value.
+                // Validate the whole batch against the shape each step leaves
+                // behind before writing anything. Only the row count and the
+                // set of record IDs change shape; the set is built once, on the
+                // first insert, and IDs deleted earlier in the batch stay
+                // reserved until the next batch.
+                let width = current.data.columns.len();
+                let identity = current.data.ids.is_some();
+                let mut len = current.data.rows.len();
+                let mut live: Option<HashSet<&str>> = None;
                 for edit in &edits {
                     match edit {
-                        Edit::Cell { row, column, .. }
-                            if *row < current.data.rows.len()
-                                && *column < current.data.columns.len() => {}
-                        Edit::Row { row, values }
-                            if *row < current.data.rows.len()
-                                && values.len() == current.data.columns.len() => {}
+                        Edit::Cell { row, column, .. } if *row < len && *column < width => {}
+                        Edit::Row { row, values } if *row < len && values.len() == width => {}
+                        Edit::Insert { at, values, id } => {
+                            if *at > len || values.len() != width || len >= 100_000 {
+                                return Err(
+                                    "Dataset insert has an invalid index or width, or exceeds 100000 rows"
+                                        .into(),
+                                );
+                            }
+                            match (identity, id) {
+                                (false, None) => {}
+                                (true, Some(id)) => {
+                                    let live = live.get_or_insert_with(|| {
+                                        current
+                                            .data
+                                            .ids
+                                            .as_ref()
+                                            .map(|ids| ids.iter().map(String::as_str).collect())
+                                            .unwrap_or_default()
+                                    });
+                                    if id.is_empty() || !live.insert(id) {
+                                        return Err(format!(
+                                            "Dataset insert needs a nonempty unused record ID: {id}"
+                                        ));
+                                    }
+                                }
+                                _ => {
+                                    return Err(
+                                        "Dataset insert carries a record ID exactly when the dataset has record IDs"
+                                            .into(),
+                                    );
+                                }
+                            }
+                            len += 1;
+                        }
+                        Edit::Delete { row } if *row < len => len -= 1,
+                        Edit::Move { row, to } if *row < len && *to < len => {}
                         _ => return Err("Dataset edit has an invalid row, column or width".into()),
                     }
                 }
@@ -310,6 +376,27 @@ impl Store {
                         Edit::Row { row, values } => {
                             work.cells_written += values.len();
                             current.data.rows[row] = values;
+                        }
+                        Edit::Insert { at, values, id } => {
+                            work.cells_written += values.len();
+                            current.data.rows.insert(at, values);
+                            if let (Some(ids), Some(id)) = (&mut current.data.ids, id) {
+                                ids.insert(at, id);
+                            }
+                        }
+                        Edit::Delete { row } => {
+                            current.data.rows.remove(row);
+                            if let Some(ids) = &mut current.data.ids {
+                                ids.remove(row);
+                            }
+                        }
+                        Edit::Move { row, to } => {
+                            let record = current.data.rows.remove(row);
+                            current.data.rows.insert(to, record);
+                            if let Some(ids) = &mut current.data.ids {
+                                let id = ids.remove(row);
+                                ids.insert(to, id);
+                            }
                         }
                     }
                 }

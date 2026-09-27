@@ -571,6 +571,9 @@ impl DartView {
         let id = update.id.clone();
         let revision = update.revision;
         let replace = matches!(&update.change, Change::Replace { .. });
+        // A structural edit changes which records exist, so every view index
+        // over the dataset is stale afterwards, spec or not.
+        let structural = matches!(&update.change, Change::Edit { edits } if edits.iter().any(Edit::is_structural));
         // Columns an edit touches, for the view-recompute check. Row edits
         // touch every column; Replace is handled separately.
         let touched: Option<HashSet<usize>> = match &update.change {
@@ -586,7 +589,8 @@ impl DartView {
                         .iter()
                         .flat_map(|edit| match edit {
                             Edit::Cell { column, .. } => vec![*column],
-                            Edit::Row { .. } => (0..width).collect(),
+                            Edit::Row { .. } | Edit::Insert { .. } => (0..width).collect(),
+                            Edit::Delete { .. } | Edit::Move { .. } => Vec::new(),
                         })
                         .collect(),
                 )
@@ -622,6 +626,7 @@ impl DartView {
                     // A cell edit only triggers a view recompute when it
                     // touches a column the view sorts or filters on.
                     let recompute = replace
+                        || structural
                         || match (&self.tables[&table_id].view, &touched) {
                             (Some(view), Some(touched)) => view
                                 .referenced_columns()

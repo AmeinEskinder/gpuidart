@@ -89,7 +89,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. This is not a presentation fence. |
-| registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. See [datasets](datasets.md). |
+| registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. Edit batches change cells and rows, and insert, delete or move records in order. See [datasets](datasets.md). |
 | close / done | Close is idempotent. Normal completion follows native teardown. Failure can precede teardown on a shutdown timeout; native memory stays alive until the runner returns. Pending requests settle with success or an error. A paused event subscriber does not delay done. |
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.

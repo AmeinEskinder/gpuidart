@@ -345,4 +345,95 @@ void main() {
     },
     timeout: const Timeout(Duration(seconds: 30)),
   );
+
+  test('structural edits keep record identity, views and selection', () async {
+    final dataset = TableDataset(
+      'records',
+      columns: ['sym', 'price'],
+      rows: [
+        ['A', '3'],
+        ['B', '1'],
+        ['C', '2'],
+      ],
+      rowIds: ['a', 'b', 'c'],
+    );
+    final host = await GpuiHost.open(
+      const UiTable(
+        'table',
+        dataset: 'records',
+        view: UiTableView(sort: [UiSort(1, direction: UiSortDirection.desc)]),
+      ),
+      datasets: [dataset],
+    );
+    try {
+      // View order by price: A, C, B. Select C.
+      await host.diagnose('select_row', {'table': 'table', 'row': 1});
+      var state = await host.diagnose('inspect');
+      expect(state['tables']['table']['selection']['record'], 'c');
+
+      await host.editDataset(dataset, [
+        InsertRow(0, ['D', '4'], id: 'd'),
+        const DeleteRow(2),
+        const MoveRow(0, 2),
+        const CellEdit(1, 1, '5'),
+      ]);
+      expect(dataset.revision, 2);
+      expect(
+        [for (var i = 0; i < dataset.rowCount; i++) dataset.rowId(i)],
+        ['a', 'c', 'd'],
+      );
+      expect(dataset.row(1), ['C', '5']);
+      expect(dataset.row(2), ['D', '4']);
+      state = await host.diagnose('inspect');
+      final table = state['tables']['table'];
+      expect(table['row_count'], 3);
+      expect(table['view']['view_rows'], 3);
+      expect(table['selection'], {'row': 0, 'record': 'c'});
+      expect(
+        (await host.diagnose('formatted_cell', {
+          'table': 'table',
+          'row': 1,
+          'column': 0,
+        }))['text'],
+        'D',
+      );
+      expect(
+        (await host.diagnose('cell', {
+          'dataset': 'records',
+          'row': 2,
+          'column': 0,
+        }))['value'],
+        'D',
+      );
+
+      // Validation runs before submission, in batch order.
+      expect(
+        () => host.editDataset(dataset, [
+          InsertRow(4, ['E', '1'], id: 'e'),
+        ]),
+        throwsRangeError,
+      );
+      expect(
+        () => host.editDataset(dataset, [
+          InsertRow(0, ['E', '1']),
+        ]),
+        throwsArgumentError,
+      );
+      expect(
+        () => host.editDataset(dataset, [
+          InsertRow(0, ['E', '1'], id: 'a'),
+        ]),
+        throwsArgumentError,
+      );
+      expect(
+        () =>
+            host.editDataset(dataset, [const DeleteRow(2), const DeleteRow(2)]),
+        throwsRangeError,
+      );
+      expect(dataset.revision, 2);
+      expect(dataset.rowCount, 3);
+    } finally {
+      await host.close();
+    }
+  }, timeout: const Timeout(Duration(seconds: 30)));
 }

@@ -239,6 +239,176 @@ fn record_ids_validate_and_survive_edits() {
 }
 
 #[test]
+fn structural_edits_apply_in_order_and_reject_as_a_whole() {
+    let mut store = Store::new(vec![Upload {
+        id: "records".into(),
+        revision: 1,
+        data: TableData {
+            columns: vec!["A".into()],
+            rows: vec![vec!["x".into()], vec!["y".into()], vec!["z".into()]],
+            ids: Some(vec!["r1".into(), "r2".into(), "r3".into()]),
+            format: None,
+        },
+    }]);
+    let rows = |store: &Store| {
+        let data = store.entries["records"].borrow();
+        (
+            data.data
+                .rows
+                .iter()
+                .map(|row| row[0].clone())
+                .collect::<Vec<_>>(),
+            data.data.ids.clone().unwrap(),
+            data.revision,
+        )
+    };
+    let work = store
+        .apply(edit(
+            1,
+            vec![
+                Edit::Insert {
+                    at: 3,
+                    values: vec!["w".into()],
+                    id: Some("r4".into()),
+                },
+                Edit::Move { row: 3, to: 0 },
+                Edit::Delete { row: 2 },
+                Edit::Cell {
+                    row: 2,
+                    column: 0,
+                    value: "z2".into(),
+                },
+                Edit::Insert {
+                    at: 1,
+                    values: vec!["v".into()],
+                    id: Some("r5".into()),
+                },
+            ],
+        ))
+        .unwrap();
+    assert_eq!(work.records_checked, 5);
+    assert_eq!(work.cells_written, 3);
+    assert_eq!(
+        rows(&store),
+        (
+            vec!["w".into(), "v".into(), "x".into(), "z2".into()],
+            vec!["r4".into(), "r5".into(), "r1".into(), "r3".into()],
+            2
+        )
+    );
+    for (invalid, reason) in [
+        (
+            vec![Edit::Insert {
+                at: 5,
+                values: vec!["q".into()],
+                id: Some("r6".into()),
+            }],
+            "insert index past the end",
+        ),
+        (
+            vec![Edit::Insert {
+                at: 0,
+                values: vec!["q".into(), "extra".into()],
+                id: Some("r6".into()),
+            }],
+            "insert width",
+        ),
+        (
+            vec![Edit::Insert {
+                at: 0,
+                values: vec!["q".into()],
+                id: None,
+            }],
+            "identity dataset needs an id",
+        ),
+        (
+            vec![Edit::Insert {
+                at: 0,
+                values: vec!["q".into()],
+                id: Some("r1".into()),
+            }],
+            "duplicate id",
+        ),
+        (
+            vec![
+                Edit::Delete { row: 0 },
+                Edit::Insert {
+                    at: 0,
+                    values: vec!["q".into()],
+                    id: Some("r4".into()),
+                },
+            ],
+            "an id deleted in the batch stays reserved",
+        ),
+        (
+            vec![Edit::Delete { row: 3 }, Edit::Delete { row: 3 }],
+            "second delete sees the shorter dataset",
+        ),
+        (
+            vec![Edit::Move { row: 0, to: 4 }],
+            "move target past the end",
+        ),
+        (
+            vec![
+                Edit::Delete { row: 0 },
+                Edit::Cell {
+                    row: 0,
+                    column: 0,
+                    value: "ok".into(),
+                },
+                Edit::Row {
+                    row: 9,
+                    values: vec!["bad".into()],
+                },
+            ],
+            "a later invalid step rejects the earlier valid ones",
+        ),
+    ] {
+        assert!(store.apply(edit(2, invalid)).is_err(), "{reason}");
+        assert_eq!(
+            rows(&store),
+            (
+                vec!["w".into(), "v".into(), "x".into(), "z2".into()],
+                vec!["r4".into(), "r5".into(), "r1".into(), "r3".into()],
+                2
+            ),
+            "{reason}"
+        );
+    }
+    let mut plain = Store::new(vec![upload(2)]);
+    assert!(
+        plain
+            .apply(edit(
+                1,
+                vec![Edit::Insert {
+                    at: 0,
+                    values: vec!["a".into(), "b".into()],
+                    id: Some("r1".into()),
+                }],
+            ))
+            .is_err(),
+        "index dataset rejects an id"
+    );
+    plain
+        .apply(edit(
+            1,
+            vec![
+                Edit::Insert {
+                    at: 2,
+                    values: vec!["2".into(), "new".into()],
+                    id: None,
+                },
+                Edit::Delete { row: 0 },
+            ],
+        ))
+        .unwrap();
+    let data = plain.entries["records"].borrow();
+    assert_eq!(data.data.rows.len(), 2);
+    assert_eq!(data.data.rows[1][1], "new");
+    assert!(data.data.ids.is_none());
+}
+
+#[test]
 fn view_columns_must_exist_in_the_dataset() {
     let view = crate::protocol::TableView {
         sort: vec![crate::protocol::SortKey {
