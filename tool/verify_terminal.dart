@@ -229,6 +229,22 @@ Future<void> main(List<String> args) async {
   } catch (error, stack) {
     report['error'] = '$error';
     report['stack'] = '$stack';
+    if (semantics &&
+        Platform.isLinux &&
+        Platform.environment['GPUIDART_CAPTURE_FAILURE'] == '1') {
+      // Capture the private Xvfb test desktop before closing the failed fixture.
+      // This is diagnostic evidence, not an automated visual-quality assertion.
+      try {
+        final capture = await Process.run('scrot', ['${output.path}.png']);
+        report['failure_capture'] = {
+          'exit': capture.exitCode,
+          'stderr': '${capture.stderr}',
+          'path': '${output.path}.png',
+        };
+      } catch (captureError) {
+        report['failure_capture'] = {'error': '$captureError'};
+      }
+    }
     rethrow;
   } finally {
     await app?.close();

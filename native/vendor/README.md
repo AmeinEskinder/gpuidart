@@ -67,3 +67,18 @@ AT-SPI Component.GetExtents(SCREEN) returned client-relative positions. The term
 hover verifier exposed the missing translation by moving the real pointer to those
 reported coordinates. The external tooltip check is the regression gate. The
 Windows/macOS default hook is a no-op; their adapters own the translation.
+
+
+## Windows command menu invocation
+
+[menu-invoke.patch](menu-invoke.patch) retains InvokePattern on clickable command
+MenuItems whose selected flag describes Kit's hover/keyboard highlight. The
+original generic predicate suppressed Invoke for any selected-state property,
+while the Windows adapter did not expose SelectionItem for MenuItem. The terminal's
+Settings command thus had no action pattern despite its Click handler. Toggle and
+expand/collapse items keep their existing patterns. The external terminal client
+requires InvokePattern and verifies the resulting page change.
+
+This follows Microsoft's [MenuItem control contract](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-supportmenuitemcontroltype):
+a command item exposes Invoke; selection among options uses SelectionItem. It
+changes no other role's pattern selection and makes no speech/navigation claim.

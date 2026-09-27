@@ -291,3 +291,32 @@ Both the interaction and reload verifiers now use GPUI's diagnostic syntax.
 A Python syntax check created a bytecode cache which was accidentally included
 in the probe-fix commit. It is removed and ignored. The debug-DLL CI artifact is
 also removed because its shader source dependency prevents portable local use.
+
+
+### Menu command pattern
+
+The Windows terminal reached eight interaction/semantics steps, then the external
+client found the Settings menu item had no Invoke or SelectionItem pattern. The
+[focused OS capture](attempts/f3f27bf/terminal-menu-patterns.json) shows it enabled
+but with an empty pattern list. Kit emits selected state for menu highlighting;
+AccessKit's generic invocation predicate rejects any selected-state property,
+and Windows does not map plain MenuItem to SelectionItem. The narrow
+[menu Invoke correction](../../native/vendor/menu-invoke.patch) preserves the
+command pattern for clickable plain menu items, leaving toggle/expand cases alone.
+The verifier requires actual OS invocation and resulting application navigation.
+
+An earlier local run reported no UIA window after navigation. Subsequent runs
+passed that point and exposed the menu-pattern defect. The original failure is
+retained, remains unlocalized, and is not classified as an application crash or
+successful run. No retry rule was added for it.
+
+Local Windows interaction and AOT each passed all 15 steps; actual code reload
+also passed, preserving the dark/custom theme, input text/focus/selection and
+both dataset revisions without data republication. These do not replace the
+pending full external-semantics pass. The 70 native tests and 67 headless Dart
+tests passed after the window-bounds correction.
+
+Linux's next capture showed corrected screen bounds `[160, 242, 198, 32]`, but
+still no tooltip. The bounds fix is necessary and not sufficient to close that
+failure. A failed private-Xvfb capture and matching Linux library are now retained
+for direct reproduction; no tooltip pass is inferred from corrected coordinates.

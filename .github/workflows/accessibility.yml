@@ -50,7 +50,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers xvfb openbox dbus-x11 at-spi2-core gir1.2-atspi-2.0 python3-gi
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers xvfb openbox dbus-x11 at-spi2-core gir1.2-atspi-2.0 python3-gi scrot
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: |
@@ -84,6 +84,7 @@ jobs:
           mkdir -p build/accessibility
           dbus-run-session -- xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'PROBE'
           unset WAYLAND_DISPLAY ZED_HEADLESS
+          export GPUIDART_CAPTURE_FAILURE=1
           openbox >build/accessibility/openbox.log 2>&1 &
           gdbus call --session --dest org.a11y.Bus --object-path /org/a11y/bus --method org.freedesktop.DBus.Properties.Set org.a11y.Status IsEnabled '<true>'
           gdbus call --session --dest org.a11y.Bus --object-path /org/a11y/bus --method org.freedesktop.DBus.Properties.Set org.a11y.Status ScreenReaderEnabled '<true>'
@@ -126,6 +127,13 @@ jobs:
       - name: Market terminal actual code reload
         if: runner.os != 'Linux'
         run: dart run tool/verify_terminal_reload.dart build/accessibility/terminal-reload.json
+      - name: Retain Linux host for local diagnostic reproduction
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terminal-linux-host
+          path: target/debug/libgpuidart.so
+          retention-days: 7
       - name: Retain platform responses and failures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -134,4 +142,5 @@ jobs:
           path: |
             build/accessibility/*.json
             build/accessibility/*.log
+            build/accessibility/*.png
           retention-days: 14

@@ -20,7 +20,10 @@ if ($Operation -ne 'query') {
     $element = $matches[0]
     $details = @{}
     switch ($Operation) {
-        invoke-menu { $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke() }
+        invoke-menu {
+            $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+            $details.pattern = 'Invoke'
+        }
         hover {
             Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public static class TerminalPointer { [DllImport("user32.dll")] public static extern bool SetPhysicalCursorPos(int x, int y); [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }'
             $bounds = $element.Current.BoundingRectangle
