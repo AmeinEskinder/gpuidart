@@ -11,19 +11,31 @@
 param(
     [Parameter(Mandatory = $true)] [string] $Baseline,
     [Parameter(Mandatory = $true)] [string] $Output,
-    [string] $TargetDir = ''
+    [string] $TargetDir = '',
+    [string[]] $Sides = @('trunk', 'head')
 )
 $ErrorActionPreference = 'Stop'
 $head = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $Output = [IO.Path]::GetFullPath($Output)
-if (Test-Path -LiteralPath $Output) { throw "Retain the previous gate series: $Output exists" }
 New-Item -ItemType Directory -Force -Path $Output | Out-Null
+
+# Each side sources its own env.ps1. Restore the process environment between
+# sides: a PATH holding both SDK directories makes `where.exe fxc.exe` print
+# two lines, which the GPUI build script takes as one path.
+$environment = @{}
+foreach ($name in 'PATH', 'INCLUDE', 'LIB', 'CC', 'CXX', 'AR', 'CARGO_HOME', 'RUSTUP_HOME', 'CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER') {
+    $environment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
+}
 
 $sides = @(
     @{ name = 'trunk'; root = [IO.Path]::GetFullPath($Baseline) },
     @{ name = 'head'; root = $head }
-)
+) | Where-Object { $Sides -contains $_.name }
 foreach ($side in $sides) {
+    if (Test-Path -LiteralPath (Join-Path $Output $side.name)) { throw "Retain the previous $($side.name) series in $Output" }
+    foreach ($entry in $environment.GetEnumerator()) {
+        [Environment]::SetEnvironmentVariable($entry.Key, $entry.Value, 'Process')
+    }
     Push-Location $side.root
     try {
         . ./tool/env.ps1
