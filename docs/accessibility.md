@@ -186,3 +186,26 @@ Dependency upgrades must pass the same external actions, disabled-state checks,
 focus checks and stable-record selection checks before the small pinned overrides
 can be removed. [Vendor provenance](../native/vendor/README.md) records original
 archive hashes, per-file hashes, licenses and patch-only diffs.
+
+
+### Terminal semantics
+
+Tabs expose TabList/Tab roles, radio groups expose RadioGroup/RadioButton, and
+menus use Kit or native menu semantics. Accepted snapshot values provide selected
+and checked states; focus follows retained handles. Button tooltip text is also
+an accessibility description. Windows AccessKit maps that description to
+[UIA FullDescription](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-automation-element-propids),
+not HelpText. The external probe uses native IUIAutomation for this newer property
+because PowerShell's .NET Framework property registry does not expose it.
+
+Charts expose Group roles with a summary and bounded point Labels. The pinned
+AccessKit version has no Chart role. Point alternatives use the same projection
+as rendering and carry stable record-based author IDs when supplied. They do not
+expose the entire source dataset or promise accessible chart exploration.
+
+`dart run tool/verify_terminal.dart REPORT.json --semantics` queries platform roles,
+selected states, input values, help and chart text after interaction steps. It
+also requests OS pointer movement to externally queried bounds for tooltip
+appearance/dismissal and invokes menu commands through the platform client.
+[The terminal report](../reports/market-terminal/README.md) tracks acceptance and
+retains failures. No human screen-reader or visual-quality claim follows.

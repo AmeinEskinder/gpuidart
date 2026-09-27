@@ -38,6 +38,12 @@ Startup waits at most 30 seconds for reload registration. Failed startup cleans 
 
 Windows and Linux execute GPUI inside the blocking native runner isolate. macOS starts an owned native companion because AppKit needs the process main thread and its normal quit terminates that process. Dart creates and reaps the child; close waits for transport completion and child exit before disposing callbacks. The companion uses a private Unix socket with bounded frames and queues. It adds process/transport cost; Windows measurements do not quantify that cost.
 
+The [market terminal](../example/terminal/README.md) adds Watchlist / Instrument /
+Settings navigation, real app menus, record context menus, themes and dataset
+charts. Run `dart run tool/dev.dart example/terminal/main.dart`. Its data is
+fictitious and stays in memory. The [navigation and charts contract](navigation-and-charts.md)
+defines the bounded public API and event ownership.
+
 ## Application lifecycle
 
 ```dart
@@ -90,6 +96,12 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | publish / rebuild | Completes after native application of a snapshot. This is not a presentation fence. |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. See [datasets](datasets.md). |
+| UiTheme | Whole-snapshot light/dark palette plus bounded opaque token overrides. `openView` reevaluates its theme builder on rebuild/reload. |
+| UiTabs / UiRadioGroup | Controlled option IDs with retained focus and keyboard navigation. Changes return on the event channel. |
+| UiMenu / UiMenuAction | Flat app menus referencing global actions; native menu bar on macOS, Kit menu bar on Windows/Linux. |
+| UiTable.contextMenu | Record-bound row commands, pointer or Shift+F10 activation, typed RowActionEvent. Requires stable row IDs. |
+| UiButton.tooltip | Bounded help text with native hover behavior and accessible description. |
+| UiChart | Read-only line/bar series from a retained dataset/view, at most 512 projected points. |
 | close / done | Close is idempotent. Normal completion follows native teardown. Failure can precede teardown on a shutdown timeout; native memory stays alive until the runner returns. Pending requests settle with success or an error. A paused event subscriber does not delay done. |
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.
