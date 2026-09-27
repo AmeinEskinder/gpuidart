@@ -87,12 +87,16 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       integer('revision', minimum: 1);
       string('name');
       string('context');
-    case 'checkbox_change':
+    case 'checkbox_change' || 'switch_change':
       integer('revision', minimum: 1);
       string('id');
       if (value['checked'] is! bool) {
-        throw const FormatException('Invalid checkbox checked value');
+        throw const FormatException('Invalid toggle checked value');
       }
+    case 'radio_change':
+      integer('revision', minimum: 1);
+      string('id');
+      string('selected');
     case 'slider_change':
       integer('revision', minimum: 1);
       string('id');

@@ -37,6 +37,7 @@ fn description(revision: u64) -> Snapshot {
                     semantics: None,
                     style: None,
                     label: "Increment".into(),
+                    tooltip: String::new(),
                 },
                 Node::Input {
                     id: "name".into(),
@@ -420,6 +421,99 @@ fn layout_primitives_size_position_and_retain_scroll_offsets(cx: &mut TestAppCon
 }
 
 #[gpui::test]
+fn switches_and_radio_groups_show_the_pick_before_publication(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let snapshot = |revision: u64, wifi: bool, mode: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"switch","id":"wifi","label":"Wi-Fi","checked":{wifi}}},
+                {{"kind":"radio_group","id":"mode","options":[{{"id":"auto","label":"Automatic"}},{{"id":"manual","label":"Manual"}}],"selected":"{mode}"}},
+                {{"kind":"progress","id":"upload","value":40}},
+                {{"kind":"separator","id":"rule","label":"Advanced"}},
+                {{"kind":"button","id":"save","label":"Save","tooltip":"Saves the draft"}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, false, "auto"),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let changes = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::SwitchChange { id, checked, .. } => Some((id.clone(), checked.to_string())),
+                Event::RadioChange { id, selected, .. } => Some((id.clone(), selected.clone())),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.find("upload").bounds().size.width > px(0.));
+        assert!(window.find("rule").bounds().size.width > px(0.));
+        window.click("wifi", cx);
+        window.render_frame(cx);
+        // The radio group re-keys its items by position, so the second
+        // option is element 1, not the option ID.
+        window.click(1usize, cx);
+        window.render_frame(cx);
+        assert_eq!(
+            changes(),
+            [
+                ("wifi".to_string(), "true".to_string()),
+                ("mode".to_string(), "manual".to_string())
+            ]
+        );
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(controls["wifi"]["checked"], true);
+        assert_eq!(controls["wifi"]["published"], false);
+        assert_eq!(controls["mode"]["selected"], "manual");
+        assert_eq!(controls["mode"]["published"], "auto");
+        assert_eq!(controls["upload"]["value"], 40.0);
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(2, true, "manual"), window, cx)
+        });
+        window.render_frame(cx);
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(controls["wifi"]["published"], true);
+        assert_eq!(controls["mode"]["published"], "manual");
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(3, false, "auto"), window, cx)
+        });
+        window.render_frame(cx);
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(
+            controls["wifi"]["checked"], false,
+            "a publication is authoritative"
+        );
+        assert_eq!(controls["mode"]["selected"], "auto");
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let trace = Arc::new(crate::trace::Trace::default());
@@ -491,6 +585,7 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                                 semantics: None,
                                 style: None,
                                 label: format!("A long action label {i}"),
+                                tooltip: String::new(),
                             })
                             .collect(),
                     },
@@ -500,6 +595,7 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                     semantics: None,
                     style: None,
                     label: "End of screen".into(),
+                    tooltip: String::new(),
                 });
                 cx.new(|cx| DartView::new(data, Events(Arc::new(|_| {})), window, cx))
             },

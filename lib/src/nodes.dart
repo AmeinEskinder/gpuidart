@@ -134,16 +134,166 @@ final class UiText extends UiNode {
 }
 
 final class UiButton extends UiNode {
-  const UiButton(super.id, this.label, {super.style, super.semantics});
+  const UiButton(
+    super.id,
+    this.label, {
+    this.tooltip = '',
+    super.style,
+    super.semantics,
+  });
   final String label;
+
+  /// Native hover text, at most 1024 UTF-8 bytes; empty shows none.
+  final String tooltip;
   @override
-  Map<String, Object> props() => {
-    'kind': 'button',
-    'id': id,
-    if (semantics != null) 'semantics': semantics!.toJson('button'),
-    if (style != null) 'style': style!.toJson(),
-    'label': label,
-  };
+  Map<String, Object> props() {
+    if (utf8.encode(tooltip).length > 1024) {
+      throw ArgumentError.value(tooltip, 'tooltip', 'Maximum 1024 UTF-8 bytes');
+    }
+    return {
+      'kind': 'button',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('button'),
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      if (tooltip.isNotEmpty) 'tooltip': tooltip,
+    };
+  }
+}
+
+/// An on/off toggle. Publish the requested [GpuiEvent.checked] value to
+/// acknowledge a `switch_change` event; the switch shows the toggle at once.
+final class UiSwitch extends UiNode {
+  const UiSwitch(
+    super.id,
+    this.label, {
+    required this.checked,
+    this.disabled = false,
+    super.style,
+    super.semantics,
+  });
+  final String label;
+  final bool checked;
+  final bool disabled;
+
+  @override
+  Map<String, Object> props() {
+    if (utf8.encode(label).length > 1024) {
+      throw ArgumentError.value(label, 'label', 'Maximum 1024 UTF-8 bytes');
+    }
+    return {
+      'kind': 'switch',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('switch'),
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      'checked': checked,
+      'disabled': disabled,
+    };
+  }
+}
+
+/// One choice among options. Publish `radio_change` event.selected to accept
+/// it; the group shows the pick at once. Options follow [UiSelectOption]'s
+/// identity and label bounds.
+final class UiRadioGroup extends UiNode {
+  UiRadioGroup(
+    super.id, {
+    required List<UiSelectOption> options,
+    this.selected,
+    this.disabled = false,
+    this.horizontal = false,
+    super.style,
+    super.semantics,
+  }) : options = List.unmodifiable(options);
+  final List<UiSelectOption> options;
+  final String? selected;
+  final bool disabled;
+  final bool horizontal;
+
+  @override
+  Map<String, Object> props() {
+    _validateOptions(options, selected);
+    return {
+      'kind': 'radio_group',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('radio_group'),
+      if (style != null) 'style': style!.toJson(),
+      'options': options.map((o) => o.toJson()).toList(),
+      'selected': ?selected,
+      'disabled': disabled,
+      'horizontal': horizontal,
+    };
+  }
+}
+
+/// A progress bar. [value] is a percentage 0–100; null shows an indeterminate
+/// bar.
+final class UiProgress extends UiNode {
+  const UiProgress(super.id, {this.value, super.style, super.semantics});
+  final double? value;
+
+  @override
+  Map<String, Object> props() {
+    final value = this.value;
+    if (value != null && (!value.isFinite || value < 0 || value > 100)) {
+      throw ArgumentError.value(value, 'value', 'Progress is 0..100');
+    }
+    return {
+      'kind': 'progress',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('progress'),
+      if (style != null) 'style': style!.toJson(),
+      'value': ?value,
+    };
+  }
+}
+
+/// A horizontal or vertical rule with an optional centered label.
+final class UiSeparator extends UiNode {
+  const UiSeparator(
+    super.id, {
+    this.vertical = false,
+    this.label = '',
+    super.style,
+    super.semantics,
+  });
+  final bool vertical;
+  final String label;
+
+  @override
+  Map<String, Object> props() {
+    if (utf8.encode(label).length > 1024) {
+      throw ArgumentError.value(label, 'label', 'Maximum 1024 UTF-8 bytes');
+    }
+    return {
+      'kind': 'separator',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('separator'),
+      if (style != null) 'style': style!.toJson(),
+      'vertical': vertical,
+      if (label.isNotEmpty) 'label': label,
+    };
+  }
+}
+
+void _validateOptions(List<UiSelectOption> options, String? selected) {
+  if (options.isEmpty || options.length > 256) {
+    throw ArgumentError('Options require 1..256 entries');
+  }
+  final ids = <String>{};
+  for (final option in options) {
+    if (option.id.isEmpty ||
+        utf8.encode(option.id).length > 256 ||
+        !ids.add(option.id) ||
+        option.label.isEmpty ||
+        utf8.encode(option.label).length > 1024) {
+      throw ArgumentError('Invalid or duplicate option');
+    }
+  }
+  if (selected != null && !ids.contains(selected)) {
+    throw ArgumentError.value(selected, 'selected', 'Not an option ID');
+  }
 }
 
 /// A controlled checkbox. Publish the requested [GpuiEvent.checked] value to

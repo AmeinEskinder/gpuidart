@@ -15,6 +15,10 @@ pub enum SemanticRole {
     Textbox,
     Combobox,
     Table,
+    Switch,
+    RadioGroup,
+    ProgressBar,
+    Separator,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -53,6 +57,10 @@ impl Semantics {
                 Node::Input { .. } => role == Textbox,
                 Node::Select { .. } => role == Combobox,
                 Node::Table { .. } => role == Table,
+                Node::Switch { .. } => role == Switch,
+                Node::RadioGroup { .. } => role == RadioGroup,
+                Node::Progress { .. } => role == ProgressBar,
+                Node::Separator { .. } => role == Separator,
             };
             if !valid {
                 return Err(format!(

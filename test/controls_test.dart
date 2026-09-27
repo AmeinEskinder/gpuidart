@@ -5,6 +5,121 @@ import 'package:gpuidart/src/native_event.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('switch, radio group, progress and separator encode and validate', () {
+    expect(const UiSwitch('wifi', 'Wi-Fi', checked: true).toJson(), {
+      'kind': 'switch',
+      'id': 'wifi',
+      'label': 'Wi-Fi',
+      'checked': true,
+      'disabled': false,
+    });
+    expect(
+      UiSwitch('s', 'é' * 513, checked: false).toJson,
+      throwsArgumentError,
+    );
+    final group = UiRadioGroup(
+      'mode',
+      options: const [
+        UiSelectOption('auto', 'Automatic'),
+        UiSelectOption('manual', 'Manual'),
+      ],
+      selected: 'auto',
+      horizontal: true,
+    );
+    expect(group.toJson(), {
+      'kind': 'radio_group',
+      'id': 'mode',
+      'options': [
+        {'id': 'auto', 'label': 'Automatic'},
+        {'id': 'manual', 'label': 'Manual'},
+      ],
+      'selected': 'auto',
+      'disabled': false,
+      'horizontal': true,
+    });
+    expect(
+      UiRadioGroup(
+        'm',
+        options: const [UiSelectOption('a', 'A')],
+        selected: 'b',
+      ).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      UiRadioGroup(
+        'm',
+        options: const [UiSelectOption('a', 'A'), UiSelectOption('a', 'B')],
+      ).toJson,
+      throwsArgumentError,
+    );
+    expect(const UiProgress('p', value: 42.5).toJson()['value'], 42.5);
+    expect(const UiProgress('p').toJson().containsKey('value'), isFalse);
+    expect(const UiProgress('p', value: 101).toJson, throwsArgumentError);
+    expect(const UiSeparator('r', label: 'Advanced').toJson(), {
+      'kind': 'separator',
+      'id': 'r',
+      'vertical': false,
+      'label': 'Advanced',
+    });
+    expect(
+      const UiButton('b', 'Save', tooltip: 'Ctrl+S').toJson()['tooltip'],
+      'Ctrl+S',
+    );
+    expect(
+      UiButton('b', 'Save', tooltip: 'é' * 513).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiSwitch(
+        's',
+        'Wi-Fi',
+        checked: true,
+        semantics: UiSemantics(role: UiRole.toggle),
+      ).toJson()['semantics'],
+      {'role': 'switch'},
+    );
+    expect(
+      const UiProgress('p', semantics: UiSemantics(role: UiRole.slider)).toJson,
+      throwsArgumentError,
+    );
+  });
+
+  test('switch and radio events decode with their values', () {
+    Map<String, dynamic> decode(Map<String, Object?> event) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(event)));
+    expect(
+      decode({
+        'type': 'switch_change',
+        'revision': 1,
+        'id': 'wifi',
+        'checked': true,
+      })['checked'],
+      true,
+    );
+    expect(
+      () => decode({'type': 'switch_change', 'revision': 1, 'id': 'wifi'}),
+      throwsFormatException,
+    );
+    expect(
+      decode({
+        'type': 'radio_change',
+        'revision': 1,
+        'id': 'mode',
+        'selected': 'manual',
+      })['selected'],
+      'manual',
+    );
+    expect(
+      () => decode({
+        'type': 'radio_change',
+        'revision': 1,
+        'id': 'mode',
+        'selected': null,
+      }),
+      throwsFormatException,
+    );
+  });
+
   test('confirmation dialog encodes labels, styles and bounded content', () {
     const dialog = UiConfirmDialog(
       'reset',

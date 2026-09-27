@@ -17,9 +17,14 @@ use gpui_kit::component::{
     button::{Button, ButtonVariants},
     checkbox::Checkbox,
     input::{Input, InputEvent, InputState},
+    progress::Progress,
+    radio::{Radio, RadioGroup},
     scroll::ScrollableElement,
+    separator::Separator,
+    switch::Switch,
     table::{Column, DataTable, TableDelegate, TableEvent, TableState},
 };
+use gpui_kit::prelude::FluentBuilder;
 use gpui_kit::*;
 use serde_json::{Value, json};
 use std::{
@@ -230,9 +235,11 @@ pub(crate) struct DartView {
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
-    /// Checkbox values toggled by the user since the last commit. Shown until
-    /// the next publication, whose values are authoritative.
+    /// Checkbox and switch values toggled by the user since the last commit.
+    /// Shown until the next publication, whose values are authoritative.
     checkbox_shown: Rc<RefCell<HashMap<String, bool>>>,
+    /// Radio options chosen by the user since the last commit, by group.
+    radio_shown: Rc<RefCell<HashMap<String, String>>>,
     /// Scroll containers keep their offset by ID across publications.
     scrolls: HashMap<String, ScrollHandle>,
     tables: HashMap<String, RetainedTable>,
@@ -399,6 +406,7 @@ impl DartView {
             selects: HashMap::new(),
             active_dialog: Default::default(),
             checkbox_shown: Default::default(),
+            radio_shown: Default::default(),
             scrolls: HashMap::new(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
@@ -496,6 +504,7 @@ impl DartView {
         }
         self.snapshot = snapshot;
         self.checkbox_shown.borrow_mut().clear();
+        self.radio_shown.borrow_mut().clear();
         if let Err(message) = self.reconcile(window, cx) {
             self.fail(message, cx);
             return;
@@ -1177,6 +1186,132 @@ impl DartView {
                 };
                 apply_node_style(container, node, colors).into_any_element()
             }
+            Node::Switch {
+                label,
+                checked,
+                disabled,
+                ..
+            } => {
+                let events = self.events.clone();
+                let event_id = node.id().to_owned();
+                let revision = self.snapshot.revision;
+                let shown = self
+                    .checkbox_shown
+                    .borrow()
+                    .get(node.id())
+                    .copied()
+                    .unwrap_or(*checked);
+                let displayed = self.checkbox_shown.clone();
+                apply_node_style(
+                    Switch::new(id)
+                        .accessibility_label(accessible_name(node))
+                        .label(label.clone())
+                        .checked(shown)
+                        .disabled(*disabled)
+                        .on_change(move |checked, window, _| {
+                            displayed.borrow_mut().insert(event_id.clone(), *checked);
+                            window.refresh();
+                            events.emit(Event::SwitchChange {
+                                revision,
+                                id: event_id.clone(),
+                                checked: *checked,
+                            });
+                        }),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::RadioGroup {
+                options,
+                selected,
+                disabled,
+                horizontal,
+                ..
+            } => {
+                let events = self.events.clone();
+                let event_id = node.id().to_owned();
+                let revision = self.snapshot.revision;
+                let shown = self
+                    .radio_shown
+                    .borrow()
+                    .get(node.id())
+                    .cloned()
+                    .or_else(|| selected.clone());
+                let selected_index = shown
+                    .as_ref()
+                    .and_then(|choice| options.iter().position(|option| option.id == *choice));
+                let ids: Vec<String> = options.iter().map(|option| option.id.clone()).collect();
+                let displayed = self.radio_shown.clone();
+                let group = RadioGroup::new(SharedString::from(format!("{}-radios", node.id())))
+                    .layout(if *horizontal {
+                        Axis::Horizontal
+                    } else {
+                        Axis::Vertical
+                    })
+                    .selected_index(selected_index)
+                    .disabled(*disabled)
+                    .children(options.iter().map(|option| {
+                        Radio::new(SharedString::from(format!("{}:{}", node.id(), option.id)))
+                            .label(option.label.clone())
+                    }))
+                    .on_change(move |index, window, _| {
+                        let Some(choice) = ids.get(*index) else {
+                            return;
+                        };
+                        displayed
+                            .borrow_mut()
+                            .insert(event_id.clone(), choice.clone());
+                        window.refresh();
+                        events.emit(Event::RadioChange {
+                            revision,
+                            id: event_id.clone(),
+                            selected: choice.clone(),
+                        });
+                    });
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(group),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Progress { value, .. } => {
+                let bar = Progress::new(id.clone()).accessibility_label(accessible_name(node));
+                let bar = match value {
+                    Some(value) => bar.value(*value),
+                    None => bar.loading(true),
+                };
+                apply_node_style(
+                    annotate(div().id(id), node)
+                        .test_support()
+                        .w_full()
+                        .child(bar),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Separator {
+                vertical, label, ..
+            } => {
+                let rule = if *vertical {
+                    Separator::vertical()
+                } else {
+                    Separator::horizontal()
+                };
+                let rule = if label.is_empty() {
+                    rule
+                } else {
+                    rule.label(label.clone())
+                };
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(rule),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
             Node::Text { text, .. } => apply_node_style(
                 annotate(div().id(id), node)
                     .test_support()
@@ -1185,7 +1320,7 @@ impl DartView {
                 colors,
             )
             .into_any_element(),
-            Node::Button { label, .. } => {
+            Node::Button { label, tooltip, .. } => {
                 let events = self.events.clone();
                 let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
@@ -1195,6 +1330,9 @@ impl DartView {
                         .accessibility_label(accessible_name(node))
                         .primary()
                         .label(label.clone())
+                        .when(!tooltip.is_empty(), |button| {
+                            button.tooltip(tooltip.clone())
+                        })
                         .on_click(move |_, _, _| {
                             #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
                             crate::input_trace::record(

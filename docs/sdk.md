@@ -84,7 +84,8 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiScroll | A bounded vertical, horizontal or two-axis scroll container with a native scrollbar. Its offset is retained by ID across publications and reload. |
 | UiText / UiButton | Text and native button. Click events carry node ID and snapshot revision. |
 | UiInput | Native-retained by default. `controlled: true` enables guarded text/selection writes; native remains authoritative during composition. See [controlled inputs](controlled-inputs.md). |
-| UiCheckbox / UiSlider / UiSelect | Application values with native change-request events. The control shows the interaction immediately; the next publication's value is authoritative, so publish the accepted value. See the [settings controls contract](control-catalog.md). |
+| UiCheckbox / UiSwitch / UiRadioGroup / UiSlider / UiSelect | Application values with native change-request events (`checkbox_change`, `switch_change`, `radio_change`, `slider_change`, `select_change`). The control shows the interaction immediately; the next publication's value is authoritative, so publish the accepted value. See the [settings controls contract](control-catalog.md). |
+| UiProgress / UiSeparator | A determinate or indeterminate progress bar; a horizontal or vertical rule with an optional label. Display only. |
 | UiConfirmDialog | Native confirmation modal with one result, focus trapping and cancellation when its trigger is removed or disabled. |
 | UiSemantics | Optional bounded names and compatible roles on every node; native controls supply their states. See [accessibility and platform gaps](accessibility.md). |
 | UiTable | References a registered dataset ID. Cells contain strings and render in Rust. |

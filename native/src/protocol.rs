@@ -138,6 +138,57 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         semantics: Option<Semantics>,
         label: String,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        tooltip: String,
+    },
+    /// An on/off toggle. Like a checkbox, the shown value follows the user
+    /// until the next publication.
+    Switch {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        label: String,
+        checked: bool,
+        #[serde(default)]
+        disabled: bool,
+    },
+    /// One choice among options; `radio_change` carries the chosen option ID.
+    RadioGroup {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        options: Vec<SelectOption>,
+        selected: Option<String>,
+        #[serde(default)]
+        disabled: bool,
+        #[serde(default)]
+        horizontal: bool,
+    },
+    /// A determinate bar for `value` 0 to 100, or an indeterminate one when
+    /// `value` is absent.
+    Progress {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        value: Option<f32>,
+    },
+    Separator {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default)]
+        vertical: bool,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        label: String,
     },
     Checkbox {
         id: String,
@@ -750,7 +801,11 @@ impl Node {
             | Self::Input { id, .. }
             | Self::Table { id, .. }
             | Self::Stack { id, .. }
-            | Self::Scroll { id, .. } => id,
+            | Self::Scroll { id, .. }
+            | Self::Switch { id, .. }
+            | Self::RadioGroup { id, .. }
+            | Self::Progress { id, .. }
+            | Self::Separator { id, .. } => id,
         }
     }
 
@@ -767,7 +822,11 @@ impl Node {
             | Self::Input { style, .. }
             | Self::Table { style, .. }
             | Self::Stack { style, .. }
-            | Self::Scroll { style, .. } => style.as_ref(),
+            | Self::Scroll { style, .. }
+            | Self::Switch { style, .. }
+            | Self::RadioGroup { style, .. }
+            | Self::Progress { style, .. }
+            | Self::Separator { style, .. } => style.as_ref(),
         }
     }
 
@@ -784,7 +843,11 @@ impl Node {
             | Self::Input { semantics, .. }
             | Self::Table { semantics, .. }
             | Self::Stack { semantics, .. }
-            | Self::Scroll { semantics, .. } => semantics.as_ref(),
+            | Self::Scroll { semantics, .. }
+            | Self::Switch { semantics, .. }
+            | Self::RadioGroup { semantics, .. }
+            | Self::Progress { semantics, .. }
+            | Self::Separator { semantics, .. } => semantics.as_ref(),
         }
     }
 
@@ -827,6 +890,34 @@ impl Snapshot {
         validate_tree(&self.root, 0, &mut ids)?;
         self.validate_actions(&ids)
     }
+}
+
+/// Options carry stable IDs and visible labels; `selected` must name one.
+fn validate_options(
+    options: &[SelectOption],
+    selected: Option<&String>,
+    what: &str,
+) -> Result<(), String> {
+    if options.is_empty() || options.len() > 256 {
+        return Err(format!(
+            "{what} requires 1..256 options and a placeholder of at most 1024 UTF-8 bytes"
+        ));
+    }
+    let mut keys = HashSet::new();
+    for option in options {
+        if option.id.is_empty()
+            || option.id.len() > 256
+            || !keys.insert(&option.id)
+            || option.label.is_empty()
+            || option.label.len() > 1024
+        {
+            return Err("Invalid or duplicate select option".into());
+        }
+    }
+    if selected.is_some_and(|id| !keys.contains(id)) {
+        return Err(format!("{what} selected ID is not an option"));
+    }
+    Ok(())
 }
 
 fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result<(), String> {
@@ -886,26 +977,30 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
             placeholder,
             ..
         } => {
-            if options.is_empty() || options.len() > 256 || placeholder.len() > 1024 {
+            if placeholder.len() > 1024 {
                 return Err(
                     "Select requires 1..256 options and a placeholder of at most 1024 UTF-8 bytes"
                         .into(),
                 );
             }
-            let mut keys = HashSet::new();
-            for option in options {
-                if option.id.is_empty()
-                    || option.id.len() > 256
-                    || !keys.insert(&option.id)
-                    || option.label.is_empty()
-                    || option.label.len() > 1024
-                {
-                    return Err("Invalid or duplicate select option".into());
-                }
-            }
-            if selected.as_ref().is_some_and(|id| !keys.contains(id)) {
-                return Err("Select selected ID is not an option".into());
-            }
+            validate_options(options, selected.as_ref(), "Select")?;
+        }
+        Node::RadioGroup {
+            options, selected, ..
+        } => validate_options(options, selected.as_ref(), "Radio group")?,
+        Node::Switch { label, .. } if label.len() > 1024 => {
+            return Err("Switch label exceeds 1024 UTF-8 bytes".into());
+        }
+        Node::Button { tooltip, .. } if tooltip.len() > 1024 => {
+            return Err("Button tooltip exceeds 1024 UTF-8 bytes".into());
+        }
+        Node::Separator { label, .. } if label.len() > 1024 => {
+            return Err("Separator label exceeds 1024 UTF-8 bytes".into());
+        }
+        Node::Progress {
+            value: Some(value), ..
+        } if !value.is_finite() || !(0. ..=100.).contains(value) => {
+            return Err("Progress value must be between 0 and 100".into());
         }
         Node::ConfirmDialog {
             label,
@@ -1231,6 +1326,16 @@ pub enum Event {
         revision: u64,
         id: String,
         checked: bool,
+    },
+    SwitchChange {
+        revision: u64,
+        id: String,
+        checked: bool,
+    },
+    RadioChange {
+        revision: u64,
+        id: String,
+        selected: String,
     },
     SliderChange {
         revision: u64,
@@ -2031,6 +2136,45 @@ mod tests {
             r#"{"kind":"text","id":"t","text":"x","style":{"inset":{"middle":4}}}"#,
             r#"{"kind":"scroll","id":"s","axis":"diagonal","children":[]}"#,
             r#"{"kind":"stack","id":"s","semantics":{"role":"button"},"children":[]}"#,
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
+        }
+    }
+
+    #[test]
+    fn switches_radio_groups_progress_and_separators_validate() {
+        let snapshot = Snapshot::parse(
+            br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
+                {"kind":"button","id":"save","label":"Save","tooltip":"Ctrl+S"},
+                {"kind":"switch","id":"wifi","label":"Wi-Fi","checked":true,"semantics":{"role":"switch"}},
+                {"kind":"radio_group","id":"mode","options":[{"id":"auto","label":"Automatic"},{"id":"manual","label":"Manual"}],"selected":"auto","horizontal":true,"semantics":{"role":"radio_group","label":"Mode"}},
+                {"kind":"progress","id":"upload","value":42.5,"semantics":{"role":"progress_bar","label":"Upload"}},
+                {"kind":"progress","id":"busy"},
+                {"kind":"separator","id":"rule","label":"Advanced","semantics":{"role":"separator"}},
+                {"kind":"separator","id":"vrule","vertical":true}
+            ]}}"#,
+        )
+        .unwrap();
+        let children = snapshot.root.children().unwrap();
+        assert!(matches!(&children[0], Node::Button { tooltip, .. } if tooltip == "Ctrl+S"));
+        assert!(matches!(&children[4], Node::Progress { value: None, .. }));
+        assert!(matches!(
+            &children[6],
+            Node::Separator { vertical: true, .. }
+        ));
+        for invalid in [
+            format!(r#"{{"kind":"switch","id":"s","label":"{}","checked":false}}"#, "y".repeat(1025)),
+            r#"{"kind":"switch","id":"s","label":"Wi-Fi"}"#.into(),
+            r#"{"kind":"radio_group","id":"m","options":[],"selected":null}"#.into(),
+            r#"{"kind":"radio_group","id":"m","options":[{"id":"a","label":"A"},{"id":"a","label":"B"}],"selected":null}"#.into(),
+            r#"{"kind":"radio_group","id":"m","options":[{"id":"a","label":"A"}],"selected":"b"}"#.into(),
+            r#"{"kind":"progress","id":"p","value":101}"#.into(),
+            r#"{"kind":"progress","id":"p","value":-1}"#.into(),
+            format!(r#"{{"kind":"separator","id":"r","label":"{}"}}"#, "y".repeat(1025)),
+            format!(r#"{{"kind":"button","id":"b","label":"Go","tooltip":"{}"}}"#, "y".repeat(1025)),
+            r#"{"kind":"switch","id":"s","label":"Wi-Fi","checked":true,"semantics":{"role":"checkbox"}}"#.into(),
+            r#"{"kind":"progress","id":"p","semantics":{"role":"slider"}}"#.into(),
         ] {
             let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
             assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");

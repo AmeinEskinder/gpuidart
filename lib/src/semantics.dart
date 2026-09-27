@@ -13,9 +13,19 @@ enum UiRole {
   slider,
   textbox,
   combobox,
-  table;
+  table,
+  toggle,
+  radioGroup,
+  progressBar,
+  separator;
 
-  String get wire => this == listItem ? 'list_item' : name;
+  String get wire => switch (this) {
+    listItem => 'list_item',
+    toggle => 'switch',
+    radioGroup => 'radio_group',
+    progressBar => 'progress_bar',
+    _ => name,
+  };
 }
 
 /// Optional annotations for the native accessibility tree.
@@ -46,6 +56,10 @@ final class UiSemantics {
       'input' => {UiRole.textbox},
       'select' => {UiRole.combobox},
       'table' => {UiRole.table},
+      'switch' => {UiRole.toggle},
+      'radio_group' => {UiRole.radioGroup},
+      'progress' => {UiRole.progressBar},
+      'separator' => {UiRole.separator},
       _ => throw ArgumentError.value(kind, 'kind'),
     };
     if (role != null && !allowed.contains(role)) {

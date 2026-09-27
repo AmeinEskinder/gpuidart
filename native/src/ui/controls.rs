@@ -111,6 +111,17 @@ impl DartView {
                 let shown = self.checkbox_shown.borrow().get(id).copied().unwrap_or(*checked);
                 controls.insert(id.clone(),json!({"kind":"checkbox","checked":shown,"published":checked,"disabled":disabled}));
             }
+            if let Node::Switch { id, checked, disabled, .. } = node {
+                let shown = self.checkbox_shown.borrow().get(id).copied().unwrap_or(*checked);
+                controls.insert(id.clone(),json!({"kind":"switch","checked":shown,"published":checked,"disabled":disabled}));
+            }
+            if let Node::RadioGroup { id, selected, disabled, .. } = node {
+                let shown = self.radio_shown.borrow().get(id).cloned().or_else(|| selected.clone());
+                controls.insert(id.clone(),json!({"kind":"radio_group","selected":shown,"published":selected,"disabled":disabled}));
+            }
+            if let Node::Progress { id, value, .. } = node {
+                controls.insert(id.clone(),json!({"kind":"progress","value":value}));
+            }
             if let Node::ConfirmDialog { id, disabled, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"confirm_dialog","disabled":disabled,
                     "open":self.active_dialog.borrow().as_ref().is_some_and(|session|session.id == *id)}));

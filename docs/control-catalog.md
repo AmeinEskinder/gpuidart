@@ -131,3 +131,17 @@ scope. Catalog breadth is not an acceptance criterion.
 [Keep manual codecs for this milestone](protocol-schema-decision.md). Generation
 remains a separate migration with versioning, deterministic output and wire
 equivalence gates. The public Dart API and semantic tests remain either way.
+
+## Toggle, choice and display additions
+
+`UiSwitch`, `UiRadioGroup`, `UiProgress` and `UiSeparator` follow the settings
+contract above. A switch behaves like a checkbox: `switch_change` carries the
+requested `checked` value, the switch shows the toggle at once, and the next
+publication's value is authoritative. A radio group takes the same option
+list as a select, shows the picked option at once, and reports `radio_change`
+with the option ID. Progress is display only: `value` is a percentage from 0
+to 100 and an absent value shows an indeterminate bar. A separator is a
+horizontal or vertical rule with an optional centered label. Buttons accept a
+`tooltip` of at most 1024 UTF-8 bytes. Option lists, labels and tooltips keep
+the select and dialog bounds, and semantics roles are `switch`,
+`radio_group`, `progress_bar` and `separator`.
