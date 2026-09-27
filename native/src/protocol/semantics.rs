@@ -17,6 +17,7 @@ pub enum SemanticRole {
     Table,
     TabList,
     RadioGroup,
+    Chart,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -52,6 +53,7 @@ impl Semantics {
                 Node::RadioGroup { .. } => role == RadioGroup,
                 Node::Select { .. } => role == Combobox,
                 Node::Table { .. } => role == Table,
+                Node::Chart { .. } => role == Chart,
             };
             if !valid {
                 return Err(format!(

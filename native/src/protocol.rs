@@ -2,6 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+mod charts;
+pub use charts::{ChartKind, ChartSpec};
 mod menus;
 pub use menus::{MenuEntry, MenuSpec};
 mod navigation;
@@ -138,6 +140,14 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         semantics: Option<Semantics>,
         text: String,
+    },
+    Chart {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        chart: ChartSpec,
     },
     Button {
         id: String,
@@ -700,6 +710,14 @@ impl ColumnFormat {
 }
 
 impl Node {
+    pub fn dataset(&self) -> Option<&str> {
+        match self {
+            Self::Table { dataset, .. } => Some(dataset),
+            Self::Chart { chart, .. } => Some(&chart.dataset),
+            _ => None,
+        }
+    }
+
     pub fn id(&self) -> &str {
         match self {
             Self::Column { id, .. }
@@ -713,7 +731,8 @@ impl Node {
             | Self::Select { id, .. }
             | Self::ConfirmDialog { id, .. }
             | Self::Input { id, .. }
-            | Self::Table { id, .. } => id,
+            | Self::Table { id, .. }
+            | Self::Chart { id, .. } => id,
         }
     }
 
@@ -730,7 +749,8 @@ impl Node {
             | Self::Select { style, .. }
             | Self::ConfirmDialog { style, .. }
             | Self::Input { style, .. }
-            | Self::Table { style, .. } => style.as_ref(),
+            | Self::Table { style, .. }
+            | Self::Chart { style, .. } => style.as_ref(),
         }
     }
 
@@ -747,7 +767,8 @@ impl Node {
             | Self::Select { semantics, .. }
             | Self::ConfirmDialog { semantics, .. }
             | Self::Input { semantics, .. }
-            | Self::Table { semantics, .. } => semantics.as_ref(),
+            | Self::Table { semantics, .. }
+            | Self::Chart { semantics, .. } => semantics.as_ref(),
         }
     }
 
@@ -810,6 +831,7 @@ impl Snapshot {
                         validate(child, depth + 1, ids)?;
                     }
                 }
+                Node::Chart { chart, .. } => chart.validate()?,
                 Node::Table {
                     dataset,
                     view,

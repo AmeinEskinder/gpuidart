@@ -192,3 +192,36 @@ Retained verifier failures: a mechanical test adaptation produced an invalid
 Dart variable name, fixed before running the successful tests. The analyzer also
 caught the tooltip codec's null-element style rule; the codec now uses Dart's
 null-aware map element. These were test/lint failures, not native runtime failures.
+
+### Hosted radio follow-up
+
+The radio live bridge and accessibility workflow passed on all three platforms
+at `58db8c5`; the remaining SDK jobs are tracked before final acceptance.
+
+## Dataset charts
+
+Line and bar use Kit's native chart components, with a cached projection from the
+same datasets and views as tables. A chart consumes at most 512 trailing candidate
+rows. Non-numeric/non-finite values or magnitudes over 1e12 are omitted and counted,
+without backfilling or zero substitution. A line connects valid points across
+omissions; that policy is explicit in the design. Labels are capped at 128 Unicode
+scalars. Internal axis keys retain source identity separately from displayed
+labels, so duplicate labels do not collapse multiple records into one position.
+
+Native Group semantics describe the chart and bounded point Labels use record
+IDs. Pinned AccessKit has no Chart role. The same cached points feed Kit, summary,
+diagnostics and point alternatives. Relevant column edits recompute; unrelated
+columns only advance the observed dataset revision. Unchanged publications reuse
+the point allocation. Dataset replacement validates chart columns/view references;
+release rejects while a chart still references the dataset.
+
+Windows native tests passed for both actual Kit render paths over a 100k source,
+12-point tails, unchanged allocation identity, relevant/unrelated edits, invalid
+values, negative values, filter changes, empty views, and atomic replacement/release
+rejection. Dart bounds/wire tests and analyzer passed. A live chart bridge test is
+added to the three hosted platform jobs. No chart visual-quality claim is made.
+
+Retained implementation failures: the first nested JSON fixture needed parentheses
+around its mapped array expression. Dart's sealed UiNode also required the chart
+declaration to be a part of its library rather than an independent subclass file;
+analysis caught this before live execution.

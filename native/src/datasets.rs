@@ -126,24 +126,24 @@ pub fn validate_views(
 ) -> Result<(), String> {
     let mut error = None;
     snapshot.root.visit(&mut |node| {
-        if let Node::Table {
-            dataset,
-            view: Some(view),
-            ..
-        } = node
-        {
-            let width = columns(dataset).unwrap_or(0);
-            let column = view
-                .sort
-                .iter()
-                .map(|key| key.column)
-                .chain(view.filter.iter().map(|term| term.column))
-                .find(|column| *column >= width);
-            if let Some(column) = column {
-                error = Some(format!(
-                    "Table view references column {column} beyond dataset {dataset}'s {width} columns"
-                ));
-            }
+        let (dataset, view, axes) = match node {
+            Node::Table { dataset, view, .. } => (dataset, view.as_ref(), Vec::new()),
+            Node::Chart { chart, .. } => (
+                &chart.dataset,
+                chart.view.as_ref(),
+                vec![chart.label_column, chart.value_column],
+            ),
+            _ => return,
+        };
+        let width = columns(dataset).unwrap_or(0);
+        let mut referenced = axes;
+        if let Some(view) = view {
+            referenced.extend(view.referenced_columns());
+        }
+        if let Some(column) = referenced.iter().find(|column| **column >= width) {
+            error = Some(format!(
+                "View references column {column} beyond dataset {dataset}'s {width} columns"
+            ));
         }
     });
     error.map_or(Ok(()), Err)
@@ -177,9 +177,9 @@ pub fn validate_references(
 ) -> Result<(), String> {
     let mut missing = None;
     snapshot.root.visit(&mut |node| {
-        if let Node::Table { dataset, .. } = node {
+        if let Some(dataset) = node.dataset() {
             if !contains(dataset) {
-                missing = Some(dataset.clone());
+                missing = Some(dataset.to_owned());
             }
         }
     });

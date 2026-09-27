@@ -234,6 +234,7 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     next_input_generation: u64,
+    charts: HashMap<String, charts::RetainedChart>,
     choices: HashMap<String, choices::RetainedChoices>,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
@@ -320,7 +321,7 @@ impl DartView {
         }
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
-        json!({"theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "controls": self.inspect_controls(window, cx),
+        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -404,6 +405,7 @@ impl DartView {
             events,
             inputs: HashMap::new(),
             next_input_generation: 0,
+            charts: HashMap::new(),
             choices: HashMap::new(),
             sliders: HashMap::new(),
             selects: HashMap::new(),
@@ -587,8 +589,8 @@ impl DartView {
         if matches!(&update.change, Change::Release) {
             let mut referenced = false;
             self.snapshot.root.visit(&mut |node| {
-                if let Node::Table { dataset, .. } = node {
-                    referenced |= dataset == &id;
+                if let Some(dataset) = node.dataset() {
+                    referenced |= dataset == id;
                 }
             });
             if referenced {
@@ -656,6 +658,8 @@ impl DartView {
                         state.update(cx, |_, cx| cx.notify());
                     }
                 }
+                self.update_charts(&id, touched.as_ref());
+                cx.notify();
                 self.counters
                     .data_records_checked
                     .set(self.counters.data_records_checked.get() + work.records_checked as u64);
@@ -785,6 +789,7 @@ impl DartView {
         self.reconcile_dialog(window, cx);
         self.reconcile_controls(window, cx);
         self.reconcile_choices(window, cx);
+        self.reconcile_charts()?;
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
         let owner = cx.entity().downgrade();
@@ -1195,6 +1200,7 @@ impl DartView {
                 )
                 .into_any_element()
             }
+            Node::Chart { .. } => self.chart_element(node, colors)?,
             Node::Tabs { .. } | Node::RadioGroup { .. } => {
                 self.choices_element(node, colors, cx)?
             }
@@ -1366,6 +1372,7 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     element
 }
 
+mod charts;
 mod choices;
 mod control_root;
 mod controls;
@@ -1629,3 +1636,7 @@ mod tooltip_tests;
 #[cfg(test)]
 #[path = "ui/radio_tests.rs"]
 mod radio_tests;
+
+#[cfg(test)]
+#[path = "ui/charts_tests.rs"]
+mod charts_tests;

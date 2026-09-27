@@ -15,7 +15,8 @@ enum UiRole {
   combobox,
   table,
   tabList,
-  radioGroup;
+  radioGroup,
+  chart;
 
   String get wire => switch (this) {
     listItem => 'list_item',
@@ -50,6 +51,7 @@ final class UiSemantics {
       'input' => {UiRole.textbox},
       'select' => {UiRole.combobox},
       'table' => {UiRole.table},
+      'chart' => {UiRole.chart},
       'tabs' => {UiRole.tabList},
       'radio_group' => {UiRole.radioGroup},
       _ => throw ArgumentError.value(kind, 'kind'),

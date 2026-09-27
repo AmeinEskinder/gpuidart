@@ -179,3 +179,19 @@ entry paths. Keyboard opening anchors at the window center; pointer opening uses
 the click position. Sort/filter changes leave the captured record valid while it
 remains in the dataset generation, even if the filter hides it. Dataset
 replacement, table removal/rebinding or changed menu entries cancel the session.
+
+### Frozen chart projection policy
+
+Line and bar charts take the last max_points candidates of the filtered/sorted
+view, at most 512. Each candidate with a non-numeric, non-finite or magnitude
+above 1e12 value is omitted and counted; the window is not backfilled. Zero is
+never substituted. A line connects the remaining points, so the summary reports
+omissions rather than implying gap-preserving interpolation. Labels are truncated
+to 128 Unicode scalars. Heights are 80..1024 logical pixels. The default is 128
+candidates and 220 pixels. Bar values may be negative.
+
+The chart has a named native Group, because pinned AccessKit has no Chart role.
+Its description and a generated summary Label expose kind/count/range/first/last,
+candidate omissions and excluded earlier rows. Bounded point Labels expose the
+same cached series and stable record identity when provided. Their presence is
+not a claim about how a screen reader announces a chart.

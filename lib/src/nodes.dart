@@ -6,6 +6,8 @@ import 'menus.dart';
 import 'semantics.dart';
 import 'table_view.dart';
 
+part 'charts.dart';
+
 sealed class UiNode {
   const UiNode(this.id, {this.style, this.semantics});
   final String id;
