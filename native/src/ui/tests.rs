@@ -35,6 +35,7 @@ fn description(revision: u64) -> Snapshot {
                     text: format!("Revision {revision}"),
                 },
                 Node::Button {
+                    tooltip: None,
                     id: "increment".into(),
                     semantics: None,
                     style: None,
@@ -248,6 +249,7 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                         style: None,
                         children: (0..3)
                             .map(|i| Node::Button {
+                                tooltip: None,
                                 id: format!("action-{i}"),
                                 semantics: None,
                                 style: None,
@@ -257,6 +259,7 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                     },
                 );
                 children.push(Node::Button {
+                    tooltip: None,
                     id: "footer".into(),
                     semantics: None,
                     style: None,

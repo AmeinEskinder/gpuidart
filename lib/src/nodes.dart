@@ -56,17 +56,36 @@ final class UiText extends UiNode {
   };
 }
 
+/// A native button. [tooltip] supplies hover help and its accessible description.
 final class UiButton extends UiNode {
-  const UiButton(super.id, this.label, {super.style, super.semantics});
+  const UiButton(
+    super.id,
+    this.label, {
+    this.tooltip,
+    super.style,
+    super.semantics,
+  });
   final String label;
+  final String? tooltip;
   @override
-  Map<String, Object> toJson() => {
-    'kind': 'button',
-    'id': id,
-    if (semantics != null) 'semantics': semantics!.toJson('button'),
-    if (style != null) 'style': style!.toJson(),
-    'label': label,
-  };
+  Map<String, Object> toJson() {
+    if (tooltip != null &&
+        (tooltip!.isEmpty || utf8.encode(tooltip!).length > 1024)) {
+      throw ArgumentError.value(
+        tooltip,
+        'tooltip',
+        'Requires 1..1024 UTF-8 bytes',
+      );
+    }
+    return {
+      'kind': 'button',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('button'),
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      if (tooltip != null) 'tooltip': tooltip!,
+    };
+  }
 }
 
 /// A controlled checkbox. Publish the requested [GpuiEvent.checked] value to

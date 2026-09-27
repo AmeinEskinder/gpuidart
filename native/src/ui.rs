@@ -20,6 +20,7 @@ use gpui_kit::component::{
     scroll::ScrollableElement,
     table::{Column, DataTable, TableDelegate, TableEvent, TableState},
 };
+use gpui_kit::prelude::FluentBuilder;
 use gpui_kit::*;
 use serde_json::{Value, json};
 use std::{
@@ -1127,7 +1128,7 @@ impl DartView {
                 colors,
             )
             .into_any_element(),
-            Node::Button { label, .. } => {
+            Node::Button { label, tooltip, .. } => {
                 let events = self.events.clone();
                 let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
@@ -1137,6 +1138,9 @@ impl DartView {
                         .accessibility_label(accessible_name(node))
                         .primary()
                         .label(label.clone())
+                        .when_some(tooltip.clone(), |button, help| {
+                            semantics::description(button.tooltip(help.clone()), help)
+                        })
                         .on_click(move |_, _, _| {
                             #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
                             crate::input_trace::record(
@@ -1615,3 +1619,7 @@ pub(crate) fn run(
         None => Ok(()),
     }
 }
+
+#[cfg(test)]
+#[path = "ui/tooltip_tests.rs"]
+mod tooltip_tests;

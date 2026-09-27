@@ -146,6 +146,8 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         semantics: Option<Semantics>,
         label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        tooltip: Option<String>,
     },
     Checkbox {
         id: String,
@@ -809,6 +811,12 @@ impl Snapshot {
                     if let Some(view) = view {
                         view.validate()?;
                     }
+                }
+                Node::Button {
+                    tooltip: Some(tooltip),
+                    ..
+                } if tooltip.is_empty() || tooltip.len() > 1024 => {
+                    return Err("Tooltip requires 1..1024 UTF-8 bytes".into());
                 }
                 Node::Checkbox { label, .. } if label.len() > 1024 => {
                     return Err("Checkbox label exceeds 1024 UTF-8 bytes".into());

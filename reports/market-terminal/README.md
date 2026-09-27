@@ -149,3 +149,26 @@ Retained failures/findings:
 - One local analyzer launch failed with a PowerShell out-of-memory error in
   Flutter's Dart wrapper. Running the installed Dart SDK executable directly
   completed analysis; the failed wrapper launch is not counted as a pass.
+
+### Hosted row-menu follow-up
+
+All five workflows passed at `230fe60`, including the live row-command bridge
+test on Windows/macOS/Linux.
+
+## Tooltips
+
+Buttons accept optional help of 1..1024 UTF-8 bytes, separately from their name.
+Kit owns hover timing and the popup; the same text sets the button's AccessKit
+description through the existing root-properties adapter. No extra focus stop or
+wrapper accessibility node is introduced.
+
+Windows headless tests passed for byte bounds, hover dispatch and unchanged button
+name; the Dart wire test passed. Popup appearance/dismissal and external HelpText,
+description or AXHelp queries remain terminal-fixture checks.
+
+Retained attempts: the initial implementation tried StatefulInteractiveElement
+methods directly on Kit Component Button, which only exposes InteractiveElement.
+The existing root-properties adapter is the supported host boundary. An initial
+headless test then timed out looking up `tooltip-popup`: Base Tooltip does not
+register with Kit's opt-in test observer. That result does not establish whether
+the tooltip painted. External accessibility queries will check the actual popup.

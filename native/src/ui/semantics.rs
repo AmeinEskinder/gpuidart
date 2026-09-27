@@ -102,3 +102,8 @@ pub(super) fn input_text(interactivity: &mut Interactivity) {
         tree.push_child(id, run);
     });
 }
+
+pub(super) fn description<T: InteractiveElement>(mut element: T, help: String) -> T {
+    RootProperties(element.interactivity()).aria_description(help);
+    element
+}
