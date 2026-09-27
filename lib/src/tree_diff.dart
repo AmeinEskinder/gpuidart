@@ -4,26 +4,46 @@ import 'nodes.dart';
 /// `json['children']` holds the children's own `json` maps, so the full
 /// description is available without a second serialization pass.
 final class DescribedNode {
-  DescribedNode._(this.json, this.children);
+  DescribedNode._(this.json, this._parent);
 
   factory DescribedNode.describe(UiNode node) =>
-      DescribedNode._wrap(node.toJson());
+      DescribedNode._wrap(node.toJson(), null);
 
-  static DescribedNode _wrap(Map<String, Object> json) =>
-      DescribedNode._(json, [
-        for (final child
-            in (json['children'] as List<Object>?) ?? const <Object>[])
-          _wrap(child as Map<String, Object>),
-      ]);
+  static DescribedNode _wrap(Map<String, Object> json, DescribedNode? parent) {
+    final node = DescribedNode._(json, parent);
+    final children = json['children'] as List<Object>?;
+    if (children != null) {
+      for (final child in children) {
+        node.children.add(_wrap(child as Map<String, Object>, node));
+      }
+    }
+    return node;
+  }
 
   final Map<String, Object> json;
-  final List<DescribedNode> children;
+  final List<DescribedNode> children = [];
+  final DescribedNode? _parent;
   String get id => json['id'] as String;
   String get kind => json['kind'] as String;
   bool get isContainer => kind == 'column' || kind == 'row';
 
+  // Scratch for one diff. On the old tree: whether the new tree keeps this
+  // node and under which new node. On the new tree: the old node it keeps.
+  bool _retained = false;
+  DescribedNode? _newParent;
+  DescribedNode? _before;
+
   /// Every node ID in this subtree.
-  Set<String> ids() => {id, for (final child in children) ...child.ids()};
+  Set<String> ids() {
+    final all = <String>{};
+    void collect(DescribedNode node) {
+      all.add(node.id);
+      node.children.forEach(collect);
+    }
+
+    collect(this);
+    return all;
+  }
 
   /// Own fields only, the payload of a `set` operation.
   Map<String, Object> ownFields() => {
@@ -32,11 +52,16 @@ final class DescribedNode {
   };
 
   bool sameOwnFields(DescribedNode other) {
-    if (json.length != other.json.length) return false;
+    final theirs = other.json;
+    if (json.length != theirs.length) return false;
     for (final entry in json.entries) {
       if (entry.key == 'children') continue;
-      if (!other.json.containsKey(entry.key) ||
-          !_deepEquals(entry.value, other.json[entry.key])) {
+      final value = entry.value;
+      final counterpart = theirs[entry.key];
+      if (counterpart == null) return false;
+      if (value is String || value is num || value is bool) {
+        if (value != counterpart) return false;
+      } else if (!_deepEquals(value, counterpart)) {
         return false;
       }
     }
@@ -54,28 +79,7 @@ List<Map<String, Object?>>? diffDescribed(
   DescribedNode next,
 ) {
   if (old.id != next.id || old.kind != next.kind) return null;
-  final oldById = <String, DescribedNode>{};
-  final oldParent = <String, String>{};
-  void indexOld(DescribedNode node) {
-    oldById[node.id] = node;
-    for (final child in node.children) {
-      oldParent[child.id] = node.id;
-      indexOld(child);
-    }
-  }
-
-  indexOld(old);
-  final newById = <String, DescribedNode>{};
-  void indexNew(DescribedNode node) {
-    newById[node.id] = node;
-    node.children.forEach(indexNew);
-  }
-
-  indexNew(next);
-  for (final entry in newById.entries) {
-    final before = oldById[entry.key];
-    if (before != null && before.kind != entry.value.kind) return null;
-  }
+  if (!_Matcher(old).match(next, old)) return null;
 
   final inserts = <Map<String, Object?>>[];
   final reparents = <Map<String, Object?>>[];
@@ -90,27 +94,30 @@ List<Map<String, Object?>>? diffDescribed(
     if (node.isContainer)
       'children': [
         for (final child in node.children)
-          if (!oldById.containsKey(child.id)) payload(child),
+          if (child._before == null) payload(child),
       ],
   };
 
-  void visit(DescribedNode node, DescribedNode? before) {
+  void visit(DescribedNode node) {
+    final before = node._before;
     if (before != null && !before.sameOwnFields(node)) {
       sets.add({'op': 'set', 'id': node.id, 'node': node.ownFields()});
     }
-    // Membership once inserts, reparents and removes have run: surviving
-    // children keep their order, inserted ones append, reparented ones append
-    // after every insert.
+    if (node.children.isEmpty && (before == null || before.children.isEmpty)) {
+      return;
+    }
+    // Membership once inserts, reparents and removes have run: children that
+    // stay under this node keep their order, inserted ones append, reparented
+    // ones append after every insert.
     final surviving = <String>[
       if (before != null)
         for (final child in before.children)
-          if (newById.containsKey(child.id) && oldParent[child.id] == node.id)
-            child.id,
+          if (child._retained && identical(child._newParent, node)) child.id,
     ];
     final inserted = <String>[];
     final reparented = <String>[];
     for (final child in node.children) {
-      final childBefore = oldById[child.id];
+      final childBefore = child._before;
       if (childBefore == null) {
         if (before != null) {
           inserts.add({
@@ -120,14 +127,11 @@ List<Map<String, Object?>>? diffDescribed(
           });
         }
         inserted.add(child.id);
-        visit(child, null);
-      } else {
-        if (before == null || oldParent[child.id] != node.id) {
-          reparents.add({'op': 'reparent', 'id': child.id, 'parent': node.id});
-          reparented.add(child.id);
-        }
-        visit(child, childBefore);
+      } else if (before == null || !identical(childBefore._parent, before)) {
+        reparents.add({'op': 'reparent', 'id': child.id, 'parent': node.id});
+        reparented.add(child.id);
       }
+      visit(child);
     }
     final resulting = [...surviving, ...inserted, ...reparented];
     final desired = [for (final child in node.children) child.id];
@@ -136,11 +140,11 @@ List<Map<String, Object?>>? diffDescribed(
     }
   }
 
-  visit(next, old);
+  visit(next);
 
   void collectRemoved(DescribedNode node) {
     for (final child in node.children) {
-      if (newById.containsKey(child.id)) {
+      if (child._retained) {
         collectRemoved(child);
       } else {
         removes.add({'op': 'remove', 'id': child.id});
@@ -150,6 +154,59 @@ List<Map<String, Object?>>? diffDescribed(
 
   collectRemoved(old);
   return [...inserts, ...reparents, ...removes, ...sets, ...orders];
+}
+
+/// Pairs every new node with the old node of the same ID. Children are tried
+/// by position first, so a tree that keeps its order never touches the index;
+/// the index over the old tree is built on the first miss.
+final class _Matcher {
+  _Matcher(this.old) {
+    void reset(DescribedNode node) {
+      node._retained = false;
+      node._newParent = null;
+      node.children.forEach(reset);
+    }
+
+    reset(old);
+  }
+
+  final DescribedNode old;
+  Map<String, DescribedNode>? _oldById;
+
+  Map<String, DescribedNode> get oldById {
+    final index = _oldById;
+    if (index != null) return index;
+    final built = <String, DescribedNode>{};
+    void collect(DescribedNode node) {
+      built[node.id] = node;
+      node.children.forEach(collect);
+    }
+
+    collect(old);
+    return _oldById = built;
+  }
+
+  /// Returns false when a node keeps its ID but changes kind.
+  bool match(DescribedNode node, DescribedNode? before) {
+    node._before = before;
+    if (before != null) {
+      if (before.kind != node.kind) return false;
+      before._retained = true;
+      before._newParent = node._parent;
+    }
+    final beforeChildren = before?.children;
+    for (var i = 0; i < node.children.length; i++) {
+      final child = node.children[i];
+      var candidate = beforeChildren != null && i < beforeChildren.length
+          ? beforeChildren[i]
+          : null;
+      if (candidate == null || candidate.id != child.id) {
+        candidate = oldById[child.id];
+      }
+      if (!match(child, candidate)) return false;
+    }
+    return true;
+  }
 }
 
 bool _sameIds(List<String> a, List<String> b) {

@@ -86,9 +86,12 @@ difference directly.
 
 The diff lives in `lib/src/tree_diff.dart`. Nodes expose their own fields
 through `props()` and their children through `children`; `toJson()` composes
-the two. The diff walks the new tree once, emits inserts, reparents, removes,
-sets and child orders in that order, and never needs index arithmetic because
-native appends and the final `children` operation fixes the order.
+the two. The diff pairs every new node with the old node of the same ID,
+trying children by position first so a tree that keeps its order never
+touches a hash index, then walks the new tree once and emits inserts,
+reparents, removes, sets and child orders in that order. It never needs index
+arithmetic because native appends and the final `children` operation fixes
+the order. `tool/performance/bench_diff.dart` times describe and diff alone.
 
 ## What does not change
 
@@ -113,5 +116,10 @@ native appends and the final `children` operation fixes the order.
 
 ## Evidence
 
-See [the operation update gate](../reports/performance/update-gate/README.md)
-for the trunk and head snapshot-gate runs on the same machine.
+[The operation update gate](../reports/performance/update-gate/README.md)
+ran the snapshot gate at trunk and head on the same machine with release
+artifacts per side. At 2,048 properties a change moves 201 bytes instead of
+273,772, the encode and decode stages fall from about 6 ms to under 50 us,
+and publish-to-ack improves for every change kind at 512 and 2,048 nodes.
+The Dart describe plus diff and the native clone plus revalidation are the
+remaining costs, which is why a binary wire is not the next step.
