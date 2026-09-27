@@ -111,3 +111,42 @@ provider defects, verifier failures and the narrow pinned dependency corrections
 Human screen-reader sessions, offscreen virtual-table navigation, Linux EditableText
 and live announcements remain outside the verified surface. This milestone does
 not close the parked release gates or justify a production patch protocol.
+
+## Framework delivery status (2026-09-27)
+
+The owner's ten-move plan toward Flutter parity was executed in the order the
+evaluation recommended: retained tree first, measured before any wire change,
+then value ownership for controls, then datasets, then catalog breadth, then
+windows. Each move landed as verified commits on `dev`:
+
+| Move | Outcome | Commits |
+| --- | --- | --- |
+| Retained description updates | Dart diffs against the previous tree and sends operations; native applies them atomically with full validation and stale-base resubmission. Measured on the snapshot-gate workload: a 2,048-property change fell from 273,772 to 201 bytes and publish-to-ack from 7,197 to 3,317 µs. | `61de8e1`, `06466d8`, `3b6c03d`, `b3f0c56`, reports `34fc39a`, `1925f9b` |
+| Binary wire | Deferred with evidence: after operations, encode and decode are microseconds; the remaining cost is Dart describe/diff and native clone/revalidation, not JSON. | [update gate](../reports/performance/update-gate/README.md) |
+| Control value ownership | Controls show the interaction at once; the next publication is authoritative. Checkbox, switch, radio group, tabs, list. | `364a789`, `c7e3554`, `c73ecce` |
+| Datasets 2.0 | Structural edits (insert, delete, move) with running-shape validation, deferred record upload, grouped views with native aggregates, and virtualized lists over a column. | `f535cb0`, `bda6589`, `04cc914`, `ace3fcc` |
+| Layout | Flex growth, min/max sizes, stacks with insets, scroll containers with retained offsets. | `934c102` |
+| Catalog | Switch, radio group, progress, separator, tooltips, tabs, canvas draw lists, native animation, menu buttons, native file/save/URL/reveal requests. | `c7e3554`, `c73ecce`, `8d602c4` |
+| Multi-window | Secondary windows with their own descriptions, datasets, revisions and events, addressed through window-aware exports. | `890e20a` |
+| Process model | The GPUI loop now runs on a dedicated 64 MiB-stack thread; the 1 MiB Dart isolate stack overflowed under unoptimized table rendering and crashed the VM. | `7b7cd0d` |
+| Build environment | Worktree builds resolve a junctioned `.tools`. | `e558f12` |
+
+Feasibility verdicts recorded on this machine:
+
+- **Embedding the Dart runtime in the native executable** is not feasible
+  here. It needs the Dart SDK built from source for the embedder API and a
+  patched quit path in the vendored macOS platform; neither the SDK source
+  tree nor the build time fit this environment. The launcher and companion
+  process model stays.
+- **A Flutter Windows fixture for side-by-side measurement** cannot be built
+  here: the Flutter SDK is present but Flutter's Windows target requires a
+  Visual Studio installation with the C++ workload, and no Visual Studio or
+  `cl.exe` is installed (the Rust build uses the pinned portable toolchain).
+  Comparative claims against Flutter wait for a machine with that toolchain.
+- **Native dialogs** are wired but not covered by headless tests; the test
+  platform leaves the prompts and reveal unimplemented, so they are verified
+  by manual runs only.
+
+Verification at the end of the series: 74 native tests, 82 Dart tests
+including the live-window suite, on the debug library, plus the full check
+gate.
