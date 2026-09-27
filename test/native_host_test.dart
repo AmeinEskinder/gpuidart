@@ -279,4 +279,70 @@ void main() {
     },
     timeout: const Timeout(Duration(seconds: 30)),
   );
+
+  test(
+    'publications send operations and typed native input survives them',
+    () async {
+      UiNode build(String message, {bool wrapped = false}) => UiColumn('root', [
+        UiText('status', message),
+        if (wrapped)
+          UiRow('row', [
+            const UiText('label', 'Name'),
+            const UiInput('name', placeholder: 'Name'),
+          ])
+        else
+          const UiInput('name', placeholder: 'Name'),
+      ]);
+      final host = await GpuiHost.open(build('Start'));
+      try {
+        await host.diagnose('focus', {'input': 'name'});
+        for (final key in ['h', 'i']) {
+          await host.diagnose('key', {'key': key});
+        }
+        final typed = await host.diagnose('inspect');
+        expect(typed['inputs']['name']['text'], 'hi');
+        final entity = typed['inputs']['name']['entity'];
+
+        await host.publish(build('Changed'));
+        expect(host.metrics.operationPublications, 1);
+        var state = await host.diagnose('inspect');
+        expect(state['labels']['status'], 'Changed');
+        expect(state['inputs']['name']['text'], 'hi');
+        expect(state['inputs']['name']['entity'], entity);
+
+        await host.publish(build('Wrapped', wrapped: true));
+        expect(host.metrics.operationPublications, 2);
+        state = await host.diagnose('inspect');
+        expect(state['labels']['label'], 'Name');
+        expect(state['inputs']['name']['text'], 'hi');
+        expect(state['inputs']['name']['entity'], entity);
+
+        // A batch native cannot apply rejects asynchronously. A publication
+        // queued behind it was computed against the rejected tree; the host
+        // resends its whole description so it still lands, in order.
+        final doomed = host.publish(
+          UiColumn('root', [const UiTable('orphan', dataset: 'missing')]),
+        );
+        final following = host.publish(build('Pipelined'));
+        await expectLater(doomed, throwsStateError);
+        await following;
+        expect(host.metrics.operationPublications, 4);
+        expect(host.metrics.resubmittedPublications, 1);
+        state = await host.diagnose('inspect');
+        expect(state['labels']['status'], 'Pipelined');
+        expect(state['inputs']['name']['text'], 'hi');
+        expect(state['inputs']['name']['entity'], entity);
+
+        await host.publish(build('Recovered'));
+        expect(host.metrics.operationPublications, 5);
+        state = await host.diagnose('inspect');
+        expect(state['labels']['status'], 'Recovered');
+        expect(state['inputs']['name']['entity'], entity);
+        expect(host.metrics.encodedSnapshots, 6);
+      } finally {
+        await host.close();
+      }
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
 }

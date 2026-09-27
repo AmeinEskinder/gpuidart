@@ -15,6 +15,7 @@ import 'window_options.dart';
 import 'windows.dart';
 import 'platform.dart';
 import 'trace_clock.dart';
+import 'tree_diff.dart';
 import 'native_event.dart';
 
 part 'dataset.dart';
@@ -23,6 +24,14 @@ part 'companion.dart';
 part 'input_commands.dart';
 
 final _jsonUtf8 = JsonUtf8Encoder();
+
+/// A queued publication: the tree native will hold once it applies.
+final class _Publication {
+  const _Publication(this.described, this.actions, {required this.viaOps});
+  final DescribedNode described;
+  final List<UiAction> actions;
+  final bool viaOps;
+}
 
 typedef _EventNative = Void Function(Pointer<Uint8>, Size);
 typedef _CreateNative = Pointer<Void> Function(
@@ -77,6 +86,18 @@ final class _Bindings {
     'gd_diagnostic',
   );
   late final input = _inputBinding();
+
+  /// Null when the library predates operation updates; publishes then send
+  /// whole descriptions.
+  late final _PublishDart? update = _updateBinding();
+  _PublishDart? _updateBinding() {
+    try {
+      return library.lookupFunction<_PublishNative, _PublishDart>('gd_update');
+    } on ArgumentError {
+      return null;
+    }
+  }
+
   _PublishDart _inputBinding() {
     try {
       return library.lookupFunction<_PublishNative, _PublishDart>('gd_input');
@@ -225,6 +246,16 @@ final class GpuiHost {
   Object? _failure;
   StackTrace? _failureStack;
   int _revision = 1;
+
+  /// The description native will hold once every queued publication applies,
+  /// and its revision. Null after any failure, so the next publication sends
+  /// the whole description again.
+  DescribedNode? _baseline;
+  int _baselineRevision = 0;
+
+  /// Queued publications native has not acknowledged, by revision. A stale
+  /// rejection resubmits the latest of them as a whole description.
+  final _inFlight = <int, _Publication>{};
   bool _closing = false;
   _Companion? _companion;
 
@@ -318,10 +349,11 @@ final class GpuiHost {
       host._datasets[dataset.id] = dataset;
     }
     final describeStart = trace?._clock.now();
+    final described = DescribedNode.describe(root);
     final initial = <String, Object>{
       'snapshot': {
         'revision': 1,
-        'root': root.toJson(),
+        'root': described.json,
         if (actions.isNotEmpty)
           'actions': actions.map((action) => action.toJson()).toList(),
       },
@@ -376,6 +408,8 @@ final class GpuiHost {
       dataset._owner = host;
       dataset._revision = 1;
     }
+    host._baseline = described;
+    host._baselineRevision = 1;
     final result = ReceivePort();
     final nativeDone = result.first;
     try {
@@ -508,6 +542,12 @@ final class GpuiHost {
 
   /// Completes when Rust applies the snapshot. This is not a GPU presentation fence.
   ///
+  /// The host sends the operations that turn the previously published tree
+  /// into [root] when it can, and the whole description otherwise: after a
+  /// failed publication, when the root changes identity or a node changes
+  /// kind under the same ID, or with a native library that predates updates.
+  /// Either way native applies the result atomically at [root]'s revision.
+  ///
   /// Actions are declared per snapshot like the node tree: [actions] replaces
   /// the bindings, and omitting it clears them. [openView] rebuilds redeclare
   /// the actions passed to [openView].
@@ -520,23 +560,51 @@ final class GpuiHost {
     _publishTimers[revision] = Stopwatch()..start();
     var status = 0;
     try {
-      final rootDescription = _trace == null
-          ? root.toJson()
-          : _trace._measure('dart.describe', 'snapshot', revision, root.toJson);
-      status = _withMessage(
-        {
-          'revision': revision,
-          'root': rootDescription,
-          if (actions.isNotEmpty)
-            'actions': actions.map((action) => action.toJson()).toList(),
-        },
-        'snapshot',
+      final described = _trace == null
+          ? DescribedNode.describe(root)
+          : _trace._measure(
+              'dart.describe',
+              'snapshot',
+              revision,
+              () => DescribedNode.describe(root),
+            );
+      final baseline = _baseline;
+      final update = _bindings.update;
+      // A binding context absent from the tree is a submission error for a
+      // whole description; keep that synchronous contract for operations too.
+      final contextsPresent =
+          actions.isEmpty ||
+          () {
+            final ids = described.ids();
+            return actions.every(
+              (action) => switch (action.context) {
+                UiGlobalActionContext() => true,
+                UiNodeActionContext(:final id) => ids.contains(id),
+              },
+            );
+          }();
+      final ops = baseline == null || update == null || !contextsPresent
+          ? null
+          : _trace == null
+          ? diffDescribed(baseline, described)
+          : _trace._measure(
+              'dart.diff',
+              'snapshot',
+              revision,
+              () => diffDescribed(baseline, described),
+            );
+      _baseline = null;
+      status = _submitDescription(
         revision,
-        (bytes, length) => _bindings.publish(_handle, bytes, length),
+        described,
+        actions,
+        ops: ops,
+        update: update,
       );
       if (status != 0) {
         throw StateError('Native snapshot submission failed: $status');
       }
+      if (ops != null) metrics.operationPublications++;
     } catch (error, stack) {
       _pending.remove(revision);
       _publishTimers.remove(revision);
@@ -544,6 +612,97 @@ final class GpuiHost {
       rethrow;
     }
     return _withDeadline(accepted.future, 'snapshot $revision');
+  }
+
+  /// Sends [described] at [revision], as [ops] against the queued baseline or
+  /// as the whole description, and records it as queued on success.
+  int _submitDescription(
+    int revision,
+    DescribedNode described,
+    List<UiAction> actions, {
+    required List<Map<String, Object?>>? ops,
+    required _PublishDart? update,
+  }) {
+    final status = _withMessage(
+      {
+        'revision': revision,
+        if (ops == null) 'root': described.json,
+        if (ops != null) 'base_revision': _baselineRevision,
+        'ops': ?ops,
+        if (actions.isNotEmpty)
+          'actions': actions.map((action) => action.toJson()).toList(),
+      },
+      'snapshot',
+      revision,
+      (bytes, length) => ops == null
+          ? _bindings.publish(_handle, bytes, length)
+          : update!(_handle, bytes, length),
+    );
+    if (status == 0) {
+      _baseline = described;
+      _baselineRevision = revision;
+      _inFlight[revision] = _Publication(
+        described,
+        actions,
+        viaOps: ops != null,
+      );
+    }
+    return status;
+  }
+
+  /// Native rejected [rejected] because its base was never applied. Every
+  /// queued publication from it onwards was computed against that missing
+  /// state, and each carries the whole intended tree, so the latest one is
+  /// resent as a whole description and completes all of them.
+  void _resubmitLatest(int rejected, _Publication flight) {
+    final superseded = _inFlight.keys.where((r) => r > rejected).toList()
+      ..sort();
+    final latest = superseded.isEmpty ? flight : _inFlight[superseded.last]!;
+    final completers = <Completer<void>>[
+      ?_pending.remove(rejected),
+      for (final revision in superseded) ?_pending.remove(revision),
+    ];
+    _publishTimers.remove(rejected);
+    for (final revision in superseded) {
+      _inFlight.remove(revision);
+      _publishTimers.remove(revision);
+    }
+    final revision = ++_revision;
+    _trace?._point('dart.request', 'snapshot', revision);
+    final merged = Completer<void>();
+    _pending[revision] = merged;
+    _publishTimers[revision] = Stopwatch()..start();
+    merged.future.then(
+      (_) {
+        for (final completer in completers) {
+          completer.complete();
+        }
+      },
+      onError: (Object error, StackTrace stack) {
+        for (final completer in completers) {
+          completer.completeError(error, stack);
+        }
+      },
+    );
+    var status = 0;
+    try {
+      status = _submitDescription(
+        revision,
+        latest.described,
+        latest.actions,
+        ops: null,
+        update: null,
+      );
+      if (status != 0) {
+        throw StateError('Native snapshot submission failed: $status');
+      }
+      metrics.resubmittedPublications++;
+    } catch (error, stack) {
+      _pending.remove(revision);
+      _publishTimers.remove(revision);
+      merged.completeError(error, stack);
+      if (status == -4) _fail(error, stack);
+    }
   }
 
   Future<void> registerDataset(TableDataset dataset) => _transact(
@@ -745,12 +904,20 @@ final class GpuiHost {
               timer.elapsedMicroseconds,
             );
           }
+          _inFlight.remove(event.revision);
           _pending.remove(event.revision)?.complete();
         case 'rejected':
-          _publishTimers.remove(event.revision);
-          _pending
-              .remove(event.revision)
-              ?.completeError(StateError(event.data['message'] as String));
+          final flight = _inFlight.remove(event.revision);
+          final message = event.data['message'] as String;
+          if (flight != null &&
+              flight.viaOps &&
+              message.startsWith('Stale base revision')) {
+            _resubmitLatest(event.revision!, flight);
+          } else {
+            _baseline = null;
+            _publishTimers.remove(event.revision);
+            _pending.remove(event.revision)?.completeError(StateError(message));
+          }
         case 'dataset_applied':
           final pending = _dataPending[event.data['request']];
           if (pending != null &&

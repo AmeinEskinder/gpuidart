@@ -1,5 +1,7 @@
 final class HostMetrics {
   int descriptionBuilds = 0;
+  int operationPublications = 0;
+  int resubmittedPublications = 0;
   int encodedSnapshots = 0;
   int encodedBytes = 0;
   int ffiCallbacks = 0;
@@ -43,6 +45,8 @@ final class HostMetrics {
   Map<String, Object> read() => {
     'description_builds': descriptionBuilds,
     'encoded_snapshots': encodedSnapshots,
+    'operation_publications': operationPublications,
+    'resubmitted_publications': resubmittedPublications,
     'encoded_bytes': encodedBytes,
     'ffi_callbacks': ffiCallbacks,
     'ui_callbacks': uiCallbacks,
