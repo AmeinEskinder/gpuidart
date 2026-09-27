@@ -184,6 +184,17 @@ pub enum Node {
         #[serde(default)]
         disabled: bool,
     },
+    RadioGroup {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        options: Vec<ChoiceOption>,
+        selected: String,
+        #[serde(default)]
+        disabled: bool,
+    },
     Select {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -698,6 +709,7 @@ impl Node {
             | Self::Checkbox { id, .. }
             | Self::Slider { id, .. }
             | Self::Tabs { id, .. }
+            | Self::RadioGroup { id, .. }
             | Self::Select { id, .. }
             | Self::ConfirmDialog { id, .. }
             | Self::Input { id, .. }
@@ -714,6 +726,7 @@ impl Node {
             | Self::Checkbox { style, .. }
             | Self::Slider { style, .. }
             | Self::Tabs { style, .. }
+            | Self::RadioGroup { style, .. }
             | Self::Select { style, .. }
             | Self::ConfirmDialog { style, .. }
             | Self::Input { style, .. }
@@ -730,6 +743,7 @@ impl Node {
             | Self::Checkbox { semantics, .. }
             | Self::Slider { semantics, .. }
             | Self::Tabs { semantics, .. }
+            | Self::RadioGroup { semantics, .. }
             | Self::Select { semantics, .. }
             | Self::ConfirmDialog { semantics, .. }
             | Self::Input { semantics, .. }
@@ -843,6 +857,9 @@ impl Snapshot {
                     }
                 }
                 Node::Tabs {
+                    options, selected, ..
+                }
+                | Node::RadioGroup {
                     options, selected, ..
                 } => navigation::validate_choices(options, selected)?,
                 Node::Select {
@@ -989,6 +1006,11 @@ pub enum Event {
         number: f32,
     },
     TabChange {
+        revision: u64,
+        id: String,
+        selected: String,
+    },
+    RadioChange {
         revision: u64,
         id: String,
         selected: String,

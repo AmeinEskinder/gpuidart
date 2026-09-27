@@ -83,7 +83,7 @@ final class UiButton extends UiNode {
       if (semantics != null) 'semantics': semantics!.toJson('button'),
       if (style != null) 'style': style!.toJson(),
       'label': label,
-      if (tooltip != null) 'tooltip': tooltip!,
+      'tooltip': ?tooltip,
     };
   }
 }
@@ -394,6 +394,35 @@ final class UiTabs extends UiNode {
       'disabled': disabled,
       if (style != null) 'style': style!.toJson(),
       if (semantics != null) 'semantics': semantics!.toJson('tabs'),
+    };
+  }
+}
+
+/// A controlled radio group. Arrows/Home/End move focus and request selection.
+/// Space selects the focused option. Publish radio_change event.selected to accept.
+final class UiRadioGroup extends UiNode {
+  UiRadioGroup(
+    super.id, {
+    required List<UiChoiceOption> options,
+    required this.selected,
+    this.disabled = false,
+    super.style,
+    super.semantics,
+  }) : options = List.unmodifiable(options);
+  final List<UiChoiceOption> options;
+  final String selected;
+  final bool disabled;
+  @override
+  Map<String, Object> toJson() {
+    _validateChoices(options, selected);
+    return {
+      'kind': 'radio_group',
+      'id': id,
+      'options': options.map((o) => o.toJson()).toList(),
+      'selected': selected,
+      'disabled': disabled,
+      if (style != null) 'style': style!.toJson(),
+      if (semantics != null) 'semantics': semantics!.toJson('radio_group'),
     };
   }
 }

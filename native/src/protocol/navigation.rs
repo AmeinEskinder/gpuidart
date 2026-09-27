@@ -35,36 +35,38 @@ mod tests {
     use super::*;
     use serde_json::json;
     #[test]
-    fn tabs_bound_choices_and_reject_invalid_selection() {
-        let parse = |options, selected| {
-            Snapshot::parse(
-                &serde_json::to_vec(&json!({
-                    "revision":1,"root":{"kind":"tabs","id":"navigation", "options":options,
-                    "selected":selected,"semantics":{"role":"tab_list","label":"Pages"}}
-                }))
-                .unwrap(),
-            )
-        };
-        let options = json!([{"id":"a","label":"A"},{"id":"b","label":"B","disabled":true}]);
-        let node = parse(options.clone(), "a").unwrap();
-        assert!(Snapshot::parse(&serde_json::to_vec(&node).unwrap()).is_ok());
-        for selected in ["b", "missing", ""] {
-            assert!(parse(options.clone(), selected).is_err());
-        }
-        for invalid in [
-            json!([]),
-            json!([{"id":"a","label":""}]),
-            json!([{"id":"a","label":"A"},{"id":"a","label":"Duplicate"}]),
-            json!([{"id":"a","label":"A","url":"bad"}]),
-            json!([{"id":"a","label":"x".repeat(1025)}]),
-            json!([{"id":"x".repeat(257),"label":"A"}]),
-            json!(
-                (0..33)
-                    .map(|i| json!({"id":i.to_string(),"label":"X"}))
-                    .collect::<Vec<_>>()
-            ),
-        ] {
-            assert!(parse(invalid, "a").is_err());
+    fn choice_groups_bound_options_and_reject_invalid_selection() {
+        for (kind, role) in [("tabs", "tab_list"), ("radio_group", "radio_group")] {
+            let parse = |options, selected| {
+                Snapshot::parse(
+                    &serde_json::to_vec(&json!({
+                        "revision":1,"root":{"kind":kind,"id":"navigation", "options":options,
+                        "selected":selected,"semantics":{"role":role,"label":"Pages"}}
+                    }))
+                    .unwrap(),
+                )
+            };
+            let options = json!([{"id":"a","label":"A"},{"id":"b","label":"B","disabled":true}]);
+            let node = parse(options.clone(), "a").unwrap();
+            assert!(Snapshot::parse(&serde_json::to_vec(&node).unwrap()).is_ok());
+            for selected in ["b", "missing", ""] {
+                assert!(parse(options.clone(), selected).is_err());
+            }
+            for invalid in [
+                json!([]),
+                json!([{"id":"a","label":""}]),
+                json!([{"id":"a","label":"A"},{"id":"a","label":"Duplicate"}]),
+                json!([{"id":"a","label":"A","url":"bad"}]),
+                json!([{"id":"a","label":"x".repeat(1025)}]),
+                json!([{"id":"x".repeat(257),"label":"A"}]),
+                json!(
+                    (0..33)
+                        .map(|i| json!({"id":i.to_string(),"label":"X"}))
+                        .collect::<Vec<_>>()
+                ),
+            ] {
+                assert!(parse(invalid, "a").is_err());
+            }
         }
     }
 }

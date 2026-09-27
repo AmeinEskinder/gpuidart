@@ -27,7 +27,7 @@ fn snapshot(revision: u64, selected: &str, reverse: bool, disabled: bool) -> Sna
         &serde_json::to_vec(&json!({"revision":revision,"root":{
         "kind":"column","id":"root","children":[
             {"kind":"input","id":"before","placeholder":"Before"},
-            {"kind":"tabs","id":"pages","options":options,"selected":selected,"disabled":disabled,
+            {"kind":"radio_group","id":"pages","options":options,"selected":selected,"disabled":disabled,
              "semantics":{"label":"Terminal pages"}},
             {"kind":"input","id":"after","placeholder":"After"}
         ]}}))
@@ -36,7 +36,7 @@ fn snapshot(revision: u64, selected: &str, reverse: bool, disabled: bool) -> Sna
     .unwrap()
 }
 fn tab(id: &str) -> SharedString {
-    json!(["pages", "tab", id]).to_string().into()
+    json!(["pages", "radio", id]).to_string().into()
 }
 fn press(window: &mut Window, key: &str, cx: &mut App) {
     window.press(key, cx);
@@ -50,7 +50,7 @@ fn press(window: &mut Window, key: &str, cx: &mut App) {
 }
 
 #[gpui::test]
-fn tabs_keyboard_semantics_reorder_disabled_and_stale_callbacks(cx: &mut TestAppContext) {
+fn radio_keyboard_semantics_reorder_disabled_and_stale_callbacks(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let events = Arc::new(Mutex::new(Vec::new()));
     let out = events.clone();
@@ -73,9 +73,12 @@ fn tabs_keyboard_semantics_reorder_disabled_and_stale_callbacks(cx: &mut TestApp
     });
     cx.update_window(handle, |_, window, cx| {
         window.render_frame(cx);
-        assert_eq!(window.find("pages").role(), Some(Role::TabList));
+        assert_eq!(window.find("pages").role(), Some(Role::RadioGroup));
         assert_eq!(window.find("pages").label(), Some("Terminal pages"));
-        assert_eq!(window.find(tab("watchlist")).role(), Some(Role::Tab));
+        assert_eq!(
+            window.find(tab("watchlist")).role(),
+            Some(Role::RadioButton)
+        );
         assert_eq!(window.find(tab("watchlist")).selected(), Some(true));
         window.click("before", cx);
         press(window, "tab", cx);
@@ -83,19 +86,18 @@ fn tabs_keyboard_semantics_reorder_disabled_and_stale_callbacks(cx: &mut TestApp
         press(window, "right", cx);
         assert!(view.read(cx).choices["pages"].focus["detail"].is_focused(window));
         assert_eq!(window.find(tab("watchlist")).selected(), Some(true));
-        assert!(
-            !events
+        assert_eq!(
+            events
                 .lock()
                 .unwrap()
                 .iter()
-                .any(|e| matches!(e, Event::TabChange { .. }))
+                .filter(|e| matches!(e, Event::RadioChange { .. }))
+                .count(),
+            1
         );
-        press(window, "enter", cx);
-        assert!(
-            events.lock().unwrap().iter().any(
-                |e| matches!(e,Event::TabChange{selected,revision:1,..} if selected == "detail")
-            )
-        );
+        assert!(events.lock().unwrap().iter().any(
+            |e| matches!(e,Event::RadioChange{selected,revision:1,..} if selected == "detail")
+        ));
         let retained = view.read(cx).choices["pages"].focus["detail"].clone();
         view.update(cx, |view, cx| {
             view.publish(snapshot(2, "detail", true, false), window, cx)
@@ -104,6 +106,9 @@ fn tabs_keyboard_semantics_reorder_disabled_and_stale_callbacks(cx: &mut TestApp
         assert_eq!(view.read(cx).choices["pages"].focus["detail"], retained);
         assert!(view.read(cx).choices["pages"].focus["detail"].is_focused(window));
         assert_eq!(window.find(tab("detail")).selected(), Some(true));
+        let accepted_count = events.lock().unwrap().len();
+        press(window, "space", cx);
+        assert_eq!(events.lock().unwrap().len(), accepted_count);
         press(window, "home", cx);
         assert!(view.read(cx).choices["pages"].focus["settings"].is_focused(window));
         press(window, "end", cx);
@@ -114,7 +119,7 @@ fn tabs_keyboard_semantics_reorder_disabled_and_stale_callbacks(cx: &mut TestApp
         window.render_frame(cx);
         assert!(view.read(cx).choices["pages"].focus["settings"].is_focused(window));
         assert!(events.lock().unwrap().iter().any(
-            |e| matches!(e,Event::TabChange{selected,revision:2,..} if selected == "settings")
+            |e| matches!(e,Event::RadioChange{selected,revision:2,..} if selected == "settings")
         ));
         view.update(cx, |view, cx| {
             view.publish(snapshot(3, "detail", false, true), window, cx)

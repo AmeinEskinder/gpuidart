@@ -234,7 +234,7 @@ pub(crate) struct DartView {
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     next_input_generation: u64,
-    tabs: HashMap<String, tabs::RetainedTabs>,
+    choices: HashMap<String, choices::RetainedChoices>,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
@@ -404,7 +404,7 @@ impl DartView {
             events,
             inputs: HashMap::new(),
             next_input_generation: 0,
-            tabs: HashMap::new(),
+            choices: HashMap::new(),
             sliders: HashMap::new(),
             selects: HashMap::new(),
             active_dialog: Default::default(),
@@ -784,7 +784,7 @@ impl DartView {
         self.reconcile_menus(cx)?;
         self.reconcile_dialog(window, cx);
         self.reconcile_controls(window, cx);
-        self.reconcile_tabs(window, cx);
+        self.reconcile_choices(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
         let owner = cx.entity().downgrade();
@@ -1041,7 +1041,7 @@ impl DartView {
                 return self.context_chain(id);
             }
         }
-        for (id, tabs) in &self.tabs {
+        for (id, tabs) in &self.choices {
             if tabs.focus.values().any(|handle| *handle == focused) {
                 return self.context_chain(id);
             }
@@ -1195,7 +1195,9 @@ impl DartView {
                 )
                 .into_any_element()
             }
-            Node::Tabs { .. } => self.tabs_element(node, colors, cx)?,
+            Node::Tabs { .. } | Node::RadioGroup { .. } => {
+                self.choices_element(node, colors, cx)?
+            }
             Node::Slider { .. } => self.slider_element(node, colors, cx)?,
             Node::Select { .. } => self.select_element(node, colors)?,
             Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
@@ -1364,6 +1366,7 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     element
 }
 
+mod choices;
 mod control_root;
 mod controls;
 mod menus;
@@ -1374,7 +1377,6 @@ mod semantics;
 #[cfg(test)]
 mod semantics_tests;
 mod slider;
-mod tabs;
 #[cfg(test)]
 mod tabs_tests;
 mod theming;
@@ -1623,3 +1625,7 @@ pub(crate) fn run(
 #[cfg(test)]
 #[path = "ui/tooltip_tests.rs"]
 mod tooltip_tests;
+
+#[cfg(test)]
+#[path = "ui/radio_tests.rs"]
+mod radio_tests;

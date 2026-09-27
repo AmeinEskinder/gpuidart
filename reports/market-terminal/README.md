@@ -172,3 +172,23 @@ The existing root-properties adapter is the supported host boundary. An initial
 headless test then timed out looking up `tooltip-popup`: Base Tooltip does not
 register with Kit's opt-in test observer. That result does not establish whether
 the tooltip painted. External accessibility queries will check the actual popup.
+
+## Radio groups
+
+UiRadioGroup shares the validated stable choices and retained focus implementation
+with tabs. Kit Base Radio supplies native checked/selected semantics and pointer
+activation. Arrows/Home/End focus and request a selection; Space on the accepted
+choice is inert. One tab stop, disabled choices, reordered identity and stale
+callbacks have native regression coverage. Changing between tabs and radios at
+the same node ID creates fresh control generations. Both use theme tokens and
+native focus styling.
+
+Windows: all 68 native tests passed. Five focused Dart tests passed for radio,
+tabs and tooltip wire behavior. The live radio event/acknowledgement test is added
+to all three hosted accessibility jobs. It checks that arrow activation returns
+to Dart and a publication accepts the selection while retaining focus.
+
+Retained verifier failures: a mechanical test adaptation produced an invalid
+Dart variable name, fixed before running the successful tests. The analyzer also
+caught the tooltip codec's null-element style rule; the codec now uses Dart's
+null-aware map element. These were test/lint failures, not native runtime failures.

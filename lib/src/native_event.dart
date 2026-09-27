@@ -107,6 +107,7 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         throw const FormatException('Invalid slider number');
       }
     case 'tab_change':
+    case 'radio_change':
       integer('revision', minimum: 1);
       string('id');
       string('selected');

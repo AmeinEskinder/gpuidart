@@ -14,11 +14,13 @@ enum UiRole {
   textbox,
   combobox,
   table,
-  tabList;
+  tabList,
+  radioGroup;
 
   String get wire => switch (this) {
     listItem => 'list_item',
     tabList => 'tab_list',
+    radioGroup => 'radio_group',
     _ => name,
   };
 }
@@ -49,6 +51,7 @@ final class UiSemantics {
       'select' => {UiRole.combobox},
       'table' => {UiRole.table},
       'tabs' => {UiRole.tabList},
+      'radio_group' => {UiRole.radioGroup},
       _ => throw ArgumentError.value(kind, 'kind'),
     };
     if (role != null && !allowed.contains(role)) {

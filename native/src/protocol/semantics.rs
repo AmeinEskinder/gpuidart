@@ -16,6 +16,7 @@ pub enum SemanticRole {
     Combobox,
     Table,
     TabList,
+    RadioGroup,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -48,6 +49,7 @@ impl Semantics {
                 Node::Slider { .. } => role == Slider,
                 Node::Input { .. } => role == Textbox,
                 Node::Tabs { .. } => role == TabList,
+                Node::RadioGroup { .. } => role == RadioGroup,
                 Node::Select { .. } => role == Combobox,
                 Node::Table { .. } => role == Table,
             };
