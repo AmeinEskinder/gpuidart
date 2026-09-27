@@ -40,7 +40,12 @@ impl Semantics {
         use SemanticRole::*;
         if let Some(role) = self.role {
             let valid = match node {
-                Node::Column { .. } | Node::Row { .. } => matches!(role, Group | List | ListItem),
+                Node::Column { .. }
+                | Node::Row { .. }
+                | Node::Stack { .. }
+                | Node::Scroll { .. } => {
+                    matches!(role, Group | List | ListItem)
+                }
                 Node::Text { .. } => matches!(role, Label | Heading),
                 Node::Button { .. } | Node::ConfirmDialog { .. } => role == Button,
                 Node::Checkbox { .. } => role == Checkbox,

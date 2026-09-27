@@ -38,7 +38,7 @@ pub struct Style {
 ### Boundaries
 
 - Units are logical pixels only. No percentages, no `em`, no viewport units. Scale-factor conversion stays in GPUI.
-- Numeric bounds: padding/gap/radius 0–512 px, font size 8–96 px, fixed width/height 0–8192 px, flex not supported in this milestone. Out-of-range values are validation rejections, not clamps.
+- Numeric bounds: padding/gap/radius 0–512 px, font size 8–96 px, fixed and min/max width/height 0–8192 px, flex grow 0–64, stack insets 0–8192 px. Out-of-range values are validation rejections, not clamps. `flex` shares the remaining space of a row or column from a zero basis, like Flutter's Expanded; `inset` positions a child inside the nearest `UiStack` and is ignored elsewhere.
 - **No inheritance or cascade.** A style applies to exactly its node. Text color/size on a container does not propagate to children in this milestone; this is deliberate to keep precedence trivially defined: node style wins over the gpui-kit theme default, nothing else competes.
 - `font_size`/`font_weight` on non-text nodes are validation errors. Unknown token names are validation errors.
 - Validation happens in `Snapshot::validate`, so malformed styles reject before any retained state changes — same discipline as existing node validation.

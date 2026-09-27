@@ -48,6 +48,57 @@ void main() {
       'font_weight': 'semibold',
     });
     expect(UiSize.fit.toJson(), 'fit');
+    final layout = jsonDecode(
+      jsonEncode(
+        const UiStyle(
+          flex: 2,
+          minWidth: UiSize.px(80),
+          maxWidth: UiSize.full,
+          minHeight: UiSize.fit,
+          maxHeight: UiSize.px(600),
+          inset: UiInset(top: 8, left: 12),
+        ).toJson(),
+      ),
+    );
+    expect(layout, {
+      'flex': 2,
+      'min_width': {'px': 80},
+      'max_width': 'full',
+      'min_height': 'fit',
+      'max_height': {'px': 600},
+      'inset': {'top': 8, 'left': 12},
+    });
+  });
+
+  test('stack and scroll are containers with their own wire shape', () {
+    final stack = UiStack('layers', [
+      const UiText('under', 'Under'),
+      const UiText('badge', 'Badge', style: UiStyle(inset: UiInset(top: 4))),
+    ], semantics: const UiSemantics(role: UiRole.group, label: 'Layers'));
+    expect(stack.children.length, 2);
+    expect(stack.toJson()['kind'], 'stack');
+    expect((stack.toJson()['children'] as List).length, 2);
+    expect(stack.props().containsKey('children'), isFalse);
+    final scroll = UiScroll('list', const [UiText('a', 'A')]);
+    expect(scroll.toJson(), {
+      'kind': 'scroll',
+      'id': 'list',
+      'children': [
+        {'kind': 'text', 'id': 'a', 'text': 'A'},
+      ],
+    });
+    expect(
+      UiScroll('h', const [], axis: UiScrollAxis.horizontal).props()['axis'],
+      'horizontal',
+    );
+    expect(
+      () => UiScroll(
+        's',
+        const [],
+        semantics: const UiSemantics(role: UiRole.button),
+      ).props(),
+      throwsArgumentError,
+    );
   });
 
   test('style rides along on every node kind', () {

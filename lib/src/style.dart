@@ -14,6 +14,12 @@ final class UiStyle {
     this.borderRadius,
     this.fontSize,
     this.fontWeight,
+    this.flex,
+    this.minWidth,
+    this.maxWidth,
+    this.minHeight,
+    this.maxHeight,
+    this.inset,
   });
 
   /// Logical pixels: top, right, bottom, left. Each edge 0–512.
@@ -38,6 +44,17 @@ final class UiStyle {
   /// Text nodes only.
   final UiFontWeight? fontWeight;
 
+  /// Flex grow factor inside a row or column, 0–64. A positive value shares
+  /// the remaining space like Flutter's Expanded; 0 keeps the content size.
+  final double? flex;
+  final UiSize? minWidth;
+  final UiSize? maxWidth;
+  final UiSize? minHeight;
+  final UiSize? maxHeight;
+
+  /// Absolute placement inside the nearest [UiStack]. Ignored elsewhere.
+  final UiInset? inset;
+
   Map<String, Object> toJson() {
     final padding = this.padding;
     if (padding != null && padding.length != 4) {
@@ -60,8 +77,31 @@ final class UiStyle {
       'border_radius': ?borderRadius,
       'font_size': ?fontSize,
       if (fontWeight != null) 'font_weight': fontWeight!.wire,
+      'flex': ?flex,
+      if (minWidth != null) 'min_width': minWidth!.toJson(),
+      if (maxWidth != null) 'max_width': maxWidth!.toJson(),
+      if (minHeight != null) 'min_height': minHeight!.toJson(),
+      if (maxHeight != null) 'max_height': maxHeight!.toJson(),
+      if (inset != null) 'inset': inset!.toJson(),
     };
   }
+}
+
+/// Distances from a [UiStack]'s edges, logical pixels 0–8192. A null edge is
+/// unconstrained.
+final class UiInset {
+  const UiInset({this.top, this.right, this.bottom, this.left});
+  final double? top;
+  final double? right;
+  final double? bottom;
+  final double? left;
+
+  Map<String, Object> toJson() => {
+    'top': ?top,
+    'right': ?right,
+    'bottom': ?bottom,
+    'left': ?left,
+  };
 }
 
 /// A fixed pixel size, `"full"` (fill the parent) or `"fit"` (shrink to content).

@@ -210,6 +210,41 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         view: Option<TableView>,
     },
+    /// Children overlap in order. A child sits at the top left with its own
+    /// size unless its style has `inset`; `width` and `height` of `full`
+    /// cover the stack. The stack takes its size from its own style or its
+    /// parent.
+    Stack {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default)]
+        children: Vec<Node>,
+    },
+    /// A bounded container whose content scrolls; the offset is retained by
+    /// ID across publications.
+    Scroll {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default)]
+        axis: ScrollAxis,
+        #[serde(default)]
+        children: Vec<Node>,
+    },
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScrollAxis {
+    #[default]
+    Vertical,
+    Horizontal,
+    Both,
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -368,6 +403,24 @@ pub struct Style {
     /// Logical px; text nodes only.
     pub font_size: Option<f32>,
     pub font_weight: Option<FontWeight>,
+    /// Flex grow factor inside a row or column, 0 to 64. Positive values
+    /// share the remaining space; 0 keeps the content size.
+    pub flex: Option<f32>,
+    pub min_width: Option<Size>,
+    pub max_width: Option<Size>,
+    pub min_height: Option<Size>,
+    pub max_height: Option<Size>,
+    /// Absolute placement inside the nearest stack, logical px from each edge.
+    pub inset: Option<Inset>,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Inset {
+    pub top: Option<f32>,
+    pub right: Option<f32>,
+    pub bottom: Option<f32>,
+    pub left: Option<f32>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -532,9 +585,27 @@ impl Style {
         if let Some(radius) = self.border_radius {
             bounded(radius, 512., "border_radius")?;
         }
-        for (field, size) in [("width", self.width), ("height", self.height)] {
+        for (field, size) in [
+            ("width", self.width),
+            ("height", self.height),
+            ("min_width", self.min_width),
+            ("max_width", self.max_width),
+            ("min_height", self.min_height),
+            ("max_height", self.max_height),
+        ] {
             if let Some(Size::Px(value)) = size {
                 bounded(value, 8192., field)?;
+            }
+        }
+        if let Some(flex) = self.flex {
+            bounded(flex, 64., "flex")?;
+        }
+        if let Some(inset) = self.inset {
+            for edge in [inset.top, inset.right, inset.bottom, inset.left]
+                .into_iter()
+                .flatten()
+            {
+                bounded(edge, 8192., "inset")?;
             }
         }
         if let Some(size) = self.font_size {
@@ -677,7 +748,9 @@ impl Node {
             | Self::Select { id, .. }
             | Self::ConfirmDialog { id, .. }
             | Self::Input { id, .. }
-            | Self::Table { id, .. } => id,
+            | Self::Table { id, .. }
+            | Self::Stack { id, .. }
+            | Self::Scroll { id, .. } => id,
         }
     }
 
@@ -692,7 +765,9 @@ impl Node {
             | Self::Select { style, .. }
             | Self::ConfirmDialog { style, .. }
             | Self::Input { style, .. }
-            | Self::Table { style, .. } => style.as_ref(),
+            | Self::Table { style, .. }
+            | Self::Stack { style, .. }
+            | Self::Scroll { style, .. } => style.as_ref(),
         }
     }
 
@@ -707,13 +782,26 @@ impl Node {
             | Self::Select { semantics, .. }
             | Self::ConfirmDialog { semantics, .. }
             | Self::Input { semantics, .. }
-            | Self::Table { semantics, .. } => semantics.as_ref(),
+            | Self::Table { semantics, .. }
+            | Self::Stack { semantics, .. }
+            | Self::Scroll { semantics, .. } => semantics.as_ref(),
+        }
+    }
+
+    /// The children of a container kind; leaf kinds have none.
+    pub fn children(&self) -> Option<&Vec<Node>> {
+        match self {
+            Self::Column { children, .. }
+            | Self::Row { children, .. }
+            | Self::Stack { children, .. }
+            | Self::Scroll { children, .. } => Some(children),
+            _ => None,
         }
     }
 
     pub fn visit(&self, f: &mut impl FnMut(&Node)) {
         f(self);
-        if let Self::Column { children, .. } | Self::Row { children, .. } = self {
+        if let Some(children) = self.children() {
             for child in children {
                 child.visit(f);
             }
@@ -754,12 +842,12 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
     if let Some(semantics) = node.semantics() {
         semantics.validate(node)?;
     }
-    match node {
-        Node::Column { children, .. } | Node::Row { children, .. } => {
-            for child in children {
-                validate_tree(child, depth + 1, ids)?;
-            }
+    if let Some(children) = node.children() {
+        for child in children {
+            validate_tree(child, depth + 1, ids)?;
         }
+    }
+    match node {
         Node::Table { dataset, view, .. } => {
             if dataset.is_empty() {
                 return Err("Table dataset ID must be nonempty".into());
@@ -939,10 +1027,8 @@ impl Update {
                     if node.id() != id {
                         return Err(format!("Set node ID differs from its target: {id}"));
                     }
-                    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
-                        if !children.is_empty() {
-                            return Err("Set carries own fields only, not children".into());
-                        }
+                    if node.children().is_some_and(|children| !children.is_empty()) {
+                        return Err("Set carries own fields only, not children".into());
                     }
                     validate_tree(node, 0, &mut HashSet::new())?;
                 }
@@ -1017,12 +1103,8 @@ impl Snapshot {
                         return Err(format!("Set changes the kind of node: {id}"));
                     }
                     let mut replacement = node.clone();
-                    if let Node::Column { children: old, .. } | Node::Row { children: old, .. } =
-                        target
-                    {
-                        if let Node::Column { children: new, .. }
-                        | Node::Row { children: new, .. } = &mut replacement
-                        {
+                    if let Some(old) = children_mut(target) {
+                        if let Some(new) = children_mut(&mut replacement) {
                             *new = std::mem::take(old);
                         }
                     }
@@ -1062,7 +1144,7 @@ pub(crate) fn find_mut<'a>(node: &'a mut Node, id: &str) -> Option<&'a mut Node>
     if node.id() == id {
         return Some(node);
     }
-    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+    if let Some(children) = children_mut(node) {
         for child in children {
             if let Some(found) = find_mut(child, id) {
                 return Some(found);
@@ -1074,7 +1156,10 @@ pub(crate) fn find_mut<'a>(node: &'a mut Node, id: &str) -> Option<&'a mut Node>
 
 pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
     match node {
-        Node::Column { children, .. } | Node::Row { children, .. } => Some(children),
+        Node::Column { children, .. }
+        | Node::Row { children, .. }
+        | Node::Stack { children, .. }
+        | Node::Scroll { children, .. } => Some(children),
         _ => None,
     }
 }
@@ -1082,7 +1167,7 @@ pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
 /// Removes and returns the node with `id` from below `node`. The root itself
 /// is never detached.
 pub(crate) fn detach(node: &mut Node, id: &str) -> Option<Node> {
-    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+    if let Some(children) = children_mut(node) {
         if let Some(index) = children.iter().position(|child| child.id() == id) {
             return Some(children.remove(index));
         }
@@ -1878,6 +1963,78 @@ mod tests {
             encoded,
             serde_json::json!({"kind":"text","id":"t","text":"x"})
         );
+    }
+
+    #[test]
+    fn stack_and_scroll_are_containers_with_layout_styles() {
+        let snapshot = Snapshot::parse(
+            br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
+                {"kind":"stack","id":"stack","style":{"height":{"px":200},"flex":1},"semantics":{"role":"group","label":"Layers"},"children":[
+                    {"kind":"text","id":"under","text":"Under"},
+                    {"kind":"text","id":"badge","text":"Badge","style":{"inset":{"top":8,"right":8}}}
+                ]},
+                {"kind":"scroll","id":"list","axis":"horizontal","style":{"max_height":{"px":300},"min_width":"full"},"children":[
+                    {"kind":"text","id":"a","text":"A"}
+                ]},
+                {"kind":"scroll","id":"default","children":[]}
+            ]}}"#,
+        )
+        .unwrap();
+        let mut ids = Vec::new();
+        snapshot
+            .root
+            .visit(&mut |node| ids.push(node.id().to_owned()));
+        assert_eq!(
+            ids,
+            ["root", "stack", "under", "badge", "list", "a", "default"]
+        );
+        assert!(matches!(
+            snapshot.root.children().unwrap()[1],
+            Node::Scroll {
+                axis: ScrollAxis::Horizontal,
+                ..
+            }
+        ));
+        assert!(matches!(
+            snapshot.root.children().unwrap()[2],
+            Node::Scroll {
+                axis: ScrollAxis::Vertical,
+                ..
+            }
+        ));
+        let update = Update::parse(
+            br#"{"revision":2,"base_revision":1,"ops":[
+                {"op":"set","id":"list","node":{"kind":"scroll","id":"list","axis":"both"}},
+                {"op":"reparent","id":"a","parent":"stack"}
+            ]}"#,
+        )
+        .unwrap();
+        let after = snapshot.apply(&update).unwrap();
+        let list = &after.root.children().unwrap()[1];
+        assert!(matches!(
+            list,
+            Node::Scroll {
+                axis: ScrollAxis::Both,
+                ..
+            }
+        ));
+        assert_eq!(
+            after.root.children().unwrap()[0].children().unwrap().len(),
+            3
+        );
+        for invalid in [
+            r#"{"kind":"text","id":"t","text":"x","style":{"flex":65}}"#,
+            r#"{"kind":"text","id":"t","text":"x","style":{"flex":-1}}"#,
+            r#"{"kind":"text","id":"t","text":"x","style":{"min_width":{"px":-1}}}"#,
+            r#"{"kind":"text","id":"t","text":"x","style":{"max_height":{"px":9000}}}"#,
+            r#"{"kind":"text","id":"t","text":"x","style":{"inset":{"top":-4}}}"#,
+            r#"{"kind":"text","id":"t","text":"x","style":{"inset":{"middle":4}}}"#,
+            r#"{"kind":"scroll","id":"s","axis":"diagonal","children":[]}"#,
+            r#"{"kind":"stack","id":"s","semantics":{"role":"button"},"children":[]}"#,
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
+        }
     }
 
     fn applied() -> Snapshot {

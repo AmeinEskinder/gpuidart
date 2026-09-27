@@ -79,7 +79,9 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 
 | API | Contract |
 | --- | --- |
-| UiColumn / UiRow | Vertical/horizontal groups with the native theme's standard spacing. Rows wrap when space is limited. The screen scrolls vertically when its content exceeds the window. |
+| UiColumn / UiRow | Vertical/horizontal groups with the native theme's standard spacing. Rows wrap when space is limited. The screen scrolls vertically when its content exceeds the window. A child style's `flex` shares the remaining space; `minWidth`, `maxWidth`, `minHeight` and `maxHeight` bound any node. |
+| UiStack | Children overlap in order. A child sits at the top left with its own size unless its style has an `inset` from the stack's edges; `full` width and height cover the stack. Size the stack through its style or a flex parent. |
+| UiScroll | A bounded vertical, horizontal or two-axis scroll container with a native scrollbar. Its offset is retained by ID across publications and reload. |
 | UiText / UiButton | Text and native button. Click events carry node ID and snapshot revision. |
 | UiInput | Native-retained by default. `controlled: true` enables guarded text/selection writes; native remains authoritative during composition. See [controlled inputs](controlled-inputs.md). |
 | UiCheckbox / UiSlider / UiSelect | Application values with native change-request events. The control shows the interaction immediately; the next publication's value is authoritative, so publish the accepted value. See the [settings controls contract](control-catalog.md). |

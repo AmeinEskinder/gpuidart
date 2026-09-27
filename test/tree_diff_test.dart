@@ -257,6 +257,27 @@ void main() {
     expectRoundTrip(wrapped, before);
   });
 
+  test('stack and scroll containers diff like rows and columns', () {
+    final before = UiColumn('root', [
+      UiScroll('list', [const UiText('a', 'A'), const UiText('b', 'B')]),
+      UiStack('layers', [const UiText('under', 'U')]),
+    ]);
+    final after = UiColumn('root', [
+      UiScroll('list', [
+        const UiText('b', 'B'),
+        const UiText('a', 'A'),
+      ], axis: UiScrollAxis.both),
+      UiStack('layers', [
+        const UiText('under', 'U'),
+        const UiText('badge', 'Badge', style: UiStyle(inset: UiInset(top: 2))),
+      ]),
+    ]);
+    final ops = diff(before, after);
+    expect(ops.map((op) => op['op']), ['insert', 'set', 'children']);
+    expect((ops[1]['node'] as Map).containsKey('children'), isFalse);
+    expectRoundTrip(before, after);
+  });
+
   test('a survivor leaves a removed subtree before the removal', () {
     final before = UiColumn('root', [
       UiRow('row', [

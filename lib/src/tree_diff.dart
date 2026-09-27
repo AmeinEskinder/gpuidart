@@ -25,7 +25,7 @@ final class DescribedNode {
   final DescribedNode? _parent;
   String get id => json['id'] as String;
   String get kind => json['kind'] as String;
-  bool get isContainer => kind == 'column' || kind == 'row';
+  bool get isContainer => json.containsKey('children');
 
   // Scratch for one diff. On the old tree: whether the new tree keeps this
   // node and under which new node. On the new tree: the old node it keeps.

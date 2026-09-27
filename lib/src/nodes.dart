@@ -61,6 +61,65 @@ final class UiRow extends UiNode {
   };
 }
 
+/// Children overlap in order. A child sits at the top left with its own size
+/// unless its style has an [UiInset]; `UiSize.full` width and height cover the
+/// stack. Give the stack a size through its style or its parent.
+final class UiStack extends UiNode {
+  UiStack(super.id, List<UiNode> children, {super.style, super.semantics})
+    : children = List.unmodifiable(children);
+  @override
+  final List<UiNode> children;
+  @override
+  Map<String, Object> props() => {
+    'kind': 'stack',
+    'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('stack'),
+    if (style != null) 'style': style!.toJson(),
+  };
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
+    'children': children.map((child) => child.toJson()).toList(),
+  };
+}
+
+enum UiScrollAxis {
+  vertical('vertical'),
+  horizontal('horizontal'),
+  both('both');
+
+  const UiScrollAxis(this.wire);
+  final String wire;
+}
+
+/// A bounded container whose content scrolls. Bound it through its style or a
+/// flex parent; the scroll offset is retained by ID across publications.
+final class UiScroll extends UiNode {
+  UiScroll(
+    super.id,
+    List<UiNode> children, {
+    this.axis = UiScrollAxis.vertical,
+    super.style,
+    super.semantics,
+  }) : children = List.unmodifiable(children);
+  final UiScrollAxis axis;
+  @override
+  final List<UiNode> children;
+  @override
+  Map<String, Object> props() => {
+    'kind': 'scroll',
+    'id': id,
+    if (semantics != null) 'semantics': semantics!.toJson('scroll'),
+    if (style != null) 'style': style!.toJson(),
+    if (axis != UiScrollAxis.vertical) 'axis': axis.wire,
+  };
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
+    'children': children.map((child) => child.toJson()).toList(),
+  };
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;

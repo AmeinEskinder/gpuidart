@@ -35,7 +35,10 @@ final class UiSemantics {
       throw ArgumentError('Semantics label must contain 1..1024 UTF-8 bytes');
     }
     final allowed = switch (kind) {
-      'row' || 'column' => {UiRole.group, UiRole.list, UiRole.listItem},
+      'row' ||
+      'column' ||
+      'stack' ||
+      'scroll' => {UiRole.group, UiRole.list, UiRole.listItem},
       'text' => {UiRole.label, UiRole.heading},
       'button' || 'confirm_dialog' => {UiRole.button},
       'checkbox' => {UiRole.checkbox},

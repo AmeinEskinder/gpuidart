@@ -4,8 +4,8 @@ use crate::{
     Command, Events,
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Event, FontWeight as StyleFontWeight,
-        Justify as StyleJustify, KeystrokeSpec, Node, Size as StyleSize, Snapshot, Style,
-        TableView, ThemeToken,
+        Justify as StyleJustify, KeystrokeSpec, Node, ScrollAxis, Size as StyleSize, Snapshot,
+        Style, TableView, ThemeToken,
     },
 };
 use async_channel::Receiver;
@@ -233,6 +233,8 @@ pub(crate) struct DartView {
     /// Checkbox values toggled by the user since the last commit. Shown until
     /// the next publication, whose values are authoritative.
     checkbox_shown: Rc<RefCell<HashMap<String, bool>>>,
+    /// Scroll containers keep their offset by ID across publications.
+    scrolls: HashMap<String, ScrollHandle>,
     tables: HashMap<String, RetainedTable>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
@@ -294,6 +296,17 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<_, _>>();
+        let scrolls = self
+            .scrolls
+            .iter()
+            .map(|(id, handle)| {
+                let offset = handle.offset();
+                (
+                    id.clone(),
+                    json!({"x": f32::from(offset.x), "y": f32::from(offset.y)}),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>();
         let mut labels = serde_json::Map::new();
         self.snapshot.root.visit(&mut |node| {
             if let Node::Text { id, text, .. } = node {
@@ -313,7 +326,7 @@ impl DartView {
         }
         let frames = window.frame_duration_snapshot();
         let input = window.input_latency_snapshot();
-        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "controls": self.inspect_controls(window, cx),
+        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -386,6 +399,7 @@ impl DartView {
             selects: HashMap::new(),
             active_dialog: Default::default(),
             checkbox_shown: Default::default(),
+            scrolls: HashMap::new(),
             tables: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
@@ -769,9 +783,16 @@ impl DartView {
         self.reconcile_controls(window, cx);
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
+        let mut scroll_ids = HashSet::new();
         let mut changed_views = Vec::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
+            Node::Scroll { id, .. } => {
+                scroll_ids.insert(id.clone());
+                self.scrolls
+                    .entry(id.clone())
+                    .or_insert_with(ScrollHandle::new);
+            }
             Node::Input {
                 id,
                 placeholder,
@@ -952,6 +973,7 @@ impl DartView {
             return Err(message);
         }
         self.inputs.retain(|id, _| input_ids.contains(id));
+        self.scrolls.retain(|id, _| scroll_ids.contains(id));
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
@@ -1020,7 +1042,7 @@ impl DartView {
             if node.id() == target {
                 return true;
             }
-            if let Node::Column { children, .. } | Node::Row { children, .. } = node {
+            if let Some(children) = node.children() {
                 for child in children {
                     if visit(child, target, trail) {
                         return true;
@@ -1080,6 +1102,81 @@ impl DartView {
                 colors,
             )
             .into_any_element(),
+            Node::Stack { children, .. } => apply_node_style(
+                annotate(div().id(id), node)
+                    .test_support()
+                    .relative()
+                    .children(
+                        children
+                            .iter()
+                            .map(|child| {
+                                let mut layer = div().absolute();
+                                layer = match child.style().and_then(|style| style.inset) {
+                                    Some(inset) => {
+                                        if let Some(top) = inset.top {
+                                            layer = layer.top(px(top));
+                                        }
+                                        if let Some(right) = inset.right {
+                                            layer = layer.right(px(right));
+                                        }
+                                        if let Some(bottom) = inset.bottom {
+                                            layer = layer.bottom(px(bottom));
+                                        }
+                                        if let Some(left) = inset.left {
+                                            layer = layer.left(px(left));
+                                        }
+                                        layer
+                                    }
+                                    None => layer.inset_0(),
+                                };
+                                self.materialize(child, colors, cx)
+                                    .map(|element| layer.child(element))
+                            })
+                            .collect::<Result<Vec<_>, _>>()?,
+                    ),
+                node,
+                colors,
+            )
+            .into_any_element(),
+            Node::Scroll {
+                id: scroll_id,
+                axis,
+                children,
+                ..
+            } => {
+                let handle = self
+                    .scrolls
+                    .get(scroll_id)
+                    .ok_or_else(|| format!("Missing retained scroll: {scroll_id}"))?;
+                let content = match axis {
+                    ScrollAxis::Horizontal => div().h_flex(),
+                    ScrollAxis::Vertical | ScrollAxis::Both => div().v_flex(),
+                }
+                .gap_3()
+                .children(
+                    children
+                        .iter()
+                        .map(|child| self.materialize(child, colors, cx))
+                        .collect::<Result<Vec<_>, _>>()?,
+                );
+                let mut container = annotate(div().id(id), node)
+                    .test_support()
+                    .track_scroll(handle)
+                    .child(content);
+                container = match axis {
+                    ScrollAxis::Vertical => {
+                        container.overflow_y_scroll().vertical_scrollbar(handle)
+                    }
+                    ScrollAxis::Horizontal => {
+                        container.overflow_x_scroll().horizontal_scrollbar(handle)
+                    }
+                    ScrollAxis::Both => container
+                        .overflow_scroll()
+                        .vertical_scrollbar(handle)
+                        .horizontal_scrollbar(handle),
+                };
+                apply_node_style(container, node, colors).into_any_element()
+            }
             Node::Text { text, .. } => apply_node_style(
                 annotate(div().id(id), node)
                     .test_support()
@@ -1284,6 +1381,27 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     }
     if let Some(height) = style.height {
         element = element.h(style_length(height));
+    }
+    if let Some(size) = style.min_width {
+        element = element.min_w(style_length(size));
+    }
+    if let Some(size) = style.max_width {
+        element = element.max_w(style_length(size));
+    }
+    if let Some(size) = style.min_height {
+        element = element.min_h(style_length(size));
+    }
+    if let Some(size) = style.max_height {
+        element = element.max_h(style_length(size));
+    }
+    if let Some(flex) = style.flex {
+        // Like Flutter's Expanded: share the remaining space from a zero
+        // basis instead of adding to the content size.
+        element = if flex > 0. {
+            element.flex_grow(flex).flex_shrink(1.).flex_basis(px(0.))
+        } else {
+            element.flex_none()
+        };
     }
     if let Some(align) = style.align {
         element = match align {

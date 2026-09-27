@@ -197,36 +197,13 @@ pub(crate) fn children(node: &Node) -> Result<&Vec<Node>, String> {
     }
 }
 fn children_mut(node: &mut Node) -> Result<&mut Vec<Node>, String> {
-    match node {
-        Node::Column { children, .. } | Node::Row { children, .. } => Ok(children),
-        _ => Err("Target has no children".into()),
-    }
+    crate::protocol::children_mut(node).ok_or_else(|| "Target has no children".into())
 }
 fn find_mut<'a>(node: &'a mut Node, id: &str) -> Option<&'a mut Node> {
-    if node.id() == id {
-        return Some(node);
-    }
-    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
-        for child in children {
-            if let Some(found) = find_mut(child, id) {
-                return Some(found);
-            }
-        }
-    }
-    None
+    crate::protocol::find_mut(node, id)
 }
 fn remove(node: &mut Node, id: &str) -> Option<Node> {
-    if let Node::Column { children, .. } | Node::Row { children, .. } = node {
-        if let Some(index) = children.iter().position(|child| child.id() == id) {
-            return Some(children.remove(index));
-        }
-        for child in children {
-            if let Some(found) = remove(child, id) {
-                return Some(found);
-            }
-        }
-    }
-    None
+    crate::protocol::detach(node, id)
 }
 fn state_owners(root: &Node) -> Result<HashMap<String, String>, String> {
     let mut owners = HashMap::new();

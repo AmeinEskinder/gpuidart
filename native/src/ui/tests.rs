@@ -307,6 +307,119 @@ fn updates_apply_operations_atomically_and_retain_native_entities(cx: &mut TestA
 }
 
 #[gpui::test]
+fn layout_primitives_size_position_and_retain_scroll_offsets(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, label: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","style":{{"gap":0}},"children":[
+                {{"kind":"row","id":"bar","style":{{"gap":0,"width":{{"px":600}}}},"children":[
+                    {{"kind":"text","id":"fixed","text":"Fixed","style":{{"width":{{"px":100}}}}}},
+                    {{"kind":"text","id":"grow","text":"Grow","style":{{"flex":1}}}},
+                    {{"kind":"text","id":"grow2","text":"Grow2","style":{{"flex":2}}}}
+                ]}},
+                {{"kind":"stack","id":"stack","style":{{"width":{{"px":300}},"height":{{"px":200}}}},"children":[
+                    {{"kind":"text","id":"under","text":"{label}"}},
+                    {{"kind":"text","id":"badge","text":"Badge","style":{{"inset":{{"top":10,"left":20}},"width":{{"px":40}},"height":{{"px":16}}}}}}
+                ]}},
+                {{"kind":"scroll","id":"list","style":{{"height":{{"px":120}}}},"children":[
+                    {{"kind":"text","id":"l0","text":"0","style":{{"height":{{"px":100}}}}}},
+                    {{"kind":"text","id":"l1","text":"1","style":{{"height":{{"px":100}}}}}},
+                    {{"kind":"text","id":"l2","text":"2","style":{{"height":{{"px":100}}}}}}
+                ]}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(
+            WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(Bounds {
+                    origin: Point::default(),
+                    size: size(px(900.), px(700.)),
+                })),
+                ..Default::default()
+            },
+            cx,
+            |window, cx| {
+                cx.new(|cx| {
+                    DartView::new(
+                        Initial {
+                            window: Default::default(),
+                            snapshot: snapshot(1, "Under"),
+                            datasets: vec![],
+                        },
+                        Events(Arc::new(|_| {})),
+                        window,
+                        cx,
+                    )
+                })
+            },
+        )
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let fixed = window.find("fixed").bounds();
+        let grow = window.find("grow").bounds();
+        let grow2 = window.find("grow2").bounds();
+        assert_eq!(fixed.size.width, px(100.));
+        let remaining = px(500.);
+        assert!(
+            (grow.size.width - remaining / 3.).abs() < px(1.),
+            "{grow:?}"
+        );
+        assert!(
+            (grow2.size.width - remaining * 2. / 3.).abs() < px(1.),
+            "{grow2:?}"
+        );
+        let stack = window.find("stack").bounds();
+        let under = window.find("under").bounds();
+        let badge = window.find("badge").bounds();
+        assert_eq!(stack.size, size(px(300.), px(200.)));
+        assert_eq!(
+            under.origin, stack.origin,
+            "a child without inset sits at the stack's top left"
+        );
+        assert_eq!(under.size.width, px(300.));
+        assert!(under.size.height < px(200.), "and keeps its own height");
+        assert_eq!(badge.origin, stack.origin + point(px(20.), px(10.)));
+        assert_eq!(badge.size, size(px(40.), px(16.)));
+
+        window.scroll("list", ScrollDelta::Pixels(point(px(0.), px(-150.))), cx);
+        window.render_frame(cx);
+        let before = view.read(cx).inspect(window, cx);
+        let offset = before["scrolls"]["list"]["y"].as_f64().unwrap();
+        assert!(offset < 0., "the scroll container moved: {before}");
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(2, "Changed"), window, cx)
+        });
+        window.render_frame(cx);
+        let after = view.read(cx).inspect(window, cx);
+        assert_eq!(after["labels"]["under"], "Changed");
+        assert_eq!(after["scrolls"]["list"]["y"].as_f64().unwrap(), offset);
+        view.update(cx, |view, cx| {
+            view.publish(
+                Snapshot::parse(
+                    br#"{"revision":3,"root":{"kind":"text","id":"root","text":"Gone"}}"#,
+                )
+                .unwrap(),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        assert!(
+            view.read(cx).scrolls.is_empty(),
+            "removed scroll containers drop their handle"
+        );
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn startup_paint_marker_requires_content_paint_and_is_emitted_once(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let trace = Arc::new(crate::trace::Trace::default());
