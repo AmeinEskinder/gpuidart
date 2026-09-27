@@ -1,0 +1,20 @@
+--- committed/linux.py
++++ diagnostic/linux.py
+@@ -1,6 +1,8 @@
+ """External AT-SPI client for the SDK's owned test window (X11 CI)."""
+ import json
+ import sys
++import subprocess
++import time
+ 
+ import gi
+ 
+@@ -64,6 +66,8 @@
+                 raise RuntimeError("Hover target has no bounds")
+             details["bounds"] = [rect.x, rect.y, rect.width, rect.height]
+             accepted = Atspi.generate_mouse_event(rect.x + rect.width // 2, rect.y + rect.height // 2, "abs")
++            time.sleep(.05)
++            details["pointer"] = subprocess.run(["xdotool", "getmouselocation", "--shell"], capture_output=True, text=True).stdout
+         elif operation == "set-value":
+             accepted = element.get_editable_text_iface().set_text_contents(value)
+         elif operation == "set-range":

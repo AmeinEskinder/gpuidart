@@ -9,6 +9,7 @@ Future<void> main(List<String> args) async {
     throw StateError('Refusing to replace ${output.path}');
   }
   output.parent.createSync(recursive: true);
+  await Directory('.cache').create(recursive: true);
   final fixture = await Directory('.cache').createTemp('terminal-reload-');
   await Directory('${fixture.path}/terminal').create();
   await Directory('${fixture.path}/watchlist').create();

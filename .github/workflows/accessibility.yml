@@ -82,7 +82,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           mkdir -p build/accessibility
-          dbus-run-session -- xvfb-run -a -s '-screen 0 1280x800x24' bash -e -o pipefail <<'PROBE'
+          xvfb-run -a -s '-screen 0 1280x800x24' dbus-run-session -- bash -e -o pipefail <<'PROBE'
           unset WAYLAND_DISPLAY ZED_HEADLESS
           export GPUIDART_CAPTURE_FAILURE=1
           openbox >build/accessibility/openbox.log 2>&1 &

@@ -1,0 +1,3973 @@
+{
+  "passed": false,
+  "platform": "windows",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"windows_x64\"",
+  "mode": "jit",
+  "rows": 100000,
+  "scope": "Real native window and GPUI key dispatch. External OS queries when requested; no visual, screen-reader or latency claim.",
+  "semantics": true,
+  "steps": [
+    {
+      "step": "100k initial table and navigation",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": null,
+          "query": "",
+          "ticks": 0,
+          "instruments_revision": 1,
+          "history_revision": 1,
+          "events": {
+            "table_selection": 1,
+            "click": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 1,
+          "native_process_id": 5004,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 0,
+                "end": 10
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 1,
+              "scroll_y": 0.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": null,
+                "record": null
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "No instrument selected",
+            "terminal-notice": "Select an instrument to inspect its sample history."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.25,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 4,
+            "rows_constructed": 48,
+            "cells_constructed": 248,
+            "data_records_checked": 0,
+            "data_cells_written": 0,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 4,
+            "p50_us": 20627.455,
+            "p95_us": 35979.263,
+            "p99_us": 35979.263
+          },
+          "dirty_to_present_submit": {
+            "samples": 3,
+            "p50_us": 21102.591,
+            "p95_us": 35258.367,
+            "p99_us": 35258.367
+          },
+          "present_interval": {
+            "samples": 1,
+            "p50_us": 21495.807,
+            "p95_us": 21495.807,
+            "p99_us": 21495.807
+          },
+          "input_to_frame": {
+            "samples": 0,
+            "p50_us": 0.0,
+            "p95_us": 0.0,
+            "p99_us": 0.0
+          }
+        },
+        "metrics": {
+          "description_builds": 1,
+          "encoded_snapshots": 0,
+          "encoded_bytes": 0,
+          "ffi_callbacks": 5,
+          "ui_callbacks": 0,
+          "diagnostic_callbacks": 3,
+          "description_build": {
+            "samples": 1,
+            "p50_us": 3309,
+            "p95_us": 3309,
+            "p99_us": 3309
+          },
+          "encode": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "publish_to_applied": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 117287
+          },
+          "data_messages": 0,
+          "data_bytes": 0,
+          "data_records_checked": 0,
+          "data_cells_written": 0,
+          "data_encode": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "data_publish_to_applied": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_data_parse": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_data_apply": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_snapshot_apply": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          }
+        },
+        "platform": {
+          "nodes": [
+            {
+              "name": "Market terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.MenuBar",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "View",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Data",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Market terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "terminal-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Fictitious instruments and history. No live feed or trading.",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "sample-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Terminal pages",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Tab",
+              "id": "pages",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Watchlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"watchlist\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": true
+            },
+            {
+              "name": "Instrument",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"instrument\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "Settings",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"settings\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "Search instruments by symbol",
+              "description": "",
+              "help": "Search symbol",
+              "role": "ControlType.Edit",
+              "id": "search",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "",
+              "read_only": false
+            },
+            {
+              "name": "Simulate price update",
+              "description": "Update the selected sample price by 0.07",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "tick",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Open instrument",
+              "description": "Show price and volume history for the selected instrument",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "open-instrument",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Show shortlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "shortlist-filter",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Sort by price",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "sort-price",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Instruments",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Table",
+              "id": "watchlist",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Symbol",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Company",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Price",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Change",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Shortlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0000\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ALP0000",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Alpine Research",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.00",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.20",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0000\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0001\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "BRK0001",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Brookfield Labs",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.07",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.07",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0001\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0002\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "CED0002",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Cedar Systems",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.14",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.06",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0002\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0003\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "DLT0003",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Delta Works",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.21",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.19",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0003\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0004\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ELM0004",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Elm Networks",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.28",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.09",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0004\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0005\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "FIR0005",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Fir Energy",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.35",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.04",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0005\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0006\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "GLN0006",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Glen Robotics",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.42",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.17",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0006\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0007\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "HBR0007",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Harbor Design",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.49",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.11",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0007\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0008\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ALP0008",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Alpine Research",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.56",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.02",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0008\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0009\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "BRK0009",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0009\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Brookfield Labs",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0009\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "100.63",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0009\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.15",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0009\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0009\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "No instrument selected",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "selection",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Select an instrument to inspect its sample history.",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "terminal-notice",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            }
+          ],
+          "context": {
+            "cursor": [
+              855,
+              677
+            ],
+            "foreground_process": 40084
+          },
+          "api": "UIAutomationClient",
+          "process": 5004
+        }
+      }
+    },
+    {
+      "step": "stable selected record loads history once",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 0,
+          "instruments_revision": 1,
+          "history_revision": 2,
+          "events": {
+            "table_selection": 1,
+            "click": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 2,
+          "native_process_id": 5004,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 16,
+                "end": 26
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 1,
+              "scroll_y": -536.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": 25,
+                "record": "BRK0025"
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Selected BRK0025."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.25,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 8,
+            "rows_constructed": 96,
+            "cells_constructed": 496,
+            "data_records_checked": 48,
+            "data_cells_written": 192,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 8,
+            "p50_us": 22708.223,
+            "p95_us": 35979.263,
+            "p99_us": 35979.263
+          },
+          "dirty_to_present_submit": {
+            "samples": 7,
+            "p50_us": 24133.631,
+            "p95_us": 35258.367,
+            "p99_us": 35258.367
+          },
+          "present_interval": {
+            "samples": 4,
+            "p50_us": 23855.103,
+            "p95_us": 674234.367,
+            "p99_us": 674234.367
+          },
+          "input_to_frame": {
+            "samples": 0,
+            "p50_us": 0.0,
+            "p95_us": 0.0,
+            "p99_us": 0.0
+          }
+        },
+        "metrics": {
+          "description_builds": 2,
+          "encoded_snapshots": 1,
+          "encoded_bytes": 3317,
+          "ffi_callbacks": 11,
+          "ui_callbacks": 1,
+          "diagnostic_callbacks": 6,
+          "description_build": {
+            "samples": 2,
+            "p50_us": 3309,
+            "p95_us": 3309,
+            "p99_us": 3309
+          },
+          "encode": {
+            "samples": 1,
+            "p50_us": 195,
+            "p95_us": 195,
+            "p99_us": 195
+          },
+          "publish_to_applied": {
+            "samples": 1,
+            "p50_us": 22749,
+            "p95_us": 22749,
+            "p99_us": 22749
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 117287
+          },
+          "data_messages": 1,
+          "data_bytes": 2405,
+          "data_records_checked": 48,
+          "data_cells_written": 192,
+          "data_encode": {
+            "samples": 1,
+            "p50_us": 235,
+            "p95_us": 235,
+            "p99_us": 235
+          },
+          "data_publish_to_applied": {
+            "samples": 1,
+            "p50_us": 26049,
+            "p95_us": 26049,
+            "p99_us": 26049
+          },
+          "native_data_parse": {
+            "samples": 1,
+            "p50_us": 225,
+            "p95_us": 225,
+            "p99_us": 225
+          },
+          "native_data_apply": {
+            "samples": 1,
+            "p50_us": 98,
+            "p95_us": 98,
+            "p99_us": 98
+          },
+          "native_snapshot_apply": {
+            "samples": 1,
+            "p50_us": 400,
+            "p95_us": 400,
+            "p99_us": 400
+          }
+        },
+        "platform": {
+          "nodes": [
+            {
+              "name": "Market terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.MenuBar",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "View",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Data",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Market terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "terminal-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Fictitious instruments and history. No live feed or trading.",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "sample-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Terminal pages",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Tab",
+              "id": "pages",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Watchlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"watchlist\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": true
+            },
+            {
+              "name": "Instrument",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"instrument\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "Settings",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"settings\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "Search instruments by symbol",
+              "description": "",
+              "help": "Search symbol",
+              "role": "ControlType.Edit",
+              "id": "search",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "",
+              "read_only": false
+            },
+            {
+              "name": "Simulate price update",
+              "description": "Update the selected sample price by 0.07",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "tick",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Open instrument",
+              "description": "Show price and volume history for the selected instrument",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "open-instrument",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Show shortlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "shortlist-filter",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Sort by price",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "sort-price",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Instruments",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Table",
+              "id": "watchlist",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Symbol",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Company",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Price",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Change",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Shortlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0016\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ALP0016",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Alpine Research",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.12",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.17",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0017\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "BRK0017",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Brookfield Labs",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.19",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.04",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0018\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "CED0018",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Cedar Systems",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.26",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.09",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0019\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "DLT0019",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Delta Works",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.33",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.19",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0020\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ELM0020",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Elm Networks",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.40",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.06",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0021\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "FIR0021",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Fir Energy",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.47",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.07",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0022\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "GLN0022",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Glen Robotics",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.54",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.20",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0023\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "HBR0023",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Harbor Design",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.61",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.08",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0024\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ALP0024",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Alpine Research",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.68",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.05",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": true
+            },
+            {
+              "name": "BRK0025",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Brookfield Labs",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.75",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.18",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "BRK0025",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "selection",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Selected BRK0025.",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "terminal-notice",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            }
+          ],
+          "context": {
+            "cursor": [
+              777,
+              593
+            ],
+            "foreground_process": 40084
+          },
+          "api": "UIAutomationClient",
+          "process": 5004
+        }
+      }
+    },
+    {
+      "step": "button tick edits selected record",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 4,
+          "native_process_id": 5004,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 16,
+                "end": 26
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 2,
+              "scroll_y": -536.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": 25,
+                "record": "BRK0025"
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(11v1))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.25,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 23,
+            "rows_constructed": 276,
+            "cells_constructed": 1426,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 23,
+            "p50_us": 34275.327,
+            "p95_us": 39616.511,
+            "p99_us": 41058.303
+          },
+          "dirty_to_present_submit": {
+            "samples": 20,
+            "p50_us": 35487.743,
+            "p95_us": 41975.807,
+            "p99_us": 44007.423
+          },
+          "present_interval": {
+            "samples": 14,
+            "p50_us": 39944.191,
+            "p95_us": 674234.367,
+            "p99_us": 674234.367
+          },
+          "input_to_frame": {
+            "samples": 1,
+            "p50_us": 110297.087,
+            "p95_us": 110297.087,
+            "p99_us": 110297.087
+          }
+        },
+        "metrics": {
+          "description_builds": 4,
+          "encoded_snapshots": 3,
+          "encoded_bytes": 9960,
+          "ffi_callbacks": 24,
+          "ui_callbacks": 2,
+          "diagnostic_callbacks": 14,
+          "description_build": {
+            "samples": 4,
+            "p50_us": 40,
+            "p95_us": 3309,
+            "p99_us": 3309
+          },
+          "encode": {
+            "samples": 3,
+            "p50_us": 317,
+            "p95_us": 399,
+            "p99_us": 399
+          },
+          "publish_to_applied": {
+            "samples": 3,
+            "p50_us": 1598,
+            "p95_us": 22749,
+            "p99_us": 22749
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 117287
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 235,
+            "p99_us": 235
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 683,
+            "p95_us": 26049,
+            "p99_us": 26049
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 75,
+            "p95_us": 225,
+            "p99_us": 225
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 98,
+            "p95_us": 103,
+            "p99_us": 103
+          },
+          "native_snapshot_apply": {
+            "samples": 3,
+            "p50_us": 163,
+            "p95_us": 400,
+            "p99_us": 400
+          }
+        },
+        "platform": {
+          "nodes": [
+            {
+              "name": "Market terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Window",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "WindowPatternIdentifiers.Pattern",
+                "TransformPatternIdentifiers.Pattern"
+              ],
+              "modal": false
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Group",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.MenuBar",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "View",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Data",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Market terminal",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "terminal-title",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Fictitious instruments and history. No live feed or trading.",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "sample-note",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Terminal pages",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Tab",
+              "id": "pages",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Watchlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"watchlist\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": true
+            },
+            {
+              "name": "Instrument",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"instrument\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "Settings",
+              "description": "",
+              "help": "",
+              "role": "ControlType.TabItem",
+              "id": "[\"pages\",\"tab\",\"settings\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "Search instruments by symbol",
+              "description": "",
+              "help": "Search symbol",
+              "role": "ControlType.Edit",
+              "id": "search",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "ValuePatternIdentifiers.Pattern",
+                "TextPatternIdentifiers.Pattern"
+              ],
+              "value": "",
+              "read_only": false
+            },
+            {
+              "name": "Simulate price update",
+              "description": "Update the selected sample price by 0.07",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "tick",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Open instrument",
+              "description": "Show price and volume history for the selected instrument",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "open-instrument",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Show shortlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "shortlist-filter",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Sort by price",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Button",
+              "id": "sort-price",
+              "enabled": true,
+              "focused": false,
+              "focusable": true,
+              "offscreen": false,
+              "patterns": [
+                "InvokePatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Instruments",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Table",
+              "id": "watchlist",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionPatternIdentifiers.Pattern"
+              ]
+            },
+            {
+              "name": "Symbol",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Company",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Price",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Change",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Shortlist",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"column\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0016\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ALP0016",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Alpine Research",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.12",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.17",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0016\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0017\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "BRK0017",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Brookfield Labs",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.19",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.04",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0017\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"CED0018\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "CED0018",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Cedar Systems",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.26",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.09",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"CED0018\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"DLT0019\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "DLT0019",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Delta Works",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.33",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.19",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"DLT0019\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ELM0020\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ELM0020",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Elm Networks",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.40",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.06",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ELM0020\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"FIR0021\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "FIR0021",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Fir Energy",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.47",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.07",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"FIR0021\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"GLN0022\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "GLN0022",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Glen Robotics",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.54",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.20",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"GLN0022\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"HBR0023\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "HBR0023",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Harbor Design",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.61",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "-0.08",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"HBR0023\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"ALP0024\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": false
+            },
+            {
+              "name": "ALP0024",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Alpine Research",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.68",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.05",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"ALP0024\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"watchlist\",\"instruments\",\"record\",\"BRK0025\"]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": [
+                "SelectionItemPatternIdentifiers.Pattern"
+              ],
+              "selected": true
+            },
+            {
+              "name": "BRK0025",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",0]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Brookfield Labs",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",1]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "101.82",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",2]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "0.18",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",3]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "",
+              "description": "",
+              "help": "",
+              "role": "ControlType.DataItem",
+              "id": "[\"[\\\"watchlist\\\",\\\"instruments\\\",\\\"record\\\",\\\"BRK0025\\\"]\",\"cell\",4]",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "BRK0025",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "selection",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            },
+            {
+              "name": "Updated BRK0025 to 101.82.",
+              "description": "",
+              "help": "",
+              "role": "ControlType.Text",
+              "id": "terminal-notice",
+              "enabled": true,
+              "focused": false,
+              "focusable": false,
+              "offscreen": false,
+              "patterns": []
+            }
+          ],
+          "context": {
+            "cursor": [
+              777,
+              593
+            ],
+            "foreground_process": 40084
+          },
+          "api": "UIAutomationClient",
+          "process": 5004
+        }
+      }
+    }
+  ],
+  "error": "Bad state: Platform client exited 1: Pointer move failed\r\nAt D:\\Dev\\gpuidart\\tool\\accessibility\\windows.ps1:41 char:142\r\n+ ... nt]($bounds.Y + $bounds.Height / 2))) { throw 'Pointer move failed' }\r\n+                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : OperationStopped: (Pointer move failed:String) [], RuntimeException\r\n    + FullyQualifiedErrorId : Pointer move failed\r\n \r\n\n\nrestarts=[]",
+  "stack": "#0      platformQuery (file:///D:/Dev/gpuidart/tool/accessibility/client.dart:72:7)\n<asynchronous suspension>\n#1      verifyTerminalTooltip (file:///D:/Dev/gpuidart/tool/accessibility/terminal_track.dart:128:3)\n<asynchronous suspension>\n#2      main (file:///D:/Dev/gpuidart/tool/verify_terminal.dart:103:27)\n<asynchronous suspension>\n"
+}

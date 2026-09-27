@@ -320,3 +320,35 @@ Linux's next capture showed corrected screen bounds `[160, 242, 198, 32]`, but
 still no tooltip. The bounds fix is necessary and not sufficient to close that
 failure. A failed private-Xvfb capture and matching Linux library are now retained
 for direct reproduction; no tooltip pass is inferred from corrected coordinates.
+
+
+### Linux pointer delivery and fresh-checkout reload setup
+
+At `17cb8c7`, Windows UIA and macOS AX passed all 15 terminal steps, including
+actual menu invocation, chart alternatives and theme/draft remount. Both AOT
+interaction checks passed. Their reload scripts failed before launch because
+`.cache` did not exist in a fresh checkout. The script now creates that parent
+before allocating its source fixture. The [failed logs and reports](attempts/17cb8c7/)
+remain available; the missing reload report was not treated as success.
+
+The Linux failure screenshot confirmed the corrected AT-SPI bounds matched the
+rendered button. A local Ubuntu 24.04 container reproduced the failure with the
+exact CI library and a Dart kernel compiled from the verifier, executed by Linux
+Dart 3.13.4. A temporary xdotool observation after AT-SPI injection showed the
+pointer still at `(640, 400)` while AT-SPI returned accepted for `(259, 258)`.
+The diagnostic-only [probe delta](attempts/17cb8c7/linux-pointer-observation.patch)
+is retained; it is not a product dependency.
+
+D-Bus was launched outside Xvfb. Its activated AT-SPI registry therefore lacked
+the display environment required to inject X11 input, even though tree queries
+and semantic actions worked. Reversing the launch order to start D-Bus inside
+Xvfb delivered the pointer event and passed all 15 Linux steps. The original
+window-bounds defect and the service environment defect were independent; both
+fixes are retained. [Local before/after reports](attempts/17cb8c7/) are diagnostic
+captures; the hosted all-platform rerun is the release gate.
+
+Later local Windows hover attempts encountered unavailable pointer movement and
+one missing tooltip. They are failed runs, not replacement passes. The Windows
+probe now records foreground PID and physical cursor coordinates, and reports
+Win32 failure details on a rejected move. Those fields describe test conditions;
+they do not retry input or turn a failed assertion into success.

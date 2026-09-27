@@ -8,9 +8,18 @@ param(
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+Add-Type -Path (Join-Path $PSScriptRoot 'windows_pointer.cs')
+function PointerObservation {
+    $point = New-Object TerminalPointer+Point
+    $position = if ([TerminalPointer]::GetPhysicalCursorPos([ref]$point)) { @($point.X, $point.Y) } else { $null }
+    return @{ foreground_process = [TerminalPointer]::ForegroundProcess(); cursor = $position }
+}
 $condition = New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ProcessIdProperty, $AppProcessId)
 $window = [System.Windows.Automation.AutomationElement]::RootElement.FindFirst([System.Windows.Automation.TreeScope]::Children, $condition)
-if ($null -eq $window) { throw "No UIA window for process $AppProcessId" }
+if ($null -eq $window) {
+    $owned = Get-Process -Id $AppProcessId -ErrorAction SilentlyContinue
+    throw "No UIA window for process $AppProcessId; alive=$($null -ne $owned); native_handle=$($owned.MainWindowHandle); context=$(PointerObservation | ConvertTo-Json -Compress)"
+}
 $elements = $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [System.Windows.Automation.Condition]::TrueCondition)
 if ($elements.Count -gt 4096) { throw "UIA tree exceeds probe bound: $($elements.Count)" }
 if ($Operation -ne 'query') {
@@ -25,12 +34,11 @@ if ($Operation -ne 'query') {
             $details.pattern = 'Invoke'
         }
         hover {
-            Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public static class TerminalPointer { [DllImport("user32.dll")] public static extern bool SetPhysicalCursorPos(int x, int y); [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }'
             $bounds = $element.Current.BoundingRectangle
             $details.bounds = @($bounds.X, $bounds.Y, $bounds.Width, $bounds.Height)
             if ($bounds.IsEmpty -or $bounds.Width -le 0 -or $bounds.Height -le 0) { throw 'Hover target has no bounds' }
             [void][TerminalPointer]::SetForegroundWindow([IntPtr]$window.Current.NativeWindowHandle)
-            if (-not [TerminalPointer]::SetPhysicalCursorPos([int]($bounds.X + $bounds.Width / 2), [int]($bounds.Y + $bounds.Height / 2))) { throw 'Pointer move failed' }
+            if (-not [TerminalPointer]::SetPhysicalCursorPos([int]($bounds.X + $bounds.Width / 2), [int]($bounds.Y + $bounds.Height / 2))) { throw "Pointer move failed: Win32=$([Runtime.InteropServices.Marshal]::GetLastWin32Error()); bounds=$($details.bounds); context=$(PointerObservation | ConvertTo-Json -Compress)" }
         }
         invoke { $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke() }
         toggle { $element.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern).Toggle() }
@@ -39,7 +47,7 @@ if ($Operation -ne 'query') {
         focus { $element.SetFocus() }
         select { $element.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select() }
     }
-    @{ api = 'UIAutomationClient'; operation = $Operation; accepted = $true; details = $details } | ConvertTo-Json -Compress
+    @{ api = 'UIAutomationClient'; operation = $Operation; accepted = $true; details = $details; context = (PointerObservation) } | ConvertTo-Json -Compress
     exit
 }
 Add-Type -Path (Join-Path $PSScriptRoot 'windows_description.cs')
@@ -83,4 +91,4 @@ foreach ($element in $elements) {
     if ($element.TryGetCurrentPattern([System.Windows.Automation.GridItemPattern]::Pattern, [ref]$pattern)) { $node.row = $pattern.Current.Row; $node.column = $pattern.Current.Column }
     $nodes += $node
 }
-@{ api = 'UIAutomationClient'; process = $AppProcessId; nodes = $nodes } | ConvertTo-Json -Depth 8 -Compress
+@{ api = 'UIAutomationClient'; process = $AppProcessId; context = (PointerObservation); nodes = $nodes } | ConvertTo-Json -Depth 8 -Compress
