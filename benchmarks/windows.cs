@@ -55,8 +55,17 @@ public static class BenchmarkWindow {
     [DllImport("kernel32.dll", SetLastError = true)] static extern bool SetWaitableTimer(IntPtr timer, ref long dueTime, int period, IntPtr callback, IntPtr argument, bool resume);
     [DllImport("kernel32.dll")] static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
     [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr handle);
+    [DllImport("kernel32.dll")] static extern IntPtr GetCurrentProcess();
+    [DllImport("kernel32.dll")] static extern IntPtr GetCurrentThread();
+    [DllImport("kernel32.dll")] static extern bool SetPriorityClass(IntPtr process, uint priorityClass);
+    [DllImport("kernel32.dll")] static extern bool SetThreadPriority(IntPtr thread, int priority);
+    [DllImport("ntdll.dll")] static extern int NtQueryTimerResolution(out uint maximum, out uint minimum, out uint current);
     static IntPtr driverTimer;
     public static int ActivationClicks { get; private set; }
+
+    /// The system timer resolution in place while the driver runs, in 100 ns units.
+    public static uint TimerResolution { get; private set; }
+    public static bool ElevatedPriority { get; private set; }
 
     public static void Initialize() {
         SetProcessDPIAware();
@@ -64,8 +73,25 @@ public static class BenchmarkWindow {
         driverTimer = CreateWaitableTimerExW(IntPtr.Zero, null, 2, 0x00100002);
         if (driverTimer == IntPtr.Zero) throw new InvalidOperationException("Cannot create high resolution driver timer: " + Marshal.GetLastWin32Error());
         timeBeginPeriod(1);
+        uint maximum, minimum, current;
+        TimerResolution = NtQueryTimerResolution(out maximum, out minimum, out current) == 0 ? current : 0;
+        // The driver competes with the fixture for the CPU; a higher class keeps
+        // its one-millisecond wakeups from landing behind the fixture's frames.
+        ElevatedPriority = SetPriorityClass(GetCurrentProcess(), 0x80) && SetThreadPriority(GetCurrentThread(), 2);
     }
-    public static void Finish() { timeEndPeriod(1); if (driverTimer != IntPtr.Zero) CloseHandle(driverTimer); driverTimer = IntPtr.Zero; }
+    public static void Finish() {
+        SetThreadPriority(GetCurrentThread(), 0);
+        SetPriorityClass(GetCurrentProcess(), 0x20);
+        timeEndPeriod(1);
+        if (driverTimer != IntPtr.Zero) CloseHandle(driverTimer);
+        driverTimer = IntPtr.Zero;
+    }
+    /// Pays the first-call costs of the input path before the measured window:
+    /// a zero-length pointer move through SendInput and one timer wait.
+    public static void Warm() {
+        Mouse(Packet(0x0001, 0));
+        Pause();
+    }
     public static void Pause() {
         long dueTime = -10000; // Relative time in 100 ns units: one millisecond.
         if (!SetWaitableTimer(driverTimer, ref dueTime, 0, IntPtr.Zero, IntPtr.Zero, false) || WaitForSingleObject(driverTimer, 2000) != 0)

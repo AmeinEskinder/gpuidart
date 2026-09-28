@@ -19,6 +19,8 @@ Memory was the stable difference. Across both series and all four workloads the 
 
 Qualifications: Flutter rebuilds every row in its cache extent on each `setState` (18 rows per click, 5,400 row builds in a burst run) where the Dart fixture edits one record and the native table repaints; Flutter's `FrameTiming` histograms and the native draw histograms have different scopes and estimators and are listed per run, not compared; every Flutter scroll run and two Dart scroll runs missed at least one driver deadline, so they sit outside the equal-work subset; presentation is still unmeasured for both. The [wheel calibration](calibration-flutter/calibration.json) gives Flutter 80 logical pixels per -120 notch, so the runner sends -117 for the shared 78-pixel step; Flutter's background scroll check cannot pass because its embedder reads the wheel position from the real cursor ([retained](flutter-smoke/flutter-scroll)). The interrupted attempts were first blamed on this session's own tool invocations; a series run with no commands issued during it was interrupted the same way, so the cause is the desktop, and [resume-series.ps1](../../benchmarks/resume-series.ps1) completes a series across such interruptions.
 
+The scroll runs' missed driver deadlines were the driver's own: Windows PowerShell compiles the input loop after its sixteenth execution, inside the measured window. The runner now executes that loop once as a dry phase before measuring; with that change Flutter met the 60-events-per-second cadence in three of three scroll runs and Dart in four of six, as [scroll cadence](scroll-cadence-20260929.md) records, with one Dart run retained because the Kit table's scroll offset drifted 276 px past the injected total. The rotated series above predate the change, so their scroll rows remain outside the equal-work subset.
+
 ## Completed
 
 - Built a direct Rust + GPUI Kit reference, GPUI Shell/QuickJS fixture, GPUIX/Solid compiled executable and Dart AOT fixture.
@@ -53,7 +55,7 @@ The payload files are enumerated by [artifacts.json](artifacts.json), including 
 
 | Measurement | Current status |
 | --- | --- |
-| Foreground workload CPU and memory | Rust/Dart series retained separately; Dart/Solid/Shell has 36 completed measurements and 4 incomplete attempts; 25 completed runs met the planned input cadence; Dart/Flutter has two series of 24 completed runs with 2 incomplete attempts each |
+| Foreground workload CPU and memory | Rust/Dart series retained separately; Dart/Solid/Shell has 36 completed measurements and 4 incomplete attempts; 25 completed runs met the planned input cadence; Dart/Flutter has two series of 24 completed runs with 2 incomplete attempts each, plus a Dart-only deferred-dataset series; scroll cadence is met since the warmed driver (Flutter 3 of 3, Dart 4 of 6) |
 | Native drawing and Dart publication | Recorded separately with original histogram scopes; Solid exports p90/p99 over up to 1,000 draws; Shell has no equivalent native timer |
 | Frame/presentation p95 and p99, undisplayed frames | PresentMon ETW capture denied by current Windows permissions; [error log](presentmon-preflight.txt) |
 | Input-to-response-present latency | Unmeasured; requires matching the changed-cell frame to its input sequence, in addition to ETW access |

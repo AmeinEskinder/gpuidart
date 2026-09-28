@@ -90,6 +90,7 @@ try {
         }
         Start-Sleep -Milliseconds 100
     }
+    if (-not $BackgroundSmoke) { [BenchmarkWindow]::Warm() }
     $app.Refresh()
     $cpuStart = $app.TotalProcessorTime.TotalMilliseconds
     $samples = [Collections.Generic.List[object]]::new()
@@ -104,37 +105,55 @@ try {
     $nextSlot = 0
     $nextSample = 0.0
     $missedInputDeadlines = 0
-    while ($timer.Elapsed.TotalSeconds -lt $Seconds) {
-        if (-not $BackgroundSmoke) { [BenchmarkWindow]::RequireFocus($window) }
-        $elapsed = $timer.Elapsed.TotalMilliseconds
-        if ($elapsed -ge $Seconds * 1000) { break }
-        if ($nextSlot -lt $plannedInputs -and $elapsed -ge $nextInput) {
-            $late = $elapsed - $nextInput
-            if ($late -ge $period) {
-                $skipped = [math]::Floor($late / $period)
-                $missedInputDeadlines += $skipped
-                $nextSlot += $skipped
+    # PowerShell compiles a loop body to IL after its sixteenth execution and
+    # the compile stalls the driver for several milliseconds, so the same loop
+    # runs once as a dry phase at the workload cadence, sending zero-length
+    # pointer moves, before the measured phase resets the clocks.
+    foreach ($phase in @('warm', 'measure')) {
+        $measuring = $phase -eq 'measure'
+        $phaseSeconds = if ($measuring) { $Seconds } else { 0.6 }
+        while ($timer.Elapsed.TotalSeconds -lt $phaseSeconds) {
+            if (-not $BackgroundSmoke) { [BenchmarkWindow]::RequireFocus($window) }
+            $elapsed = $timer.Elapsed.TotalMilliseconds
+            if ($elapsed -ge $phaseSeconds * 1000) { break }
+            if ($nextSlot -lt $plannedInputs -and $elapsed -ge $nextInput) {
+                $late = $elapsed - $nextInput
+                if ($late -ge $period) {
+                    $skipped = [math]::Floor($late / $period)
+                    $missedInputDeadlines += $skipped
+                    $nextSlot += $skipped
+                    $nextInput = $nextSlot * $period
+                }
+                $qpc = [Diagnostics.Stopwatch]::GetTimestamp()
+                $sequence = $inputTimes.Count + 1
+                $sentPackets = $null
+                switch ($Workload) {
+                    scroll { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageWheel($window, $wheelDelta) } else { [BenchmarkWindow]::Wheel($window, $wheelDelta) } }
+                    cell { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 69) } else { $sentPackets = [BenchmarkWindow]::Click($window, 69, $sequence) } }
+                    burst { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 113) } else { $sentPackets = [BenchmarkWindow]::Click($window, 113, $sequence) } }
+                }
+                $inputTimes.Add(@{ sequence = $sequence; qpc = $qpc; injection_completed_qpc = [Diagnostics.Stopwatch]::GetTimestamp(); packets_accepted = $sentPackets; scheduled_ms = $nextInput; sent_ms = $elapsed })
+                $nextSlot++
                 $nextInput = $nextSlot * $period
             }
-            $qpc = [Diagnostics.Stopwatch]::GetTimestamp()
-            $sequence = $inputTimes.Count + 1
-            $sentPackets = $null
-            switch ($Workload) {
-                scroll { if ($BackgroundSmoke) { [BenchmarkWindow]::MessageWheel($window, $wheelDelta) } else { [BenchmarkWindow]::Wheel($window, $wheelDelta) } }
-                cell { if ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 69) } else { $sentPackets = [BenchmarkWindow]::Click($window, 69, $sequence) } }
-                burst { if ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 113) } else { $sentPackets = [BenchmarkWindow]::Click($window, 113, $sequence) } }
+            # Process sampling costs a few milliseconds; keep it out of the slack
+            # just before an input deadline.
+            if ($measuring -and $elapsed -ge $nextSample -and ($nextSlot -ge $plannedInputs -or $nextInput - $elapsed -gt 8)) {
+                $app.Refresh()
+                if ($app.HasExited) { throw 'Application exited during workload' }
+                $samples.Add(@{ elapsed_ms = $elapsed; working_set_bytes = $app.WorkingSet64; private_bytes = $app.PrivateMemorySize64; cpu_ms = $app.TotalProcessorTime.TotalMilliseconds - $cpuStart })
+                $nextSample += 250
             }
-            $inputTimes.Add(@{ sequence = $sequence; qpc = $qpc; injection_completed_qpc = [Diagnostics.Stopwatch]::GetTimestamp(); packets_accepted = $sentPackets; scheduled_ms = $nextInput; sent_ms = $elapsed })
-            $nextSlot++
-            $nextInput = $nextSlot * $period
+            [BenchmarkWindow]::Pause()
         }
-        if ($elapsed -ge $nextSample) {
+        if (-not $measuring) {
+            $inputTimes.Clear(); $samples.Clear()
+            $nextInput = 0.0; $nextSlot = 0; $nextSample = 0.0; $missedInputDeadlines = 0
             $app.Refresh()
-            if ($app.HasExited) { throw 'Application exited during workload' }
-            $samples.Add(@{ elapsed_ms = $elapsed; working_set_bytes = $app.WorkingSet64; private_bytes = $app.PrivateMemorySize64; cpu_ms = $app.TotalProcessorTime.TotalMilliseconds - $cpuStart })
-            $nextSample += 250
+            $cpuStart = $app.TotalProcessorTime.TotalMilliseconds
+            $startQpc = [Diagnostics.Stopwatch]::GetTimestamp()
+            $timer.Restart()
         }
-        [BenchmarkWindow]::Pause()
     }
     $endQpc = [Diagnostics.Stopwatch]::GetTimestamp()
     $app.Refresh()
@@ -188,8 +207,10 @@ try {
         input_trace = [bool]$TraceInput; pointer_warmup = -not [bool]$NoPointerWarmup
         activation_clicks = [BenchmarkWindow]::ActivationClicks
         rows = 100000; seconds_requested = $Seconds; duration_ms = $durationMs
-        harness_timer_resolution_ms = 1
+        harness_timer_resolution_ms = [BenchmarkWindow]::TimerResolution / 10000.0
         driver_wait = 'one-millisecond high resolution waitable timer'
+        driver_priority = $(if ([BenchmarkWindow]::ElevatedPriority) { 'high priority class, highest thread priority' } else { 'normal; elevation failed' })
+        driver_warmup = -not [bool]$BackgroundSmoke
         input_count = $inputTimes.Count; input_deadlines_missed = $missedInputDeadlines
         planned_inputs = $plannedInputs
         correctness = @{
