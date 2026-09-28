@@ -1,4 +1,4 @@
-# Comparison status — 2026-09-25
+# Comparison status — 2026-09-28
 
 **All 36 Dart/Solid/Shell measurements are complete, with four incomplete attempts retained.** All 3,148 delivered update clicks passed application checks. See the [three-repetition results](dart-js-20260925.md) and [summary retaining all 40 attempts](dart-js-20260925-summary.json). Dart used fewer private bytes than Solid, with a higher idle working set; Shell was lower on both memory measures. Dart's single-cell CPU readings were lower than Solid's, while idle/burst ranges overlapped and every scroll run missed driver slots. Presentation remains unmeasured.
 
@@ -7,6 +7,17 @@ Three repetitions of Rust/Dart workloads previously completed, with a repeated m
 The Rust/Dart series contains 24 foreground runs and 2,101 applied updates from 2,101 injected clicks. It retains one skipped scroll deadline and one extra click at the interval boundary. A follow-up after correcting the cutoff completed 12 runs before two focus interruptions. Diagnostic builds traced another 700 complete input-to-state chains. The original 49-of-50 observation remains unresolved and is retained in the report.
 
 The production snapshot/dataset architecture remains frozen. Native input tracing is opt-in through a diagnostic build feature. The earlier [pilot record](measurements-20260925.md) remains available.
+
+## Dart and Flutter Windows (2026-09-28)
+
+Two three-repetition foreground series compare the Dart AOT fixture with a Flutter Windows application built from the same records, geometry and click targets ([fixture source](../../benchmarks/flutter/lib/main.dart)), at GPUI Kit v0.7.0 and Flutter 3.47.5 stable. All 24 slots completed in each series. Every completed run passed its application checks except one Dart scroll run in the first series, which applied 583 of 597 wheel events and is retained as a correctness failure. Four interrupted idle attempts, two per series and always the first slots after launch, are retained: a desktop notification window and Explorer took the foreground.
+
+- [Stock Material buttons](dart-flutter-20260928.md) ([summary](dart-flutter-20260928-summary.json)). Flutter's ink ripple kept the click workloads animating at the display rate: 631 frames in a cell run against 58 Dart draws, 19.4 percent of one core for cell against Dart's 3.0, and 29.5 against 15.8 for burst.
+- [Splash-free buttons](dart-flutter-nosplash-20260928.md) ([summary](dart-flutter-nosplash-20260928-summary.json)). With the ripple off the click workloads are close: cell 4.7 against 2.3 percent, burst 17.8 against 17.2, scroll 21.1 against 20.9, idle 0.8 against 0.8. The fixture keeps this setting; the buttons are the driver's injection surface, and the Kit fixtures' buttons do not animate.
+
+Memory was the stable difference. Across both series and all four workloads the Dart fixture's working set was 34 to 43 MiB lower (idle 138 against 173 MiB) and its private bytes 27 to 34 MiB lower (idle 152 against 179 MiB), with per-series ranges under 3 MiB except Flutter's burst runs in the first series. Flutter's window handle appeared 64 ms after launch against Dart's 459 ms; the Dart fixture builds and uploads the 100,000-record dataset before its window opens, and neither figure is a first-displayed-frame time. The Flutter release directory (executable, engine DLL and AOT data) is 24.85 MiB against the Dart package's 29.48 MiB, without the CRT in either case.
+
+Qualifications: Flutter rebuilds every row in its cache extent on each `setState` (18 rows per click, 5,400 row builds in a burst run) where the Dart fixture edits one record and the native table repaints; Flutter's `FrameTiming` histograms and the native draw histograms have different scopes and estimators and are listed per run, not compared; every Flutter scroll run and two Dart scroll runs missed at least one driver deadline, so they sit outside the equal-work subset; presentation is still unmeasured for both. The [wheel calibration](calibration-flutter/calibration.json) gives Flutter 80 logical pixels per -120 notch, so the runner sends -117 for the shared 78-pixel step; Flutter's background scroll check cannot pass because its embedder reads the wheel position from the real cursor ([retained](flutter-smoke/flutter-scroll)). The interrupted attempts were first blamed on this session's own tool invocations; a series run with no commands issued during it was interrupted the same way, so the cause is the desktop, and [resume-series.ps1](../../benchmarks/resume-series.ps1) completes a series across such interruptions.
 
 ## Completed
 
@@ -42,7 +53,7 @@ The payload files are enumerated by [artifacts.json](artifacts.json), including 
 
 | Measurement | Current status |
 | --- | --- |
-| Foreground workload CPU and memory | Rust/Dart series retained separately; Dart/Solid/Shell has 36 completed measurements and 4 incomplete attempts; 25 completed runs met the planned input cadence |
+| Foreground workload CPU and memory | Rust/Dart series retained separately; Dart/Solid/Shell has 36 completed measurements and 4 incomplete attempts; 25 completed runs met the planned input cadence; Dart/Flutter has two series of 24 completed runs with 2 incomplete attempts each |
 | Native drawing and Dart publication | Recorded separately with original histogram scopes; Solid exports p90/p99 over up to 1,000 draws; Shell has no equivalent native timer |
 | Frame/presentation p95 and p99, undisplayed frames | PresentMon ETW capture denied by current Windows permissions; [error log](presentmon-preflight.txt) |
 | Input-to-response-present latency | Unmeasured; requires matching the changed-cell frame to its input sequence, in addition to ETW access |

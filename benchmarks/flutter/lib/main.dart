@@ -163,6 +163,11 @@ class _BenchmarkState extends State<Benchmark> {
         width: 280,
         child: FilledButton.tonal(
           key: ValueKey(id),
+          // The buttons are the driver's injection surface, not the measured
+          // subject: without this the Material ink ripple keeps every click
+          // workload animating at the display rate, which the Kit fixtures'
+          // buttons do not do.
+          style: const ButtonStyle(splashFactory: NoSplash.splashFactory),
           onPressed: onPressed,
           child: Text(label, style: textStyle),
         ),

@@ -81,7 +81,7 @@ $lines.Add('## Application frame histograms, per run')
 $lines.Add('')
 $lines.Add('Each row is one run''s own cumulative histogram since window creation, including startup and warmup; percentiles are not pooled across runs and the estimators differ between fixtures.')
 $lines.Add('')
-$lines.Add('| Workload | Implementation | Run | Samples | p50 µs | p95 µs | p99 µs | Max µs | Source |')
+$lines.Add('| Workload | Implementation | Run | Samples | p50 us | p95 us | p99 us | Max us | Source |')
 $lines.Add('| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |')
 foreach ($workload in $workloads) {
     foreach ($implementation in $implementations) {
@@ -90,7 +90,7 @@ foreach ($workload in $workloads) {
         foreach ($entry in @($group.native_draw_by_run)) {
             $h = $entry.histogram
             if ($null -eq $h) { continue }
-            $lines.Add("| $workload | $(Label $implementation) | $($entry.run_id) | $($h.samples) | $($h.p50_us) | $($h.p95_us) | $($h.p99_us) | $($h.max_us) | native draw |")
+            $lines.Add("| $workload | $(Label $implementation) | $($entry.run_id) | $($h.samples) | $($h.p50_us) | $($h.p95_us) | $($h.p99_us) | - | native draw |")
         }
         foreach ($entry in @($group.flutter_frames_by_run)) {
             foreach ($phase in @('build_us','raster_us','total_us')) {
