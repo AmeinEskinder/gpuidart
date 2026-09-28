@@ -509,4 +509,34 @@ void main() {
     }
     expect(reused, greaterThan(100));
   });
+  test('a description finds nodes by ID and replaces own fields in place', () {
+    final tree = DescribedNode.describe(
+      UiColumn('root', [
+        const UiText('status', 'one'),
+        UiRow('row', [const UiButton('save', 'Save')]),
+      ]),
+    );
+    expect(tree.find('save')!.kind, 'button');
+    expect(tree.find('missing'), isNull);
+    final status = tree.find('status')!;
+    status.replaceOwnFields(const UiText('status', 'two').props());
+    expect(status.json, {'kind': 'text', 'id': 'status', 'text': 'two'});
+    final row = tree.find('row')!;
+    row.replaceOwnFields(
+      UiRow('row', const [], style: const UiStyle(gap: 4)).props(),
+    );
+    expect(row.json['children'], hasLength(1), reason: 'children kept');
+    expect((row.json['style'] as Map)['gap'], 4);
+    // The tree now diffs as if the values had been published.
+    final next = DescribedNode.describe(
+      UiColumn('root', [
+        const UiText('status', 'two'),
+        UiRow('row', [
+          const UiButton('save', 'Save'),
+        ], style: const UiStyle(gap: 4)),
+      ]),
+      previous: tree,
+    );
+    expect(diffDescribed(tree, next), isEmpty);
+  });
 }

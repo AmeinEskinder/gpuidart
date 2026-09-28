@@ -115,6 +115,24 @@ parent is found by position or ID among that parent's previous children. A
 kept instance that moves to another parent is described afresh and diffs to
 a reparent, as before. Nothing changes on the wire or in native.
 
+## Bound writes
+
+`patch` writes one published node without a rebuild:
+
+```dart
+await host.patch(UiText('status', 'Saving'));
+```
+
+The host looks the node up in the previous description, replaces its own
+fields there and sends one `set` operation, so the write costs neither
+build, describe nor diff, and a later diff or a whole resubmission carries
+the value. The node keeps its ID and kind and carries no children; native
+validates the fields as it does for any `set`. The write stands until the
+next publication, which carries the application's value for that node, the
+same contract the controls follow. Bindings, theme and menus of the last
+publication are restated with every patch, as an operation update replaces
+them.
+
 ## What does not change
 
 - Node identity rules. The same ID and kind keeps its native entity; an ID that

@@ -701,6 +701,13 @@ final class GpuiHost {
     List<UiMenu> menus = const [],
   }) => _main.publish(root, actions: actions, theme: theme, menus: menus);
 
+  /// Writes one published node's own fields without a rebuild: [node] must
+  /// keep the ID and kind of a node in the last publication and carry no
+  /// children. Native applies it as one `set` operation, so a bound value
+  /// costs neither build, describe nor diff. The write stands until the next
+  /// publication, which carries the application's value for that node.
+  Future<void> patch(UiNode node) => _main.patch(node);
+
   /// Opens a secondary window with its own description and datasets. See
   /// docs/windows.md. Completes once native has opened the window; a
   /// rejected request throws a [StateError].
@@ -1228,6 +1235,12 @@ final class _View {
   final pending = <int, Completer<void>>{};
   final publishTimers = <int, Stopwatch>{};
 
+  /// Snapshot-level fields of the last submission; an operation update
+  /// restates them, and omitting them would clear them.
+  List<UiAction> actions = const [];
+  UiTheme? theme;
+  List<UiMenu> menus = const [];
+
   /// Tracing covers the main window only.
   GpuiTrace? get trace => window == 0 ? host._trace : null;
 
@@ -1339,6 +1352,9 @@ final class _View {
     if (status == 0) {
       baseline = described;
       baselineRevision = revision;
+      this.actions = actions;
+      this.theme = theme;
+      this.menus = menus;
       inFlight[revision] = _Publication(
         described,
         actions,
@@ -1348,6 +1364,63 @@ final class _View {
       );
     }
     return status;
+  }
+
+  Future<void> patch(UiNode node) {
+    if (host._closing || host._closed.isCompleted) {
+      throw StateError('Host is closing');
+    }
+    final baseline = this.baseline;
+    final canUpdate = window != 0 || host._bindings.update != null;
+    if (baseline == null || !canUpdate) {
+      throw StateError(
+        'A patch builds on an accepted publication; publish the tree first',
+      );
+    }
+    if (node.children.isNotEmpty) {
+      throw ArgumentError.value(node.id, 'node', 'A patch carries no children');
+    }
+    final target = baseline.find(node.id);
+    if (target == null) {
+      throw ArgumentError.value(node.id, 'node', 'Not in the published tree');
+    }
+    final fields = node.props();
+    if (fields['kind'] != target.kind) {
+      throw ArgumentError.value(node.id, 'node', 'A patch keeps the node kind');
+    }
+    final revision = ++this.revision;
+    trace?._point('dart.request', 'snapshot', revision);
+    final accepted = Completer<void>();
+    pending[revision] = accepted;
+    publishTimers[revision] = Stopwatch()..start();
+    // The baseline shows the value from now on, so a later diff or a whole
+    // resubmission carries it.
+    final previous = Map<String, Object>.of(target.json);
+    target.replaceOwnFields(fields);
+    var status = 0;
+    try {
+      status = _submitDescription(
+        revision,
+        baseline,
+        actions,
+        theme,
+        menus,
+        ops: [
+          {'op': 'set', 'id': node.id, 'node': fields},
+        ],
+      );
+      if (status != 0) {
+        throw StateError('Native patch submission failed: $status');
+      }
+      host.metrics.patches++;
+    } catch (error, stack) {
+      target.replaceOwnFields(previous);
+      pending.remove(revision);
+      publishTimers.remove(revision);
+      if (status == -4) host._fail(error, stack);
+      rethrow;
+    }
+    return host._withDeadline(accepted.future, 'patch $revision');
   }
 
   /// Native rejected [rejected] because its base was never applied. Every
@@ -1486,6 +1559,13 @@ final class GpuiWindow {
   }) {
     _checkOpen();
     return _view.publish(root, actions: actions, theme: theme, menus: menus);
+  }
+
+  /// Writes one published node's own fields in this window; see
+  /// [GpuiHost.patch].
+  Future<void> patch(UiNode node) {
+    _checkOpen();
+    return _view.patch(node);
   }
 
   /// Native inspection addressed to this window; see [GpuiHost.diagnose].

@@ -2,6 +2,9 @@ final class HostMetrics {
   int descriptionBuilds = 0;
   int operationPublications = 0;
   int resubmittedPublications = 0;
+
+  /// Node writes sent as one operation without a rebuild.
+  int patches = 0;
   int encodedSnapshots = 0;
   int encodedBytes = 0;
   int ffiCallbacks = 0;
@@ -47,6 +50,7 @@ final class HostMetrics {
     'encoded_snapshots': encodedSnapshots,
     'operation_publications': operationPublications,
     'resubmitted_publications': resubmittedPublications,
+    'patches': patches,
     'encoded_bytes': encodedBytes,
     'ffi_callbacks': ffiCallbacks,
     'ui_callbacks': uiCallbacks,

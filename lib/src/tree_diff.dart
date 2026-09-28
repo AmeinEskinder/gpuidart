@@ -104,6 +104,35 @@ final class DescribedNode {
   DescribedNode? _newParentValue;
   DescribedNode? _beforeValue;
 
+  Map<String, DescribedNode>? _byId;
+
+  /// The node with [id] in this tree; the index is built on first use and
+  /// stays valid because publications never restructure a description in
+  /// place, only [replaceOwnFields] changes one.
+  DescribedNode? find(String id) {
+    var index = _byId;
+    if (index == null) {
+      index = <String, DescribedNode>{};
+      void collect(DescribedNode node) {
+        index![node.id] = node;
+        node.children.forEach(collect);
+      }
+
+      collect(this);
+      _byId = index;
+    }
+    return index[id];
+  }
+
+  /// Replaces this node's own fields with [fields], keeping its children.
+  void replaceOwnFields(Map<String, Object> fields) {
+    final children = json['children'];
+    json
+      ..clear()
+      ..addAll(fields);
+    if (children != null) json['children'] = children;
+  }
+
   /// Every node ID in this subtree.
   Set<String> ids() {
     final all = <String>{};

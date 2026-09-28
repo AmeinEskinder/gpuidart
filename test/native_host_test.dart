@@ -577,4 +577,42 @@ void main() {
     },
     timeout: const Timeout(Duration(seconds: 30)),
   );
+  test(
+    'patches write one node without a rebuild and yield to publication',
+    () async {
+      UiNode build(String status) => UiColumn('root', [
+        UiText('status', status),
+        const UiButton('save', 'Save'),
+      ]);
+      final host = await GpuiHost.openView(() => build('idle'));
+      try {
+        await host.patch(const UiText('status', 'saving'));
+        expect((await host.diagnose('inspect'))['labels']['status'], 'saving');
+        expect(host.metrics.patches, 1);
+        // A rebuild carries the application's value again.
+        await host.rebuild();
+        expect((await host.diagnose('inspect'))['labels']['status'], 'idle');
+        // Patches diff cleanly against the next publication.
+        await host.patch(const UiText('status', 'saved'));
+        await host.publish(build('saved'));
+        expect((await host.diagnose('inspect'))['labels']['status'], 'saved');
+        expect(
+          () => host.patch(const UiText('missing', 'x')),
+          throwsArgumentError,
+        );
+        expect(
+          () => host.patch(const UiButton('status', 'kind change')),
+          throwsArgumentError,
+        );
+        expect(
+          () => host.patch(UiColumn('root', [const UiText('status', 'x')])),
+          throwsArgumentError,
+        );
+        expect(host.metrics.patches, 2);
+      } finally {
+        await host.close();
+      }
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
 }
