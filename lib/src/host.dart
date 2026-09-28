@@ -1396,7 +1396,8 @@ final class _View {
     // The baseline shows the value from now on, so a later diff or a whole
     // resubmission carries it.
     final previous = Map<String, Object>.of(target.json);
-    target.replaceOwnFields(fields);
+    final previousSource = target.source;
+    target.patch(fields);
     var status = 0;
     try {
       status = _submitDescription(
@@ -1414,7 +1415,8 @@ final class _View {
       }
       host.metrics.patches++;
     } catch (error, stack) {
-      target.replaceOwnFields(previous);
+      target.patch(previous);
+      target.source = previousSource;
       pending.remove(revision);
       publishTimers.remove(revision);
       if (status == -4) host._fail(error, stack);

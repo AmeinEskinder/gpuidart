@@ -152,11 +152,11 @@ Feasibility verdicts recorded on this machine:
   patched quit path in the vendored macOS platform; neither the SDK source
   tree nor the build time fit this environment. The launcher and companion
   process model stays.
-- **A Flutter Windows fixture for side-by-side measurement** cannot be built
-  here: the Flutter SDK is present but Flutter's Windows target requires a
-  Visual Studio installation with the C++ workload, and no Visual Studio or
-  `cl.exe` is installed (the Rust build uses the pinned portable toolchain).
-  Comparative claims against Flutter wait for a machine with that toolchain.
+- **A Flutter Windows fixture for side-by-side measurement** was blocked
+  until 2026-09-28 by the missing C++ toolchain. Visual Studio 2022 Build
+  Tools 17.14 with the C++ workload are installed now and `flutter doctor`
+  passes its Visual Studio check, so the fixture can be built here; the
+  comparison itself is still to be run.
 - **Native dialogs** are wired but not covered by headless tests; the test
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
@@ -166,5 +166,6 @@ Dart suite 104, including the live-window, list and secondary-window suites
 and the tab, radio, menu, theme, chart and tooltip suites merged from `main`,
 on the debug library, plus the repository's full check gate. Earlier counts in
 this document and in commit messages are the totals at those revisions.
-Secondary windows and in-place updates have run on Windows only; the branch
-has not been pushed, so no macOS or Linux CI run exists for them.
+The branch is pushed; the Windows, Linux and macOS SDK checks and the
+accessibility probes pass on it, and the Linux and macOS window jobs run the
+live-window suite that holds the secondary-window and patch tests.

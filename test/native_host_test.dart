@@ -592,6 +592,23 @@ void main() {
         // A rebuild carries the application's value again.
         await host.rebuild();
         expect((await host.diagnose('inspect'))['labels']['status'], 'idle');
+        // So does a rebuild that hands back the same const instance the
+        // patch wrote over.
+        const constant = UiText('constant', 'app');
+        final shell = UiColumn('shell', const [constant]);
+        await host.publish(
+          UiColumn('root', [shell, const UiText('status', 'idle')]),
+        );
+        await host.patch(const UiText('constant', 'patched'));
+        expect(
+          (await host.diagnose('inspect'))['labels']['constant'],
+          'patched',
+        );
+        await host.publish(
+          UiColumn('root', [shell, const UiText('status', 'idle')]),
+        );
+        expect((await host.diagnose('inspect'))['labels']['constant'], 'app');
+        await host.publish(build('idle'));
         // Patches diff cleanly against the next publication.
         await host.patch(const UiText('status', 'saved'));
         await host.publish(build('saved'));
@@ -608,7 +625,7 @@ void main() {
           () => host.patch(UiColumn('root', [const UiText('status', 'x')])),
           throwsArgumentError,
         );
-        expect(host.metrics.patches, 2);
+        expect(host.metrics.patches, 3);
       } finally {
         await host.close();
       }

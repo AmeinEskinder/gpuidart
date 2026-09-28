@@ -2243,3 +2243,67 @@ fn cached_subtrees_render_again_only_when_their_content_changes(cx: &mut TestApp
     })
     .unwrap();
 }
+
+#[gpui::test]
+fn typing_into_an_input_inside_a_cached_subtree_renders_it(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = Snapshot::parse(
+        br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
+            {"kind":"column","id":"part","style":{"height":{"px":160},"cached":true},"children":[
+                {"kind":"input","id":"name","placeholder":"Name"}
+            ]},
+            {"kind":"text","id":"status","text":"idle"}
+        ]}}"#,
+    )
+    .unwrap();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot,
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let frame = |window: &mut gpui_kit::Window, cx: &mut gpui_kit::App| {
+        window.draw(cx).clear(cx);
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let renders =
+            |view: &gpui_kit::Entity<DartView>, window: &gpui_kit::Window, cx: &gpui_kit::App| {
+                view.read(cx).inspect(window, cx)["subtrees"]["part"]["renders"]
+                    .as_u64()
+                    .unwrap()
+            };
+        let before = renders(&view, window, cx);
+        frame(window, cx);
+        assert_eq!(
+            renders(&view, window, cx),
+            before,
+            "an idle frame reuses the subtree"
+        );
+        window.click("name", cx);
+        window.press("a", cx);
+        window.press("b", cx);
+        frame(window, cx);
+        assert_eq!(
+            window.find("name").value(),
+            Some("ab"),
+            "typing reaches the retained input"
+        );
+        assert!(
+            renders(&view, window, cx) > before,
+            "the input's own change marks its cached container dirty"
+        );
+    })
+    .unwrap();
+}

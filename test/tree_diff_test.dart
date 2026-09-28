@@ -441,6 +441,32 @@ void main() {
     },
   );
 
+  test('a patched node and its ancestors give up identity reuse', () {
+    const status = UiText('status', 'idle');
+    final shell = UiColumn('shell', const [status]);
+    UiNode build() => UiColumn('root', [shell]);
+    final first = DescribedNode.describe(build());
+    first.find('status')!.patch(const UiText('status', 'saving').props());
+    expect(first.find('status')!.json['text'], 'saving');
+    // The same instances come back, yet the patched subtree is described
+    // afresh and the diff restores the application's value.
+    final second = DescribedNode.describe(build(), previous: first);
+    expect(identical(second.find('shell'), first.find('shell')), isFalse);
+    expect(second.find('status')!.json['text'], 'idle');
+    expect(diffDescribed(first, second), [
+      {
+        'op': 'set',
+        'id': 'status',
+        'node': {'kind': 'text', 'id': 'status', 'text': 'idle'},
+      },
+    ]);
+    second.seal();
+    // Untouched const instances still reuse afterwards.
+    final third = DescribedNode.describe(build(), previous: second);
+    expect(identical(third.find('shell'), second.find('shell')), isTrue);
+    expect(diffDescribed(second, third), isEmpty);
+  });
+
   test('random rebuilds that keep subtree instances replay through reuse', () {
     final random = Random(20260928);
     var serial = 0;
@@ -519,12 +545,10 @@ void main() {
     expect(tree.find('save')!.kind, 'button');
     expect(tree.find('missing'), isNull);
     final status = tree.find('status')!;
-    status.replaceOwnFields(const UiText('status', 'two').props());
+    status.patch(const UiText('status', 'two').props());
     expect(status.json, {'kind': 'text', 'id': 'status', 'text': 'two'});
     final row = tree.find('row')!;
-    row.replaceOwnFields(
-      UiRow('row', const [], style: const UiStyle(gap: 4)).props(),
-    );
+    row.patch(UiRow('row', const [], style: const UiStyle(gap: 4)).props());
     expect(row.json['children'], hasLength(1), reason: 'children kept');
     expect((row.json['style'] as Map)['gap'], 4);
     // The tree now diffs as if the values had been published.

@@ -80,8 +80,9 @@ final class DescribedNode {
 
   final Map<String, Object> json;
 
-  /// The typed node this description came from.
-  final UiNode source;
+  /// The typed node this description came from, or null once a patch wrote
+  /// this node or a descendant, which ends identity reuse for it.
+  UiNode? source;
   final List<DescribedNode> children = [];
   DescribedNode? _parent;
   DescribedNode? _pendingParent;
@@ -124,13 +125,22 @@ final class DescribedNode {
     return index[id];
   }
 
-  /// Replaces this node's own fields with [fields], keeping its children.
-  void replaceOwnFields(Map<String, Object> fields) {
+  /// Replaces this node's own fields with [fields], keeping its children,
+  /// as a patch does. The node and its ancestors stop standing in for their
+  /// typed instances, so a later rebuild that hands back the same
+  /// instances describes them afresh and carries the application's value
+  /// instead of the patched one.
+  void patch(Map<String, Object> fields) {
     final children = json['children'];
     json
       ..clear()
       ..addAll(fields);
     if (children != null) json['children'] = children;
+    DescribedNode? node = this;
+    while (node != null) {
+      node.source = null;
+      node = node._parent;
+    }
   }
 
   /// Every node ID in this subtree.

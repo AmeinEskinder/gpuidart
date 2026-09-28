@@ -152,7 +152,7 @@ The Windows release checks have a [setup guide](docs/windows-test-setup.md), an 
 
 The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 
-- One application host with a main window and optional [secondary windows](docs/windows.md). Windows and Linux X11 use a blocking native runner isolate; macOS uses a native companion process whose main thread owns GPUI. Secondary windows have run on Windows only so far.
+- One application host with a main window and optional [secondary windows](docs/windows.md). Windows and Linux X11 use a blocking native runner isolate; macOS uses a native companion process whose main thread owns GPUI.
 - One description per publication, sent whole or as operations against the applied tree. No signals, child-view snapshots or Rust executable embedding the Dart VM.
 - Descriptions use UTF-8 JSON. Table datasets upload once; edits send changed records. Initial upload, full replacement and storage grow with row count.
 - Tables render cells entirely in Rust. Dart provides strings; arbitrary Dart row render callbacks are not implemented. Sorting and filtering are native views over the dataset; stable record identity is supported through optional `rowIds`, and table selection follows the record ID when present (row indices otherwise).
