@@ -1,0 +1,659 @@
+{
+  "capture_directory": "build/startup-bisect-e5345e5",
+  "failed_runs": [],
+  "groups": {
+    "aot-host-0-trace-direct": {
+      "startup_us.dart_main_after_clock_init": {
+        "samples": [
+          68498.2,
+          75070.1
+        ],
+        "median": 71784.15,
+        "min": 68498.2,
+        "max": 75070.1
+      },
+      "startup_us.records_constructed": {
+        "samples": [
+          68594.4,
+          75111.6
+        ],
+        "median": 71853.0,
+        "min": 68594.4,
+        "max": 75111.6
+      },
+      "startup_us.host_ready": {
+        "samples": [
+          393118.0,
+          500033.1
+        ],
+        "median": 446575.55,
+        "min": 393118.0,
+        "max": 500033.1
+      },
+      "startup_us.verified_draw_ack": {
+        "samples": [
+          435935.1,
+          547168.2
+        ],
+        "median": 491551.64999999997,
+        "min": 435935.1,
+        "max": 547168.2
+      },
+      "startup_us.idle_start": {
+        "samples": [
+          436495.0,
+          547713.1
+        ],
+        "median": 492104.05,
+        "min": 436495.0,
+        "max": 547713.1
+      },
+      "startup_us.idle_end": {
+        "samples": [
+          2566785.9,
+          2681681.6
+        ],
+        "median": 2624233.75,
+        "min": 2566785.9,
+        "max": 2681681.6
+      },
+      "startup_us.first_content_paint": {
+        "samples": [
+          392339.0,
+          499415.6
+        ],
+        "median": 445877.3,
+        "min": 392339.0,
+        "max": 499415.6
+      },
+      "stage_us.dart.build": {
+        "samples": [
+          20.0,
+          13.2
+        ],
+        "median": 16.6,
+        "min": 13.2,
+        "max": 20.0
+      },
+      "stage_us.dart.library": {
+        "samples": [
+          14078.7,
+          10012.1
+        ],
+        "median": 12045.400000000001,
+        "min": 10012.1,
+        "max": 14078.7
+      },
+      "stage_us.dart.describe": {
+        "samples": [
+          41.4,
+          39.3
+        ],
+        "median": 40.349999999999994,
+        "min": 39.3,
+        "max": 41.4
+      },
+      "stage_us.dart.encode": {
+        "samples": [
+          85.4,
+          86.2
+        ],
+        "median": 85.80000000000001,
+        "min": 85.4,
+        "max": 86.2
+      },
+      "bytes.dart.encode": {
+        "samples": [
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.json_utf8": {
+        "samples": [
+          80.2,
+          80.2
+        ],
+        "median": 80.2,
+        "min": 80.2,
+        "max": 80.2
+      },
+      "stage_us.dart.ffi_copy": {
+        "samples": [
+          3.6,
+          3.4
+        ],
+        "median": 3.5,
+        "min": 3.4,
+        "max": 3.6
+      },
+      "bytes.dart.ffi_copy": {
+        "samples": [
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.ffi": {
+        "samples": [
+          322.3,
+          278.5
+        ],
+        "median": 300.4,
+        "min": 278.5,
+        "max": 322.3
+      },
+      "bytes.dart.ffi": {
+        "samples": [
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.native.initial_decode": {
+        "samples": [
+          198.2,
+          153.2
+        ],
+        "median": 175.7,
+        "min": 153.2,
+        "max": 198.2
+      },
+      "bytes.native.initial_decode": {
+        "samples": [
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.native.initial_validate": {
+        "samples": [
+          60.1,
+          56.6
+        ],
+        "median": 58.35,
+        "min": 56.6,
+        "max": 60.1
+      },
+      "bytes.native.initial_validate": {
+        "samples": [
+          232.0,
+          232.0
+        ],
+        "median": 232.0,
+        "min": 232.0,
+        "max": 232.0
+      },
+      "stage_us.dart.runner_spawn": {
+        "samples": [
+          508.1,
+          602.0
+        ],
+        "median": 555.05,
+        "min": 508.1,
+        "max": 602.0
+      },
+      "stage_us.native.window_create": {
+        "samples": [
+          70037.1,
+          74153.7
+        ],
+        "median": 72095.4,
+        "min": 70037.1,
+        "max": 74153.7
+      },
+      "bytes.native.emit": {
+        "samples": [
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "stage_us.dart.decode": {
+        "samples": [
+          58.1,
+          48.3
+        ],
+        "median": 53.2,
+        "min": 48.3,
+        "max": 58.1
+      },
+      "bytes.dart.receive": {
+        "samples": [
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "settled.application.memory_bytes.working_set": {
+        "samples": [
+          81862656.0,
+          81965056.0
+        ],
+        "median": 81913856.0,
+        "min": 81862656.0,
+        "max": 81965056.0
+      },
+      "settled.application.memory_bytes.private_commit": {
+        "samples": [
+          99201024.0,
+          99082240.0
+        ],
+        "median": 99141632.0,
+        "min": 99082240.0,
+        "max": 99201024.0
+      },
+      "settled.application.memory_peak_bytes.working_set": {
+        "samples": [
+          85872640.0,
+          85770240.0
+        ],
+        "median": 85821440.0,
+        "min": 85770240.0,
+        "max": 85872640.0
+      },
+      "settled.application.memory_peak_bytes.commit": {
+        "samples": [
+          99221504.0,
+          99082240.0
+        ],
+        "median": 99151872.0,
+        "min": 99082240.0,
+        "max": 99221504.0
+      },
+      "settled.ui.memory_bytes.working_set": {
+        "samples": [
+          81862656.0,
+          81965056.0
+        ],
+        "median": 81913856.0,
+        "min": 81862656.0,
+        "max": 81965056.0
+      },
+      "settled.ui.memory_bytes.private_commit": {
+        "samples": [
+          99201024.0,
+          99082240.0
+        ],
+        "median": 99141632.0,
+        "min": 99082240.0,
+        "max": 99201024.0
+      },
+      "settled.ui.memory_peak_bytes.working_set": {
+        "samples": [
+          85872640.0,
+          85770240.0
+        ],
+        "median": 85821440.0,
+        "min": 85770240.0,
+        "max": 85872640.0
+      },
+      "settled.ui.memory_peak_bytes.commit": {
+        "samples": [
+          99221504.0,
+          99082240.0
+        ],
+        "median": 99151872.0,
+        "min": 99082240.0,
+        "max": 99221504.0
+      },
+      "inspect_round_trip_us.run_median": {
+        "samples": [
+          207.5,
+          146.2
+        ],
+        "median": 176.85,
+        "min": 146.2,
+        "max": 207.5
+      },
+      "inspect_round_trip_us.run_p95": {
+        "samples": [
+          407.2,
+          215.5
+        ],
+        "median": 311.35,
+        "min": 215.5,
+        "max": 407.2
+      }
+    },
+    "aot-host-100000-trace-direct": {
+      "startup_us.dart_main_after_clock_init": {
+        "samples": [
+          52192.1,
+          57125.3
+        ],
+        "median": 54658.7,
+        "min": 52192.1,
+        "max": 57125.3
+      },
+      "startup_us.records_constructed": {
+        "samples": [
+          87108.9,
+          98186.9
+        ],
+        "median": 92647.9,
+        "min": 87108.9,
+        "max": 98186.9
+      },
+      "startup_us.host_ready": {
+        "samples": [
+          431974.5,
+          511777.6
+        ],
+        "median": 471876.05,
+        "min": 431974.5,
+        "max": 511777.6
+      },
+      "startup_us.verified_draw_ack": {
+        "samples": [
+          470744.8,
+          558993.8
+        ],
+        "median": 514869.30000000005,
+        "min": 470744.8,
+        "max": 558993.8
+      },
+      "startup_us.idle_start": {
+        "samples": [
+          471306.6,
+          559802.4
+        ],
+        "median": 515554.5,
+        "min": 471306.6,
+        "max": 559802.4
+      },
+      "startup_us.idle_end": {
+        "samples": [
+          2595608.0,
+          2675138.5
+        ],
+        "median": 2635373.25,
+        "min": 2595608.0,
+        "max": 2675138.5
+      },
+      "startup_us.first_content_paint": {
+        "samples": [
+          431348.8,
+          510942.8
+        ],
+        "median": 471145.8,
+        "min": 431348.8,
+        "max": 510942.8
+      },
+      "stage_us.dart.build": {
+        "samples": [
+          78.8,
+          32.5
+        ],
+        "median": 55.65,
+        "min": 32.5,
+        "max": 78.8
+      },
+      "stage_us.dart.library": {
+        "samples": [
+          6753.7,
+          7816.7
+        ],
+        "median": 7285.2,
+        "min": 6753.7,
+        "max": 7816.7
+      },
+      "stage_us.dart.describe": {
+        "samples": [
+          21.5,
+          26.6
+        ],
+        "median": 24.05,
+        "min": 21.5,
+        "max": 26.6
+      },
+      "stage_us.dart.encode": {
+        "samples": [
+          32171.7,
+          35496.3
+        ],
+        "median": 33834.0,
+        "min": 32171.7,
+        "max": 35496.3
+      },
+      "bytes.dart.encode": {
+        "samples": [
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.json_utf8": {
+        "samples": [
+          30183.3,
+          32295.7
+        ],
+        "median": 31239.5,
+        "min": 30183.3,
+        "max": 32295.7
+      },
+      "stage_us.dart.ffi_copy": {
+        "samples": [
+          1983.2,
+          3189.4
+        ],
+        "median": 2586.3,
+        "min": 1983.2,
+        "max": 3189.4
+      },
+      "bytes.dart.ffi_copy": {
+        "samples": [
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.ffi": {
+        "samples": [
+          35323.0,
+          35463.4
+        ],
+        "median": 35393.2,
+        "min": 35323.0,
+        "max": 35463.4
+      },
+      "bytes.dart.ffi": {
+        "samples": [
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.native.initial_decode": {
+        "samples": [
+          34961.7,
+          34852.8
+        ],
+        "median": 34907.25,
+        "min": 34852.8,
+        "max": 34961.7
+      },
+      "bytes.native.initial_decode": {
+        "samples": [
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.native.initial_validate": {
+        "samples": [
+          299.6,
+          514.3
+        ],
+        "median": 406.95,
+        "min": 299.6,
+        "max": 514.3
+      },
+      "bytes.native.initial_validate": {
+        "samples": [
+          2178134.0,
+          2178134.0
+        ],
+        "median": 2178134.0,
+        "min": 2178134.0,
+        "max": 2178134.0
+      },
+      "stage_us.dart.runner_spawn": {
+        "samples": [
+          485.1,
+          572.7
+        ],
+        "median": 528.9000000000001,
+        "min": 485.1,
+        "max": 572.7
+      },
+      "stage_us.native.window_create": {
+        "samples": [
+          55332.0,
+          81447.6
+        ],
+        "median": 68389.8,
+        "min": 55332.0,
+        "max": 81447.6
+      },
+      "bytes.native.emit": {
+        "samples": [
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "bytes.dart.receive": {
+        "samples": [
+          16.0,
+          16.0
+        ],
+        "median": 16.0,
+        "min": 16.0,
+        "max": 16.0
+      },
+      "stage_us.dart.decode": {
+        "samples": [
+          58.4,
+          60.5
+        ],
+        "median": 59.45,
+        "min": 58.4,
+        "max": 60.5
+      },
+      "settled.application.memory_bytes.working_set": {
+        "samples": [
+          133480448.0,
+          133537792.0
+        ],
+        "median": 133509120.0,
+        "min": 133480448.0,
+        "max": 133537792.0
+      },
+      "settled.application.memory_bytes.private_commit": {
+        "samples": [
+          152170496.0,
+          152268800.0
+        ],
+        "median": 152219648.0,
+        "min": 152170496.0,
+        "max": 152268800.0
+      },
+      "settled.application.memory_peak_bytes.working_set": {
+        "samples": [
+          137355264.0,
+          137592832.0
+        ],
+        "median": 137474048.0,
+        "min": 137355264.0,
+        "max": 137592832.0
+      },
+      "settled.application.memory_peak_bytes.commit": {
+        "samples": [
+          152170496.0,
+          152268800.0
+        ],
+        "median": 152219648.0,
+        "min": 152170496.0,
+        "max": 152268800.0
+      },
+      "settled.ui.memory_bytes.working_set": {
+        "samples": [
+          133480448.0,
+          133537792.0
+        ],
+        "median": 133509120.0,
+        "min": 133480448.0,
+        "max": 133537792.0
+      },
+      "settled.ui.memory_bytes.private_commit": {
+        "samples": [
+          152170496.0,
+          152268800.0
+        ],
+        "median": 152219648.0,
+        "min": 152170496.0,
+        "max": 152268800.0
+      },
+      "settled.ui.memory_peak_bytes.working_set": {
+        "samples": [
+          137355264.0,
+          137592832.0
+        ],
+        "median": 137474048.0,
+        "min": 137355264.0,
+        "max": 137592832.0
+      },
+      "settled.ui.memory_peak_bytes.commit": {
+        "samples": [
+          152170496.0,
+          152268800.0
+        ],
+        "median": 152219648.0,
+        "min": 152170496.0,
+        "max": 152268800.0
+      },
+      "inspect_round_trip_us.run_median": {
+        "samples": [
+          269.2,
+          390.5
+        ],
+        "median": 329.85,
+        "min": 269.2,
+        "max": 390.5
+      },
+      "inspect_round_trip_us.run_p95": {
+        "samples": [
+          430.7,
+          458.5
+        ],
+        "median": 444.6,
+        "min": 430.7,
+        "max": 458.5
+      }
+    }
+  },
+  "scope": "Each settled-memory value is the median of three observations in one process; group medians summarize fresh-process repetitions. Round-trip run summaries are not pooled. OS peaks are lifetime peaks. Application/UI roles can name the same PID; never sum these role fields as unique memory. Initial spans overlap."
+}

@@ -133,6 +133,21 @@ same contract the controls follow. Bindings, theme and menus of the last
 publication are restated with every patch, as an operation update replaces
 them.
 
+`tool/performance/bench_patch_live.dart` times both paths against a live
+host with the release library, JIT, medians over 30 rounds on 2026-09-28,
+settled after an inspect round trip so the previous frame does not count:
+
+| Fields | Rebuild to ack | Patch to ack |
+| ---: | ---: | ---: |
+| 128 | 868 us | 411 us |
+| 512 | 1,346 us | 482 us |
+| 2,048 | 4,609 us | 1,010 us |
+
+Back to back, without waiting for the previous frame, the frame's own cost
+adds to both figures; the draw histogram at 2,048 nodes shows about 24 ms
+per frame, which is why rendering the whole tree every frame is the next
+cost to remove.
+
 ## What does not change
 
 - Node identity rules. The same ID and kind keeps its native entity; an ID that
