@@ -102,7 +102,8 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiList | A virtualized list over one column of a dataset with record IDs, in an optional filter/sort view; `list_select` carries the chosen record in `GpuiEvent.listSelection`, the item shows the pick at once and the next publication's `selected` is authoritative. See [datasets](datasets.md#lists). |
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
-| publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. This is not a presentation fence. |
+| publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. Subtrees handed back as the same `UiNode` instances (const nodes, `UiMemo`) are neither re-described nor re-diffed. This is not a presentation fence. |
+| UiMemo | Keeps a built subtree while its inputs compare equal, so a rebuild reuses it by identity. See [retained tree](retained-tree.md). |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. Edit batches change cells and rows, and insert, delete or move records in order. See [datasets](datasets.md). |
 | openWindow / GpuiWindow | A secondary native window with its own description, datasets and revision sequence; events carry `GpuiEvent.window`. Closing the main window closes the application. See [secondary windows](windows.md). |
 | UiTheme | Whole-snapshot light/dark palette plus bounded opaque token overrides. `openView` reevaluates its theme builder on rebuild/reload. |

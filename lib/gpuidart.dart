@@ -18,6 +18,7 @@ export 'src/host.dart'
 export 'src/actions.dart';
 export 'src/format.dart';
 export 'src/nodes.dart';
+export 'src/memo.dart';
 export 'src/semantics.dart';
 export 'src/input_state.dart'
     show UiInputState, UiTextSelection, InputWriteException;

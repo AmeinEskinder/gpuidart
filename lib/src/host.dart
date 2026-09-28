@@ -1247,15 +1247,15 @@ final class _View {
     publishTimers[revision] = Stopwatch()..start();
     var status = 0;
     try {
+      final baseline = this.baseline;
       final described = trace == null
-          ? DescribedNode.describe(root)
+          ? DescribedNode.describe(root, previous: baseline)
           : trace!._measure(
               'dart.describe',
               'snapshot',
               revision,
-              () => DescribedNode.describe(root),
+              () => DescribedNode.describe(root, previous: baseline),
             );
-      final baseline = this.baseline;
       final canUpdate = window != 0 || host._bindings.update != null;
       // A binding context absent from the tree is a submission error for a
       // whole description; keep that synchronous contract for operations too.
@@ -1280,6 +1280,7 @@ final class _View {
               revision,
               () => diffDescribed(baseline, described),
             );
+      described.seal();
       this.baseline = null;
       status = _submitDescription(
         revision,

@@ -93,6 +93,28 @@ reparents, removes, sets and child orders in that order. It never needs index
 arithmetic because native appends and the final `children` operation fixes
 the order. `tool/performance/bench_diff.dart` times describe and diff alone.
 
+## Sublinear rebuilds through identity
+
+Describing a tree against the previous description reuses every subtree whose
+`UiNode` instance is unchanged, without serializing it, and the diff skips a
+reused subtree whole. A rebuild therefore costs the parts that changed when
+the application hands back the same instances for the parts that did not:
+`const` nodes are the same instance on every build, and `UiMemo` keeps a
+built subtree while its inputs compare equal:
+
+```dart
+final header = UiMemo<UiNode>();
+UiNode build() => UiColumn('root', [
+  header.of([title, unread], () => UiRow('header', [...])),
+  UiText('status', status),
+]);
+```
+
+Reuse is positional under the same parent: a kept instance under a rebuilt
+parent is found by position or ID among that parent's previous children. A
+kept instance that moves to another parent is described afresh and diffs to
+a reparent, as before. Nothing changes on the wire or in native.
+
 ## What does not change
 
 - Node identity rules. The same ID and kind keeps its native entity; an ID that
@@ -105,9 +127,16 @@ the order. `tool/performance/bench_diff.dart` times describe and diff alone.
 
 ## Limits
 
-- Native applies operations on a clone of the tree and finds targets by
-  walking it, so a batch costs O(nodes) per operation. Measured cost decides
-  whether an ID index or a native arena is the next step.
+- Native applies operations in place. It keeps an index of node IDs and
+  parents beside the applied tree, so a target costs its path from the root
+  rather than a walk of every node, and each operation records its inverse.
+  A failing operation, binding, menu, theme or dataset check rolls the batch
+  back through that log, so the applied description never shows a partial
+  batch. Own fields of inserted and set nodes are validated when the update
+  parses; after application native checks only identity, size, depth, the
+  bindings and menus the update carries, and the datasets the touched nodes
+  reference. Reconciliation of retained entities still walks the resulting
+  tree.
 - Rendering still materializes the whole tree every frame. Per-node entities
   with scoped invalidation are a separate change gated by the same
   measurement.
@@ -124,3 +153,18 @@ and publish-to-ack improves for every change kind at every size, 0.46 of
 trunk for a property change at 2,048 nodes. The Dart describe plus diff and
 the native clone plus revalidation are the remaining costs, which is why a
 binary wire is not the next step.
+
+`tool/performance/bench_memo.dart` times describe and diff for one field
+change in a form of memoized rows, fresh rows against rows handed back by
+`UiMemo`. JIT medians over 100 rounds on 2026-09-28, while a release build
+ran on the same machine, so the ratios carry the claim rather than the
+absolute figures:
+
+| Fields | Describe, fresh | Describe, memoized | Diff, fresh | Diff, memoized |
+| ---: | ---: | ---: | ---: | ---: |
+| 128 | 192 us | 11 us | 281 us | 23 us |
+| 512 | 437 us | 30 us | 539 us | 84 us |
+| 2,048 | 1,688 us | 100 us | 2,099 us | 278 us |
+
+The operations are the same 101 bytes either way. The remaining memoized
+cost is the root's child list, which the diff still walks by position.

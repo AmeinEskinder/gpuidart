@@ -361,4 +361,152 @@ void main() {
       );
     }
   });
+  test(
+    'subtrees kept as the same instances are reused by describe and diff',
+    () {
+      final header = UiRow('header', [
+        const UiText('title', 'Title'),
+        const UiButton('save', 'Save'),
+      ]);
+      UiNode build(String status) =>
+          UiColumn('root', [header, UiText('status', status)]);
+      final first = DescribedNode.describe(build('one'));
+      final second = DescribedNode.describe(build('two'), previous: first);
+      expect(identical(second.children[0], first.children[0]), isTrue);
+      expect(identical(second.children[1], first.children[1]), isFalse);
+      final ops = diffDescribed(first, second)!;
+      expect(ops, [
+        {
+          'op': 'set',
+          'id': 'status',
+          'node': {'kind': 'text', 'id': 'status', 'text': 'two'},
+        },
+      ]);
+      expect(canonical(applyOps(first.json, ops)), canonical(second.json));
+      second.seal();
+      // The header instance moves under a new container.
+      final moved = UiColumn('root', [
+        UiStack('shell', [header]),
+        const UiText('status', 'two'),
+      ]);
+      final third = DescribedNode.describe(moved, previous: second);
+      final movedOps = diffDescribed(second, third)!;
+      expect(
+        movedOps.map((op) => op['op']),
+        containsAll(['insert', 'reparent']),
+      );
+      expect(canonical(applyOps(second.json, movedOps)), canonical(third.json));
+      third.seal();
+      // The same root instance again: the whole description is reused.
+      final fourth = DescribedNode.describe(moved, previous: third);
+      expect(identical(fourth, third), isTrue);
+      expect(diffDescribed(third, fourth), isEmpty);
+      fourth.seal();
+      // A rebuilt shell around the kept header reuses the header and reports
+      // no stale reparent from the earlier move.
+      final fifth = DescribedNode.describe(
+        UiColumn('root', [
+          UiStack('shell', [header]),
+          const UiText('status', 'three'),
+        ]),
+        previous: fourth,
+      );
+      expect(
+        identical(
+          fifth.children[0].children[0],
+          fourth.children[0].children[0],
+        ),
+        isTrue,
+      );
+      final laterOps = diffDescribed(fourth, fifth)!;
+      expect(laterOps, [
+        {
+          'op': 'set',
+          'id': 'status',
+          'node': {'kind': 'text', 'id': 'status', 'text': 'three'},
+        },
+      ]);
+      expect(canonical(applyOps(fourth.json, laterOps)), canonical(fifth.json));
+      fifth.seal();
+      // A kept instance that leaves the tree is removed like any node.
+      final sixth = DescribedNode.describe(
+        UiColumn('root', [const UiText('status', 'three')]),
+        previous: fifth,
+      );
+      final removal = diffDescribed(fifth, sixth)!;
+      expect(removal, [
+        {'op': 'remove', 'id': 'shell'},
+      ]);
+      expect(canonical(applyOps(fifth.json, removal)), canonical(sixth.json));
+    },
+  );
+
+  test('random rebuilds that keep subtree instances replay through reuse', () {
+    final random = Random(20260928);
+    var serial = 0;
+    UiNode leaf(String id) => switch (random.nextInt(3)) {
+      0 => UiText(id, 'T${random.nextInt(3)}'),
+      1 => UiButton(id, 'B${random.nextInt(3)}'),
+      _ => UiInput(id, placeholder: 'P${random.nextInt(3)}'),
+    };
+    UiNode fresh(int depth) {
+      final id = 'f${serial++}';
+      if (depth == 0 || random.nextInt(3) == 0) return leaf(id);
+      final children = [
+        for (var i = 0; i < random.nextInt(4); i++) fresh(depth - 1),
+      ];
+      return random.nextBool() ? UiColumn(id, children) : UiRow(id, children);
+    }
+
+    UiNode evolve(UiNode node) {
+      if (random.nextInt(3) == 0) return node;
+      if (node.children.isEmpty) {
+        return random.nextInt(4) == 0 ? fresh(2) : leaf(node.id);
+      }
+      if (random.nextInt(5) == 0) return fresh(2);
+      final children = [for (final child in node.children) evolve(child)];
+      if (random.nextInt(4) == 0) children.add(fresh(1));
+      if (random.nextBool()) children.shuffle(random);
+      if (random.nextInt(5) == 0 && children.isNotEmpty) children.removeLast();
+      return node is UiRow
+          ? UiRow(node.id, children)
+          : UiColumn(node.id, children);
+    }
+
+    var current = UiColumn('root', [fresh(2), fresh(2), fresh(2)]);
+    var described = DescribedNode.describe(current);
+    var reused = 0;
+    for (var round = 0; round < 300; round++) {
+      final next = UiColumn('root', [
+        for (final child in current.children) evolve(child),
+        if (random.nextInt(4) == 0) fresh(2),
+      ]);
+      final nextDescribed = DescribedNode.describe(next, previous: described);
+      expect(canonical(nextDescribed.json), canonical(next.toJson()));
+      for (var i = 0; i < next.children.length; i++) {
+        if (i < current.children.length &&
+            identical(next.children[i], current.children[i])) {
+          expect(
+            identical(nextDescribed.children[i], described.children[i]),
+            isTrue,
+          );
+          reused++;
+        }
+      }
+      final ops = diffDescribed(described, nextDescribed);
+      nextDescribed.seal();
+      current = next;
+      if (ops == null) {
+        described = DescribedNode.describe(next);
+        continue;
+      }
+      expect(
+        canonical(applyOps(described.json, ops)),
+        canonical(next.toJson()),
+        reason: 'round $round ops $ops',
+      );
+      described = nextDescribed;
+    }
+    expect(reused, greaterThan(100));
+  });
 }

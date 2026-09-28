@@ -14,8 +14,11 @@ sealed class UiNode {
   final UiStyle? style;
   final UiSemantics? semantics;
 
-  /// Child nodes. Only [UiColumn] and [UiRow] have any.
+  /// Child nodes. Only container kinds have any.
   List<UiNode> get children => const [];
+
+  /// Whether this kind carries children on the wire.
+  bool get isContainer => false;
 
   /// This node's own fields without [children]. Throws [ArgumentError] when a
   /// field is outside the protocol's bounds.
@@ -30,6 +33,8 @@ final class UiColumn extends UiNode {
     : children = List.unmodifiable(children);
   @override
   final List<UiNode> children;
+  @override
+  bool get isContainer => true;
   @override
   Map<String, Object> props() => {
     'kind': 'column',
@@ -50,6 +55,8 @@ final class UiRow extends UiNode {
     : children = List.unmodifiable(children);
   @override
   final List<UiNode> children;
+  @override
+  bool get isContainer => true;
   @override
   Map<String, Object> props() => {
     'kind': 'row',
@@ -72,6 +79,8 @@ final class UiStack extends UiNode {
     : children = List.unmodifiable(children);
   @override
   final List<UiNode> children;
+  @override
+  bool get isContainer => true;
   @override
   Map<String, Object> props() => {
     'kind': 'stack',
@@ -108,6 +117,8 @@ final class UiScroll extends UiNode {
   final UiScrollAxis axis;
   @override
   final List<UiNode> children;
+  @override
+  bool get isContainer => true;
   @override
   Map<String, Object> props() => {
     'kind': 'scroll',
