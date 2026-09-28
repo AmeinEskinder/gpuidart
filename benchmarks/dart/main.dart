@@ -2,8 +2,35 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:gpuidart/gpuidart.dart';
+
+/// The view workload cycles the table through these stages, one per click:
+/// a descending sort on the price, the sort with a filter that keeps about
+/// half the records, both with a grouping by sector and native aggregates,
+/// and back to the plain records.
+const viewStages = ['records', 'sort', 'sort+filter', 'sort+filter+group'];
+
+UiTableView? viewForStage(int stage) => switch (stage) {
+  1 => const UiTableView(sort: [UiSort(2, direction: UiSortDirection.desc)]),
+  2 => const UiTableView(
+    sort: [UiSort(2, direction: UiSortDirection.desc)],
+    filter: [UiFilter(2, UiFilterOp.gt, '5100')],
+  ),
+  3 => const UiTableView(
+    sort: [UiSort(2, direction: UiSortDirection.desc)],
+    filter: [UiFilter(2, UiFilterOp.gt, '5100')],
+    group: UiGroup(
+      3,
+      aggregates: [
+        UiAggregate(2, UiAggregateOp.avg),
+        UiAggregate(2, UiAggregateOp.max),
+      ],
+    ),
+  ),
+  _ => null,
+};
 
 Future<void> main(List<String> args) async {
   // Match the native executables' physical rendering scale before opening GPUI.
@@ -16,27 +43,37 @@ Future<void> main(List<String> args) async {
       'Could not select per-monitor DPI awareness for the benchmark',
     );
   }
-  // The runner sets the row count; workloads other than idle need 100,000.
+  // The runner sets the row count; workloads other than idle and view need
+  // 100,000. The view workload adds a low-cardinality sector column to group
+  // by and turns the first button into the view cycle.
   final rows =
       int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
+  final viewWorkload =
+      Platform.environment['GPUIDART_BENCH_WORKLOAD'] == 'view';
   final data = TableDataset(
     'quotes',
-    columns: ['ID', 'Instrument', 'Price'],
+    columns: ['ID', 'Instrument', 'Price', if (viewWorkload) 'Sector'],
     rows: List.generate(
       rows,
-      (i) => ['$i', 'Instrument $i', (100 + i / 100).toStringAsFixed(2)],
+      (i) => [
+        '$i',
+        'Instrument $i',
+        (100 + i / 100).toStringAsFixed(2),
+        if (viewWorkload) 'Sector ${i % 12}',
+      ],
     ),
   );
   final launchUtcMs = int.tryParse(
     Platform.environment['GPUIDART_BENCH_LAUNCH_UTC_MS'] ?? '',
   );
+  var stage = 0;
   final host = await GpuiHost.openView(
-    () => UiColumn('main', const [
-      UiText('title', 'GPUI comparison · 100,000 records'),
-      UiButton('cell', 'Update one cell'),
-      UiButton('burst', 'Update eight visible cells'),
-      UiButton('report', 'Save measurements'),
-      UiTable('table', dataset: 'quotes'),
+    () => UiColumn('main', [
+      const UiText('title', 'GPUI comparison · 100,000 records'),
+      UiButton('cell', viewWorkload ? 'Cycle view' : 'Update one cell'),
+      const UiButton('burst', 'Update eight visible cells'),
+      const UiButton('report', 'Save measurements'),
+      UiTable('table', dataset: 'quotes', view: viewForStage(stage)),
     ]),
     datasets: [data],
     // The SDK's path for large datasets: the window opens first and the
@@ -49,6 +86,7 @@ Future<void> main(List<String> args) async {
       : DateTime.now().toUtc().millisecondsSinceEpoch - launchUtcMs;
   var updates = 0;
   var cellsWritten = 0;
+  final viewApplyUs = <int>[];
   final traceEnabled = Platform.environment['GPUIDART_INPUT_TRACE'] == '1';
   final inputTrace = <Map<String, Object?>>[];
   final traceClock = Stopwatch()..start();
@@ -85,6 +123,18 @@ Future<void> main(List<String> args) async {
           'first_price': data.rowCount == 0 ? null : data.cell(0, 2),
           'first_frame_ms_since_launch': readyMsSinceLaunch,
           'native_first_price': nativeCell,
+          if (viewWorkload)
+            'view': {
+              'stage': stage,
+              'stage_name': viewStages[stage],
+              'displayed_rows': state['tables']['table']['view']['view_rows'],
+              'table': state['tables']['table'],
+              'apply_us': distribution(viewApplyUs),
+              'scope':
+                  'per click: from the click handler through the rebuild '
+                  'acknowledgement, after native has recomputed the view '
+                  'and notified the table; the frame that shows it follows',
+            },
           if (traceEnabled) 'input_trace': inputTrace,
           'native': state,
           'publication': host.metrics.read(),
@@ -102,6 +152,14 @@ Future<void> main(List<String> args) async {
         'update_ordinal': updates + 1,
         'target_revision': data.revision + 1,
       });
+    }
+    if (viewWorkload && event.id == 'cell') {
+      stage = (stage + 1) % viewStages.length;
+      updates++;
+      final applying = Stopwatch()..start();
+      await host.rebuild();
+      viewApplyUs.add(applying.elapsedMicroseconds);
+      return;
     }
     final count = event.id == 'burst' ? 8 : 1;
     updates++;
@@ -146,4 +204,22 @@ Future<void> main(List<String> args) async {
     await File('${args.single}.input-trace.json')
         .writeAsString(const JsonEncoder.withIndent('  ').convert(inputTrace));
   }
+}
+
+/// The same estimator the analyzer uses: the value at ceil(p * n) - 1 of the
+/// sorted samples.
+Map<String, Object?> distribution(List<int> samples) {
+  if (samples.isEmpty) return {'samples': 0};
+  final sorted = [...samples]..sort();
+  int at(double p) => sorted[max(0, (p * sorted.length).ceil() - 1)];
+  return {
+    'samples': sorted.length,
+    'p50': at(0.50),
+    'p95': at(0.95),
+    'p99': at(0.99),
+    'max': sorted.last,
+    'values': sorted,
+    // In click order, so each sample can be read against its view stage.
+    'sequence': samples,
+  };
 }

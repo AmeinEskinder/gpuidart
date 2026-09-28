@@ -160,6 +160,12 @@ Feasibility verdicts recorded on this machine:
   Build Tools 17.14 installed the fixture is built and measured; the two
   series and their qualifications are in the
   [comparison status](../reports/comparison/README.md).
+- **Grouped views at a million records** cost 0.4 to 0.6 s of native
+  recompute where a sort over the same records costs 0.1 to 0.2 s
+  ([view workload](../reports/comparison/view-1m-20260929.md)); the Dart
+  fixture completes its view changes in about half the Flutter fixture's
+  time, not the order of magnitude the plan's exit condition asks for, and
+  the grouped recompute is where that gap would have to come from.
 - **Typed dataset cells** stay deferred: sort, filter and aggregates already
   compare numerically when a cell parses as a number, formats render
   numbers from strings, and the one-million-record measurement puts a sort

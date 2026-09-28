@@ -8,6 +8,10 @@ The Rust/Dart series contains 24 foreground runs and 2,101 applied updates from 
 
 The production snapshot/dataset architecture remains frozen. Native input tracing is opt-in through a diagnostic build feature. The earlier [pilot record](measurements-20260925.md) remains available.
 
+## Sort, filter and group over a million records (2026-09-29)
+
+A `view` workload cycles both fixtures through a descending sort, the sort with a filter keeping half the records, and both with a grouping by a twelve-value sector column, one click per second at 1,000,000 records ([report](view-1m-20260929.md), runs [view-1m-20260929-0](view-1m-20260929-0) to [-2](view-1m-20260929-2)). The Dart fixture's view changes complete in about half the Flutter fixture's time (medians 146 to 178 ms against 315 to 366 ms per click, ratio 1.8 to 2.5 over three runs), not the order of magnitude the exit condition asked for; the grouped stage costs 0.4 to 0.6 s natively and is the finding to act on. CPU over the run was 25 to 30 percent of a core for Dart against 51 to 57 for Flutter; the Dart fixture's working set was about 200 MiB higher because it keeps its Dart copy of the records beside the native one.
+
 ## Dart and Flutter Windows (2026-09-28)
 
 Two three-repetition foreground series compare the Dart AOT fixture with a Flutter Windows application built from the same records, geometry and click targets ([fixture source](../../benchmarks/flutter/lib/main.dart)), at GPUI Kit v0.7.0 and Flutter 3.47.5 stable. All 24 slots completed in each series. Every completed run passed its application checks except one Dart scroll run in the first series, which applied 583 of 597 wheel events and is retained as a correctness failure. Four interrupted idle attempts, two per series and always the first slots after launch, are retained: a desktop notification window and Explorer took the foreground.

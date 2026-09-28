@@ -1,6 +1,6 @@
 param(
     [ValidateSet('rust','dart','solid','shell','flutter')][string]$Implementation = 'dart',
-    [ValidateSet('idle','scroll','cell','burst')][string]$Workload = 'idle',
+    [ValidateSet('idle','scroll','cell','burst','view')][string]$Workload = 'idle',
     [ValidateRange(2,120)][int]$Seconds = 10,
     [string]$RunId = 'pilot',
     [switch]$CapturePresent,
@@ -32,7 +32,8 @@ $exe = switch ($Implementation) {
 $arguments = if ($Implementation -eq 'shell') { '"' + (Join-Path $root 'benchmarks/shell') + '"' } else { '"' + $appOutput + '"' }
 $env:GPUIDART_LIBRARY = Join-Path $root 'target/release/gpuidart.dll'
 $env:GPUIDART_BENCH_ROWS = "$Rows"
-if ($Rows -ne 100000 -and $Workload -ne 'idle') { throw 'Only the idle workload runs with a row count other than 100000' }
+$env:GPUIDART_BENCH_WORKLOAD = $Workload
+if ($Rows -ne 100000 -and $Workload -notin @('idle','view')) { throw 'Only the idle and view workloads run with a row count other than 100000' }
 $env:GPUIDART_INPUT_TRACE = $null
 $env:GPUIDART_NATIVE_TRACE = $null
 if ($TraceInput) {
@@ -93,6 +94,7 @@ try {
         switch ($Workload) {
             scroll { [BenchmarkWindow]::Pointer($window, 400, 270) }
             cell { [BenchmarkWindow]::Pointer($window, 140, 69) }
+            view { [BenchmarkWindow]::Pointer($window, 140, 69) }
             burst { [BenchmarkWindow]::Pointer($window, 140, 113) }
         }
         Start-Sleep -Milliseconds 100
@@ -105,8 +107,8 @@ try {
     $frequency = [Diagnostics.Stopwatch]::Frequency
     $startQpc = [Diagnostics.Stopwatch]::GetTimestamp()
     $timer = [Diagnostics.Stopwatch]::StartNew()
-    $period = switch ($Workload) { idle { [double]::PositiveInfinity } scroll { 1000.0 / 60 } cell { 200.0 } burst { 1000.0 / 30 } }
-    $plannedInputs = $Seconds * $(switch ($Workload) { idle { 0 } scroll { 60 } cell { 5 } burst { 30 } })
+    $period = switch ($Workload) { idle { [double]::PositiveInfinity } scroll { 1000.0 / 60 } cell { 200.0 } burst { 1000.0 / 30 } view { 1000.0 } }
+    $plannedInputs = $Seconds * $(switch ($Workload) { idle { 0 } scroll { 60 } cell { 5 } burst { 30 } view { 1 } })
     $wheelDelta = switch ($Implementation) { solid { -156 } flutter { -117 } default { -120 } }
     $nextInput = 0.0
     $nextSlot = 0
@@ -137,6 +139,7 @@ try {
                 switch ($Workload) {
                     scroll { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageWheel($window, $wheelDelta) } else { [BenchmarkWindow]::Wheel($window, $wheelDelta) } }
                     cell { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 69) } else { $sentPackets = [BenchmarkWindow]::Click($window, 69, $sequence) } }
+                    view { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 69) } else { $sentPackets = [BenchmarkWindow]::Click($window, 69, $sequence) } }
                     burst { if (-not $measuring) { [BenchmarkWindow]::Warm() } elseif ($BackgroundSmoke) { [BenchmarkWindow]::MessageClick($window, 113) } else { $sentPackets = [BenchmarkWindow]::Click($window, 113, $sequence) } }
                 }
                 $inputTimes.Add(@{ sequence = $sequence; qpc = $qpc; injection_completed_qpc = [Diagnostics.Stopwatch]::GetTimestamp(); packets_accepted = $sentPackets; scheduled_ms = $nextInput; sent_ms = $elapsed })
@@ -186,11 +189,14 @@ try {
     if (-not (Test-Path -LiteralPath $appOutput)) { throw 'Application produced no verification report' }
     $verification = Get-Content -Raw -LiteralPath $appOutput | ConvertFrom-Json
     $verificationIssues = [Collections.Generic.List[string]]::new()
-    $expectedUpdates = if ($Workload -in @('cell','burst')) { $inputTimes.Count } else { 0 }
+    $expectedUpdates = if ($Workload -in @('cell','burst','view')) { $inputTimes.Count } else { 0 }
     if ($verification.updates -ne $expectedUpdates) { $verificationIssues.Add("$($verification.updates) updates for $expectedUpdates injected clicks") }
-    $expectedCells = $expectedUpdates * $(if ($Workload -eq 'burst') { 8 } else { 1 })
+    $expectedCells = $expectedUpdates * $(switch ($Workload) { burst { 8 } view { 0 } default { 1 } })
     if ($verification.cells_written -ne $expectedCells) { $verificationIssues.Add('Changed-cell count does not match injected input') }
-    $expectedPrice = if ($Rows -eq 0) { $null } elseif ($expectedUpdates) { 'Tick {0:D6}' -f $expectedUpdates } else { '100.00' }
+    $expectedPrice = if ($Rows -eq 0) { $null } elseif ($Workload -eq 'view' -or -not $expectedUpdates) { '100.00' } else { 'Tick {0:D6}' -f $expectedUpdates }
+    # The view workload cycles four stages; the report must show the stage the clicks add up to.
+    $expectedStage = if ($Workload -eq 'view') { $inputTimes.Count % 4 } else { $null }
+    if ($Workload -eq 'view' -and $verification.view.stage -ne $expectedStage) { $verificationIssues.Add("View stage $($verification.view.stage) after $($inputTimes.Count) clicks; expected $expectedStage") }
     if ($verification.first_price -ne $expectedPrice) { $verificationIssues.Add('Application final cell does not match injected input') }
     if ($Implementation -eq 'dart' -and $Rows -gt 0 -and $verification.native_first_price.value -ne $expectedPrice) { $verificationIssues.Add('Native final cell does not match injected input') }
     $visibleStart = switch ($Implementation) {
@@ -227,6 +233,7 @@ try {
             expected_price = $expectedPrice; application_price = $verification.first_price
             native_price = $(if ($Implementation -eq 'dart') { $verification.native_first_price.value } elseif ($Implementation -eq 'rust') { $verification.first_price } else { $null })
             expected_scroll_y = $expectedScrollY; observed_scroll_y = $scrollY
+            expected_view_stage = $expectedStage; observed_view_stage = $(if ($Workload -eq 'view') { $verification.view.stage } else { $null })
         }
         wheel_delta = $wheelDelta
         cpu_ms = $cpuMs; cpu_percent_one_core = 100 * $cpuMs / $durationMs

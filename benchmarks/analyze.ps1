@@ -20,7 +20,7 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
     $applicationPath = Join-Path $file.DirectoryName 'application.json'
     $application = if (Test-Path -LiteralPath $applicationPath) { Get-Content -Raw -LiteralPath $applicationPath | ConvertFrom-Json } else { $null }
     $native = switch ($run.implementation) { rust { $application }; dart { $application.native }; default { $null } }
-    $rate = switch ($run.workload) { idle { 0 }; scroll { 60 }; cell { 5 }; burst { 30 } }
+    $rate = switch ($run.workload) { idle { 0 }; scroll { 60 }; cell { 5 }; burst { 30 }; view { 1 } }
     $plannedInputs = if ($null -ne $run.seconds_requested) { $run.seconds_requested * $rate } else { $null }
     $excessInputs = if ($null -ne $plannedInputs) { [math]::Max(0, $run.input_count - $plannedInputs) } else { $null }
     $uninjectedInputs = if ($null -ne $plannedInputs) { [math]::Max(0, $plannedInputs - $run.input_count) } else { $null }
@@ -41,7 +41,7 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
     $inputAnalysisPath = Join-Path $file.DirectoryName 'input-analysis.json'
     $responseLatency = if (Test-Path -LiteralPath $inputAnalysisPath) { (Get-Content -Raw -LiteralPath $inputAnalysisPath | ConvertFrom-Json).response_presentation } else { $null }
     $correlated = $null -ne $responseLatency -and $responseLatency.frames_correlated -gt 0
-    $targetMs = switch ($run.workload) { scroll { 1000.0 / 60 } burst { 1000.0 / 30 } cell { 200.0 } idle { $null } }
+    $targetMs = switch ($run.workload) { scroll { 1000.0 / 60 } burst { 1000.0 / 30 } cell { 200.0 } view { 1000.0 } idle { $null } }
     # The first interval starts before the measurement window.
     $intervals = @(ColumnNumbers @($displayed | Select-Object -Skip 1) 'MsBetweenDisplayChange')
     $missedSlots = $null
@@ -68,6 +68,7 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
             solid_row_components_created = $application.row_components_created
             solid_mounted_window = $application.mounted_window; solid_scroll_offset = $application.scroll_offset
             flutter_row_builds = $application.row_builds; flutter_visible_rows = $application.visible_rows; flutter_scroll_y = $application.scroll_y
+            view = $application.view
         } } else { $null })
         native_diagnostics = $(if ($native) { @{
             scope = $application.scope
