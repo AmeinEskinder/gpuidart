@@ -212,6 +212,40 @@ public static class BenchmarkWindow {
             bitmap.Save(path, ImageFormat.Png);
         }
     }
+    /// Milliseconds on [since] when the window's client area first shows more
+    /// than one color through PrintWindow, polled every five milliseconds; -1
+    /// on timeout. A proxy for the first presented frame that needs no ETW
+    /// access: it observes the composited content, not the swap chain.
+    public static double FirstContent(IntPtr window, Stopwatch since, int timeoutMs) {
+        while (since.ElapsedMilliseconds < timeoutMs) {
+            Rect rect = Client(window);
+            if (rect.Right > 0 && rect.Bottom > 0) {
+                using (Bitmap bitmap = new Bitmap(rect.Right, rect.Bottom)) {
+                    bool printed;
+                    using (Graphics graphics = Graphics.FromImage(bitmap)) {
+                        IntPtr device = graphics.GetHdc();
+                        try { printed = PrintWindow(window, device, 3); }
+                        finally { graphics.ReleaseHdc(device); }
+                    }
+                    if (printed && HasContent(bitmap)) return since.Elapsed.TotalMilliseconds;
+                }
+            }
+            System.Threading.Thread.Sleep(5);
+        }
+        return -1;
+    }
+    static bool HasContent(Bitmap bitmap) {
+        int step = Math.Max(1, Math.Min(bitmap.Width, bitmap.Height) / 64);
+        Color first = bitmap.GetPixel(0, 0);
+        int differing = 0, sampled = 0;
+        for (int y = 0; y < bitmap.Height; y += step)
+            for (int x = 0; x < bitmap.Width; x += step) {
+                sampled++;
+                Color pixel = bitmap.GetPixel(x, y);
+                if (Math.Abs(pixel.R - first.R) + Math.Abs(pixel.G - first.G) + Math.Abs(pixel.B - first.B) > 24) differing++;
+            }
+        return sampled > 0 && differing * 100 > sampled;
+    }
     public static void CaptureOffscreen(IntPtr window, string path) {
         Rect rect = Client(window);
         using (Bitmap bitmap = new Bitmap(rect.Right, rect.Bottom)) {

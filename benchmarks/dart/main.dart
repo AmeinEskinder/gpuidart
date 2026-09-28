@@ -16,13 +16,19 @@ Future<void> main(List<String> args) async {
       'Could not select per-monitor DPI awareness for the benchmark',
     );
   }
+  // The runner sets the row count; workloads other than idle need 100,000.
+  final rows =
+      int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
   final data = TableDataset(
     'quotes',
     columns: ['ID', 'Instrument', 'Price'],
     rows: List.generate(
-      100000,
+      rows,
       (i) => ['$i', 'Instrument $i', (100 + i / 100).toStringAsFixed(2)],
     ),
+  );
+  final launchUtcMs = int.tryParse(
+    Platform.environment['GPUIDART_BENCH_LAUNCH_UTC_MS'] ?? '',
   );
   final host = await GpuiHost.openView(
     () => UiColumn('main', const [
@@ -38,6 +44,9 @@ Future<void> main(List<String> args) async {
     // upload.
     deferDatasets: true,
   );
+  final readyMsSinceLaunch = launchUtcMs == null
+      ? null
+      : DateTime.now().toUtc().millisecondsSinceEpoch - launchUtcMs;
   var updates = 0;
   var cellsWritten = 0;
   final traceEnabled = Platform.environment['GPUIDART_INPUT_TRACE'] == '1';
@@ -60,18 +69,21 @@ Future<void> main(List<String> args) async {
     if (event.type != 'click') return;
     if (event.id == 'report') {
       final state = await host.diagnose('inspect');
-      final nativeCell = await host.diagnose('cell', {
-        'dataset': data.id,
-        'row': 0,
-        'column': 2,
-      });
+      final nativeCell = data.rowCount == 0
+          ? null
+          : await host.diagnose('cell', {
+              'dataset': data.id,
+              'row': 0,
+              'column': 2,
+            });
       await File(args.single).writeAsString(
         const JsonEncoder.withIndent('  ').convert({
           'implementation': 'dart',
           'rows': data.rowCount,
           'updates': updates,
           'cells_written': cellsWritten,
-          'first_price': data.cell(0, 2),
+          'first_price': data.rowCount == 0 ? null : data.cell(0, 2),
+          'first_frame_ms_since_launch': readyMsSinceLaunch,
           'native_first_price': nativeCell,
           if (traceEnabled) 'input_trace': inputTrace,
           'native': state,

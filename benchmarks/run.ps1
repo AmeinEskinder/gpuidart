@@ -7,7 +7,8 @@ param(
     [switch]$BackgroundSmoke,
     [switch]$Packaged,
     [switch]$TraceInput,
-    [switch]$NoPointerWarmup
+    [switch]$NoPointerWarmup,
+    [ValidateRange(0,1000000)][int]$Rows = 100000
 )
 $ErrorActionPreference = 'Stop'
 if ($BackgroundSmoke -and $CapturePresent) { throw 'BackgroundSmoke cannot capture presentation measurements' }
@@ -30,6 +31,8 @@ $exe = switch ($Implementation) {
 }
 $arguments = if ($Implementation -eq 'shell') { '"' + (Join-Path $root 'benchmarks/shell') + '"' } else { '"' + $appOutput + '"' }
 $env:GPUIDART_LIBRARY = Join-Path $root 'target/release/gpuidart.dll'
+$env:GPUIDART_BENCH_ROWS = "$Rows"
+if ($Rows -ne 100000 -and $Workload -ne 'idle') { throw 'Only the idle workload runs with a row count other than 100000' }
 $env:GPUIDART_INPUT_TRACE = $null
 $env:GPUIDART_NATIVE_TRACE = $null
 if ($TraceInput) {
@@ -62,6 +65,8 @@ try {
     }
     $startup = [Diagnostics.Stopwatch]::StartNew()
     $launchQpc = [Diagnostics.Stopwatch]::GetTimestamp()
+    # The fixtures report their own first frame relative to this launch instant.
+    $env:GPUIDART_BENCH_LAUNCH_UTC_MS = [string][DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     $app = [BenchmarkWindow]::Start($exe, $arguments, $folder, $Packaged)
     while ($window -eq [IntPtr]::Zero -and $startup.Elapsed.TotalSeconds -lt 45) {
         $app.Refresh()
@@ -72,6 +77,8 @@ try {
     if ($window -eq [IntPtr]::Zero) { throw 'No visible application window within 45 seconds' }
     $windowAvailableMs = $startup.Elapsed.TotalMilliseconds
     [BenchmarkWindow]::Prepare($window, -not $BackgroundSmoke)
+    # First painted content after the window is shown, from the driver's side.
+    $firstContentMs = [BenchmarkWindow]::FirstContent($window, $startup, 20000)
     Start-Sleep -Seconds 3
     [BenchmarkWindow]::Prepare($window, -not $BackgroundSmoke)
     Start-Sleep -Milliseconds 250
@@ -183,9 +190,9 @@ try {
     if ($verification.updates -ne $expectedUpdates) { $verificationIssues.Add("$($verification.updates) updates for $expectedUpdates injected clicks") }
     $expectedCells = $expectedUpdates * $(if ($Workload -eq 'burst') { 8 } else { 1 })
     if ($verification.cells_written -ne $expectedCells) { $verificationIssues.Add('Changed-cell count does not match injected input') }
-    $expectedPrice = if ($expectedUpdates) { 'Tick {0:D6}' -f $expectedUpdates } else { '100.00' }
+    $expectedPrice = if ($Rows -eq 0) { $null } elseif ($expectedUpdates) { 'Tick {0:D6}' -f $expectedUpdates } else { '100.00' }
     if ($verification.first_price -ne $expectedPrice) { $verificationIssues.Add('Application final cell does not match injected input') }
-    if ($Implementation -eq 'dart' -and $verification.native_first_price.value -ne $expectedPrice) { $verificationIssues.Add('Native final cell does not match injected input') }
+    if ($Implementation -eq 'dart' -and $Rows -gt 0 -and $verification.native_first_price.value -ne $expectedPrice) { $verificationIssues.Add('Native final cell does not match injected input') }
     $visibleStart = switch ($Implementation) {
         rust { $verification.visible_rows.start }
         dart { $verification.native.tables.table.visible_rows.start }
@@ -206,7 +213,7 @@ try {
         purpose = $(if ($TraceInput) { 'foreground input tracing; ineligible for performance comparison' } elseif ($BackgroundSmoke) { 'background fixture correctness; ineligible for performance comparison' } else { 'foreground measurement' })
         input_trace = [bool]$TraceInput; pointer_warmup = -not [bool]$NoPointerWarmup
         activation_clicks = [BenchmarkWindow]::ActivationClicks
-        rows = 100000; seconds_requested = $Seconds; duration_ms = $durationMs
+        rows = $Rows; seconds_requested = $Seconds; duration_ms = $durationMs
         harness_timer_resolution_ms = [BenchmarkWindow]::TimerResolution / 10000.0
         driver_wait = 'one-millisecond high resolution waitable timer'
         driver_priority = $(if ([BenchmarkWindow]::ElevatedPriority) { 'high priority class, highest thread priority' } else { 'normal; elevation failed' })
@@ -225,6 +232,8 @@ try {
         cpu_ms = $cpuMs; cpu_percent_one_core = 100 * $cpuMs / $durationMs
         logical_processors = [Environment]::ProcessorCount
         window_available_ms = $windowAvailableMs; startup_boundary = 'process launch to created HWND; window explicitly shown afterward; not first displayed frame'
+        first_content_ms = $firstContentMs; first_content_boundary = 'process launch to the first PrintWindow capture after showing the window whose client area holds more than one color, polled every 5 ms; composited content, not the swap chain present'
+        application_first_frame_ms = $verification.first_frame_ms_since_launch; application_first_frame_boundary = 'the fixture''s own clock: Dart when open returns with the window up and the first description applied; Flutter at the first FrameTiming callback; both relative to the launch instant the runner passed in'
         start_qpc = $startQpc; end_qpc = $endQpc; qpc_frequency = $frequency
         trace_status = $traceStatus; trace_exit_code = $(if ($trace -and $trace.HasExited) { $trace.ExitCode } else { $null }); dpi_scale = $dpiScale; window_dpi = $windowDpi
         client_pixels = $clientPixels

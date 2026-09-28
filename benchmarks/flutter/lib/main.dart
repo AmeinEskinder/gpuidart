@@ -11,7 +11,9 @@ import 'package:flutter/scheduler.dart';
 /// 320-pixel table viewport and 16-pixel text. The runner clicks at
 /// (140, 69), (140, 113) and (140, 157) for the three buttons and scrolls
 /// with the pointer at (400, 270).
-const rowCount = 100000;
+/// The runner sets the row count; workloads other than idle need 100,000.
+final rowCount =
+    int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
 const columnWidth = 200.0;
 const rowHeight = 32.0;
 const viewportHeight = 320.0;
@@ -49,6 +51,7 @@ class _BenchmarkState extends State<Benchmark> {
   final buildUs = <int>[];
   final rasterUs = <int>[];
   final totalUs = <int>[];
+  int? firstFrameMsSinceLaunch;
   var updates = 0;
   var cellsWritten = 0;
   var rowBuilds = 0;
@@ -67,6 +70,15 @@ class _BenchmarkState extends State<Benchmark> {
   }
 
   void _recordFrames(List<FrameTiming> timings) {
+    if (firstFrameMsSinceLaunch == null) {
+      final launch = int.tryParse(
+        Platform.environment['GPUIDART_BENCH_LAUNCH_UTC_MS'] ?? '',
+      );
+      if (launch != null) {
+        firstFrameMsSinceLaunch =
+            DateTime.now().toUtc().millisecondsSinceEpoch - launch;
+      }
+    }
     for (final timing in timings) {
       buildUs.add(timing.buildDuration.inMicroseconds);
       rasterUs.add(timing.rasterDuration.inMicroseconds);
@@ -95,7 +107,8 @@ class _BenchmarkState extends State<Benchmark> {
         'rows': rowCount,
         'updates': updates,
         'cells_written': cellsWritten,
-        'first_price': rows[0][2],
+        'first_price': rows.isEmpty ? null : rows[0][2],
+        'first_frame_ms_since_launch': firstFrameMsSinceLaunch,
         'visible_rows': {'start': start, 'end': end},
         'scroll_y': -offset,
         'scroll_y_convention':
