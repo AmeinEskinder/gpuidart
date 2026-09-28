@@ -159,15 +159,27 @@ Feasibility verdicts recorded on this machine:
   Build Tools 17.14 installed the fixture is built and measured; the two
   series and their qualifications are in the
   [comparison status](../reports/comparison/README.md).
+- **Typed dataset cells** stay deferred: sort, filter and aggregates already
+  compare numerically when a cell parses as a number, formats render
+  numbers from strings, and the one-million-record measurement puts a sort
+  recompute at about 110 ms, so a typed wire form would save parsing and
+  memory rather than change behavior. It is a protocol change on both
+  sides and waits for a workload that needs it.
+- **Starting the GPUI platform before `gd_create`** would overlap the D3D11
+  device and DirectWrite setup (about 50 ms after the font patch) with the
+  Dart side's record building and encoding, which is 6 ms at zero rows and
+  45 to 60 ms at 100,000; the gain is bounded by that Dart work, so it is
+  recorded as an option rather than built.
 - **Native dialogs** are wired but not covered by headless tests; the test
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
 
-Verification: at `9c9d081` the native library suite runs 91 tests and the
-Dart suite 104, including the live-window, list and secondary-window suites
-and the tab, radio, menu, theme, chart and tooltip suites merged from `main`,
-on the debug library, plus the repository's full check gate. Earlier counts in
-this document and in commit messages are the totals at those revisions.
+Verification: at `779b09c` the native library suite runs 100 tests (one
+ignored startup probe) and the Dart suite 113, including the live-window,
+list, secondary-window, sliced-dataset and released-copy suites and the tab,
+radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
+library, plus the repository's full check gate. Earlier counts in this
+document and in commit messages are the totals at those revisions.
 The branch is pushed; the Windows, Linux and macOS SDK checks and the
 accessibility probes pass on it, and the Linux and macOS window jobs run the
 live-window suite that holds the secondary-window and patch tests.
