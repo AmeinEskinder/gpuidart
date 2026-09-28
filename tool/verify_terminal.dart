@@ -92,12 +92,17 @@ Future<void> main(List<String> args) async {
           s['app']['selected'] == 'BRK0025' &&
           s['app']['history_revision'] == 2,
     );
+    // A large dataset uploads in slices, so its revision after open depends
+    // on the slice count; the tick must advance it by exactly one.
+    final instrumentsRevision = initial['app']['instruments_revision'] as int;
     await host.diagnose('focus', {'input': 'search'});
     await key('tab');
     await key('space');
     await until(
       'button tick edits selected record',
-      (s) => s['app']['ticks'] == 1 && s['app']['instruments_revision'] == 2,
+      (s) =>
+          s['app']['ticks'] == 1 &&
+          s['app']['instruments_revision'] == instrumentsRevision + 1,
     );
     if (semantics) {
       report['tooltip'] = await verifyTerminalTooltip(process);
