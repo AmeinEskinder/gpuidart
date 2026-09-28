@@ -2567,227 +2567,229 @@ pub(crate) fn run(
     trace.point("native.run", initial_key, None, None);
     let failure = Arc::new(std::sync::Mutex::new(None));
     let result = failure.clone();
-    gpui_kit::application()
-        .with_assets(gpui_kit::assets::Assets)
-        .run(move |cx| {
-            if let Some(before_quit) = before_quit {
-                cx.on_app_quit(move |_| {
-                    before_quit();
-                    std::future::ready(())
-                })
-                .detach();
-            }
-            gpui_kit::init(cx);
-            let options = WindowOptions {
-                window_bounds: Some(WindowBounds::centered(
-                    size(px(initial.window.width), px(initial.window.height)),
-                    cx,
-                )),
-                titlebar: Some(TitlebarOptions {
-                    title: Some(initial.window.title.clone().into()),
-                    ..Default::default()
-                }),
+    let application = gpui_kit::application().with_assets(gpui_kit::assets::Assets);
+    trace.point("native.app_built", initial_key, None, None);
+    application.run(move |cx| {
+        trace.point("native.app_callback", initial_key, None, None);
+        if let Some(before_quit) = before_quit {
+            cx.on_app_quit(move |_| {
+                before_quit();
+                std::future::ready(())
+            })
+            .detach();
+        }
+        gpui_kit::init(cx);
+        trace.point("native.kit_init", initial_key, None, None);
+        let options = WindowOptions {
+            window_bounds: Some(WindowBounds::centered(
+                size(px(initial.window.width), px(initial.window.height)),
+                cx,
+            )),
+            titlebar: Some(TitlebarOptions {
+                title: Some(initial.window.title.clone().into()),
                 ..Default::default()
-            };
-            let mut content = None;
-            let window_started = trace.start();
-            let opened = cx.open_window(options, |window, cx| {
-                let view = cx.new(|cx| {
-                    let mut view = DartView::new(initial, events.clone(), window, cx);
-                    if trace.enabled() {
-                        view.trace = Some(trace.clone());
-                    }
-                    view
-                });
-                content = Some(view.clone());
-                cx.new(|cx| gpui_kit::component::Root::new(view, window, cx))
-            });
-            trace.complete(
-                "native.window_create",
-                initial_key,
-                window_started,
-                None,
-                Some(if opened.is_ok() { 0 } else { -1 }),
-            );
-            let handle = match opened {
-                Ok(handle) => handle,
-                Err(error) => {
-                    events.emit(Event::Error {
-                        message: error.to_string(),
-                    });
-                    *failure.lock().unwrap_or_else(|error| error.into_inner()) =
-                        Some(error.to_string());
-                    cx.quit();
-                    return;
+            }),
+            ..Default::default()
+        };
+        let mut content = None;
+        let window_started = trace.start();
+        let opened = cx.open_window(options, |window, cx| {
+            let view = cx.new(|cx| {
+                let mut view = DartView::new(initial, events.clone(), window, cx);
+                if trace.enabled() {
+                    view.trace = Some(trace.clone());
                 }
-            };
-            let Some(view) = content else {
+                view
+            });
+            content = Some(view.clone());
+            cx.new(|cx| gpui_kit::component::Root::new(view, window, cx))
+        });
+        trace.complete(
+            "native.window_create",
+            initial_key,
+            window_started,
+            None,
+            Some(if opened.is_ok() { 0 } else { -1 }),
+        );
+        let handle = match opened {
+            Ok(handle) => handle,
+            Err(error) => {
                 events.emit(Event::Error {
-                    message: "Window opened without view content".into(),
+                    message: error.to_string(),
                 });
                 *failure.lock().unwrap_or_else(|error| error.into_inner()) =
-                    Some("Window opened without view content".into());
-                cx.quit();
-                return;
-            };
-            if let Some(message) = &view.read(cx).failure {
-                *failure.lock().unwrap_or_else(|error| error.into_inner()) = Some(message.clone());
+                    Some(error.to_string());
                 cx.quit();
                 return;
             }
-            trace.point("native.window_opened", initial_key, None, None);
-            let windows = Rc::new(RefCell::new(Windows::default()));
-            windows.borrow_mut().insert(0, handle, view.clone());
-            let closing = windows.clone();
-            let closed_events = events.clone();
-            cx.on_window_closed(move |cx, window_id| {
-                match closing.borrow_mut().remove_by_window_id(window_id) {
-                    // The main window owns the application.
-                    Some(0) => cx.quit(),
-                    Some(window) => {
-                        closed_events.emit(Event::WindowClosed { window });
-                        if cx.windows().is_empty() {
-                            cx.quit();
-                        }
-                    }
-                    None => {
-                        if cx.windows().is_empty() {
-                            cx.quit();
-                        }
-                    }
-                }
-            })
-            .detach();
-            events.emit(Event::Ready);
-            events.emit(Event::Applied {
-                revision: view.read(cx).snapshot.revision,
-                native_apply_us: 0,
+        };
+        let Some(view) = content else {
+            events.emit(Event::Error {
+                message: "Window opened without view content".into(),
             });
-            cx.spawn(async move |cx| {
-                while let Ok(command) = receiver.recv().await {
-                    trace.point("native.dequeue", command.trace_key(), None, None);
-                    let _dispatch = trace.dispatch(command.trace_key());
-                    // A failing update on the main window means the
-                    // application is quitting; on a secondary window it means
-                    // that window closed first and its command is dropped.
-                    match command {
-                        Command::Publish(window, snapshot) => {
-                            let Some((handle, view)) = windows.borrow().get(window) else {
-                                events.for_window(window).emit(Event::Rejected {
-                                    revision: snapshot.revision,
-                                    message: "Unknown window".into(),
-                                });
-                                continue;
-                            };
-                            if handle
-                                .update(cx, |_, w, cx| {
-                                    view.update(cx, |view, cx| view.publish(snapshot, w, cx))
-                                })
-                                .is_err()
-                                && window == 0
-                            {
-                                break;
-                            }
+            *failure.lock().unwrap_or_else(|error| error.into_inner()) =
+                Some("Window opened without view content".into());
+            cx.quit();
+            return;
+        };
+        if let Some(message) = &view.read(cx).failure {
+            *failure.lock().unwrap_or_else(|error| error.into_inner()) = Some(message.clone());
+            cx.quit();
+            return;
+        }
+        trace.point("native.window_opened", initial_key, None, None);
+        let windows = Rc::new(RefCell::new(Windows::default()));
+        windows.borrow_mut().insert(0, handle, view.clone());
+        let closing = windows.clone();
+        let closed_events = events.clone();
+        cx.on_window_closed(move |cx, window_id| {
+            match closing.borrow_mut().remove_by_window_id(window_id) {
+                // The main window owns the application.
+                Some(0) => cx.quit(),
+                Some(window) => {
+                    closed_events.emit(Event::WindowClosed { window });
+                    if cx.windows().is_empty() {
+                        cx.quit();
+                    }
+                }
+                None => {
+                    if cx.windows().is_empty() {
+                        cx.quit();
+                    }
+                }
+            }
+        })
+        .detach();
+        events.emit(Event::Ready);
+        events.emit(Event::Applied {
+            revision: view.read(cx).snapshot.revision,
+            native_apply_us: 0,
+        });
+        cx.spawn(async move |cx| {
+            while let Ok(command) = receiver.recv().await {
+                trace.point("native.dequeue", command.trace_key(), None, None);
+                let _dispatch = trace.dispatch(command.trace_key());
+                // A failing update on the main window means the
+                // application is quitting; on a secondary window it means
+                // that window closed first and its command is dropped.
+                match command {
+                    Command::Publish(window, snapshot) => {
+                        let Some((handle, view)) = windows.borrow().get(window) else {
+                            events.for_window(window).emit(Event::Rejected {
+                                revision: snapshot.revision,
+                                message: "Unknown window".into(),
+                            });
+                            continue;
+                        };
+                        if handle
+                            .update(cx, |_, w, cx| {
+                                view.update(cx, |view, cx| view.publish(snapshot, w, cx))
+                            })
+                            .is_err()
+                            && window == 0
+                        {
+                            break;
                         }
-                        Command::Update(window, update) => {
-                            let Some((handle, view)) = windows.borrow().get(window) else {
-                                events.for_window(window).emit(Event::Rejected {
-                                    revision: update.revision,
-                                    message: "Unknown window".into(),
-                                });
-                                continue;
-                            };
-                            if handle
-                                .update(cx, |_, w, cx| {
-                                    view.update(cx, |view, cx| view.apply_update(update, w, cx))
-                                })
-                                .is_err()
-                                && window == 0
-                            {
-                                break;
-                            }
+                    }
+                    Command::Update(window, update) => {
+                        let Some((handle, view)) = windows.borrow().get(window) else {
+                            events.for_window(window).emit(Event::Rejected {
+                                revision: update.revision,
+                                message: "Unknown window".into(),
+                            });
+                            continue;
+                        };
+                        if handle
+                            .update(cx, |_, w, cx| {
+                                view.update(cx, |view, cx| view.apply_update(update, w, cx))
+                            })
+                            .is_err()
+                            && window == 0
+                        {
+                            break;
                         }
-                        Command::Close | Command::CloseWindow(0) => break,
-                        Command::CloseWindow(window) => {
-                            // Removing the window runs the close observer,
-                            // which borrows the registry: hold no borrow here.
-                            let target = windows.borrow().get(window);
-                            if let Some((handle, _)) = target {
-                                let _ = handle.update(cx, |_, w, _| w.remove_window());
-                            }
+                    }
+                    Command::Close | Command::CloseWindow(0) => break,
+                    Command::CloseWindow(window) => {
+                        // Removing the window runs the close observer,
+                        // which borrows the registry: hold no borrow here.
+                        let target = windows.borrow().get(window);
+                        if let Some((handle, _)) = target {
+                            let _ = handle.update(cx, |_, w, _| w.remove_window());
                         }
-                        Command::OpenWindow(open) => open_secondary(cx, &windows, &events, open),
-                        Command::Dataset(window, update, parse_us) => {
-                            let Some((handle, view)) = windows.borrow().get(window) else {
-                                events.for_window(window).emit(Event::DatasetRejected {
-                                    request: update.request,
-                                    message: "Unknown window".into(),
-                                });
-                                continue;
-                            };
-                            if handle
-                                .update(cx, |_, _, cx| {
-                                    view.update(cx, |view, cx| {
-                                        view.update_dataset(update, parse_us, cx)
-                                    })
+                    }
+                    Command::OpenWindow(open) => open_secondary(cx, &windows, &events, open),
+                    Command::Dataset(window, update, parse_us) => {
+                        let Some((handle, view)) = windows.borrow().get(window) else {
+                            events.for_window(window).emit(Event::DatasetRejected {
+                                request: update.request,
+                                message: "Unknown window".into(),
+                            });
+                            continue;
+                        };
+                        if handle
+                            .update(cx, |_, _, cx| {
+                                view.update(cx, |view, cx| {
+                                    view.update_dataset(update, parse_us, cx)
                                 })
-                                .is_err()
-                                && window == 0
-                            {
-                                break;
-                            }
+                            })
+                            .is_err()
+                            && window == 0
+                        {
+                            break;
                         }
-                        Command::Diagnostic(window, request) => {
-                            let Some((handle, view)) = windows.borrow().get(window) else {
-                                events.for_window(window).emit(Event::Diagnostic {
-                                    request: request.id(),
-                                    data: json!({"error": "Unknown window"}),
-                                });
-                                continue;
-                            };
-                            let tagged = if window == 0 {
-                                events.clone()
-                            } else {
-                                events.for_window(window)
-                            };
-                            // Keyboard dispatch may update the Root (Tab/modal
-                            // handlers), so do not borrow it through handle.update.
-                            if cx
-                                .update_window(handle.into(), |_, w, cx| {
-                                    crate::diagnostics::handle(request, &view, &tagged, w, cx)
-                                })
-                                .is_err()
-                                && window == 0
-                            {
-                                break;
-                            }
+                    }
+                    Command::Diagnostic(window, request) => {
+                        let Some((handle, view)) = windows.borrow().get(window) else {
+                            events.for_window(window).emit(Event::Diagnostic {
+                                request: request.id(),
+                                data: json!({"error": "Unknown window"}),
+                            });
+                            continue;
+                        };
+                        let tagged = if window == 0 {
+                            events.clone()
+                        } else {
+                            events.for_window(window)
+                        };
+                        // Keyboard dispatch may update the Root (Tab/modal
+                        // handlers), so do not borrow it through handle.update.
+                        if cx
+                            .update_window(handle.into(), |_, w, cx| {
+                                crate::diagnostics::handle(request, &view, &tagged, w, cx)
+                            })
+                            .is_err()
+                            && window == 0
+                        {
+                            break;
                         }
-                        Command::Input(window, request) => {
-                            let Some((handle, view)) = windows.borrow().get(window) else {
-                                events.for_window(window).emit(Event::InputResult {
-                                    request: request.request,
-                                    id: request.id.clone(),
-                                    status: crate::input_control::Status::Missing,
-                                    state: None,
-                                });
-                                continue;
-                            };
-                            if handle
-                                .update(cx, |_, w, cx| {
-                                    view.update(cx, |view, cx| view.input_command(request, w, cx))
-                                })
-                                .is_err()
-                                && window == 0
-                            {
-                                break;
-                            }
+                    }
+                    Command::Input(window, request) => {
+                        let Some((handle, view)) = windows.borrow().get(window) else {
+                            events.for_window(window).emit(Event::InputResult {
+                                request: request.request,
+                                id: request.id.clone(),
+                                status: crate::input_control::Status::Missing,
+                                state: None,
+                            });
+                            continue;
+                        };
+                        if handle
+                            .update(cx, |_, w, cx| {
+                                view.update(cx, |view, cx| view.input_command(request, w, cx))
+                            })
+                            .is_err()
+                            && window == 0
+                        {
+                            break;
                         }
                     }
                 }
-                let _ = cx.update(|cx| cx.quit());
-            })
-            .detach();
-        });
+            }
+            let _ = cx.update(|cx| cx.quit());
+        })
+        .detach();
+    });
     let error = result
         .lock()
         .unwrap_or_else(|error| error.into_inner())

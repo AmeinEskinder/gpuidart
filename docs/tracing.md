@@ -55,6 +55,7 @@ acknowledgement when counting replacement snapshots. Later snapshots start at 2.
 | `dart.json`, `dart.utf8` | Separate stages in historical captures or the internal `gpuidart.legacy_json=true` comparison build |
 | `native.initial_decode`, `native.initial_validate` | Initial JSON decode and semantic validation, inside the create call (extension 2) |
 | `dart.runner_spawn`, `native.runner_entry`, `native.run` | Isolate spawn interval, native runner entry, UI application entry |
+| `native.app_built`, `native.app_callback`, `native.kit_init` | GPUI application constructed (platform, device and text system ready), its run loop started and the launch callback entered, and GPUI Kit initialized (theme, actions, component globals); the window opens after the third |
 | `dart.companion_start` | Socket preparation and child process launch, when used |
 | `native.companion_encode`, `native.companion_write` | Initial Rust transport JSON serialization and framed socket write |
 | `native.companion_receive`, `native.companion_decode` | Child initial receive/wait and JSON decoding; receive can overlap parent write |

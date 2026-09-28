@@ -69,6 +69,21 @@ reported coordinates. The external tooltip check is the regression gate. The
 Windows/macOS default hook is a no-op; their adapters own the translation.
 
 
+## Windows startup font enumeration
+
+[font-collection.patch](font-collection.patch) changes one argument in the
+vendored `gpui-pre-windows` 0.3.7 text system: the system font collection the
+DirectWrite text system fetches once at startup no longer asks DirectWrite to
+check for font changes first (`checkForUpdates = false`). DirectWrite still
+detects installed fonts with some latency, and the lookup path that refreshes
+the collection when a requested font is missing keeps its immediate check.
+Measured in a fresh process on this machine (`startup_platform_costs`, the
+ignored probe test in the native crate), the first enumeration took 85 to 163
+ms with the check and 1 ms without it, which was most of the time between the
+native run entry and window creation. The crate is copied from the registry
+archive with the same provenance rules as GPUI above; only `src`, the manifest,
+the build script and the license are included.
+
 ## Windows command menu invocation
 
 [menu-invoke.patch](menu-invoke.patch) retains InvokePattern on clickable command

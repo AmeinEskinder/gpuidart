@@ -689,3 +689,5 @@ unsafe fn free_event(bytes: *mut u8, len: usize) {
 
 #[cfg(test)]
 mod ffi_tests;
+#[cfg(all(test, windows))]
+mod startup_probe_tests;
