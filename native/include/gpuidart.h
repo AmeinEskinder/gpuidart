@@ -21,7 +21,8 @@ GdHost *gd_create(const uint8_t *bytes, size_t len, GdEventCallback callback);
 
 /* Blocks on the calling thread until the native application closes. Call once.
    On Windows and Linux the UI loop runs on a dedicated native thread with a
-   64 MiB stack reservation, so the caller's stack size does not matter. */
+   64 MiB stack reservation, so the caller's stack size does not matter; the
+   thread stays parked for the life of the process after the loop returns. */
 int32_t gd_run(const GdHost *host);
 
 /* 0 = queued, -1 = invalid pointer/size, -2 = invalid description,

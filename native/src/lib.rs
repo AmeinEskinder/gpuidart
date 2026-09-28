@@ -346,6 +346,7 @@ pub unsafe extern "C" fn gd_run(host: *const Host) -> i32 {
 /// on Windows, which unoptimized table rendering can exhaust; the overflow then
 /// shows up as an access violation on an unrelated thread. The reservation is
 /// virtual and only touched pages are committed.
+/// The thread stays parked for the life of the process once the loop returns.
 const UI_THREAD_STACK_BYTES: usize = 64 << 20;
 
 unsafe fn run(host: *const Host) -> i32 {
@@ -362,18 +363,31 @@ unsafe fn run(host: *const Host) -> i32 {
             }
             #[cfg(not(target_os = "macos"))]
             {
-                let worker = std::thread::Builder::new()
+                // The thread parks after the loop returns instead of exiting.
+                // On Windows a thread exit tears down its COM apartment, which
+                // pumps messages to disconnect the UIA objects an assistive
+                // client created; the window procedure then runs on a thread
+                // whose thread-locals are already destroyed and panics. The
+                // Dart pool thread that used to run the loop never exited, and
+                // this thread now matches it.
+                let (result_sender, result_receiver) = std::sync::mpsc::channel();
+                std::thread::Builder::new()
                     .name("gpuidart-ui".into())
                     .stack_size(UI_THREAD_STACK_BYTES)
                     .spawn(move || {
-                        boundary::catch(|| ui::run(initial, receiver, events, trace, None))
+                        let result =
+                            boundary::catch(|| ui::run(initial, receiver, events, trace, None));
+                        let _ = result_sender.send(result);
+                        loop {
+                            std::thread::park();
+                        }
                     })
                     .map_err(|error| format!("Could not start the UI thread: {error}"))?;
-                match worker.join() {
+                match result_receiver.recv() {
                     Ok(Ok(result)) => result,
                     // Re-raise on the caller so the boundary reports -4 as before.
                     Ok(Err(message)) => std::panic::resume_unwind(Box::new(message)),
-                    Err(payload) => std::panic::resume_unwind(payload),
+                    Err(_) => Err("The UI thread ended without a result".into()),
                 }
             }
         })
