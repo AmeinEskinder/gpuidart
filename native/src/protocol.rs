@@ -653,29 +653,64 @@ impl ViewIndex {
     }
 }
 
-fn aggregate_text(op: AggregateOp, column: usize, members: &[usize], data: &TableData) -> String {
-    if op == AggregateOp::Count {
-        return members.len().to_string();
+/// The cell as a finite number, which is when comparisons and aggregates
+/// treat it numerically.
+fn finite(cell: &str) -> Option<f64> {
+    cell.parse::<f64>().ok().filter(|value| value.is_finite())
+}
+
+/// One column parsed once per recompute, so a sort compares numbers rather
+/// than parsing both cells on every comparison.
+fn parsed_column(data: &TableData, column: usize) -> Vec<Option<f64>> {
+    data.rows.iter().map(|row| finite(&row[column])).collect()
+}
+
+/// The numeric cells of one column within one group, folded as the records
+/// are walked so every aggregate over the column costs one pass.
+#[derive(Clone, Copy)]
+struct Accumulator {
+    count: usize,
+    sum: f64,
+    min: f64,
+    max: f64,
+}
+
+impl Default for Accumulator {
+    fn default() -> Self {
+        Self {
+            count: 0,
+            sum: 0.0,
+            min: f64::INFINITY,
+            max: f64::NEG_INFINITY,
+        }
     }
-    let values: Vec<f64> = members
-        .iter()
-        .filter_map(|&source| data.rows[source][column].parse::<f64>().ok())
-        .filter(|value| value.is_finite())
-        .collect();
-    if values.is_empty() {
-        return String::new();
+}
+
+impl Accumulator {
+    fn add(&mut self, value: f64) {
+        self.count += 1;
+        self.sum += value;
+        self.min = self.min.min(value);
+        self.max = self.max.max(value);
     }
-    let value = match op {
-        AggregateOp::Count => unreachable!(),
-        AggregateOp::Sum => values.iter().sum(),
-        AggregateOp::Avg => values.iter().sum::<f64>() / values.len() as f64,
-        AggregateOp::Min => values.iter().cloned().fold(f64::INFINITY, f64::min),
-        AggregateOp::Max => values.iter().cloned().fold(f64::NEG_INFINITY, f64::max),
-    };
-    if value.fract() == 0. && value.abs() < 1e15 {
-        format!("{}", value as i64)
-    } else {
-        format!("{value}")
+
+    /// The aggregate's text; empty when no cell of the group was numeric.
+    fn text(&self, op: AggregateOp) -> String {
+        if self.count == 0 {
+            return String::new();
+        }
+        let value = match op {
+            AggregateOp::Count => self.count as f64,
+            AggregateOp::Sum => self.sum,
+            AggregateOp::Avg => self.sum / self.count as f64,
+            AggregateOp::Min => self.min,
+            AggregateOp::Max => self.max,
+        };
+        if value.fract() == 0. && value.abs() < 1e15 {
+            format!("{}", value as i64)
+        } else {
+            format!("{value}")
+        }
     }
 }
 
@@ -747,25 +782,50 @@ impl TableView {
     /// The rows in order: filtered and sorted records, grouped under header
     /// rows in order of first appearance when a grouping is set.
     pub fn compute_view(&self, data: &TableData) -> ViewIndex {
-        let records = self.compute_index(data);
+        let (records, mut numbers) = self.compute_records(data);
         let Some(grouping) = &self.group else {
             return ViewIndex {
                 entries: records.into_iter().map(ViewEntry::Record).collect(),
                 groups: Vec::new(),
             };
         };
+        // The aggregated columns, parsed once and shared with the sort and
+        // filter parses; a count needs no numbers.
+        let mut summed: Vec<usize> = Vec::new();
+        for aggregate in &grouping.aggregates {
+            if aggregate.op != AggregateOp::Count && !summed.contains(&aggregate.column) {
+                summed.push(aggregate.column);
+                numbers
+                    .entry(aggregate.column)
+                    .or_insert_with(|| parsed_column(data, aggregate.column));
+            }
+        }
+        let columns: Vec<&[Option<f64>]> = summed
+            .iter()
+            .map(|column| numbers[column].as_slice())
+            .collect();
         let mut order: HashMap<&str, usize> = HashMap::new();
-        let mut members: Vec<(String, Vec<usize>)> = Vec::new();
+        let mut members: Vec<(String, Vec<usize>, Vec<Accumulator>)> = Vec::new();
         for source in records {
             let key = data.rows[source][grouping.column].as_str();
             let group = *order.entry(key).or_insert_with(|| {
-                members.push((key.to_owned(), Vec::new()));
+                members.push((
+                    key.to_owned(),
+                    Vec::new(),
+                    vec![Accumulator::default(); columns.len()],
+                ));
                 members.len() - 1
             });
-            members[group].1.push(source);
+            let (_, sources, accumulators) = &mut members[group];
+            sources.push(source);
+            for (accumulator, values) in accumulators.iter_mut().zip(&columns) {
+                if let Some(value) = values[source] {
+                    accumulator.add(value);
+                }
+            }
         }
         let mut index = ViewIndex::default();
-        for (group, (key, sources)) in members.into_iter().enumerate() {
+        for (group, (key, sources, accumulators)) in members.into_iter().enumerate() {
             index.entries.push(ViewEntry::Group(group));
             index
                 .entries
@@ -778,10 +838,16 @@ impl TableView {
                     .aggregates
                     .iter()
                     .map(|aggregate| {
-                        (
-                            aggregate.column,
-                            aggregate_text(aggregate.op, aggregate.column, &sources, data),
-                        )
+                        let text = if aggregate.op == AggregateOp::Count {
+                            sources.len().to_string()
+                        } else {
+                            let at = summed
+                                .iter()
+                                .position(|column| *column == aggregate.column)
+                                .expect("aggregated column parsed");
+                            accumulators[at].text(aggregate.op)
+                        };
+                        (aggregate.column, text)
                     })
                     .collect(),
             });
@@ -792,19 +858,82 @@ impl TableView {
     /// View row -> source row, filtered then stably sorted. The dataset is
     /// never reordered.
     pub fn compute_index(&self, data: &TableData) -> Vec<usize> {
+        self.compute_records(data).0
+    }
+
+    /// The filtered, sorted source rows and the columns parsed for them.
+    /// Every sorted or compared column is parsed once here; a comparison is
+    /// numeric when both sides are finite numbers and lexical otherwise, as
+    /// `compare_cells` decides for a single pair.
+    fn compute_records(&self, data: &TableData) -> (Vec<usize>, HashMap<usize, Vec<Option<f64>>>) {
+        let mut numbers: HashMap<usize, Vec<Option<f64>>> = HashMap::new();
+        let columns = self.sort.iter().map(|key| key.column).chain(
+            self.filter
+                .iter()
+                .filter(|term| term.op != FilterOp::Contains)
+                .map(|term| term.column),
+        );
+        for column in columns {
+            numbers
+                .entry(column)
+                .or_insert_with(|| parsed_column(data, column));
+        }
+        let filters: Vec<(&FilterTerm, Option<f64>)> = self
+            .filter
+            .iter()
+            .map(|term| (term, finite(&term.value)))
+            .collect();
         let mut index: Vec<usize> = (0..data.rows.len())
             .filter(|&row| {
-                self.filter
-                    .iter()
-                    .all(|term| term.op.matches(&data.rows[row][term.column], &term.value))
+                filters.iter().all(|(term, value)| {
+                    let cell = data.rows[row][term.column].as_str();
+                    if term.op == FilterOp::Contains {
+                        return cell.contains(term.value.as_str());
+                    }
+                    let ordering = match (numbers[&term.column][row], *value) {
+                        (Some(a), Some(b)) => {
+                            a.partial_cmp(&b).unwrap_or(std::cmp::Ordering::Equal)
+                        }
+                        _ => cell.cmp(term.value.as_str()),
+                    };
+                    term.op.accepts(ordering)
+                })
             })
             .collect();
+        if let [key] = self.sort.as_slice() {
+            let values = &numbers[&key.column];
+            if index.iter().all(|&row| values[row].is_some()) {
+                // One numeric key: sort the keys beside their rows rather
+                // than reaching into the parsed column on every comparison.
+                let mut keyed: Vec<(f64, usize)> = index
+                    .iter()
+                    .map(|&row| (values[row].unwrap_or_default(), row))
+                    .collect();
+                keyed.sort_by(|a, b| {
+                    let ordering = a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal);
+                    match key.direction {
+                        SortDirection::Asc => ordering,
+                        SortDirection::Desc => ordering.reverse(),
+                    }
+                });
+                return (keyed.into_iter().map(|(_, row)| row).collect(), numbers);
+            }
+        }
         if !self.sort.is_empty() {
+            let keys: Vec<(&[Option<f64>], usize, SortDirection)> = self
+                .sort
+                .iter()
+                .map(|key| (numbers[&key.column].as_slice(), key.column, key.direction))
+                .collect();
             index.sort_by(|&a, &b| {
-                for key in &self.sort {
-                    let ordering =
-                        compare_cells(&data.rows[a][key.column], &data.rows[b][key.column]);
-                    let ordering = match key.direction {
+                for (numbers, column, direction) in &keys {
+                    let ordering = match (numbers[a], numbers[b]) {
+                        (Some(x), Some(y)) => {
+                            x.partial_cmp(&y).unwrap_or(std::cmp::Ordering::Equal)
+                        }
+                        _ => data.rows[a][*column].cmp(&data.rows[b][*column]),
+                    };
+                    let ordering = match direction {
                         SortDirection::Asc => ordering,
                         SortDirection::Desc => ordering.reverse(),
                     };
@@ -815,7 +944,7 @@ impl TableView {
                 std::cmp::Ordering::Equal
             });
         }
-        index
+        (index, numbers)
     }
 }
 
@@ -838,7 +967,13 @@ impl FilterOp {
             Self::Contains => return cell.contains(value),
             _ => {}
         }
-        match compare_cells(cell, value) {
+        self.accepts(compare_cells(cell, value))
+    }
+
+    /// Whether a comparison of the cell against the term's value passes;
+    /// `Contains` is decided before comparing.
+    fn accepts(self, ordering: std::cmp::Ordering) -> bool {
+        match ordering {
             std::cmp::Ordering::Less => {
                 matches!(self, Self::Ne | Self::Lt | Self::Le)
             }
@@ -2811,6 +2946,99 @@ mod tests {
         if let Ok(path) = std::env::var("GPUIDART_VIEW_RECOMPUTE_REPORT") {
             std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
         }
+    }
+
+    /// The view workload's records at the row cap: four columns, prices a
+    /// permutation of the same values the fixtures use (so the sort has work
+    /// to do), a twelve-value sector column. Timing probe; run explicitly.
+    #[test]
+    #[ignore = "timing probe for the million-record view recompute; run explicitly"]
+    fn view_recompute_at_1m_records_is_measured() {
+        let rows = 1_000_000usize;
+        let data = TableData {
+            columns: vec![
+                "ID".into(),
+                "Instrument".into(),
+                "Price".into(),
+                "Sector".into(),
+            ],
+            rows: (0..rows)
+                .map(|i| {
+                    vec![
+                        i.to_string(),
+                        format!("Instrument {i}"),
+                        format!("{:.2}", 100.0 + ((i * 7919) % rows) as f64 / 100.0),
+                        format!("Sector {}", i % 12),
+                    ]
+                })
+                .collect(),
+            ids: None,
+            format: None,
+        };
+        let sort = vec![SortKey {
+            column: 2,
+            direction: SortDirection::Desc,
+        }];
+        let filter = vec![FilterTerm {
+            column: 2,
+            op: FilterOp::Gt,
+            value: "5100".into(),
+        }];
+        let group = Some(Grouping {
+            column: 3,
+            aggregates: vec![
+                Aggregate {
+                    column: 2,
+                    op: AggregateOp::Avg,
+                },
+                Aggregate {
+                    column: 2,
+                    op: AggregateOp::Max,
+                },
+            ],
+        });
+        let stages = [
+            (
+                "sort",
+                TableView {
+                    sort: sort.clone(),
+                    filter: vec![],
+                    group: None,
+                },
+            ),
+            (
+                "sort+filter",
+                TableView {
+                    sort: sort.clone(),
+                    filter: filter.clone(),
+                    group: None,
+                },
+            ),
+            (
+                "sort+filter+group",
+                TableView {
+                    sort,
+                    filter,
+                    group,
+                },
+            ),
+        ];
+        let mut report = serde_json::Map::new();
+        for (name, view) in stages {
+            let mut runs = Vec::new();
+            let mut rows_shown = 0;
+            for _ in 0..3 {
+                let timer = std::time::Instant::now();
+                let index = view.compute_view(&data);
+                runs.push(timer.elapsed().as_micros() as u64);
+                rows_shown = index.entries.len();
+            }
+            report.insert(
+                name.into(),
+                serde_json::json!({"view_rows": rows_shown, "recompute_us": runs}),
+            );
+        }
+        println!("VIEW_RECOMPUTE_1M {}", serde_json::Value::Object(report));
     }
 
     #[test]

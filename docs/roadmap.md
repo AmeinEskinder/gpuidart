@@ -160,17 +160,23 @@ Feasibility verdicts recorded on this machine:
   Build Tools 17.14 installed the fixture is built and measured; the two
   series and their qualifications are in the
   [comparison status](../reports/comparison/README.md).
-- **Grouped views at a million records** cost 0.4 to 0.6 s of native
-  recompute where a sort over the same records costs 0.1 to 0.2 s
-  ([view workload](../reports/comparison/view-1m-20260929.md)); the Dart
-  fixture completes its view changes in about half the Flutter fixture's
-  time, not the order of magnitude the plan's exit condition asks for, and
-  the grouped recompute is where that gap would have to come from.
+- **View recomputes parse each column once.** The view workload's first
+  series ([report](../reports/comparison/view-1m-20260929.md)) put the Dart
+  fixture at about half the Flutter fixture's time per view change, and its
+  probe showed why the native sort had looked cheap: the fixtures' prices
+  rose with the row index, and a real descending sort over a million
+  permuted prices took 5.4 to 7.5 s because the comparator parsed both cells
+  on every comparison. Columns are now parsed once per recompute, a single
+  numeric key sorts beside its rows, and aggregates fold in one pass: the
+  same probe reads 149 to 164 ms for the sort, 148 to 184 with the filter and
+  403 to 549 grouped. The earlier "sort recompute at about 110 ms" figures
+  in this document were measured on ordered prices.
 - **Typed dataset cells** stay deferred: sort, filter and aggregates already
   compare numerically when a cell parses as a number, formats render
-  numbers from strings, and the one-million-record measurement puts a sort
-  recompute at about 110 ms, so a typed wire form would save parsing and
-  memory rather than change behavior. It is a protocol change on both
+  numbers from strings, and a recompute now parses each referenced column
+  once (a million permuted prices sort in 149 to 164 ms), so a typed wire
+  form would save that parse and the string memory rather than change
+  behavior. It is a protocol change on both
   sides and waits for a workload that needs it.
 - **Starting the GPUI platform before `gd_create`** would overlap the D3D11
   device and DirectWrite setup (about 50 ms after the font patch) with the
@@ -182,8 +188,8 @@ Feasibility verdicts recorded on this machine:
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
 
-Verification: at the packed-record head the native library suite runs 103 tests (one
-ignored startup probe) and the Dart suite 114, including the live-window,
+Verification: at the packed-record head the native library suite runs 103 tests (two
+ignored timing probes) and the Dart suite 114, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
 library, plus the repository's full check gate. Earlier counts in this

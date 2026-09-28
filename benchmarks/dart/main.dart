@@ -45,7 +45,9 @@ Future<void> main(List<String> args) async {
   }
   // The runner sets the row count; workloads other than idle and view need
   // 100,000. The view workload adds a low-cardinality sector column to group
-  // by and turns the first button into the view cycle.
+  // by, permutes the prices so a sort has work to do (the same values, no
+  // longer rising with the row index), and turns the first button into the
+  // view cycle.
   final rows =
       int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
   final viewWorkload =
@@ -58,7 +60,7 @@ Future<void> main(List<String> args) async {
       (i) => [
         '$i',
         'Instrument $i',
-        (100 + i / 100).toStringAsFixed(2),
+        (100 + (viewWorkload ? (i * 7919) % rows : i) / 100).toStringAsFixed(2),
         if (viewWorkload) 'Sector ${i % 12}',
       ],
     ),

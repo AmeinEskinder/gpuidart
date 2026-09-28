@@ -13,7 +13,9 @@ import 'package:flutter/scheduler.dart';
 /// with the pointer at (400, 270).
 /// The runner sets the row count; workloads other than idle and view need
 /// 100,000. The view workload adds a low-cardinality sector column to group
-/// by and turns the first button into the view cycle.
+/// by, permutes the prices so a sort has work to do (the same values, no
+/// longer rising with the row index), and turns the first button into the
+/// view cycle.
 final rowCount =
     int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
 final viewWorkload = Platform.environment['GPUIDART_BENCH_WORKLOAD'] == 'view';
@@ -59,7 +61,9 @@ class _BenchmarkState extends State<Benchmark> {
     (i) => [
       '$i',
       'Instrument $i',
-      (100 + i / 100).toStringAsFixed(2),
+      (100 + (viewWorkload ? (i * 7919) % rowCount : i) / 100).toStringAsFixed(
+        2,
+      ),
       if (viewWorkload) 'Sector ${i % 12}',
     ],
   );
