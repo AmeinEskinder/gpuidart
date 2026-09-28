@@ -513,3 +513,116 @@ fn window_open_requests_validate_their_identity_and_initial_description() {
         assert!(WindowOpen::parse(invalid.as_bytes()).is_err(), "{invalid}");
     }
 }
+
+fn append(base: u64, rows: Vec<Vec<&str>>, ids: Option<Vec<&str>>) -> Update {
+    Update {
+        request: 1,
+        id: "records".into(),
+        base_revision: base,
+        revision: base + 1,
+        change: Change::Append {
+            rows: rows
+                .into_iter()
+                .map(|row| row.into_iter().map(str::to_owned).collect())
+                .collect(),
+            ids: ids.map(|ids| ids.into_iter().map(str::to_owned).collect()),
+        },
+    }
+}
+
+#[test]
+fn appends_extend_records_and_ids_and_keep_the_shape_checks() {
+    let mut store = Store::new(vec![upload(3)]);
+    let work = store
+        .apply(append(1, vec![vec!["3", "new"], vec!["4", "newer"]], None))
+        .unwrap();
+    assert_eq!((work.records_checked, work.cells_written), (2, 4));
+    {
+        let data = &store.entries["records"].borrow().data;
+        assert_eq!(data.rows.len(), 5);
+        assert_eq!(data.rows[4][1], "newer");
+    }
+    for invalid in [
+        append(2, vec![], None),
+        append(2, vec![vec!["wrong width"]], None),
+        append(2, vec![vec!["5", "x"]], Some(vec!["r5"])),
+        append(1, vec![vec!["5", "x"]], None),
+    ] {
+        assert!(store.apply(invalid).is_err());
+    }
+    assert_eq!(store.entries["records"].borrow().revision, 2);
+
+    let mut store = Store::new(vec![Upload {
+        id: "records".into(),
+        revision: 1,
+        data: TableData {
+            columns: vec!["A".into()],
+            rows: vec![vec!["x".into()]],
+            ids: Some(vec!["r1".into()]),
+            format: None,
+        },
+    }]);
+    for invalid in [
+        append(1, vec![vec!["y"]], None),
+        append(1, vec![vec!["y"]], Some(vec!["r1"])),
+        append(1, vec![vec!["y"]], Some(vec![""])),
+        append(1, vec![vec!["y"], vec!["z"]], Some(vec!["r2"])),
+        append(1, vec![vec!["y"], vec!["z"]], Some(vec!["r2", "r2"])),
+    ] {
+        assert!(store.apply(invalid).is_err());
+    }
+    store
+        .apply(append(
+            1,
+            vec![vec!["y"], vec!["z"]],
+            Some(vec!["r2", "r3"]),
+        ))
+        .unwrap();
+    let data = &store.entries["records"].borrow().data;
+    assert_eq!(
+        data.ids.as_deref(),
+        Some(&["r1", "r2", "r3"].map(String::from)[..])
+    );
+
+    let parsed = Update::parse(
+        br#"{"request":1,"id":"records","base_revision":2,"revision":3,"change":{"op":"append","rows":[["w"]],"ids":["r4"]}}"#,
+    )
+    .unwrap();
+    assert!(
+        matches!(parsed.change, Change::Append { ref rows, ids: Some(ref ids) } if rows.len() == 1 && ids[0] == "r4")
+    );
+}
+
+#[test]
+fn the_record_cap_bounds_uploads_inserts_and_appends() {
+    let full = TableData {
+        columns: vec!["A".into()],
+        rows: vec![vec![String::new()]; MAX_ROWS],
+        ids: None,
+        format: None,
+    };
+    assert!(full.validate().is_ok());
+    let mut over = full;
+    over.rows.push(vec![String::new()]);
+    assert!(over.validate().is_err());
+    over.rows.pop();
+    let mut store = Store::new(vec![Upload {
+        id: "records".into(),
+        revision: 1,
+        data: over,
+    }]);
+    assert!(store.apply(append(1, vec![vec!["x"]], None)).is_err());
+    assert!(
+        store
+            .apply(edit(
+                1,
+                vec![Edit::Insert {
+                    at: 0,
+                    values: vec!["x".into()],
+                    id: None,
+                }],
+            ))
+            .is_err()
+    );
+    assert_eq!(store.entries["records"].borrow().data.rows.len(), MAX_ROWS);
+}

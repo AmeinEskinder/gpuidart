@@ -42,16 +42,16 @@ await host.replaceDataset(
 
 | Operation | Transfer and native work |
 | --- | --- |
-| `openView(..., datasets: [...])` | Upload and validate each initial dataset once |
+| `openView(..., datasets: [...])` | Upload and validate each initial dataset once. Records beyond about 4 MiB of encoded text go as a schema in the initial message and appended slices once the window is ready, one revision per slice, before `open` returns |
 | `openView(..., deferDatasets: true)` | Upload only columns and formats before the first frame; the records follow as replacements once the window is ready, and `open` returns after they applied at revision 2 |
-| `registerDataset(dataset)` | Upload a new dataset under an unused ID at revision 1 |
+| `registerDataset(dataset)` | Upload a new dataset under an unused ID at revision 1; a large one sends its first slice as that upload and the rest appended |
 | `publish` / `rebuild` | Send the whole view with dataset references, validate references and reconcile controls |
 | `CellEdit` | Send row index, column index and value; replace one indexed string |
 | `RowEdit` | Send row index and replacement values; replace one row |
 | `InsertRow` | Send the index, values and record ID; insert one record and recompute views |
 | `DeleteRow` | Send the index; drop one record and recompute views |
 | `MoveRow` | Send the index and destination; reorder one record and recompute views |
-| `replaceDataset` | Validate and replace the complete dataset and schema |
+| `replaceDataset` | Validate and replace the complete dataset and schema; a large replacement sends its first slice as the replacement and the rest appended, and the Dart records follow each acknowledgement |
 | `releaseDataset` | Drop the host's reference to an unused dataset |
 
 Removing a table control does not release its dataset. Other tables can share it. Remove all references from the current view before release:
@@ -75,7 +75,7 @@ await host.editDataset(quotes, [
 ]);
 ```
 
-Steps in a batch apply in order, so each index refers to the records as the previous steps left them, and both sides validate the whole batch against that running shape before anything is written. An insert carries a record ID exactly when the dataset has record IDs; the ID must be nonempty and unused, and an ID deleted earlier in the same batch stays reserved until the next batch. A batch may not grow the dataset past 100,000 rows. Structural edits recompute every view over the dataset. With record IDs the selection follows its record, clears when the record is deleted, and the scroll keeps the first visible record anchored; without IDs the selected view row keeps its index.
+Steps in a batch apply in order, so each index refers to the records as the previous steps left them, and both sides validate the whole batch against that running shape before anything is written. An insert carries a record ID exactly when the dataset has record IDs; the ID must be nonempty and unused, and an ID deleted earlier in the same batch stays reserved until the next batch. A batch may not grow the dataset past 1,000,000 rows. Structural edits recompute every view over the dataset. With record IDs the selection follows its record, clears when the record is deleted, and the scroll keeps the first visible record anchored; without IDs the selected view row keeps its index.
 
 ## Stable record IDs
 
@@ -189,7 +189,7 @@ Data acknowledgements report native parsing time, application time, records chec
 
 ## Cost and limits
 
-- Initial upload, replacement and storage grow with total records. Messages are limited to 16 MiB, with at most 100,000 rows and 64 columns.
+- Initial upload, replacement and storage grow with total records. Messages are limited to 16 MiB; datasets have at most 1,000,000 rows and 64 columns, and records that would exceed one message travel as appended slices of about 4 MiB each (`append` on the wire), so a large upload costs one transaction per slice. [One million records](../reports/performance/datasets-1m-20260928/README.md) upload in 13 slices in about 3 s and sort in about 110 ms, holding roughly 345 MiB in Dart and 250 MiB natively.
 - Snapshots contain no records; their cost grows with view size.
 - Batches visit only their edits. Dart copies one immutable row when committing a cell, at most 64 columns. Rust replaces the indexed string directly.
 - Rust's shared dataset belongs to the UI thread. `TableData` has no `Clone` or `PartialEq` implementation, preventing accidental full-data cloning or comparison in reconciliation.

@@ -870,7 +870,8 @@ impl DartView {
         let replace = matches!(&update.change, Change::Replace { .. });
         // A structural edit changes which records exist, so every view index
         // over the dataset is stale afterwards, spec or not.
-        let structural = matches!(&update.change, Change::Edit { edits } if edits.iter().any(Edit::is_structural));
+        let structural = matches!(&update.change, Change::Edit { edits } if edits.iter().any(Edit::is_structural))
+            || matches!(&update.change, Change::Append { .. });
         // Columns an edit touches, for the view-recompute check. Row edits
         // touch every column; Replace is handled separately.
         let touched: Option<HashSet<usize>> = match &update.change {

@@ -1,7 +1,16 @@
 part of 'host.dart';
 
+/// Records a dataset may hold. Uploads larger than one message travel as a
+/// schema followed by appended slices, so this bounds memory, not transfer.
+const int maxDatasetRows = 1000000;
+
 /// Authoritative Dart records, uploaded once and updated through host transactions.
 /// Public rows are immutable. Successful transactions advance [revision].
+///
+/// A dataset whose records exceed about 4 MiB of encoded text uploads in
+/// several messages: its columns and formats go first and its records follow
+/// in slices, each advancing [revision] by one, before `open`,
+/// `registerDataset` or `replaceDataset` completes.
 final class TableDataset {
   TableDataset(
     this.id, {
@@ -10,7 +19,7 @@ final class TableDataset {
     List<String>? rowIds,
     Map<int, UiColumnFormat>? formats,
   }) : _columns = List.unmodifiable(columns),
-       _rows = rows.map((row) => List<String>.unmodifiable(row)).toList(),
+       _rows = _copyRows(rows),
        _rowIds = rowIds?.toList(),
        _formats = formats == null
            ? null
@@ -62,6 +71,58 @@ final class TableDataset {
   };
   Map<String, Object> _upload() => {'id': id, 'revision': 1, 'data': _data()};
 
+  /// Records [start] to [end] with their IDs, for a partial replacement.
+  Map<String, Object> _dataRange(int start, int end) {
+    if (start == 0 && end == _rows.length) return _data();
+    final ids = _rowIds;
+    return {
+      'columns': _columns,
+      'rows': _rows.sublist(start, end),
+      if (ids != null) 'ids': ids.sublist(start, end),
+      if (_formats != null)
+        'format': {
+          'columns': {
+            for (final MapEntry(:key, :value) in _formats!.entries)
+              '$key': value.toJson(),
+          },
+        },
+    };
+  }
+
+  /// Records [start] to [end] as an append behind the ones already uploaded.
+  Map<String, Object> _appendChange(int start, int end) => {
+    'op': 'append',
+    'rows': _rows.sublist(start, end),
+    if (_rowIds != null) 'ids': _rowIds!.sublist(start, end),
+  };
+
+  /// Records are uploaded in messages of about this many encoded bytes; JSON
+  /// escapes and non-ASCII text can triple the estimate, still under the
+  /// 16 MiB message limit.
+  static const int _chunkBytes = 4 << 20;
+
+  /// Row ranges whose estimated encoded size each fits one message.
+  List<(int, int)> _chunks() {
+    final chunks = <(int, int)>[];
+    var start = 0;
+    var bytes = 0;
+    for (var i = 0; i < _rows.length; i++) {
+      var rowBytes = 4;
+      for (final cell in _rows[i]) {
+        rowBytes += cell.length + 3;
+      }
+      if (_rowIds != null) rowBytes += _rowIds![i].length + 3;
+      if (bytes + rowBytes > _chunkBytes && i > start) {
+        chunks.add((start, i));
+        start = i;
+        bytes = 0;
+      }
+      bytes += rowBytes;
+    }
+    chunks.add((start, _rows.length));
+    return chunks;
+  }
+
   /// The columns and formats with no records, for a deferred upload.
   Map<String, Object> _uploadSchema() => {
     'id': id,
@@ -94,10 +155,19 @@ void _validateIds(List<String>? rowIds, int rowCount) {
   }
 }
 
-void _validateData(List<String> columns, List<List<String>> rows) {
-  if (columns.isEmpty || columns.length > 64 || rows.length > 100000) {
+List<List<String>> _copyRows(List<List<String>> rows) {
+  if (rows.length > maxDatasetRows) {
     throw ArgumentError(
-      'Dataset requires 1..64 columns and at most 100000 rows',
+      'Dataset requires 1..64 columns and at most $maxDatasetRows rows',
+    );
+  }
+  return rows.map((row) => List<String>.unmodifiable(row)).toList();
+}
+
+void _validateData(List<String> columns, List<List<String>> rows) {
+  if (columns.isEmpty || columns.length > 64 || rows.length > maxDatasetRows) {
+    throw ArgumentError(
+      'Dataset requires 1..64 columns and at most $maxDatasetRows rows',
     );
   }
   if (rows.any((row) => row.length != columns.length)) {
@@ -209,8 +279,8 @@ final class InsertRow extends TableEdit {
     if (values.length != shape.columns) {
       throw ArgumentError('Row width does not match columns');
     }
-    if (shape.rows >= 100000) {
-      throw ArgumentError('Dataset allows at most 100000 rows');
+    if (shape.rows >= maxDatasetRows) {
+      throw ArgumentError('Dataset allows at most $maxDatasetRows rows');
     }
     final record = id;
     if (shape.identity != (record != null)) {
@@ -289,6 +359,44 @@ final class MoveRow extends TableEdit {
 }
 
 extension _DatasetTransactions on GpuiHost {
+  /// Sends the records the initial message left out: a deferred dataset as
+  /// one replacement, a dataset too large for one message as appended slices
+  /// behind the schema already uploaded at revision 1.
+  Future<void> _uploadRecords(
+    TableDataset dataset,
+    List<(int, int)> chunks, {
+    required bool deferred,
+  }) async {
+    if (chunks.length == 1) {
+      if (deferred) {
+        await _transact(dataset, {
+          'op': 'replace',
+          'data': dataset._data(),
+        }, () {});
+      }
+      return;
+    }
+    for (final (start, end) in chunks) {
+      await _transact(dataset, dataset._appendChange(start, end), () {});
+    }
+  }
+
+  /// Registers a dataset under an unused ID: its first slice as a replacement
+  /// at revision 1, the rest appended.
+  Future<void> _register(TableDataset dataset, {required int window}) async {
+    final chunks = dataset._chunks();
+    await _transact(
+      dataset,
+      {'op': 'replace', 'data': dataset._dataRange(0, chunks.first.$2)},
+      () {},
+      create: true,
+      window: window,
+    );
+    for (final (start, end) in chunks.skip(1)) {
+      await _transact(dataset, dataset._appendChange(start, end), () {});
+    }
+  }
+
   Future<void> _transact(
     TableDataset dataset,
     Map<String, Object> change,

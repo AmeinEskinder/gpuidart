@@ -118,7 +118,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.
 
-Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size; an operation update carries at most 4,096 operations and its result meets the same bounds. Datasets have at most 100,000 rows and 64 columns. The native command queue has 64 slots. Invalid descriptions, stale revisions, a full/closed queue and overlapping transactions are errors. Await or handle the returned Future.
+Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size; an operation update carries at most 4,096 operations and its result meets the same bounds. Datasets have at most 1,000,000 rows and 64 columns; records beyond one message upload in appended slices. The native command queue has 64 slots. Invalid descriptions, stale revisions, a full/closed queue and overlapping transactions are errors. Await or handle the returned Future.
 
 Native acknowledgements have a 30-second deadline; shutdown reporting has a 10-second deadline. Configure these with `requestTimeout` and `shutdownTimeout` when opening the host. Missing acknowledgements, malformed events and caught native panics close the host and settle pending requests. See [failure handling and its limits](failures.md).
 

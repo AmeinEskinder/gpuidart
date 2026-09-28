@@ -9,6 +9,7 @@ export 'src/host.dart'
         ActionEvent,
         TableSelection,
         TableDataset,
+        maxDatasetRows,
         TableEdit,
         CellEdit,
         RowEdit,

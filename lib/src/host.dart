@@ -478,6 +478,9 @@ final class GpuiHost {
     }
     final describeStart = trace?._clock.now();
     final described = DescribedNode.describe(root);
+    final plans = {
+      for (final dataset in datasets) dataset.id: dataset._chunks(),
+    };
     final initial = <String, Object>{
       'snapshot': {
         'revision': 1,
@@ -487,12 +490,12 @@ final class GpuiHost {
         if (actions.isNotEmpty)
           'actions': actions.map((action) => action.toJson()).toList(),
       },
-      'datasets': datasets
-          .map(
-            (dataset) =>
-                deferDatasets ? dataset._uploadSchema() : dataset._upload(),
-          )
-          .toList(),
+      'datasets': [
+        for (final dataset in datasets)
+          deferDatasets || plans[dataset.id]!.length > 1
+              ? dataset._uploadSchema()
+              : dataset._upload(),
+      ],
       'window': windowDescription,
     };
     if (describeStart != null) {
@@ -582,17 +585,17 @@ final class GpuiHost {
     unawaited(host.done.catchError((Object _) {}));
     try {
       await host._withDeadline(host._ready.future, 'startup');
-      if (deferDatasets) {
-        // The window is up with empty tables; the records follow as ordinary
-        // replacements so the first frame never waits for them.
-        await Future.wait([
-          for (final dataset in datasets)
-            host._transact(dataset, {
-              'op': 'replace',
-              'data': dataset._data(),
-            }, () {}),
-        ]);
-      }
+      // Deferred records follow as ordinary replacements, and records too
+      // large for one message as appended slices behind their schema; either
+      // way the first frame never waits for them.
+      await Future.wait([
+        for (final dataset in datasets)
+          host._uploadRecords(
+            dataset,
+            plans[dataset.id]!,
+            deferred: deferDatasets,
+          ),
+      ]);
     } catch (_) {
       await host.done.catchError((Object _) {});
       rethrow;
@@ -789,12 +792,8 @@ final class GpuiHost {
   _View? _viewFor(GpuiEvent event) =>
       event.window == 0 ? _main : _windows[event.window]?._view;
 
-  Future<void> registerDataset(TableDataset dataset) => _transact(
-    dataset,
-    {'op': 'replace', 'data': dataset._data()},
-    () {},
-    create: true,
-  );
+  Future<void> registerDataset(TableDataset dataset) =>
+      _register(dataset, window: 0);
 
   Future<void> editDataset(TableDataset dataset, List<TableEdit> edits) {
     final batch = List<TableEdit>.of(edits);
@@ -824,7 +823,7 @@ final class GpuiHost {
     required List<List<String>> rows,
     List<String>? rowIds,
     Map<int, UiColumnFormat>? formats,
-  }) {
+  }) async {
     final replacement = TableDataset(
       dataset.id,
       columns: columns,
@@ -832,16 +831,26 @@ final class GpuiHost {
       rowIds: rowIds,
       formats: formats,
     );
-    return _transact(
+    // The Dart records follow each acknowledgement, so between the slices of
+    // a large replacement they match what native holds.
+    final chunks = replacement._chunks();
+    final first = chunks.first.$2;
+    await _transact(
       dataset,
-      {'op': 'replace', 'data': replacement._data()},
+      {'op': 'replace', 'data': replacement._dataRange(0, first)},
       () {
         dataset._columns = replacement._columns;
-        dataset._rows = replacement._rows;
-        dataset._rowIds = replacement._rowIds;
+        dataset._rows = replacement._rows.sublist(0, first);
+        dataset._rowIds = replacement._rowIds?.sublist(0, first);
         dataset._formats = replacement._formats;
       },
     );
+    for (final (start, end) in chunks.skip(1)) {
+      await _transact(dataset, replacement._appendChange(start, end), () {
+        dataset._rows.addAll(replacement._rows.sublist(start, end));
+        dataset._rowIds?.addAll(replacement._rowIds!.sublist(start, end));
+      });
+    }
   }
 
   Future<void> releaseDataset(TableDataset dataset) =>
@@ -1606,13 +1615,7 @@ final class GpuiWindow {
   /// release go through the host, which routes them to this window.
   Future<void> registerDataset(TableDataset dataset) {
     _checkOpen();
-    return _host._transact(
-      dataset,
-      {'op': 'replace', 'data': dataset._data()},
-      () {},
-      create: true,
-      window: id,
-    );
+    return _host._register(dataset, window: id);
   }
 
   /// Asks native to close the window. Idempotent; returns [done]. Throws when

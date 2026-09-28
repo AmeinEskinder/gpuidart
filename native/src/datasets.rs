@@ -100,10 +100,16 @@ impl Initial {
     }
 }
 
+/// Records a dataset may hold. Uploads larger than one message arrive as an
+/// appended sequence, so the cap is a memory bound rather than a transfer one.
+pub const MAX_ROWS: usize = 1_000_000;
+
 impl TableData {
     pub fn validate(&self) -> Result<(), String> {
-        if self.columns.is_empty() || self.columns.len() > 64 || self.rows.len() > 100_000 {
-            return Err("Dataset requires 1..64 columns and at most 100000 rows".into());
+        if self.columns.is_empty() || self.columns.len() > 64 || self.rows.len() > MAX_ROWS {
+            return Err(format!(
+                "Dataset requires 1..64 columns and at most {MAX_ROWS} rows"
+            ));
         }
         if self.rows.iter().any(|row| row.len() != self.columns.len()) {
             return Err("Dataset row width does not match its columns".into());
@@ -280,8 +286,20 @@ pub struct Update {
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Change {
-    Replace { data: TableData },
-    Edit { edits: Vec<Edit> },
+    Replace {
+        data: TableData,
+    },
+    /// Records added after the existing ones, with their IDs exactly when the
+    /// dataset has record IDs. Large uploads arrive as a schema followed by
+    /// appended slices, each under the message limit.
+    Append {
+        rows: Vec<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        ids: Option<Vec<String>>,
+    },
+    Edit {
+        edits: Vec<Edit>,
+    },
     Release,
 }
 
@@ -420,6 +438,47 @@ impl Store {
                 }
                 Ok(work)
             }
+            Change::Append { rows, ids } => {
+                let mut current = current.ok_or("Unknown dataset")?.borrow_mut();
+                let width = current.data.columns.len();
+                if rows.is_empty() {
+                    return Err("Dataset append must carry records".into());
+                }
+                if current.data.rows.len() + rows.len() > MAX_ROWS {
+                    return Err(format!("Dataset append exceeds {MAX_ROWS} rows"));
+                }
+                if rows.iter().any(|row| row.len() != width) {
+                    return Err("Dataset row width does not match its columns".into());
+                }
+                match (&current.data.ids, &ids) {
+                    (None, None) => {}
+                    (Some(existing), Some(new)) => {
+                        if new.len() != rows.len() {
+                            return Err("Dataset ids must parallel its rows".into());
+                        }
+                        let mut seen: HashSet<&str> = existing.iter().map(String::as_str).collect();
+                        if new.iter().any(|id| id.is_empty() || !seen.insert(id)) {
+                            return Err("Dataset ids must be nonempty and unique".into());
+                        }
+                    }
+                    _ => {
+                        return Err(
+                            "Dataset append carries record IDs exactly when the dataset has record IDs"
+                                .into(),
+                        );
+                    }
+                }
+                let work = Work {
+                    records_checked: rows.len(),
+                    cells_written: rows.len() * width,
+                };
+                current.data.rows.extend(rows);
+                if let (Some(existing), Some(new)) = (&mut current.data.ids, ids) {
+                    existing.extend(new);
+                }
+                current.revision = update.revision;
+                Ok(work)
+            }
             Change::Edit { edits } => {
                 let mut current = current.ok_or("Unknown dataset")?.borrow_mut();
                 if edits.is_empty() {
@@ -439,11 +498,10 @@ impl Store {
                         Edit::Cell { row, column, .. } if *row < len && *column < width => {}
                         Edit::Row { row, values } if *row < len && values.len() == width => {}
                         Edit::Insert { at, values, id } => {
-                            if *at > len || values.len() != width || len >= 100_000 {
-                                return Err(
-                                    "Dataset insert has an invalid index or width, or exceeds 100000 rows"
-                                        .into(),
-                                );
+                            if *at > len || values.len() != width || len >= MAX_ROWS {
+                                return Err(format!(
+                                    "Dataset insert has an invalid index or width, or exceeds {MAX_ROWS} rows"
+                                ));
                             }
                             match (identity, id) {
                                 (false, None) => {}

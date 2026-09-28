@@ -1,0 +1,28 @@
+{
+  "rows": 1000000,
+  "slices": 13,
+  "build_ms": 1193,
+  "open_ms": 2546,
+  "sort_publish_to_inspect_ms": 129,
+  "memory": {
+    "at_start": {"rss_mib": 210.54296875, "native": {"working_set": 220262400, "private_commit": 215474176}},
+    "after_records": {"rss_mib": 527.73828125, "native": {"working_set": 553373696, "private_commit": 548229120}},
+    "after_upload": {"rss_mib": 806.796875, "native": {"working_set": 845987840, "private_commit": 889868288}},
+    "after_sort": {"rss_mib": 807.1484375, "native": {"working_set": 846356480, "private_commit": 889864192}}
+  },
+  "metrics": {
+    "data_messages": 13,
+    "data_bytes": 50587996,
+    "data_records_checked": 1000000,
+    "data_cells_written": 3000000,
+    "data_encode": {"samples": 13, "p50_us": 37126, "p95_us": 50963, "p99_us": 65154},
+    "data_publish_to_applied": {"samples": 13, "p50_us": 153977, "p95_us": 285949, "p99_us": 326187},
+    "native_data_parse": {"samples": 13, "p50_us": 53605, "p95_us": 64761, "p99_us": 65504},
+    "native_data_apply": {"samples": 13, "p50_us": 56467, "p95_us": 225157, "p99_us": 249636},
+    "native_snapshot_apply": {"samples": 1, "p50_us": 106823, "p95_us": 106823, "p99_us": 106823},
+    "publish_to_applied": {"samples": 1, "p50_us": 121877, "p95_us": 121877, "p99_us": 121877}
+  },
+  "table_after_sort": {"row_count": 1000000, "dataset_revision": 14, "visible_rows": {"start": 999991, "end": 1000000}, "view": {"source_rows": 1000000, "view_rows": 1000000, "groups": 0}},
+  "native_counters": {"materializations": 16, "rows_constructed": 154, "cells_constructed": 532, "data_records_checked": 1000000, "data_cells_written": 3000000, "view_recomputes": 14},
+  "scope": "dart run (JIT) against the release library; the JIT runtime and compiler inflate the Dart-side memory; the AOT captures beside this file are the representative ones. Metrics abbreviated to the dataset and snapshot figures."
+}

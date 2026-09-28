@@ -386,6 +386,59 @@ void main() {
     expect(host.metrics.initialBytes, lessThan(2048));
   }, timeout: const Timeout(Duration(seconds: 60)));
 
+  test('large datasets upload in slices and stay editable', () async {
+    // About 11 MB of encoded records: three slices of 4 MiB behind the
+    // schema, then a two-slice replacement.
+    List<List<String>> records(int count) =>
+        List.generate(count, (i) => ['$i', 'x' * 60, '${i % 977}']);
+    final dataset = TableDataset(
+      'big',
+      columns: ['ID', 'Text', 'Bucket'],
+      rows: records(120000),
+      rowIds: List.generate(120000, (i) => 'r$i'),
+    );
+    final host = await GpuiHost.open(
+      const UiTable('table', dataset: 'big'),
+      datasets: [dataset],
+    );
+    try {
+      expect(dataset.revision, greaterThan(2));
+      expect(host.metrics.dataMessages, dataset.revision - 1);
+      expect(host.metrics.initialBytes, lessThan(4096));
+      var state = await host.diagnose('inspect');
+      expect(state['tables']['table']['row_count'], 120000);
+      expect(state['tables']['table']['dataset_revision'], dataset.revision);
+      final last = await host.diagnose('cell', {
+        'dataset': 'big',
+        'row': 119999,
+        'column': 0,
+      });
+      expect(last['value'], '119999');
+      await host.editDataset(dataset, [const CellEdit(119999, 2, 'edited')]);
+      final edited = await host.diagnose('cell', {
+        'dataset': 'big',
+        'row': 119999,
+        'column': 2,
+      });
+      expect(edited['value'], 'edited');
+      final before = dataset.revision;
+      await host.replaceDataset(
+        dataset,
+        columns: ['ID', 'Text', 'Bucket'],
+        rows: records(90000),
+        rowIds: List.generate(90000, (i) => 's$i'),
+      );
+      expect(dataset.revision, greaterThan(before + 1));
+      expect(dataset.rowCount, 90000);
+      expect(dataset.cell(89999, 0), '89999');
+      state = await host.diagnose('inspect');
+      expect(state['tables']['table']['row_count'], 90000);
+      expect(state['tables']['table']['dataset_revision'], dataset.revision);
+    } finally {
+      await host.close();
+    }
+  }, timeout: const Timeout(Duration(seconds: 120)));
+
   test('structural edits keep record identity, views and selection', () async {
     final dataset = TableDataset(
       'records',

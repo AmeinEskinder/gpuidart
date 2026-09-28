@@ -28,6 +28,7 @@ void main() {
         ],
       ),
       ('records', List.filled(65, 'A'), []),
+      ('records', ['A'], List.filled(maxDatasetRows + 1, const ['x'])),
     ]) {
       expect(
         () => TableDataset(invalid.$1, columns: invalid.$2, rows: invalid.$3),
