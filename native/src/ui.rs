@@ -34,7 +34,7 @@ use gpui_kit::prelude::FluentBuilder;
 use gpui_kit::*;
 use serde_json::{Value, json};
 use std::{
-    cell::RefCell,
+    cell::{Cell, RefCell},
     collections::{HashMap, HashSet},
     rc::Rc,
     sync::Arc,
@@ -268,6 +268,38 @@ struct RetainedList {
     scroll: UniformListScrollHandle,
 }
 
+/// A container kept as its own GPUI entity and rendered through a cached
+/// element, so frames reuse its rendered subtree until a change touches it.
+struct RetainedSubtree {
+    view: Entity<SubtreeView>,
+    height: f32,
+}
+
+/// Renders one cached container of the owning view on demand. The owner is
+/// read, never borrowed mutably, so the shared retained state serves both.
+struct SubtreeView {
+    owner: gpui::WeakEntity<DartView>,
+    id: String,
+    renders: Cell<u64>,
+}
+
+impl Render for SubtreeView {
+    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        self.renders.set(self.renders.get() + 1);
+        let Some(owner) = self.owner.upgrade() else {
+            return div().into_any_element();
+        };
+        let colors = cx.theme().colors.clone();
+        let owner = owner.read(cx);
+        match crate::protocol::node_by_id(&owner.snapshot.root, &owner.index, &self.id) {
+            Some(node) => owner
+                .materialize_node(node, &colors, cx, true)
+                .unwrap_or_else(|_| div().into_any_element()),
+            None => div().into_any_element(),
+        }
+    }
+}
+
 /// Selection decision for a view recompute.
 enum ViewSelection {
     /// Keep the selected record at this view row.
@@ -309,6 +341,10 @@ pub(crate) struct DartView {
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
     lists: HashMap<String, RetainedList>,
+    /// Cached containers by node ID.
+    subtrees: HashMap<String, RetainedSubtree>,
+    /// This view, for element handlers built outside its own render.
+    handle: gpui::WeakEntity<DartView>,
     /// IDs and parents of the applied tree, kept in step by operation updates.
     index: TreeIndex,
     /// The last revision whose content paint the input trace recorded.
@@ -420,7 +456,17 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<String, Value>>();
-        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
+        let subtrees = self
+            .subtrees
+            .iter()
+            .map(|(id, retained)| {
+                (
+                    id.clone(),
+                    json!({"renders": retained.view.read(cx).renders.get(), "height": retained.height}),
+                )
+            })
+            .collect::<serde_json::Map<String, Value>>();
+        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -464,6 +510,7 @@ impl DartView {
     }
 
     fn new(initial: Initial, events: Events, window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let handle = cx.entity().downgrade();
         let this = cx.entity();
         let key_interceptor = cx.intercept_keystrokes(move |event, window, cx| {
             let view = this.read(cx);
@@ -519,11 +566,13 @@ impl DartView {
             next_row_menu: 0,
             tables: HashMap::new(),
             lists: HashMap::new(),
+            subtrees: HashMap::new(),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
             counters: Rc::new(Counters::default()),
             failure: None,
             _key_interceptor: key_interceptor,
+            handle,
         };
         if let Err(message) = view.reconcile(window, cx) {
             view.fail(message, cx);
@@ -603,6 +652,15 @@ impl DartView {
         self.snapshot.menus = update.menus;
         self.snapshot.theme = update.theme;
         self.finish_commit(timer, window, cx);
+        self.notify_subtrees(
+            touched
+                .set
+                .iter()
+                .chain(&touched.inserted)
+                .chain(&touched.structure)
+                .map(String::as_str),
+            cx,
+        );
     }
 
     fn commit(
@@ -640,6 +698,8 @@ impl DartView {
         self.snapshot = snapshot;
         self.index = TreeIndex::of(&self.snapshot.root);
         self.finish_commit(timer, window, cx);
+        let all: Vec<String> = self.subtrees.keys().cloned().collect();
+        self.notify_subtrees(all.iter().map(String::as_str), cx);
     }
 
     /// Shared tail of whole and operation commits: shown control values
@@ -657,6 +717,27 @@ impl DartView {
             native_apply_us: timer.elapsed().as_micros() as u64,
         });
         cx.notify();
+    }
+
+    /// Re-renders every cached container that holds one of `ids`, or is one.
+    /// Other cached containers keep their rendered subtree.
+    fn notify_subtrees<'a>(&self, ids: impl IntoIterator<Item = &'a str>, cx: &mut Context<Self>) {
+        let mut due = HashSet::new();
+        for id in ids {
+            let mut current = Some(id);
+            while let Some(candidate) = current {
+                if self.subtrees.contains_key(candidate) {
+                    due.insert(candidate.to_owned());
+                    break;
+                }
+                current = self.index.parent(candidate);
+            }
+        }
+        for id in due {
+            if let Some(retained) = self.subtrees.get(&id) {
+                retained.view.update(cx, |_, cx| cx.notify());
+            }
+        }
     }
 
     /// What an operation update can break beyond its own operations: the
@@ -886,6 +967,13 @@ impl DartView {
                         state.update(cx, |_, cx| cx.notify());
                     }
                 }
+                let mut bound = Vec::new();
+                self.snapshot.root.visit(&mut |node| {
+                    if node.dataset() == Some(id.as_str()) {
+                        bound.push(node.id().to_owned());
+                    }
+                });
+                self.notify_subtrees(bound.iter().map(String::as_str), cx);
                 let mut list_changed = false;
                 for retained in self.lists.values_mut() {
                     if retained.data.borrow().id != id {
@@ -1297,6 +1385,33 @@ impl DartView {
         if let Some(message) = failure {
             return Err(message);
         }
+        let mut subtree_ids = HashSet::new();
+        let subtree_owner = cx.entity().downgrade();
+        self.snapshot.root.visit(&mut |node| {
+            let Some(style) = node.style() else {
+                return;
+            };
+            if !style.cached {
+                return;
+            }
+            let Some(StyleSize::Px(height)) = style.height else {
+                return;
+            };
+            subtree_ids.insert(node.id().to_owned());
+            match self.subtrees.get_mut(node.id()) {
+                Some(retained) => retained.height = height,
+                None => {
+                    let view = cx.new(|_| SubtreeView {
+                        owner: subtree_owner.clone(),
+                        id: node.id().to_owned(),
+                        renders: Cell::new(0),
+                    });
+                    self.subtrees
+                        .insert(node.id().to_owned(), RetainedSubtree { view, height });
+                }
+            }
+        });
+        self.subtrees.retain(|id, _| subtree_ids.contains(id));
         self.inputs.retain(|id, _| input_ids.contains(id));
         self.lists.retain(|id, _| list_ids.contains(id));
         self.scrolls.retain(|id, _| scroll_ids.contains(id));
@@ -1398,8 +1513,31 @@ impl DartView {
         &self,
         node: &Node,
         colors: &ThemeColor,
-        cx: &Context<Self>,
+        cx: &App,
     ) -> Result<AnyElement, String> {
+        self.materialize_node(node, colors, cx, false)
+    }
+
+    /// `bypass_cache` renders a cached container itself; the placeholder
+    /// path hands it to its entity instead.
+    fn materialize_node(
+        &self,
+        node: &Node,
+        colors: &ThemeColor,
+        cx: &App,
+        bypass_cache: bool,
+    ) -> Result<AnyElement, String> {
+        if !bypass_cache && node.style().is_some_and(|style| style.cached) {
+            if let Some(retained) = self.subtrees.get(node.id()) {
+                let mut size = div().w_full().h(px(retained.height));
+                return Ok(div()
+                    .id(SharedString::from(node.id().to_owned()))
+                    .w_full()
+                    .h(px(retained.height))
+                    .child(retained.view.clone().cached(size.style().clone()))
+                    .into_any_element());
+            }
+        }
         let id = SharedString::from(node.id().to_owned());
         let materialized = match node {
             Node::Column { children, .. } => apply_node_style(

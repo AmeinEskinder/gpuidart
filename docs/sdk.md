@@ -86,6 +86,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | API | Contract |
 | --- | --- |
 | UiColumn / UiRow | Vertical/horizontal groups with the native theme's standard spacing. Rows wrap when space is limited. The screen scrolls vertically when its content exceeds the window. A child style's `flex` shares the remaining space; `minWidth`, `maxWidth`, `minHeight` and `maxHeight` bound any node. |
+| UiStyle.cached | Keeps a container's rendered native subtree across frames until a change inside it, a dataset it shows or a whole publication touches it. Needs a fixed pixel height. See [retained tree](retained-tree.md#cached-subtrees). |
 | UiStack | Children overlap in order. A child sits at the top left with its own size unless its style has an `inset` from the stack's edges; `full` width and height cover the stack. Size the stack through its style or a flex parent. |
 | UiScroll | A bounded vertical, horizontal or two-axis scroll container with a native scrollbar. Its offset is retained by ID across publications and reload. |
 | UiText / UiButton | Text and native button. Click events carry node ID and snapshot revision. |

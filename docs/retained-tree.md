@@ -148,6 +148,25 @@ adds to both figures; the draw histogram at 2,048 nodes shows about 24 ms
 per frame, which is why rendering the whole tree every frame is the next
 cost to remove.
 
+## Cached subtrees
+
+Every frame still builds the whole element tree, and the draw histogram
+shows about 24 ms per frame at 2,048 nodes whatever changed. A container
+with `cached: true` in its style becomes its own GPUI entity rendered
+through a cached element: frames reuse its rendered subtree until an
+operation touches a node inside it or its child list, a dataset that a
+table, list or chart inside it shows changes, or a whole publication
+arrives. Reordering cached containers renders the ones that moved, because
+a cached element keeps its bounds. Native requires a fixed pixel height for
+the same reason, and a control inside a cached container that re-renders itself
+(inputs, tables, selects) marks the container dirty through GPUI's own
+view path. This is the application's choice, like Flutter's repaint
+boundary: cache the parts that change rarely and keep dynamic parts
+outside. The strategies experiment measured the cost of the choice as well
+as the win: property edits stopped rendering the other sections, and
+reordering cached sections raised prepaint from about 2 to 10 ms on the
+same machines.
+
 ## What does not change
 
 - Node identity rules. The same ID and kind keeps its native entity; an ID that

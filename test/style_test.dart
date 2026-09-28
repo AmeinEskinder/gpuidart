@@ -148,4 +148,14 @@ void main() {
   test('padding must list four edges', () {
     expect(() => const UiStyle(padding: [8, 8]).toJson(), throwsArgumentError);
   });
+  test('cached is a flag on the style and absent when false', () {
+    expect(const UiStyle(height: UiSize.px(200), cached: true).toJson(), {
+      'height': {'px': 200.0},
+      'cached': true,
+    });
+    expect(
+      const UiStyle(height: UiSize.px(200)).toJson().containsKey('cached'),
+      isFalse,
+    );
+  });
 }

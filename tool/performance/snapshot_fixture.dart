@@ -3,15 +3,21 @@ import 'package:gpuidart/gpuidart.dart';
 /// Synthetic device-property inspector: values live in node descriptions.
 /// The retained table is a state-preservation sentinel, not the workload data.
 final class SnapshotFixture {
-  SnapshotFixture(this.fields, {this.fixedParts = false})
-    : values = List.filled(fields, 0),
-      order = List.generate((fields + 31) ~/ 32, (i) => i) {
+  SnapshotFixture(
+    this.fields, {
+    this.fixedParts = false,
+    this.cachedParts = false,
+  }) : values = List.filled(fields, 0),
+       order = List.generate((fields + 31) ~/ 32, (i) => i) {
     if (fields < 32 || fields > 3072) {
       throw ArgumentError('Expected 32..3072 fields');
     }
   }
   final int fields;
   final bool fixedParts;
+
+  /// Give each fixed-height section a cached native subtree.
+  final bool cachedParts;
   final List<int> values;
   List<int> order;
   final extras = <int>[];
@@ -35,22 +41,30 @@ final class SnapshotFixture {
     }
   }
 
-  UiNode section(int group) => UiColumn('section-$group', [
-    UiText('heading-$group', 'Device $group'),
-    for (
-      var field = group * 32;
-      field < (group + 1) * 32 && field < fields;
-      field++
-    )
-      UiText(
-        'field-$field',
-        'Device $group / property $field: ${values[field]}',
-        style: const UiStyle(
-          fontSize: 12,
-          foreground: UiColor.token(ThemeToken.foreground),
+  UiNode section(int group) => UiColumn(
+    'section-$group',
+    [
+      UiText('heading-$group', 'Device $group'),
+      for (
+        var field = group * 32;
+        field < (group + 1) * 32 && field < fields;
+        field++
+      )
+        UiText(
+          'field-$field',
+          'Device $group / property $field: ${values[field]}',
+          style: const UiStyle(
+            fontSize: 12,
+            foreground: UiColor.token(ThemeToken.foreground),
+          ),
         ),
-      ),
-  ], style: UiStyle(gap: 2, height: fixedParts ? const UiSize.px(768) : null));
+    ],
+    style: UiStyle(
+      gap: 2,
+      height: fixedParts ? const UiSize.px(768) : null,
+      cached: cachedParts,
+    ),
+  );
 
   UiNode build() => UiColumn('root', [
     UiInput(

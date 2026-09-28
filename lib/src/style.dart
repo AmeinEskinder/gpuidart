@@ -21,6 +21,7 @@ final class UiStyle {
     this.maxHeight,
     this.inset,
     this.animation,
+    this.cached = false,
   });
 
   /// Logical pixels: top, right, bottom, left. Each edge 0–512.
@@ -60,6 +61,12 @@ final class UiStyle {
   /// it every frame; the application publishes nothing while it runs.
   final UiAnimation? animation;
 
+  /// Keep this container's rendered subtree across frames until a change
+  /// touches it. Native requires a container with a fixed pixel [height];
+  /// frames then skip it, and a change inside it, a dataset it shows or a
+  /// whole publication renders it again.
+  final bool cached;
+
   Map<String, Object> toJson() {
     final padding = this.padding;
     if (padding != null && padding.length != 4) {
@@ -89,6 +96,7 @@ final class UiStyle {
       if (maxHeight != null) 'max_height': maxHeight!.toJson(),
       if (inset != null) 'inset': inset!.toJson(),
       if (animation != null) 'animation': animation!.toJson(),
+      if (cached) 'cached': true,
     };
   }
 }

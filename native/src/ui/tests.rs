@@ -2142,3 +2142,104 @@ fn lists_show_view_ordered_records_report_picks_and_follow_edits(cx: &mut TestAp
             .is_some_and(|message| message.contains("record IDs"))
     );
 }
+
+#[gpui::test]
+fn cached_subtrees_render_again_only_when_their_content_changes(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let tree = |revision: u64, a: &str, order: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[{order}]}}}}"#,
+                order = order
+                    .replace("A", &format!(r#"{{"kind":"column","id":"a","style":{{"height":{{"px":120}},"cached":true}},"children":[{{"kind":"text","id":"a-text","text":"{a}"}}]}}"#))
+                    .replace("B", r#"{"kind":"column","id":"b","style":{"height":{"px":120},"cached":true},"children":[{"kind":"text","id":"b-text","text":"b"}]}"#)
+                    .replace("S", r#"{"kind":"text","id":"status","text":"idle"}"#)
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: tree(1, "one", "A,B,S"),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let renders =
+        |view: &gpui_kit::Entity<DartView>, window: &gpui_kit::Window, cx: &gpui_kit::App| {
+            let subtrees = view.read(cx).inspect(window, cx)["subtrees"].clone();
+            (
+                subtrees["a"]["renders"].as_u64().unwrap(),
+                subtrees["b"]["renders"].as_u64().unwrap(),
+            )
+        };
+    let update = |json: serde_json::Value| {
+        crate::protocol::Update::parse(&serde_json::to_vec(&json).unwrap()).unwrap()
+    };
+    // The harness's render_frame refreshes the window, which bypasses caching
+    // by design; a plain draw is what a real frame does.
+    let frame = |window: &mut gpui_kit::Window, cx: &mut gpui_kit::App| {
+        window.draw(cx).clear(cx);
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let (a0, b0) = renders(&view, window, cx);
+        frame(window, cx);
+        frame(window, cx);
+        assert_eq!(renders(&view, window, cx), (a0, b0), "plain frames reuse both");
+        assert!(window.find("a-text").bounds().origin.y < window.find("b-text").bounds().origin.y);
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision": 2, "base_revision": 1, "ops": [
+                    {"op": "set", "id": "a-text", "node": {"kind": "text", "id": "a-text", "text": "two"}}
+                ]})),
+                window,
+                cx,
+            )
+        });
+        frame(window, cx);
+        assert_eq!(renders(&view, window, cx), (a0 + 1, b0), "a change inside a renders a only");
+        assert_eq!(view.read(cx).inspect(window, cx)["labels"]["a-text"], "two");
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision": 3, "base_revision": 2, "ops": [
+                    {"op": "set", "id": "status", "node": {"kind": "text", "id": "status", "text": "busy"}}
+                ]})),
+                window,
+                cx,
+            )
+        });
+        frame(window, cx);
+        assert_eq!(renders(&view, window, cx), (a0 + 1, b0), "a change outside renders neither");
+        view.update(cx, |view, cx| {
+            view.apply_update(
+                update(serde_json::json!({"revision": 4, "base_revision": 3, "ops": [
+                    {"op": "children", "id": "root", "children": ["b", "a", "status"]}
+                ]})),
+                window,
+                cx,
+            )
+        });
+        frame(window, cx);
+        assert!(window.find("b-text").bounds().origin.y < window.find("a-text").bounds().origin.y);
+        // A cached element keeps its bounds; moving it re-renders it, which is
+        // the reorder cost the strategies experiment measured.
+        assert_eq!(renders(&view, window, cx), (a0 + 2, b0 + 1), "moved cached subtrees render again");
+        view.update(cx, |view, cx| view.publish(tree(5, "three", "B,A,S"), window, cx));
+        frame(window, cx);
+        assert_eq!(renders(&view, window, cx), (a0 + 3, b0 + 2), "a whole publication renders every cached subtree");
+        assert_eq!(view.read(cx).inspect(window, cx)["labels"]["a-text"], "three");
+    })
+    .unwrap();
+}

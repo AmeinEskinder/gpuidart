@@ -174,7 +174,7 @@ impl DartView {
         &self,
         node: &Node,
         colors: &ThemeColor,
-        cx: &Context<Self>,
+        _cx: &App,
     ) -> Result<AnyElement, String> {
         let Some((kind, id, options, selected, disabled)) = spec(node) else {
             return Err("Choice materializer received a different node kind".into());
@@ -199,34 +199,42 @@ impl DartView {
                 option.id
             ])
             .to_string();
-            let activate = cx.listener({
+            // Handlers reach the view through its handle, so the element can
+            // be built inside a cached subtree's render as well as its own.
+            let activate = {
+                let owner = self.handle.clone();
                 let id = id.clone();
                 let option = option.id.clone();
                 let focus = focus.clone();
-                move |this, _: &ClickEvent, window, cx| {
-                    this.choice_input(&id, &option, &focus, None, window, cx);
+                move |_: &ClickEvent, window: &mut Window, cx: &mut App| {
+                    let _ = owner.update(cx, |this, cx| {
+                        this.choice_input(&id, &option, &focus, None, window, cx);
+                    });
                 }
-            });
-            let key_down = cx.listener({
+            };
+            let key_down = {
+                let owner = self.handle.clone();
                 let id = id.clone();
                 let option = option.id.clone();
                 let focus = focus.clone();
-                move |this, event: &KeyDownEvent, window, cx| {
-                    if event.keystroke.modifiers == Modifiers::default()
-                        && this.choice_input(
-                            &id,
-                            &option,
-                            &focus,
-                            Some(&event.keystroke.key),
-                            window,
-                            cx,
-                        )
-                    {
-                        window.prevent_default();
-                        cx.stop_propagation();
-                    }
+                move |event: &KeyDownEvent, window: &mut Window, cx: &mut App| {
+                    let _ = owner.update(cx, |this, cx| {
+                        if event.keystroke.modifiers == Modifiers::default()
+                            && this.choice_input(
+                                &id,
+                                &option,
+                                &focus,
+                                Some(&event.keystroke.key),
+                                window,
+                                cx,
+                            )
+                        {
+                            window.prevent_default();
+                            cx.stop_propagation();
+                        }
+                    });
                 }
-            });
+            };
             let inactive = disabled || option.disabled;
             let selected = option.id == *selected;
             let element = match kind {

@@ -829,6 +829,10 @@ pub struct Style {
     /// A native timeline that interpolates this node's opacity or offset
     /// every frame without involving the application.
     pub animation: Option<NodeAnimation>,
+    /// Keep this container's rendered subtree across frames until a change
+    /// touches it. Needs a fixed pixel height.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub cached: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1432,6 +1436,18 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
     }
     if let Some(semantics) = node.semantics() {
         semantics.validate(node)?;
+    }
+    if node.style().is_some_and(|style| style.cached) {
+        let fixed = matches!(
+            node.style().and_then(|style| style.height),
+            Some(Size::Px(height)) if height > 0.
+        );
+        if node.children().is_none() || !fixed {
+            return Err(format!(
+                "Cached subtree {} needs a container with a fixed pixel height",
+                node.id()
+            ));
+        }
     }
     if let Some(children) = node.children() {
         for child in children {
@@ -2882,6 +2898,26 @@ mod tests {
             r#"{"kind":"list","id":"l","dataset":"d","column":0,"view":{"group":{"column":0}}}"#,
             r#"{"kind":"list","id":"l","dataset":"d","column":0,"semantics":{"role":"table"}}"#,
             r#"{"kind":"list","id":"l","dataset":"d","column":0,"children":[]}"#,
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
+        }
+    }
+
+    #[test]
+    fn cached_subtrees_need_a_container_with_a_fixed_height() {
+        let snapshot = Snapshot::parse(
+            br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
+                {"kind":"column","id":"part","style":{"height":{"px":200},"cached":true},"children":[{"kind":"text","id":"t","text":"x"}]}
+            ]}}"#,
+        )
+        .unwrap();
+        let cached = snapshot.root.children().unwrap()[0].style().unwrap().cached;
+        assert!(cached);
+        for invalid in [
+            r#"{"kind":"text","id":"t","text":"x","style":{"cached":true}}"#,
+            r#"{"kind":"column","id":"c","style":{"cached":true},"children":[]}"#,
+            r#"{"kind":"column","id":"c","style":{"height":"full","cached":true},"children":[]}"#,
         ] {
             let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
             assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");

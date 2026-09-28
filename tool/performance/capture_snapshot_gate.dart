@@ -16,7 +16,14 @@ Future<void> main(List<String> args) async {
   final output = Directory(args[0]);
   if (output.existsSync()) throw StateError('Retain earlier gate attempt');
   output.createSync(recursive: true);
-  final fixture = SnapshotFixture(int.parse(args[1]));
+  // GPUIDART_GATE_CACHED=1 gives every section a fixed height and a cached
+  // native subtree; the head-cached series compares against the plain one.
+  final cached = Platform.environment['GPUIDART_GATE_CACHED'] == '1';
+  final fixture = SnapshotFixture(
+    int.parse(args[1]),
+    fixedParts: cached,
+    cachedParts: cached,
+  );
   final trace = GpuiTrace(capacity: 8192);
   final samples = <Map<String, Object?>>[];
   final report = <String, Object?>{

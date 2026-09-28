@@ -57,6 +57,11 @@ impl TreeIndex {
         Some(chain)
     }
 
+    /// The parent of `id`, or None for the root and unknown IDs.
+    pub fn parent(&self, id: &str) -> Option<&str> {
+        self.parents.get(id).map(String::as_str)
+    }
+
     fn depth(&self, id: &str) -> usize {
         let mut depth = 0;
         let mut current = id;
@@ -119,6 +124,8 @@ pub struct Touched {
     pub inserted: Vec<String>,
     /// Nodes whose own fields changed.
     pub set: Vec<String>,
+    /// Containers whose child list changed.
+    pub structure: Vec<String>,
 }
 
 /// One applied operation's inverse.
@@ -247,6 +254,7 @@ fn apply_ops(
                     id: node.id().to_owned(),
                 });
                 touched.inserted.push(node.id().to_owned());
+                touched.structure.push(parent.clone());
             }
             Op::Reparent { id, parent } => {
                 if !index.parents.contains_key(id.as_str()) {
@@ -264,6 +272,8 @@ fn apply_ops(
                 }
                 attach(root, index, parent, None, node, "Reparent")?;
                 index.parents.insert(id.clone(), parent.clone());
+                touched.structure.push(old_parent.clone());
+                touched.structure.push(parent.clone());
                 undo.push(Undo::Reparent {
                     id: id.clone(),
                     parent: old_parent,
@@ -273,6 +283,7 @@ fn apply_ops(
             Op::Remove { id } => {
                 let (parent, position, node) = detach_from(root, index, id, "Remove")?;
                 index.remove_subtree(&node);
+                touched.structure.push(parent.clone());
                 undo.push(Undo::Remove {
                     parent,
                     index: position,
@@ -338,6 +349,7 @@ fn apply_ops(
                     id: id.clone(),
                     order,
                 });
+                touched.structure.push(id.clone());
             }
         }
     }
