@@ -21,6 +21,23 @@ function IndexEvents($Events) {
 }
 $nativeIndex = IndexEvents $native
 $applicationIndex = IndexEvents $application
+# Response-frame correlation: the first content paint at or after the applied
+# update, then the first PresentMon record whose CPU start follows that paint.
+$painted = @($native | Where-Object { $_.stage -eq 'content_painted' -and $null -ne $_.qpc } | Sort-Object { [double]$_.qpc })
+$presentRows = @()
+$presentPath = Join-Path $Directory 'present.csv'
+if ((Test-Path $presentPath) -and $null -ne $run.process_id) {
+    $presentRows = @(Import-Csv $presentPath | Where-Object { [int]$_.ProcessID -eq $run.process_id } | Sort-Object { [double]$_.CPUStartQPC })
+}
+function QpcToMs($ticks) {
+    if ($null -eq $run.qpc_frequency -or [double]$run.qpc_frequency -le 0) { return $null }
+    return [math]::Round([double]$ticks * 1000.0 / [double]$run.qpc_frequency, 3)
+}
+function Summary($values) {
+    if ($values.Count -eq 0) { return $null }
+    $sorted = @($values | Sort-Object)
+    return @{ count = $sorted.Count; min = $sorted[0]; median = $sorted[[int][math]::Floor(($sorted.Count - 1) / 2)]; max = $sorted[-1] }
+}
 $appliedRevisions = @{}
 foreach ($event in $native | Where-Object { $_.stage -eq 'update_applied' -and $null -ne $_.data.revision }) {
     $appliedRevisions[[string]$event.data.revision] = $event
@@ -39,6 +56,22 @@ $observations = @(foreach ($input in $run.inputs) {
         @($appliedRevisions[[string]$handler[0].data.target_revision] | Where-Object { $null -ne $_ })
     } else { @() }
     $applied = @($applied | Where-Object { $null -ne $_ })
+    $paint = @(); $present = @(); $inputToPresentMs = $null; $inputToDisplayMs = $null
+    if ($applied.Count -eq 1 -and $null -ne $applied[0].qpc) {
+        $appliedQpc = [double]$applied[0].qpc
+        $revision = $applied[0].data.revision
+        $paint = @($painted | Where-Object { [double]$_.qpc -ge $appliedQpc -and ($null -eq $revision -or $_.data.revision -eq $revision) } | Select-Object -First 1)
+        if ($paint.Count -eq 1 -and $presentRows.Count -gt 0) {
+            $paintQpc = [double]$paint[0].qpc
+            $present = @($presentRows | Where-Object { [double]$_.CPUStartQPC -ge $paintQpc } | Select-Object -First 1)
+            if ($present.Count -eq 1 -and $null -ne $input.qpc) {
+                $inputToPresentMs = QpcToMs ([double]$present[0].CPUStartQPC - [double]$input.qpc)
+                if ($null -ne $inputToPresentMs -and ($present[0].PSObject.Properties.Name -contains 'DisplayLatency') -and $present[0].DisplayLatency -ne 'NA') {
+                    $inputToDisplayMs = [math]::Round($inputToPresentMs + [double]$present[0].DisplayLatency, 3)
+                }
+            }
+        }
+    }
     $expected = if ($handler.Count -eq 1) { 'Tick {0:D6}' -f [int]$handler[0].data.update_ordinal } else { $null }
     $stateMatches = $observed.Count -eq 1 -and $observed[0].data.value -eq $expected
     if ($run.implementation -eq 'dart') { $stateMatches = $stateMatches -and $observed[0].data.native.value -eq $expected }
@@ -58,14 +91,26 @@ $observations = @(foreach ($input in $run.inputs) {
         native_update_applied = $applied.Count; dart_acknowledged = $ack.Count
         state_observed = $observed.Count; state_matches = $stateMatches; first_gap = $gap
         mouse_down_positions = @($down.data); mouse_up_positions = @($up.data)
+        content_painted = $paint.Count
+        response_present_qpc = $(if ($present.Count -eq 1) { [double]$present[0].CPUStartQPC } else { $null })
+        input_to_response_present_ms = $inputToPresentMs
+        input_to_response_display_ms = $inputToDisplayMs
     }
 })
+$responseMs = @($observations | Where-Object { $null -ne $_.input_to_response_present_ms } | ForEach-Object { $_.input_to_response_present_ms })
+$displayMs = @($observations | Where-Object { $null -ne $_.input_to_response_display_ms } | ForEach-Object { $_.input_to_response_display_ms })
 $result = @{
     implementation = $run.implementation; workload = $run.workload; run_id = $run.run_id
     inputs = $observations.Count; complete_chains = @($observations | Where-Object { $null -eq $_.first_gap }).Count
     gaps = @($observations | Where-Object { $null -ne $_.first_gap })
     observations = $observations
-    limit = 'Diagnostic builds and per-update readbacks; ineligible for performance comparison. A missing GPUI event does not by itself establish driver fault. QPC and Dart elapsed times are not presentation timestamps.'
+    response_presentation = @{
+        frames_correlated = $responseMs.Count
+        input_to_response_present_ms = Summary $responseMs
+        input_to_response_display_ms = Summary $displayMs
+        limit = 'Present start is the first PresentMon record after the first content paint of the applied update; display adds PresentMon DisplayLatency. Requires a present.csv capture and content_painted trace events; diagnostic builds only.'
+    }
+    limit = 'Diagnostic builds and per-update readbacks; ineligible for performance comparison. A missing GPUI event does not by itself establish driver fault. QPC and Dart elapsed times are not presentation timestamps; response_presentation carries the PresentMon-correlated ones.'
 }
 $result | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $Directory 'input-analysis.json') -Encoding UTF8
 Write-Output "$($run.implementation) $($run.workload): $($result.complete_chains)/$($result.inputs) complete traced chains; $($result.gaps.Count) gaps."

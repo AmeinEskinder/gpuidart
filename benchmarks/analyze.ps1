@@ -38,6 +38,9 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
         }
     }
     $displayed = @($frames | Where-Object { $_.DisplayedTime -ne 'NA' })
+    $inputAnalysisPath = Join-Path $file.DirectoryName 'input-analysis.json'
+    $responseLatency = if (Test-Path -LiteralPath $inputAnalysisPath) { (Get-Content -Raw -LiteralPath $inputAnalysisPath | ConvertFrom-Json).response_presentation } else { $null }
+    $correlated = $null -ne $responseLatency -and $responseLatency.frames_correlated -gt 0
     $targetMs = switch ($run.workload) { scroll { 1000.0 / 60 } burst { 1000.0 / 30 } cell { 200.0 } idle { $null } }
     # The first interval starts before the measurement window.
     $intervals = @(ColumnNumbers @($displayed | Select-Object -Skip 1) 'MsBetweenDisplayChange')
@@ -50,7 +53,7 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
         correctness = $run.correctness
         equal_work_timing_eligible = ($null -ne $plannedInputs -and $excessInputs -eq 0 -and $uninjectedInputs -eq 0 -and $run.input_deadlines_missed -eq 0 -and ($null -eq $run.correctness -or $run.correctness.passed))
         input_delivery = @{ planned = $plannedInputs; injected = $run.input_count; excess = $excessInputs; uninjected = $uninjectedInputs }
-        status = $(if ($frames.Count) { 'ETW captured; response-frame correlation and parity review still required' } else { 'presentation unavailable' })
+        status = $(if ($frames.Count -and $correlated) { 'ETW captured with response-frame correlation; parity review still required' } elseif ($frames.Count) { 'ETW captured; response-frame correlation and parity review still required' } else { 'presentation unavailable' })
         scheduled_inputs_missed = $run.input_deadlines_missed
         input_count = $run.input_count; duration_ms = $run.duration_ms
         delivery_quality = $(if ($run.input_deadlines_missed -gt 0) { 'driver missed deadlines; exclude from matched-cadence ranking' } else { 'no skipped input deadlines; inspect recorded input jitter separately' })
@@ -86,8 +89,9 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
             between_display_changes_ms = Distribution $intervals
             estimated_missed_workload_slots = $missedSlots; target_period_ms = $targetMs
             input_associated_display_ms = Distribution @(ColumnNumbers $displayed 'MsAllInputToPhotonLatency')
-            input_to_response_present_ms = $null
-            latency_limit = 'ETW input association does not prove the frame contains the changed cell'
+            input_to_response_present_ms = $(if ($correlated) { $responseLatency.input_to_response_present_ms } else { $null })
+            input_to_response_display_ms = $(if ($correlated) { $responseLatency.input_to_response_display_ms } else { $null })
+            latency_limit = 'ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run''s changed-frame correlation in input-analysis.json'
         } } else { $null })
     }
 })

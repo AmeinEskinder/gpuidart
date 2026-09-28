@@ -311,6 +311,9 @@ pub(crate) struct DartView {
     lists: HashMap<String, RetainedList>,
     /// IDs and parents of the applied tree, kept in step by operation updates.
     index: TreeIndex,
+    /// The last revision whose content paint the input trace recorded.
+    #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
+    painted_revision: std::rc::Rc<std::cell::Cell<u64>>,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
     datasets: Store,
@@ -494,6 +497,8 @@ impl DartView {
             embedded: false,
             trace: None,
             index: TreeIndex::of(&initial.snapshot.root),
+            #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
+            painted_revision: Default::default(),
             snapshot: initial.snapshot,
             applied_theme: None,
             applied_menus: None,
@@ -2280,7 +2285,11 @@ impl Render for DartView {
             .vertical_scrollbar(&self.scroll)
             .children(self.row_menu_element());
         #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
-        let root = crate::input_trace::observe(root);
+        let root = crate::paint_trace::PaintMarker {
+            child: crate::input_trace::observe(root).into_any_element(),
+            revision: self.snapshot.revision,
+            painted: self.painted_revision.clone(),
+        };
         match &self.trace {
             Some(trace) if self.failure.is_none() => crate::paint_trace::ContentPaint {
                 child: root.into_any_element(),
