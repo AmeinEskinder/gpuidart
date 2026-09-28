@@ -136,6 +136,14 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         throw const FormatException('Missing select selected value');
       }
       if (value['selected'] != null) string('selected');
+    case 'panes_resize':
+      integer('revision', minimum: 1);
+      string('id');
+      final sizes = value['sizes'];
+      if (sizes is! List ||
+          sizes.any((size) => size is! num || !size.isFinite || size < 0)) {
+        throw const FormatException('Invalid pane sizes');
+      }
     case 'date_change':
       integer('revision', minimum: 1);
       string('id');

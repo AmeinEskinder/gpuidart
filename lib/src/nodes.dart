@@ -134,6 +134,89 @@ final class UiScroll extends UiNode {
   };
 }
 
+enum UiPanesAxis {
+  horizontal('horizontal'),
+  vertical('vertical');
+
+  const UiPanesAxis(this.wire);
+  final String wire;
+}
+
+/// One pane's initial size and bounds in logical pixels; a pane without a
+/// size takes the remaining space.
+final class UiPane {
+  const UiPane({this.size, this.minSize, this.maxSize});
+  final double? size;
+  final double? minSize;
+  final double? maxSize;
+
+  Map<String, Object> toJson() {
+    for (final (name, value) in [
+      ('size', size),
+      ('minSize', minSize),
+      ('maxSize', maxSize),
+    ]) {
+      if (value != null && (!value.isFinite || value < 0 || value > 8192)) {
+        throw ArgumentError.value(value, name, 'Logical pixels within 0..8192');
+      }
+    }
+    if (size != null && size! <= 0) {
+      throw ArgumentError.value(size, 'size', 'Pane size must be positive');
+    }
+    final min = minSize ?? 0;
+    final max = maxSize ?? double.infinity;
+    if (min > max || (size != null && (size! < min || size! > max))) {
+      throw ArgumentError('Pane size must lie within minSize and maxSize');
+    }
+    return {'size': ?size, 'min': ?minSize, 'max': ?maxSize};
+  }
+}
+
+/// Children side by side (or stacked) as panes with native drag handles
+/// between them. [panes] parallels [children] with each pane's initial size
+/// and bounds, or is empty for panes that share the space. Dragged sizes are
+/// retained by ID across publications; a publication that changes a pane's
+/// size resizes it, and a drag emits `panes_resize` with every pane's size
+/// in `GpuiEvent.sizes`. Size the group through its style or a flex parent.
+final class UiPanes extends UiNode {
+  UiPanes(
+    super.id,
+    List<UiNode> children, {
+    this.axis = UiPanesAxis.horizontal,
+    List<UiPane> panes = const [],
+    super.style,
+    super.semantics,
+  }) : children = List.unmodifiable(children),
+       panes = List.unmodifiable(panes);
+  final UiPanesAxis axis;
+  final List<UiPane> panes;
+  @override
+  final List<UiNode> children;
+  @override
+  bool get isContainer => true;
+  @override
+  Map<String, Object> props() {
+    if (panes.isNotEmpty && panes.length != children.length) {
+      throw ArgumentError('Panes need one UiPane per child or none');
+    }
+    return {
+      'kind': 'panes',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('panes'),
+      if (style != null) 'style': style!.toJson(),
+      if (axis != UiPanesAxis.horizontal) 'axis': axis.wire,
+      if (panes.isNotEmpty)
+        'panes': panes.map((pane) => pane.toJson()).toList(),
+    };
+  }
+
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
+    'children': children.map((child) => child.toJson()).toList(),
+  };
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;

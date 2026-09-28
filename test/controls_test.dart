@@ -310,6 +310,77 @@ void main() {
     );
   });
 
+  test('panes encode their specs and decode resize events', () {
+    final panes = UiPanes(
+      'split',
+      [const UiText('left', 'L'), const UiText('right', 'R')],
+      panes: const [UiPane(size: 200, minSize: 100, maxSize: 400), UiPane()],
+    );
+    expect(panes.toJson(), {
+      'kind': 'panes',
+      'id': 'split',
+      'panes': [
+        {'size': 200.0, 'min': 100.0, 'max': 400.0},
+        <String, Object>{},
+      ],
+      'children': [
+        {'kind': 'text', 'id': 'left', 'text': 'L'},
+        {'kind': 'text', 'id': 'right', 'text': 'R'},
+      ],
+    });
+    expect(
+      UiPanes('v', const [
+        UiText('a', 'A'),
+      ], axis: UiPanesAxis.vertical).toJson()['axis'],
+      'vertical',
+    );
+    expect(
+      UiPanes(
+        'bad',
+        [const UiText('a', 'A')],
+        panes: const [UiPane(), UiPane()],
+      ).toJson,
+      throwsArgumentError,
+      reason: 'one spec per child or none',
+    );
+    for (final pane in const [
+      UiPane(size: 0),
+      UiPane(size: -1),
+      UiPane(size: 9000),
+      UiPane(minSize: 300, maxSize: 200),
+      UiPane(size: 50, minSize: 100),
+      UiPane(size: double.nan),
+    ]) {
+      expect(pane.toJson, throwsArgumentError, reason: '$pane');
+    }
+    Map<String, dynamic> decode(Map<String, Object?> event) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(event)));
+    final resized = decode({
+      'type': 'panes_resize',
+      'revision': 2,
+      'id': 'split',
+      'sizes': [300, 300.5],
+    });
+    expect(resized['sizes'], [300, 300.5]);
+    for (final invalid in <Map<String, Object?>>[
+      {'type': 'panes_resize', 'revision': 2, 'id': 'split'},
+      {
+        'type': 'panes_resize',
+        'revision': 2,
+        'id': 'split',
+        'sizes': ['wide'],
+      },
+      {
+        'type': 'panes_resize',
+        'revision': 2,
+        'id': 'split',
+        'sizes': [-1],
+      },
+    ]) {
+      expect(() => decode(invalid), throwsFormatException);
+    }
+  });
+
   test('switch and radio events decode with their values', () {
     Map<String, dynamic> decode(Map<String, Object?> event) =>
         decodeNativeEvent(utf8.encode(jsonEncode(event)));

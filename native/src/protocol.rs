@@ -320,6 +320,25 @@ pub enum Node {
         #[serde(default)]
         children: Vec<Node>,
     },
+    /// Children laid side by side (or stacked) as panes with drag handles
+    /// between them. `panes` parallels `children` with each pane's initial
+    /// size and bounds in logical pixels; a pane without a size takes the
+    /// remaining space. Sizes are retained across publications by ID; a
+    /// publication that changes a pane's size resizes it, and a drag emits
+    /// `panes_resize` with every pane's size.
+    Panes {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default)]
+        axis: PanesAxis,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        panes: Vec<PaneSpec>,
+        #[serde(default)]
+        children: Vec<Node>,
+    },
     /// A calendar picker holding one date as `YYYY-MM-DD`; `date_change`
     /// carries the requested value and the next publication is authoritative.
     DatePicker {
@@ -600,6 +619,48 @@ pub enum AggregateOp {
     Avg,
     Min,
     Max,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PanesAxis {
+    #[default]
+    Horizontal,
+    Vertical,
+}
+
+/// One pane's initial size and bounds in logical pixels, all optional.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PaneSpec {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max: Option<f32>,
+}
+
+/// Pane specs parallel the children (or are absent) and every dimension is a
+/// finite logical size within the window bounds, with `min <= size <= max`.
+fn validate_panes(panes: &[PaneSpec], children: usize) -> Result<(), String> {
+    if !panes.is_empty() && panes.len() != children {
+        return Err("Panes must have one spec per child or none".into());
+    }
+    let bounded = |value: Option<f32>| value.is_none_or(|v| v.is_finite() && v >= 0. && v <= 8192.);
+    for pane in panes {
+        if !bounded(pane.size) || !bounded(pane.min) || !bounded(pane.max) {
+            return Err("Pane sizes must be finite logical pixels within 0..=8192".into());
+        }
+        if pane.size.is_some_and(|size| size <= 0.) {
+            return Err("Pane size must be positive".into());
+        }
+        let (min, max) = (pane.min.unwrap_or(0.), pane.max.unwrap_or(f32::MAX));
+        if min > max || pane.size.is_some_and(|size| size < min || size > max) {
+            return Err("Pane size must lie within its min and max".into());
+        }
+    }
+    Ok(())
 }
 
 /// One row of a table view: a record by source index, or a group header.
@@ -1487,6 +1548,7 @@ impl Node {
             | Self::Table { id, .. }
             | Self::Stack { id, .. }
             | Self::Scroll { id, .. }
+            | Self::Panes { id, .. }
             | Self::Switch { id, .. }
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
@@ -1516,6 +1578,7 @@ impl Node {
             | Self::Table { style, .. }
             | Self::Stack { style, .. }
             | Self::Scroll { style, .. }
+            | Self::Panes { style, .. }
             | Self::Switch { style, .. }
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
@@ -1545,6 +1608,7 @@ impl Node {
             | Self::Table { semantics, .. }
             | Self::Stack { semantics, .. }
             | Self::Scroll { semantics, .. }
+            | Self::Panes { semantics, .. }
             | Self::Switch { semantics, .. }
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
@@ -1569,7 +1633,8 @@ impl Node {
             Self::Column { children, .. }
             | Self::Row { children, .. }
             | Self::Stack { children, .. }
-            | Self::Scroll { children, .. } => Some(children),
+            | Self::Scroll { children, .. }
+            | Self::Panes { children, .. } => Some(children),
             _ => None,
         }
     }
@@ -1683,6 +1748,12 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
     }
     if let Some(semantics) = node.semantics() {
         semantics.validate(node)?;
+    }
+    if let Node::Panes {
+        panes, children, ..
+    } = node
+    {
+        validate_panes(panes, children.len())?;
     }
     if node.style().is_some_and(|style| style.cached) {
         let fixed = matches!(
@@ -2078,7 +2149,8 @@ pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
         Node::Column { children, .. }
         | Node::Row { children, .. }
         | Node::Stack { children, .. }
-        | Node::Scroll { children, .. } => Some(children),
+        | Node::Scroll { children, .. }
+        | Node::Panes { children, .. } => Some(children),
         _ => None,
     }
 }
@@ -2208,6 +2280,12 @@ pub enum Event {
         revision: u64,
         id: String,
         date: Option<String>,
+    },
+    /// Every pane's size in logical pixels after a drag.
+    PanesResize {
+        revision: u64,
+        id: String,
+        sizes: Vec<f32>,
     },
     DialogResult {
         revision: u64,

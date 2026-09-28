@@ -326,6 +326,14 @@ struct RetainedImage {
     image: Arc<gpui::Image>,
 }
 
+/// A resizable pane group's Kit state, kept by node ID across publications.
+struct RetainedPanes {
+    state: Entity<gpui_kit::base::ResizableState>,
+    axis: crate::protocol::PanesAxis,
+    published: Vec<crate::protocol::PaneSpec>,
+    _subscription: gpui_kit::gpui::Subscription,
+}
+
 pub(crate) struct DartView {
     #[cfg(all(test, feature = "snapshot-experiment"))]
     experiment_bounds: Option<Rc<RefCell<HashMap<String, Bounds<Pixels>>>>>,
@@ -352,6 +360,9 @@ pub(crate) struct DartView {
     choice_shown: Rc<RefCell<HashMap<String, String>>>,
     /// Scroll containers keep their offset by ID across publications.
     scrolls: HashMap<String, ScrollHandle>,
+    /// Resizable pane groups by node ID: the Kit state that holds the
+    /// dragged sizes, the axis it was built for and the specs last published.
+    panes: HashMap<String, RetainedPanes>,
     row_menu: Option<row_menus::Session>,
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
@@ -440,6 +451,20 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<_, _>>();
+        let panes = self
+            .panes
+            .iter()
+            .map(|(id, retained)| {
+                let sizes: Vec<f32> = retained
+                    .state
+                    .read(cx)
+                    .sizes()
+                    .iter()
+                    .map(|size| f32::from(*size))
+                    .collect();
+                (id.clone(), json!(sizes))
+            })
+            .collect::<serde_json::Map<_, _>>();
         let mut labels = serde_json::Map::new();
         self.snapshot.root.visit(&mut |node| {
             if let Node::Text { id, text, .. } = node {
@@ -484,7 +509,7 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<String, Value>>();
-        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
+        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "panes": panes, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -581,6 +606,7 @@ impl DartView {
             checkbox_shown: Default::default(),
             choice_shown: Default::default(),
             scrolls: HashMap::new(),
+            panes: HashMap::new(),
             row_menu: None,
             next_row_menu: 0,
             tables: HashMap::new(),
@@ -1174,6 +1200,7 @@ impl DartView {
         let mut table_ids = HashSet::new();
         let mut list_ids = HashSet::new();
         let mut scroll_ids = HashSet::new();
+        let mut pane_ids = HashSet::new();
         let owner = cx.entity().downgrade();
         let mut changed_views = Vec::new();
         let mut failure = None;
@@ -1183,6 +1210,64 @@ impl DartView {
                 self.scrolls
                     .entry(id.clone())
                     .or_insert_with(ScrollHandle::new);
+            }
+            Node::Panes {
+                id, axis, panes, ..
+            } => {
+                pane_ids.insert(id.clone());
+                match self.panes.get_mut(id) {
+                    Some(retained) if retained.axis == *axis => {
+                        if retained.published != *panes {
+                            // A publication that changes a pane's size resizes
+                            // it as a drag would; unchanged panes keep their
+                            // dragged sizes.
+                            for (index, (spec, before)) in
+                                panes.iter().zip(retained.published.iter()).enumerate()
+                            {
+                                if let Some(size) =
+                                    spec.size.filter(|size| Some(*size) != before.size)
+                                {
+                                    retained.state.update(cx, |state, cx| {
+                                        state.resize_panel(index, px(size), window, cx)
+                                    });
+                                }
+                            }
+                            retained.published = panes.clone();
+                        }
+                    }
+                    _ => {
+                        let state = cx.new(|_| gpui_kit::base::ResizableState::default());
+                        // Kit emits `Resized` at the end of a drag and after a
+                        // programmatic resize alike; either reaches the
+                        // application as `panes_resize` with every size.
+                        let event_id = id.clone();
+                        let subscription = cx.subscribe(
+                            &state,
+                            move |this, state, _: &gpui_kit::base::ResizablePanelEvent, cx| {
+                                let sizes = state
+                                    .read(cx)
+                                    .sizes()
+                                    .iter()
+                                    .map(|size| f32::from(*size))
+                                    .collect();
+                                this.events.emit(Event::PanesResize {
+                                    revision: this.snapshot.revision,
+                                    id: event_id.clone(),
+                                    sizes,
+                                });
+                            },
+                        );
+                        self.panes.insert(
+                            id.clone(),
+                            RetainedPanes {
+                                state,
+                                axis: *axis,
+                                published: panes.clone(),
+                                _subscription: subscription,
+                            },
+                        );
+                    }
+                }
             }
             Node::Input {
                 id,
@@ -1464,6 +1549,7 @@ impl DartView {
         self.inputs.retain(|id, _| input_ids.contains(id));
         self.lists.retain(|id, _| list_ids.contains(id));
         self.scrolls.retain(|id, _| scroll_ids.contains(id));
+        self.panes.retain(|id, _| pane_ids.contains(id));
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
@@ -1693,6 +1779,44 @@ impl DartView {
                 colors,
             )
             .into_any_element(),
+            Node::Panes {
+                id: panes_id,
+                axis,
+                panes,
+                children,
+                ..
+            } => {
+                let retained = self
+                    .panes
+                    .get(panes_id)
+                    .ok_or_else(|| format!("Missing retained panes: {panes_id}"))?;
+                let group_id = SharedString::from(panes_id.clone());
+                let mut group = match axis {
+                    crate::protocol::PanesAxis::Horizontal => gpui_kit::base::h_resizable(group_id),
+                    crate::protocol::PanesAxis::Vertical => gpui_kit::base::v_resizable(group_id),
+                }
+                .with_state(&retained.state);
+                for (index, child) in children.iter().enumerate() {
+                    let spec = panes.get(index).copied().unwrap_or_default();
+                    let mut panel = gpui_kit::base::resizable_panel()
+                        .child(self.materialize(child, colors, cx)?);
+                    if let Some(size) = spec.size {
+                        panel = panel.size(px(size));
+                    }
+                    if spec.min.is_some() || spec.max.is_some() {
+                        panel = panel.size_range(
+                            px(spec.min.unwrap_or(0.))..spec.max.map_or(Pixels::MAX, px),
+                        );
+                    }
+                    group = group.child(panel);
+                }
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(group),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
             Node::Scroll {
                 id: scroll_id,
                 axis,

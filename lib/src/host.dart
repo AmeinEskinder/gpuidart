@@ -214,6 +214,11 @@ final class GpuiEvent {
   /// Requested `YYYY-MM-DD` date on `date_change`; null means cleared.
   String? get date => data['date'] as String?;
 
+  /// Every pane's size in logical pixels on `panes_resize`.
+  List<double>? get sizes => type == 'panes_resize'
+      ? [for (final size in data['sizes'] as List) (size as num).toDouble()]
+      : null;
+
   /// Whether the user confirmed a `dialog_result`; false means cancelled.
   bool? get confirmed => data['confirmed'] as bool?;
 
@@ -1062,6 +1067,7 @@ final class GpuiHost {
           event.type == 'slider_change' ||
           event.type == 'select_change' ||
           event.type == 'date_change' ||
+          event.type == 'panes_resize' ||
           event.type == 'switch_change' ||
           event.type == 'radio_change' ||
           event.type == 'tab_change' ||

@@ -2513,3 +2513,136 @@ fn typing_into_an_input_inside_a_cached_subtree_renders_it(cx: &mut TestAppConte
     })
     .unwrap();
 }
+
+#[gpui::test]
+fn panes_retain_dragged_sizes_follow_publications_and_report_resizes(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, panes: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"panes","id":"split","style":{{"width":{{"px":600}},"height":{{"px":300}}}},"panes":{panes},"children":[
+                    {{"kind":"text","id":"left","text":"Left","style":{{"width":"full"}}}},
+                    {{"kind":"text","id":"right","text":"Right","style":{{"width":"full"}}}}
+                ]}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let received: Arc<Mutex<Vec<Event>>> = Arc::new(Mutex::new(Vec::new()));
+    let sink = received.clone();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(
+            WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(Bounds {
+                    origin: Point::default(),
+                    size: size(px(900.), px(700.)),
+                })),
+                ..Default::default()
+            },
+            cx,
+            |window, cx| {
+                cx.new(|cx| {
+                    DartView::new(
+                        Initial {
+                            window: Default::default(),
+                            snapshot: snapshot(1, r#"[{"size":200,"min":100,"max":400},{}]"#),
+                            datasets: vec![],
+                        },
+                        Events(Arc::new(move |event| sink.lock().unwrap().push(event))),
+                        window,
+                        cx,
+                    )
+                })
+            },
+        )
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        window.render_frame(cx);
+        let left = window.find("left").bounds();
+        let right = window.find("right").bounds();
+        assert!(
+            (f32::from(left.size.width) - 200.).abs() < 2.,
+            "the published size lays out the first pane: {left:?}"
+        );
+        assert!(
+            right.origin.x >= left.origin.x + left.size.width - px(1.),
+            "panes sit side by side on the horizontal axis: {left:?} then {right:?}"
+        );
+        let sizes = view.read(cx).inspect(window, cx)["panes"]["split"].clone();
+        assert_eq!(sizes.as_array().map(Vec::len), Some(2));
+        let state = view.read(cx).panes["split"].state.clone();
+
+        // A republication with the same specs keeps the state and its sizes.
+        view.update(cx, |view, cx| {
+            view.publish(
+                snapshot(2, r#"[{"size":200,"min":100,"max":400},{}]"#),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        assert_eq!(
+            view.read(cx).panes["split"].state.entity_id(),
+            state.entity_id()
+        );
+
+        // A drag reported through the state reaches the application.
+        state.update(cx, |state, cx| state.resize_panel(0, px(300.), window, cx));
+        window.render_frame(cx);
+        window.render_frame(cx);
+        let left = window.find("left").bounds();
+        assert!(
+            (f32::from(left.size.width) - 300.).abs() < 2.,
+            "the resize applied: {left:?}"
+        );
+    })
+    .unwrap();
+    // Subscriptions deliver once the update above has returned.
+    cx.update_window(handle, |_, window, cx| {
+        let resizes: Vec<Vec<f32>> = received
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::PanesResize { id, sizes, .. } if id == "split" => Some(sizes.clone()),
+                _ => None,
+            })
+            .collect();
+        assert!(
+            resizes.last().is_some_and(|sizes| (sizes[0] - 300.).abs() < 2.),
+            "panes_resize carries the new sizes: {resizes:?}"
+        );
+
+        // A publication that changes a size resizes that pane; the other keeps its size.
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(3, r#"[{"size":150,"min":100,"max":400},{}]"#), window, cx)
+        });
+        window.render_frame(cx);
+        window.render_frame(cx);
+        let left = window.find("left").bounds();
+        assert!(
+            (f32::from(left.size.width) - 150.).abs() < 2.,
+            "a published size change resizes the pane: {left:?}"
+        );
+
+        // Removing the node releases its state.
+        view.update(cx, |view, cx| {
+            view.publish(
+                Snapshot::parse(
+                    br#"{"revision":4,"root":{"kind":"column","id":"root","children":[{"kind":"text","id":"only","text":"Only"}]}}"#,
+                )
+                .unwrap(),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        assert!(view.read(cx).panes.is_empty(), "the pane state is released with its node");
+    })
+    .unwrap();
+}

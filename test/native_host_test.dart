@@ -496,6 +496,38 @@ void main() {
     timeout: const Timeout(Duration(seconds: 120)),
   );
 
+  test('panes lay out their children and follow published sizes', () async {
+    UiNode build(double leftWidth) => UiPanes(
+      'split',
+      const [
+        UiText('left', 'Left', style: UiStyle(width: UiSize.full)),
+        UiText('right', 'Right', style: UiStyle(width: UiSize.full)),
+      ],
+      panes: [
+        UiPane(size: leftWidth, minSize: 100, maxSize: 500),
+        const UiPane(),
+      ],
+      style: const UiStyle(width: UiSize.px(600), height: UiSize.px(200)),
+    );
+    var leftWidth = 200.0;
+    final host = await GpuiHost.openView(() => build(leftWidth));
+    try {
+      var state = await host.diagnose('inspect');
+      expect(state['panes']['split'], hasLength(2));
+      expect((state['panes']['split'][0] as num).toDouble(), closeTo(200, 2));
+      leftWidth = 300;
+      await host.rebuild();
+      state = await host.diagnose('inspect');
+      expect(
+        (state['panes']['split'][0] as num).toDouble(),
+        closeTo(300, 2),
+        reason: 'a published size change resizes the pane',
+      );
+    } finally {
+      await host.close();
+    }
+  });
+
   test('packed records carry every UTF-16 shape as native UTF-8', () async {
     // A first record past the slice estimate puts the rest in a packed
     // slice of their own, so every text shape below travels packed.

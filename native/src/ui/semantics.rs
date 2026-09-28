@@ -60,7 +60,11 @@ pub(super) fn annotate<T: StatefulInteractiveElement>(element: T, node: &Node) -
         Some(SemanticRole::Heading) => Role::Heading,
         _ => match node {
             Node::Text { .. } => Role::Label,
-            Node::Row { .. } | Node::Column { .. } | Node::Stack { .. } | Node::Scroll { .. } => {
+            Node::Row { .. }
+            | Node::Column { .. }
+            | Node::Stack { .. }
+            | Node::Scroll { .. }
+            | Node::Panes { .. } => {
                 if node.semantics().is_none() {
                     return element;
                 }

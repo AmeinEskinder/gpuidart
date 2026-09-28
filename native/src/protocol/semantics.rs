@@ -50,7 +50,8 @@ impl Semantics {
                 Node::Column { .. }
                 | Node::Row { .. }
                 | Node::Stack { .. }
-                | Node::Scroll { .. } => {
+                | Node::Scroll { .. }
+                | Node::Panes { .. } => {
                     matches!(role, Group | List | ListItem)
                 }
                 Node::Text { .. } => matches!(role, Label | Heading),
