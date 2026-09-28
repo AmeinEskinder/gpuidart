@@ -167,6 +167,14 @@ as the win: property edits stopped rendering the other sections, and
 reordering cached sections raised prepaint from about 2 to 10 ms on the
 same machines.
 
+[The cached-subtree run](../reports/performance/update-gate/frames-20260928/README.md)
+measured both at `051d79f`. After property edits at 2,048 nodes the frame
+fell from 32.8 to 6.6 ms and at 512 from 9.8 to 3.3 ms, with untouched
+sections rendering no further times; the gate's mixed workload, which
+reorders, inserts and removes sections, showed a flat per-frame median and
+11 to 30 percent longer publish-to-ack on those kinds, and a 4x shorter
+unchanged publication.
+
 ## What does not change
 
 - Node identity rules. The same ID and kind keeps its native entity; an ID that

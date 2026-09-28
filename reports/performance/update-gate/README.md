@@ -96,3 +96,10 @@ operations in place against an ID index instead of cloning and revalidating
 the tree. Native dispatch at 2,048 nodes fell to about a tenth for every
 operation kind.
 
+## Third run: cached subtrees
+
+[`frames-20260928/`](frames-20260928/README.md) runs the gate at `051d79f`
+with plain and with cached sections. The mixed workload's per-frame median
+is flat because reorders move every cached section; a property-only run
+shows the frame after an edit at about a fifth at 2,048 nodes.
+
