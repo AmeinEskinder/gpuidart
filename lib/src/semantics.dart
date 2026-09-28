@@ -19,7 +19,8 @@ enum UiRole {
   progressBar,
   separator,
   tabList,
-  image;
+  image,
+  chart;
 
   String get wire => switch (this) {
     listItem => 'list_item',
@@ -66,6 +67,7 @@ final class UiSemantics {
       'separator' => {UiRole.separator},
       'tabs' => {UiRole.tabList},
       'canvas' => {UiRole.image},
+      'chart' => {UiRole.chart},
       _ => throw ArgumentError.value(kind, 'kind'),
     };
     if (role != null && !allowed.contains(role)) {

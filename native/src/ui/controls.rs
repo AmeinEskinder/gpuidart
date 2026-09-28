@@ -107,6 +107,10 @@ impl DartView {
                 "entity":retained.state.entity_id().as_u64(), "focused":state.focus_handle(cx).is_focused(window)}));
         }
         self.snapshot.root.visit(&mut |node| {
+            if let Node::Tabs { id, selected, disabled, options, .. } | Node::RadioGroup { id, selected, disabled, options, .. } = node {
+                let focused = self.choices.get(id).and_then(|tabs| tabs.focus.iter().find(|(_,f)| f.is_focused(window)).map(|(id,_)| id));
+                controls.insert(id.clone(), json!({"kind":if matches!(node,Node::Tabs{..}) {"tabs"} else {"radio_group"},"selected":selected,"disabled":disabled,"options":options,"focused_option":focused}));
+            }
             if let Node::Checkbox { id, checked, disabled, .. } = node {
                 let shown = self.checkbox_shown.borrow().get(id).copied().unwrap_or(*checked);
                 controls.insert(id.clone(),json!({"kind":"checkbox","checked":shown,"published":checked,"disabled":disabled}));
@@ -115,16 +119,8 @@ impl DartView {
                 let shown = self.checkbox_shown.borrow().get(id).copied().unwrap_or(*checked);
                 controls.insert(id.clone(),json!({"kind":"switch","checked":shown,"published":checked,"disabled":disabled}));
             }
-            if let Node::RadioGroup { id, selected, disabled, .. } = node {
-                let shown = self.choice_shown.borrow().get(id).cloned().or_else(|| selected.clone());
-                controls.insert(id.clone(),json!({"kind":"radio_group","selected":shown,"published":selected,"disabled":disabled}));
-            }
             if let Node::Progress { id, value, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"progress","value":value}));
-            }
-            if let Node::Tabs { id, selected, .. } = node {
-                let shown = self.choice_shown.borrow().get(id).cloned().unwrap_or_else(|| selected.clone());
-                controls.insert(id.clone(),json!({"kind":"tabs","selected":shown,"published":selected}));
             }
             if let Node::ConfirmDialog { id, disabled, .. } = node {
                 controls.insert(id.clone(),json!({"kind":"confirm_dialog","disabled":disabled,

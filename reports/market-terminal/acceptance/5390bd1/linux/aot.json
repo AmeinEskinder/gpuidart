@@ -1,0 +1,4739 @@
+{
+  "passed": true,
+  "platform": "linux",
+  "dart": "3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
+  "mode": "aot",
+  "rows": 100000,
+  "scope": "Real native window and GPUI key dispatch. External OS queries when requested; no visual, screen-reader or latency claim.",
+  "semantics": false,
+  "steps": [
+    {
+      "step": "100k initial table and navigation",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": null,
+          "query": "",
+          "ticks": 0,
+          "instruments_revision": 1,
+          "history_revision": 1,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 1,
+          "native_process_id": 6177,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 0,
+                "end": 10
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 1,
+              "scroll_y": 0.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": null,
+                "record": null
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "No instrument selected",
+            "terminal-notice": "Select an instrument to inspect its sample history."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 5,
+            "rows_constructed": 60,
+            "cells_constructed": 310,
+            "data_records_checked": 0,
+            "data_cells_written": 0,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 5,
+            "p50_us": 19234.815,
+            "p95_us": 50528.255,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 3,
+            "p50_us": 34668.543,
+            "p95_us": 43188.223,
+            "p99_us": 43188.223
+          },
+          "present_interval": {
+            "samples": 1,
+            "p50_us": 46366.719,
+            "p95_us": 46366.719,
+            "p99_us": 46366.719
+          },
+          "input_to_frame": {
+            "samples": 0,
+            "p50_us": 0.0,
+            "p95_us": 0.0,
+            "p99_us": 0.0
+          }
+        },
+        "metrics": {
+          "description_builds": 1,
+          "encoded_snapshots": 0,
+          "encoded_bytes": 0,
+          "ffi_callbacks": 5,
+          "ui_callbacks": 0,
+          "diagnostic_callbacks": 3,
+          "description_build": {
+            "samples": 1,
+            "p50_us": 17,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "publish_to_applied": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 0,
+          "data_bytes": 0,
+          "data_records_checked": 0,
+          "data_cells_written": 0,
+          "data_encode": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "data_publish_to_applied": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_data_parse": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_data_apply": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          },
+          "native_snapshot_apply": {
+            "samples": 0,
+            "p50_us": 0,
+            "p95_us": 0,
+            "p99_us": 0
+          }
+        }
+      }
+    },
+    {
+      "step": "stable selected record loads history once",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 0,
+          "instruments_revision": 1,
+          "history_revision": 2,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 2,
+          "native_process_id": 6177,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 16,
+                "end": 26
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 1,
+              "scroll_y": -536.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": 25,
+                "record": "BRK0025"
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Selected BRK0025."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 6,
+            "rows_constructed": 72,
+            "cells_constructed": 372,
+            "data_records_checked": 48,
+            "data_cells_written": 192,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 6,
+            "p50_us": 19234.815,
+            "p95_us": 50528.255,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 4,
+            "p50_us": 34668.543,
+            "p95_us": 55803.903,
+            "p99_us": 55803.903
+          },
+          "present_interval": {
+            "samples": 2,
+            "p50_us": 46366.719,
+            "p95_us": 75628.543,
+            "p99_us": 75628.543
+          },
+          "input_to_frame": {
+            "samples": 0,
+            "p50_us": 0.0,
+            "p95_us": 0.0,
+            "p99_us": 0.0
+          }
+        },
+        "metrics": {
+          "description_builds": 2,
+          "encoded_snapshots": 1,
+          "encoded_bytes": 3317,
+          "ffi_callbacks": 11,
+          "ui_callbacks": 1,
+          "diagnostic_callbacks": 6,
+          "description_build": {
+            "samples": 2,
+            "p50_us": 17,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 1,
+            "p50_us": 32,
+            "p95_us": 32,
+            "p99_us": 32
+          },
+          "publish_to_applied": {
+            "samples": 1,
+            "p50_us": 1019,
+            "p95_us": 1019,
+            "p99_us": 1019
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 1,
+          "data_bytes": 2405,
+          "data_records_checked": 48,
+          "data_cells_written": 192,
+          "data_encode": {
+            "samples": 1,
+            "p50_us": 20,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 1,
+            "p50_us": 1397,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 1,
+            "p50_us": 134,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 1,
+            "p50_us": 89,
+            "p95_us": 89,
+            "p99_us": 89
+          },
+          "native_snapshot_apply": {
+            "samples": 1,
+            "p50_us": 495,
+            "p95_us": 495,
+            "p99_us": 495
+          }
+        }
+      }
+    },
+    {
+      "step": "button tick edits selected record",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 4,
+          "native_process_id": 6177,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 16,
+                "end": 26
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 2,
+              "scroll_y": -536.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": 25,
+                "record": "BRK0025"
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(11v1))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 16,
+            "rows_constructed": 192,
+            "cells_constructed": 992,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 16,
+            "p50_us": 18923.519,
+            "p95_us": 50528.255,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 12,
+            "p50_us": 34668.543,
+            "p95_us": 55803.903,
+            "p99_us": 55803.903
+          },
+          "present_interval": {
+            "samples": 9,
+            "p50_us": 45383.679,
+            "p95_us": 75628.543,
+            "p99_us": 75628.543
+          },
+          "input_to_frame": {
+            "samples": 1,
+            "p50_us": 69730.303,
+            "p95_us": 69730.303,
+            "p99_us": 69730.303
+          }
+        },
+        "metrics": {
+          "description_builds": 4,
+          "encoded_snapshots": 3,
+          "encoded_bytes": 9960,
+          "ffi_callbacks": 24,
+          "ui_callbacks": 2,
+          "diagnostic_callbacks": 14,
+          "description_build": {
+            "samples": 4,
+            "p50_us": 3,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 3,
+            "p50_us": 31,
+            "p95_us": 32,
+            "p99_us": 32
+          },
+          "publish_to_applied": {
+            "samples": 3,
+            "p50_us": 679,
+            "p95_us": 1019,
+            "p99_us": 1019
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 3,
+            "p50_us": 158,
+            "p95_us": 495,
+            "p99_us": 495
+          }
+        }
+      }
+    },
+    {
+      "step": "table focus after toolbar",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 4,
+          "native_process_id": 6177,
+          "inputs": {
+            "search": {
+              "entity": 4294967302,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 4294967304,
+              "visible_rows": {
+                "start": 16,
+                "end": 26
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 2,
+              "scroll_y": -536.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": 25,
+                "record": "BRK0025"
+              },
+              "focused": true
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(5v1))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 37,
+            "rows_constructed": 444,
+            "cells_constructed": 2294,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 37,
+            "p50_us": 19169.279,
+            "p95_us": 26836.991,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 28,
+            "p50_us": 39911.423,
+            "p95_us": 48300.031,
+            "p99_us": 55803.903
+          },
+          "present_interval": {
+            "samples": 19,
+            "p50_us": 55050.239,
+            "p95_us": 75628.543,
+            "p99_us": 75628.543
+          },
+          "input_to_frame": {
+            "samples": 6,
+            "p50_us": 50855.935,
+            "p95_us": 69730.303,
+            "p99_us": 69730.303
+          }
+        },
+        "metrics": {
+          "description_builds": 4,
+          "encoded_snapshots": 3,
+          "encoded_bytes": 9960,
+          "ffi_callbacks": 41,
+          "ui_callbacks": 2,
+          "diagnostic_callbacks": 31,
+          "description_build": {
+            "samples": 4,
+            "p50_us": 3,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 3,
+            "p50_us": 31,
+            "p95_us": 32,
+            "p99_us": 32
+          },
+          "publish_to_applied": {
+            "samples": 3,
+            "p50_us": 679,
+            "p95_us": 1019,
+            "p99_us": 1019
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 3,
+            "p50_us": 158,
+            "p95_us": 495,
+            "p99_us": 495
+          }
+        }
+      }
+    },
+    {
+      "step": "row context command opens captured instrument",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "instrument",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {
+            "volume-chart": {
+              "dataset": "history",
+              "revision": 3,
+              "points": [
+                {
+                  "record": "BRK0025:day-29",
+                  "source": 28,
+                  "label": "D29",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-30",
+                  "source": 29,
+                  "label": "D30",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-31",
+                  "source": 30,
+                  "label": "D31",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-32",
+                  "source": 31,
+                  "label": "D32",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-33",
+                  "source": 32,
+                  "label": "D33",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-34",
+                  "source": 33,
+                  "label": "D34",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-35",
+                  "source": 34,
+                  "label": "D35",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-36",
+                  "source": 35,
+                  "label": "D36",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-37",
+                  "source": 36,
+                  "label": "D37",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-38",
+                  "source": 37,
+                  "label": "D38",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-39",
+                  "source": 38,
+                  "label": "D39",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-40",
+                  "source": 39,
+                  "label": "D40",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-41",
+                  "source": 40,
+                  "label": "D41",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-42",
+                  "source": 41,
+                  "label": "D42",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-43",
+                  "source": 42,
+                  "label": "D43",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-44",
+                  "source": 43,
+                  "label": "D44",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-45",
+                  "source": 44,
+                  "label": "D45",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-46",
+                  "source": 45,
+                  "label": "D46",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-47",
+                  "source": 46,
+                  "label": "D47",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-48",
+                  "source": 47,
+                  "label": "D48",
+                  "value": 107500.0
+                }
+              ],
+              "view_rows": 20,
+              "omitted": 0,
+              "excluded": 0,
+              "projections": 1,
+              "summary": "Bar chart. 20 points from 20 view rows. 0 invalid values omitted; 0 earlier rows excluded. First D29: 32500; last D48: 107500; range 32500 to 122500."
+            },
+            "price-chart": {
+              "dataset": "history",
+              "revision": 3,
+              "points": [
+                {
+                  "record": "BRK0025:day-29",
+                  "source": 28,
+                  "label": "D29",
+                  "value": 101.24
+                },
+                {
+                  "record": "BRK0025:day-30",
+                  "source": 29,
+                  "label": "D30",
+                  "value": 101.29
+                },
+                {
+                  "record": "BRK0025:day-31",
+                  "source": 30,
+                  "label": "D31",
+                  "value": 101.24
+                },
+                {
+                  "record": "BRK0025:day-32",
+                  "source": 31,
+                  "label": "D32",
+                  "value": 101.29
+                },
+                {
+                  "record": "BRK0025:day-33",
+                  "source": 32,
+                  "label": "D33",
+                  "value": 101.34
+                },
+                {
+                  "record": "BRK0025:day-34",
+                  "source": 33,
+                  "label": "D34",
+                  "value": 101.39
+                },
+                {
+                  "record": "BRK0025:day-35",
+                  "source": 34,
+                  "label": "D35",
+                  "value": 101.44
+                },
+                {
+                  "record": "BRK0025:day-36",
+                  "source": 35,
+                  "label": "D36",
+                  "value": 101.39
+                },
+                {
+                  "record": "BRK0025:day-37",
+                  "source": 36,
+                  "label": "D37",
+                  "value": 101.44
+                },
+                {
+                  "record": "BRK0025:day-38",
+                  "source": 37,
+                  "label": "D38",
+                  "value": 101.49
+                },
+                {
+                  "record": "BRK0025:day-39",
+                  "source": 38,
+                  "label": "D39",
+                  "value": 101.54
+                },
+                {
+                  "record": "BRK0025:day-40",
+                  "source": 39,
+                  "label": "D40",
+                  "value": 101.59
+                },
+                {
+                  "record": "BRK0025:day-41",
+                  "source": 40,
+                  "label": "D41",
+                  "value": 101.54
+                },
+                {
+                  "record": "BRK0025:day-42",
+                  "source": 41,
+                  "label": "D42",
+                  "value": 101.59
+                },
+                {
+                  "record": "BRK0025:day-43",
+                  "source": 42,
+                  "label": "D43",
+                  "value": 101.64
+                },
+                {
+                  "record": "BRK0025:day-44",
+                  "source": 43,
+                  "label": "D44",
+                  "value": 101.69
+                },
+                {
+                  "record": "BRK0025:day-45",
+                  "source": 44,
+                  "label": "D45",
+                  "value": 101.74
+                },
+                {
+                  "record": "BRK0025:day-46",
+                  "source": 45,
+                  "label": "D46",
+                  "value": 101.69
+                },
+                {
+                  "record": "BRK0025:day-47",
+                  "source": 46,
+                  "label": "D47",
+                  "value": 101.74
+                },
+                {
+                  "record": "BRK0025:day-48",
+                  "source": 47,
+                  "label": "D48",
+                  "value": 101.82
+                }
+              ],
+              "view_rows": 20,
+              "omitted": 0,
+              "excluded": 0,
+              "projections": 1,
+              "summary": "Line chart. 20 points from 20 view rows. 0 invalid values omitted; 0 earlier rows excluded. First D29: 101.24; last D48: 101.82; range 101.24 to 101.82."
+            }
+          },
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 5,
+          "native_process_id": 6177,
+          "inputs": {},
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "instrument-title": "BRK0025 · Brookfield Labs",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "instrument",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "period": {
+              "kind": "radio_group",
+              "selected": "20",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "20",
+                  "label": "Recent 20 samples",
+                  "disabled": false
+                },
+                {
+                  "id": "48",
+                  "label": "All 48 samples",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 49,
+            "rows_constructed": 576,
+            "cells_constructed": 2976,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 49,
+            "p50_us": 19431.423,
+            "p95_us": 26836.991,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 37,
+            "p50_us": 40075.263,
+            "p95_us": 55803.903,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 26,
+            "p50_us": 63504.383,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 9,
+            "p50_us": 52428.799,
+            "p95_us": 69730.303,
+            "p99_us": 69730.303
+          }
+        },
+        "metrics": {
+          "description_builds": 5,
+          "encoded_snapshots": 4,
+          "encoded_bytes": 13125,
+          "ffi_callbacks": 54,
+          "ui_callbacks": 3,
+          "diagnostic_callbacks": 41,
+          "description_build": {
+            "samples": 5,
+            "p50_us": 3,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 4,
+            "p50_us": 32,
+            "p95_us": 46,
+            "p99_us": 46
+          },
+          "publish_to_applied": {
+            "samples": 4,
+            "p50_us": 1019,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 4,
+            "p50_us": 495,
+            "p95_us": 801,
+            "p99_us": 801
+          }
+        }
+      }
+    },
+    {
+      "step": "global watchlist action",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 6,
+          "native_process_id": 6177,
+          "inputs": {
+            "search": {
+              "entity": 21474836485,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 12884901912,
+              "visible_rows": {
+                "start": 0,
+                "end": 10
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 2,
+              "scroll_y": 0.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": null,
+                "record": null
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 51,
+            "rows_constructed": 588,
+            "cells_constructed": 3038,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 51,
+            "p50_us": 19447.807,
+            "p95_us": 30277.631,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 39,
+            "p50_us": 40632.319,
+            "p95_us": 59736.063,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 27,
+            "p50_us": 63864.831,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 9,
+            "p50_us": 52428.799,
+            "p95_us": 69730.303,
+            "p99_us": 69730.303
+          }
+        },
+        "metrics": {
+          "description_builds": 6,
+          "encoded_snapshots": 5,
+          "encoded_bytes": 16451,
+          "ffi_callbacks": 62,
+          "ui_callbacks": 4,
+          "diagnostic_callbacks": 45,
+          "description_build": {
+            "samples": 6,
+            "p50_us": 4,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 5,
+            "p50_us": 32,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 5,
+            "p50_us": 1019,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 5,
+            "p50_us": 495,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "tab keyboard navigation",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "instrument",
+          "period": "20",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {
+            "volume-chart": {
+              "dataset": "history",
+              "revision": 3,
+              "points": [
+                {
+                  "record": "BRK0025:day-29",
+                  "source": 28,
+                  "label": "D29",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-30",
+                  "source": 29,
+                  "label": "D30",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-31",
+                  "source": 30,
+                  "label": "D31",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-32",
+                  "source": 31,
+                  "label": "D32",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-33",
+                  "source": 32,
+                  "label": "D33",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-34",
+                  "source": 33,
+                  "label": "D34",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-35",
+                  "source": 34,
+                  "label": "D35",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-36",
+                  "source": 35,
+                  "label": "D36",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-37",
+                  "source": 36,
+                  "label": "D37",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-38",
+                  "source": 37,
+                  "label": "D38",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-39",
+                  "source": 38,
+                  "label": "D39",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-40",
+                  "source": 39,
+                  "label": "D40",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-41",
+                  "source": 40,
+                  "label": "D41",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-42",
+                  "source": 41,
+                  "label": "D42",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-43",
+                  "source": 42,
+                  "label": "D43",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-44",
+                  "source": 43,
+                  "label": "D44",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-45",
+                  "source": 44,
+                  "label": "D45",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-46",
+                  "source": 45,
+                  "label": "D46",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-47",
+                  "source": 46,
+                  "label": "D47",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-48",
+                  "source": 47,
+                  "label": "D48",
+                  "value": 107500.0
+                }
+              ],
+              "view_rows": 20,
+              "omitted": 0,
+              "excluded": 0,
+              "projections": 1,
+              "summary": "Bar chart. 20 points from 20 view rows. 0 invalid values omitted; 0 earlier rows excluded. First D29: 32500; last D48: 107500; range 32500 to 122500."
+            },
+            "price-chart": {
+              "dataset": "history",
+              "revision": 3,
+              "points": [
+                {
+                  "record": "BRK0025:day-29",
+                  "source": 28,
+                  "label": "D29",
+                  "value": 101.24
+                },
+                {
+                  "record": "BRK0025:day-30",
+                  "source": 29,
+                  "label": "D30",
+                  "value": 101.29
+                },
+                {
+                  "record": "BRK0025:day-31",
+                  "source": 30,
+                  "label": "D31",
+                  "value": 101.24
+                },
+                {
+                  "record": "BRK0025:day-32",
+                  "source": 31,
+                  "label": "D32",
+                  "value": 101.29
+                },
+                {
+                  "record": "BRK0025:day-33",
+                  "source": 32,
+                  "label": "D33",
+                  "value": 101.34
+                },
+                {
+                  "record": "BRK0025:day-34",
+                  "source": 33,
+                  "label": "D34",
+                  "value": 101.39
+                },
+                {
+                  "record": "BRK0025:day-35",
+                  "source": 34,
+                  "label": "D35",
+                  "value": 101.44
+                },
+                {
+                  "record": "BRK0025:day-36",
+                  "source": 35,
+                  "label": "D36",
+                  "value": 101.39
+                },
+                {
+                  "record": "BRK0025:day-37",
+                  "source": 36,
+                  "label": "D37",
+                  "value": 101.44
+                },
+                {
+                  "record": "BRK0025:day-38",
+                  "source": 37,
+                  "label": "D38",
+                  "value": 101.49
+                },
+                {
+                  "record": "BRK0025:day-39",
+                  "source": 38,
+                  "label": "D39",
+                  "value": 101.54
+                },
+                {
+                  "record": "BRK0025:day-40",
+                  "source": 39,
+                  "label": "D40",
+                  "value": 101.59
+                },
+                {
+                  "record": "BRK0025:day-41",
+                  "source": 40,
+                  "label": "D41",
+                  "value": 101.54
+                },
+                {
+                  "record": "BRK0025:day-42",
+                  "source": 41,
+                  "label": "D42",
+                  "value": 101.59
+                },
+                {
+                  "record": "BRK0025:day-43",
+                  "source": 42,
+                  "label": "D43",
+                  "value": 101.64
+                },
+                {
+                  "record": "BRK0025:day-44",
+                  "source": 43,
+                  "label": "D44",
+                  "value": 101.69
+                },
+                {
+                  "record": "BRK0025:day-45",
+                  "source": 44,
+                  "label": "D45",
+                  "value": 101.74
+                },
+                {
+                  "record": "BRK0025:day-46",
+                  "source": 45,
+                  "label": "D46",
+                  "value": 101.69
+                },
+                {
+                  "record": "BRK0025:day-47",
+                  "source": 46,
+                  "label": "D47",
+                  "value": 101.74
+                },
+                {
+                  "record": "BRK0025:day-48",
+                  "source": 47,
+                  "label": "D48",
+                  "value": 101.82
+                }
+              ],
+              "view_rows": 20,
+              "omitted": 0,
+              "excluded": 0,
+              "projections": 1,
+              "summary": "Line chart. 20 points from 20 view rows. 0 invalid values omitted; 0 earlier rows excluded. First D29: 101.24; last D48: 101.82; range 101.24 to 101.82."
+            }
+          },
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 7,
+          "native_process_id": 6177,
+          "inputs": {},
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "instrument-title": "BRK0025 · Brookfield Labs",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "instrument",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": "instrument"
+            },
+            "period": {
+              "kind": "radio_group",
+              "selected": "20",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "20",
+                  "label": "Recent 20 samples",
+                  "disabled": false
+                },
+                {
+                  "id": "48",
+                  "label": "All 48 samples",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(2v1))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 64,
+            "rows_constructed": 732,
+            "cells_constructed": 3782,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 64,
+            "p50_us": 19316.735,
+            "p95_us": 26836.991,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 49,
+            "p50_us": 40796.159,
+            "p95_us": 55803.903,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 34,
+            "p50_us": 63406.079,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 12,
+            "p50_us": 51544.063,
+            "p95_us": 69730.303,
+            "p99_us": 69730.303
+          }
+        },
+        "metrics": {
+          "description_builds": 7,
+          "encoded_snapshots": 6,
+          "encoded_bytes": 19616,
+          "ffi_callbacks": 77,
+          "ui_callbacks": 6,
+          "diagnostic_callbacks": 56,
+          "description_build": {
+            "samples": 7,
+            "p50_us": 4,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 6,
+            "p50_us": 46,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 6,
+            "p50_us": 4163,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 6,
+            "p50_us": 801,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "radio expands both dataset views",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "instrument",
+          "period": "48",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {
+            "volume-chart": {
+              "dataset": "history",
+              "revision": 3,
+              "points": [
+                {
+                  "record": "BRK0025:day-1",
+                  "source": 0,
+                  "label": "D01",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-2",
+                  "source": 1,
+                  "label": "D02",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-3",
+                  "source": 2,
+                  "label": "D03",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-4",
+                  "source": 3,
+                  "label": "D04",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-5",
+                  "source": 4,
+                  "label": "D05",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-6",
+                  "source": 5,
+                  "label": "D06",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-7",
+                  "source": 6,
+                  "label": "D07",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-8",
+                  "source": 7,
+                  "label": "D08",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-9",
+                  "source": 8,
+                  "label": "D09",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-10",
+                  "source": 9,
+                  "label": "D10",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-11",
+                  "source": 10,
+                  "label": "D11",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-12",
+                  "source": 11,
+                  "label": "D12",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-13",
+                  "source": 12,
+                  "label": "D13",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-14",
+                  "source": 13,
+                  "label": "D14",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-15",
+                  "source": 14,
+                  "label": "D15",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-16",
+                  "source": 15,
+                  "label": "D16",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-17",
+                  "source": 16,
+                  "label": "D17",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-18",
+                  "source": 17,
+                  "label": "D18",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-19",
+                  "source": 18,
+                  "label": "D19",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-20",
+                  "source": 19,
+                  "label": "D20",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-21",
+                  "source": 20,
+                  "label": "D21",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-22",
+                  "source": 21,
+                  "label": "D22",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-23",
+                  "source": 22,
+                  "label": "D23",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-24",
+                  "source": 23,
+                  "label": "D24",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-25",
+                  "source": 24,
+                  "label": "D25",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-26",
+                  "source": 25,
+                  "label": "D26",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-27",
+                  "source": 26,
+                  "label": "D27",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-28",
+                  "source": 27,
+                  "label": "D28",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-29",
+                  "source": 28,
+                  "label": "D29",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-30",
+                  "source": 29,
+                  "label": "D30",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-31",
+                  "source": 30,
+                  "label": "D31",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-32",
+                  "source": 31,
+                  "label": "D32",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-33",
+                  "source": 32,
+                  "label": "D33",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-34",
+                  "source": 33,
+                  "label": "D34",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-35",
+                  "source": 34,
+                  "label": "D35",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-36",
+                  "source": 35,
+                  "label": "D36",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-37",
+                  "source": 36,
+                  "label": "D37",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-38",
+                  "source": 37,
+                  "label": "D38",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-39",
+                  "source": 38,
+                  "label": "D39",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-40",
+                  "source": 39,
+                  "label": "D40",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-41",
+                  "source": 40,
+                  "label": "D41",
+                  "value": 107500.0
+                },
+                {
+                  "record": "BRK0025:day-42",
+                  "source": 41,
+                  "label": "D42",
+                  "value": 122500.0
+                },
+                {
+                  "record": "BRK0025:day-43",
+                  "source": 42,
+                  "label": "D43",
+                  "value": 32500.0
+                },
+                {
+                  "record": "BRK0025:day-44",
+                  "source": 43,
+                  "label": "D44",
+                  "value": 47500.0
+                },
+                {
+                  "record": "BRK0025:day-45",
+                  "source": 44,
+                  "label": "D45",
+                  "value": 62500.0
+                },
+                {
+                  "record": "BRK0025:day-46",
+                  "source": 45,
+                  "label": "D46",
+                  "value": 77500.0
+                },
+                {
+                  "record": "BRK0025:day-47",
+                  "source": 46,
+                  "label": "D47",
+                  "value": 92500.0
+                },
+                {
+                  "record": "BRK0025:day-48",
+                  "source": 47,
+                  "label": "D48",
+                  "value": 107500.0
+                }
+              ],
+              "view_rows": 48,
+              "omitted": 0,
+              "excluded": 0,
+              "projections": 2,
+              "summary": "Bar chart. 48 points from 48 view rows. 0 invalid values omitted; 0 earlier rows excluded. First D01: 32500; last D48: 107500; range 32500 to 122500."
+            },
+            "price-chart": {
+              "dataset": "history",
+              "revision": 3,
+              "points": [
+                {
+                  "record": "BRK0025:day-1",
+                  "source": 0,
+                  "label": "D01",
+                  "value": 100.34
+                },
+                {
+                  "record": "BRK0025:day-2",
+                  "source": 1,
+                  "label": "D02",
+                  "value": 100.39
+                },
+                {
+                  "record": "BRK0025:day-3",
+                  "source": 2,
+                  "label": "D03",
+                  "value": 100.44
+                },
+                {
+                  "record": "BRK0025:day-4",
+                  "source": 3,
+                  "label": "D04",
+                  "value": 100.49
+                },
+                {
+                  "record": "BRK0025:day-5",
+                  "source": 4,
+                  "label": "D05",
+                  "value": 100.54
+                },
+                {
+                  "record": "BRK0025:day-6",
+                  "source": 5,
+                  "label": "D06",
+                  "value": 100.49
+                },
+                {
+                  "record": "BRK0025:day-7",
+                  "source": 6,
+                  "label": "D07",
+                  "value": 100.54
+                },
+                {
+                  "record": "BRK0025:day-8",
+                  "source": 7,
+                  "label": "D08",
+                  "value": 100.59
+                },
+                {
+                  "record": "BRK0025:day-9",
+                  "source": 8,
+                  "label": "D09",
+                  "value": 100.64
+                },
+                {
+                  "record": "BRK0025:day-10",
+                  "source": 9,
+                  "label": "D10",
+                  "value": 100.69
+                },
+                {
+                  "record": "BRK0025:day-11",
+                  "source": 10,
+                  "label": "D11",
+                  "value": 100.64
+                },
+                {
+                  "record": "BRK0025:day-12",
+                  "source": 11,
+                  "label": "D12",
+                  "value": 100.69
+                },
+                {
+                  "record": "BRK0025:day-13",
+                  "source": 12,
+                  "label": "D13",
+                  "value": 100.74
+                },
+                {
+                  "record": "BRK0025:day-14",
+                  "source": 13,
+                  "label": "D14",
+                  "value": 100.79
+                },
+                {
+                  "record": "BRK0025:day-15",
+                  "source": 14,
+                  "label": "D15",
+                  "value": 100.84
+                },
+                {
+                  "record": "BRK0025:day-16",
+                  "source": 15,
+                  "label": "D16",
+                  "value": 100.79
+                },
+                {
+                  "record": "BRK0025:day-17",
+                  "source": 16,
+                  "label": "D17",
+                  "value": 100.84
+                },
+                {
+                  "record": "BRK0025:day-18",
+                  "source": 17,
+                  "label": "D18",
+                  "value": 100.89
+                },
+                {
+                  "record": "BRK0025:day-19",
+                  "source": 18,
+                  "label": "D19",
+                  "value": 100.94
+                },
+                {
+                  "record": "BRK0025:day-20",
+                  "source": 19,
+                  "label": "D20",
+                  "value": 100.99
+                },
+                {
+                  "record": "BRK0025:day-21",
+                  "source": 20,
+                  "label": "D21",
+                  "value": 100.94
+                },
+                {
+                  "record": "BRK0025:day-22",
+                  "source": 21,
+                  "label": "D22",
+                  "value": 100.99
+                },
+                {
+                  "record": "BRK0025:day-23",
+                  "source": 22,
+                  "label": "D23",
+                  "value": 101.04
+                },
+                {
+                  "record": "BRK0025:day-24",
+                  "source": 23,
+                  "label": "D24",
+                  "value": 101.09
+                },
+                {
+                  "record": "BRK0025:day-25",
+                  "source": 24,
+                  "label": "D25",
+                  "value": 101.14
+                },
+                {
+                  "record": "BRK0025:day-26",
+                  "source": 25,
+                  "label": "D26",
+                  "value": 101.09
+                },
+                {
+                  "record": "BRK0025:day-27",
+                  "source": 26,
+                  "label": "D27",
+                  "value": 101.14
+                },
+                {
+                  "record": "BRK0025:day-28",
+                  "source": 27,
+                  "label": "D28",
+                  "value": 101.19
+                },
+                {
+                  "record": "BRK0025:day-29",
+                  "source": 28,
+                  "label": "D29",
+                  "value": 101.24
+                },
+                {
+                  "record": "BRK0025:day-30",
+                  "source": 29,
+                  "label": "D30",
+                  "value": 101.29
+                },
+                {
+                  "record": "BRK0025:day-31",
+                  "source": 30,
+                  "label": "D31",
+                  "value": 101.24
+                },
+                {
+                  "record": "BRK0025:day-32",
+                  "source": 31,
+                  "label": "D32",
+                  "value": 101.29
+                },
+                {
+                  "record": "BRK0025:day-33",
+                  "source": 32,
+                  "label": "D33",
+                  "value": 101.34
+                },
+                {
+                  "record": "BRK0025:day-34",
+                  "source": 33,
+                  "label": "D34",
+                  "value": 101.39
+                },
+                {
+                  "record": "BRK0025:day-35",
+                  "source": 34,
+                  "label": "D35",
+                  "value": 101.44
+                },
+                {
+                  "record": "BRK0025:day-36",
+                  "source": 35,
+                  "label": "D36",
+                  "value": 101.39
+                },
+                {
+                  "record": "BRK0025:day-37",
+                  "source": 36,
+                  "label": "D37",
+                  "value": 101.44
+                },
+                {
+                  "record": "BRK0025:day-38",
+                  "source": 37,
+                  "label": "D38",
+                  "value": 101.49
+                },
+                {
+                  "record": "BRK0025:day-39",
+                  "source": 38,
+                  "label": "D39",
+                  "value": 101.54
+                },
+                {
+                  "record": "BRK0025:day-40",
+                  "source": 39,
+                  "label": "D40",
+                  "value": 101.59
+                },
+                {
+                  "record": "BRK0025:day-41",
+                  "source": 40,
+                  "label": "D41",
+                  "value": 101.54
+                },
+                {
+                  "record": "BRK0025:day-42",
+                  "source": 41,
+                  "label": "D42",
+                  "value": 101.59
+                },
+                {
+                  "record": "BRK0025:day-43",
+                  "source": 42,
+                  "label": "D43",
+                  "value": 101.64
+                },
+                {
+                  "record": "BRK0025:day-44",
+                  "source": 43,
+                  "label": "D44",
+                  "value": 101.69
+                },
+                {
+                  "record": "BRK0025:day-45",
+                  "source": 44,
+                  "label": "D45",
+                  "value": 101.74
+                },
+                {
+                  "record": "BRK0025:day-46",
+                  "source": 45,
+                  "label": "D46",
+                  "value": 101.69
+                },
+                {
+                  "record": "BRK0025:day-47",
+                  "source": 46,
+                  "label": "D47",
+                  "value": 101.74
+                },
+                {
+                  "record": "BRK0025:day-48",
+                  "source": 47,
+                  "label": "D48",
+                  "value": 101.82
+                }
+              ],
+              "view_rows": 48,
+              "omitted": 0,
+              "excluded": 0,
+              "projections": 2,
+              "summary": "Line chart. 48 points from 48 view rows. 0 invalid values omitted; 0 earlier rows excluded. First D01: 100.34; last D48: 101.82; range 100.34 to 101.82."
+            }
+          },
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 8,
+          "native_process_id": 6177,
+          "inputs": {},
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "instrument-title": "BRK0025 · Brookfield Labs",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "instrument",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "period": {
+              "kind": "radio_group",
+              "selected": "48",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "20",
+                  "label": "Recent 20 samples",
+                  "disabled": false
+                },
+                {
+                  "id": "48",
+                  "label": "All 48 samples",
+                  "disabled": false
+                }
+              ],
+              "focused_option": "48"
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(19v3))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 71,
+            "rows_constructed": 732,
+            "cells_constructed": 3782,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 71,
+            "p50_us": 19562.495,
+            "p95_us": 30277.631,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 54,
+            "p50_us": 40796.159,
+            "p95_us": 55803.903,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 37,
+            "p50_us": 63864.831,
+            "p95_us": 89194.495,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 14,
+            "p50_us": 52428.799,
+            "p95_us": 75956.223,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 8,
+          "encoded_snapshots": 7,
+          "encoded_bytes": 22779,
+          "ffi_callbacks": 86,
+          "ui_callbacks": 7,
+          "diagnostic_callbacks": 63,
+          "description_build": {
+            "samples": 8,
+            "p50_us": 5,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 7,
+            "p50_us": 44,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 7,
+            "p50_us": 4163,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 7,
+            "p50_us": 495,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "application menu opens settings",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "Dart user",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 9,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 30064771089,
+              "text": "Dart user",
+              "selection": {
+                "start": 9,
+                "end": 9
+              },
+              "focused": false
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "light",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 74,
+            "rows_constructed": 732,
+            "cells_constructed": 3782,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 74,
+            "p50_us": 19529.727,
+            "p95_us": 30277.631,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 57,
+            "p50_us": 40796.159,
+            "p95_us": 55803.903,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 40,
+            "p50_us": 63504.383,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 14,
+            "p50_us": 52428.799,
+            "p95_us": 75956.223,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 9,
+          "encoded_snapshots": 8,
+          "encoded_bytes": 25801,
+          "ffi_callbacks": 94,
+          "ui_callbacks": 8,
+          "diagnostic_callbacks": 67,
+          "description_build": {
+            "samples": 9,
+            "p50_us": 4,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 8,
+            "p50_us": 45,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 8,
+            "p50_us": 4163,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 8,
+            "p50_us": 666,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "native input updates application draft",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "light",
+          "custom_accent": false,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "light"
+            },
+            "resolved": {
+              "background": "#FFFFFF",
+              "foreground": "#0A0A0A",
+              "primary": "#171717",
+              "primary_foreground": "#FAFAFA",
+              "secondary": "#E5E5E5",
+              "secondary_foreground": "#171717",
+              "muted": "#F5F5F5",
+              "muted_foreground": "#737373",
+              "accent": "#F5F5F5",
+              "accent_foreground": "#171717",
+              "danger": "#EF4444",
+              "danger_foreground": "#FAFAFA",
+              "border": "#E5E5E5",
+              "success": "#22C55E",
+              "warning": "#EAB308",
+              "info": "#06B6D4"
+            }
+          },
+          "revision": 9,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 30064771089,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": true
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "light",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(16v5))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 90,
+            "rows_constructed": 732,
+            "cells_constructed": 3782,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 90,
+            "p50_us": 19169.279,
+            "p95_us": 26836.991,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 68,
+            "p50_us": 37289.983,
+            "p95_us": 54722.559,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 49,
+            "p50_us": 53182.463,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 19,
+            "p50_us": 50855.935,
+            "p95_us": 75956.223,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 9,
+          "encoded_snapshots": 8,
+          "encoded_bytes": 25801,
+          "ffi_callbacks": 116,
+          "ui_callbacks": 13,
+          "diagnostic_callbacks": 84,
+          "description_build": {
+            "samples": 9,
+            "p50_us": 4,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 8,
+            "p50_us": 45,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 8,
+            "p50_us": 4163,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 8,
+            "p50_us": 666,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "dark theme snapshot",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "dark",
+          "custom_accent": false,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "dark"
+            },
+            "resolved": {
+              "background": "#0A0A0A",
+              "foreground": "#FAFAFA",
+              "primary": "#FAFAFA",
+              "primary_foreground": "#171717",
+              "secondary": "#262626",
+              "secondary_foreground": "#FAFAFA",
+              "muted": "#262626",
+              "muted_foreground": "#A3A3A3",
+              "accent": "#262626",
+              "accent_foreground": "#FAFAFA",
+              "danger": "#F87171",
+              "danger_foreground": "#DC2626",
+              "border": "#262626",
+              "success": "#4ADE80",
+              "warning": "#FACC15",
+              "info": "#22D3EE"
+            }
+          },
+          "revision": 10,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 30064771089,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": false
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "dark",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": "dark"
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": false,
+              "disabled": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(17v5))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 96,
+            "rows_constructed": 732,
+            "cells_constructed": 3782,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 96,
+            "p50_us": 19021.823,
+            "p95_us": 26836.991,
+            "p99_us": 50528.255
+          },
+          "dirty_to_present_submit": {
+            "samples": 72,
+            "p50_us": 36995.071,
+            "p95_us": 54722.559,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 53,
+            "p50_us": 49348.607,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 21,
+            "p50_us": 50692.095,
+            "p95_us": 69730.303,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 10,
+          "encoded_snapshots": 9,
+          "encoded_bytes": 28822,
+          "ffi_callbacks": 125,
+          "ui_callbacks": 14,
+          "diagnostic_callbacks": 91,
+          "description_build": {
+            "samples": 10,
+            "p50_us": 4,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 9,
+            "p50_us": 44,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 9,
+            "p50_us": 4163,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 9,
+            "p50_us": 495,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "bounded custom accent",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "dark",
+          "custom_accent": true,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "dark",
+              "overrides": {
+                "primary": "#93C5FD",
+                "primary_foreground": "#111827"
+              }
+            },
+            "resolved": {
+              "background": "#0A0A0A",
+              "foreground": "#FAFAFA",
+              "primary": "#93C5FD",
+              "primary_foreground": "#111827",
+              "secondary": "#262626",
+              "secondary_foreground": "#FAFAFA",
+              "muted": "#262626",
+              "muted_foreground": "#A3A3A3",
+              "accent": "#262626",
+              "accent_foreground": "#FAFAFA",
+              "danger": "#F87171",
+              "danger_foreground": "#DC2626",
+              "border": "#262626",
+              "success": "#4ADE80",
+              "warning": "#FACC15",
+              "info": "#22D3EE"
+            }
+          },
+          "revision": 11,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 30064771089,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": false
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "dark",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(11v5))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 102,
+            "rows_constructed": 732,
+            "cells_constructed": 3782,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 102,
+            "p50_us": 18923.519,
+            "p95_us": 25739.263,
+            "p99_us": 39092.223
+          },
+          "dirty_to_present_submit": {
+            "samples": 77,
+            "p50_us": 35258.367,
+            "p95_us": 54722.559,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 58,
+            "p50_us": 48627.711,
+            "p95_us": 79429.631,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 22,
+            "p50_us": 50528.255,
+            "p95_us": 69730.303,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 11,
+          "encoded_snapshots": 10,
+          "encoded_bytes": 31907,
+          "ffi_callbacks": 134,
+          "ui_callbacks": 15,
+          "diagnostic_callbacks": 98,
+          "description_build": {
+            "samples": 11,
+            "p50_us": 4,
+            "p95_us": 17,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 10,
+            "p50_us": 44,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 10,
+            "p50_us": 4163,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 10,
+            "p50_us": 495,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "return to watchlist",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "watchlist",
+          "period": "48",
+          "theme": "dark",
+          "custom_accent": true,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "dark",
+              "overrides": {
+                "primary": "#93C5FD",
+                "primary_foreground": "#111827"
+              }
+            },
+            "resolved": {
+              "background": "#0A0A0A",
+              "foreground": "#FAFAFA",
+              "primary": "#93C5FD",
+              "primary_foreground": "#111827",
+              "secondary": "#262626",
+              "secondary_foreground": "#FAFAFA",
+              "muted": "#262626",
+              "muted_foreground": "#A3A3A3",
+              "accent": "#262626",
+              "accent_foreground": "#FAFAFA",
+              "danger": "#F87171",
+              "danger_foreground": "#DC2626",
+              "border": "#262626",
+              "success": "#4ADE80",
+              "warning": "#FACC15",
+              "info": "#22D3EE"
+            }
+          },
+          "revision": 12,
+          "native_process_id": 6177,
+          "inputs": {
+            "search": {
+              "entity": 21474836503,
+              "text": "",
+              "selection": {
+                "start": 0,
+                "end": 0
+              },
+              "focused": false
+            }
+          },
+          "tables": {
+            "watchlist": {
+              "entity": 21474836500,
+              "visible_rows": {
+                "start": 0,
+                "end": 10
+              },
+              "row_count": 100000,
+              "dataset": "instruments",
+              "dataset_revision": 2,
+              "scroll_y": 0.0,
+              "view": {
+                "source_rows": 100000,
+                "view_rows": 100000,
+                "spec_hash": 6086514543335466803
+              },
+              "selection": {
+                "row": null,
+                "record": null
+              },
+              "focused": false
+            }
+          },
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "selection": "BRK0025",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "watchlist",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 106,
+            "rows_constructed": 756,
+            "cells_constructed": 3906,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 106,
+            "p50_us": 18874.367,
+            "p95_us": 26607.615,
+            "p99_us": 39092.223
+          },
+          "dirty_to_present_submit": {
+            "samples": 81,
+            "p50_us": 35258.367,
+            "p95_us": 51445.759,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 62,
+            "p50_us": 48463.871,
+            "p95_us": 75628.543,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 22,
+            "p50_us": 50528.255,
+            "p95_us": 69730.303,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 12,
+          "encoded_snapshots": 11,
+          "encoded_bytes": 35298,
+          "ffi_callbacks": 143,
+          "ui_callbacks": 16,
+          "diagnostic_callbacks": 102,
+          "description_build": {
+            "samples": 12,
+            "p50_us": 4,
+            "p95_us": 7,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 11,
+            "p50_us": 44,
+            "p95_us": 49,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 11,
+            "p50_us": 3325,
+            "p95_us": 37073,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 11,
+            "p50_us": 495,
+            "p95_us": 3529,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "draft and theme survive tab remount",
+      "observed": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "dark",
+          "custom_accent": true,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "dark",
+              "overrides": {
+                "primary": "#93C5FD",
+                "primary_foreground": "#111827"
+              }
+            },
+            "resolved": {
+              "background": "#0A0A0A",
+              "foreground": "#FAFAFA",
+              "primary": "#93C5FD",
+              "primary_foreground": "#111827",
+              "secondary": "#262626",
+              "secondary_foreground": "#FAFAFA",
+              "muted": "#262626",
+              "muted_foreground": "#A3A3A3",
+              "accent": "#262626",
+              "accent_foreground": "#FAFAFA",
+              "danger": "#F87171",
+              "danger_foreground": "#DC2626",
+              "border": "#262626",
+              "success": "#4ADE80",
+              "warning": "#FACC15",
+              "info": "#22D3EE"
+            }
+          },
+          "revision": 13,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 38654705693,
+              "text": "ada",
+              "selection": {
+                "start": 3,
+                "end": 3
+              },
+              "focused": false
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "dark",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            }
+          },
+          "focus_handle": null,
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 108,
+            "rows_constructed": 768,
+            "cells_constructed": 3968,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 108,
+            "p50_us": 18874.367,
+            "p95_us": 26607.615,
+            "p99_us": 39092.223
+          },
+          "dirty_to_present_submit": {
+            "samples": 83,
+            "p50_us": 35258.367,
+            "p95_us": 51445.759,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 63,
+            "p50_us": 48594.943,
+            "p95_us": 75628.543,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 22,
+            "p50_us": 50528.255,
+            "p95_us": 69730.303,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 13,
+          "encoded_snapshots": 12,
+          "encoded_bytes": 38383,
+          "ffi_callbacks": 152,
+          "ui_callbacks": 17,
+          "diagnostic_callbacks": 106,
+          "description_build": {
+            "samples": 13,
+            "p50_us": 4,
+            "p95_us": 7,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 12,
+            "p50_us": 44,
+            "p95_us": 48,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 12,
+            "p50_us": 3325,
+            "p95_us": 33244,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 12,
+            "p50_us": 603,
+            "p95_us": 2709,
+            "p99_us": 3529
+          }
+        }
+      }
+    },
+    {
+      "step": "snapshot retains input and datasets",
+      "before": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "dark",
+          "custom_accent": true,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "dark",
+              "overrides": {
+                "primary": "#93C5FD",
+                "primary_foreground": "#111827"
+              }
+            },
+            "resolved": {
+              "background": "#0A0A0A",
+              "foreground": "#FAFAFA",
+              "primary": "#93C5FD",
+              "primary_foreground": "#111827",
+              "secondary": "#262626",
+              "secondary_foreground": "#FAFAFA",
+              "muted": "#262626",
+              "muted_foreground": "#A3A3A3",
+              "accent": "#262626",
+              "accent_foreground": "#FAFAFA",
+              "danger": "#F87171",
+              "danger_foreground": "#DC2626",
+              "border": "#262626",
+              "success": "#4ADE80",
+              "warning": "#FACC15",
+              "info": "#22D3EE"
+            }
+          },
+          "revision": 13,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 38654705693,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": true
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "dark",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(16v7))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 116,
+            "rows_constructed": 768,
+            "cells_constructed": 3968,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 116,
+            "p50_us": 18431.999,
+            "p95_us": 26607.615,
+            "p99_us": 39092.223
+          },
+          "dirty_to_present_submit": {
+            "samples": 89,
+            "p50_us": 34668.543,
+            "p95_us": 51445.759,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 67,
+            "p50_us": 48070.655,
+            "p95_us": 75628.543,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 24,
+            "p50_us": 50331.647,
+            "p95_us": 69730.303,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 13,
+          "encoded_snapshots": 12,
+          "encoded_bytes": 38383,
+          "ffi_callbacks": 162,
+          "ui_callbacks": 19,
+          "diagnostic_callbacks": 114,
+          "description_build": {
+            "samples": 13,
+            "p50_us": 4,
+            "p95_us": 7,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 12,
+            "p50_us": 44,
+            "p95_us": 48,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 12,
+            "p50_us": 3325,
+            "p95_us": 33244,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 12,
+            "p50_us": 603,
+            "p95_us": 2709,
+            "p99_us": 3529
+          }
+        }
+      },
+      "after": {
+        "app": {
+          "heading": "Market terminal",
+          "page": "settings",
+          "period": "48",
+          "theme": "dark",
+          "custom_accent": true,
+          "display_name": "ada",
+          "selected": "BRK0025",
+          "query": "",
+          "ticks": 1,
+          "instruments_revision": 2,
+          "history_revision": 3,
+          "events": {
+            "table_selection": 1,
+            "click": 1,
+            "row_action": 1,
+            "action": 4,
+            "tab_change": 2,
+            "radio_change": 2,
+            "input": 7,
+            "checkbox_change": 1
+          },
+          "failure": null
+        },
+        "native": {
+          "charts": {},
+          "theme": {
+            "descriptor": {
+              "mode": "dark",
+              "overrides": {
+                "primary": "#93C5FD",
+                "primary_foreground": "#111827"
+              }
+            },
+            "resolved": {
+              "background": "#0A0A0A",
+              "foreground": "#FAFAFA",
+              "primary": "#93C5FD",
+              "primary_foreground": "#111827",
+              "secondary": "#262626",
+              "secondary_foreground": "#FAFAFA",
+              "muted": "#262626",
+              "muted_foreground": "#A3A3A3",
+              "accent": "#262626",
+              "accent_foreground": "#FAFAFA",
+              "danger": "#F87171",
+              "danger_foreground": "#DC2626",
+              "border": "#262626",
+              "success": "#4ADE80",
+              "warning": "#FACC15",
+              "info": "#22D3EE"
+            }
+          },
+          "revision": 14,
+          "native_process_id": 6177,
+          "inputs": {
+            "display-name": {
+              "entity": 38654705693,
+              "text": "ada",
+              "selection": {
+                "start": 1,
+                "end": 2
+              },
+              "focused": true
+            }
+          },
+          "tables": {},
+          "labels": {
+            "terminal-title": "Market terminal",
+            "sample-note": "Fictitious instruments and history. No live feed or trading.",
+            "settings-title": "Workspace preferences",
+            "preferences-note": "Theme and draft survive code reload in this session. Preferences are not written to disk.",
+            "terminal-notice": "Updated BRK0025 to 101.82."
+          },
+          "controls": {
+            "pages": {
+              "kind": "tabs",
+              "selected": "settings",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "watchlist",
+                  "label": "Watchlist",
+                  "disabled": false
+                },
+                {
+                  "id": "instrument",
+                  "label": "Instrument",
+                  "disabled": false
+                },
+                {
+                  "id": "settings",
+                  "label": "Settings",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "theme": {
+              "kind": "radio_group",
+              "selected": "dark",
+              "disabled": false,
+              "options": [
+                {
+                  "id": "light",
+                  "label": "Light",
+                  "disabled": false
+                },
+                {
+                  "id": "dark",
+                  "label": "Dark",
+                  "disabled": false
+                }
+              ],
+              "focused_option": null
+            },
+            "custom-accent": {
+              "kind": "checkbox",
+              "checked": true,
+              "disabled": false
+            }
+          },
+          "focus_handle": "FocusHandle(FocusId(16v7))",
+          "window": {
+            "width": 1000.0,
+            "height": 760.0,
+            "scale_factor": 1.0,
+            "scroll_y": 0.0
+          },
+          "native": {
+            "materializations": 118,
+            "rows_constructed": 768,
+            "cells_constructed": 3968,
+            "data_records_checked": 50,
+            "data_cells_written": 194,
+            "view_recomputes": 0
+          },
+          "draw": {
+            "samples": 118,
+            "p50_us": 18415.615,
+            "p95_us": 26607.615,
+            "p99_us": 39092.223
+          },
+          "dirty_to_present_submit": {
+            "samples": 91,
+            "p50_us": 34603.007,
+            "p95_us": 51445.759,
+            "p99_us": 99483.647
+          },
+          "present_interval": {
+            "samples": 69,
+            "p50_us": 48070.655,
+            "p95_us": 75628.543,
+            "p99_us": 101384.191
+          },
+          "input_to_frame": {
+            "samples": 24,
+            "p50_us": 50331.647,
+            "p95_us": 69730.303,
+            "p99_us": 75956.223
+          }
+        },
+        "metrics": {
+          "description_builds": 14,
+          "encoded_snapshots": 13,
+          "encoded_bytes": 41468,
+          "ffi_callbacks": 165,
+          "ui_callbacks": 19,
+          "diagnostic_callbacks": 116,
+          "description_build": {
+            "samples": 14,
+            "p50_us": 4,
+            "p95_us": 7,
+            "p99_us": 17
+          },
+          "encode": {
+            "samples": 13,
+            "p50_us": 44,
+            "p95_us": 48,
+            "p99_us": 49
+          },
+          "publish_to_applied": {
+            "samples": 13,
+            "p50_us": 1196,
+            "p95_us": 33244,
+            "p99_us": 37073
+          },
+          "initial": {
+            "bytes": 6394845,
+            "encode_us": 68265
+          },
+          "data_messages": 3,
+          "data_bytes": 2703,
+          "data_records_checked": 50,
+          "data_cells_written": 194,
+          "data_encode": {
+            "samples": 3,
+            "p50_us": 13,
+            "p95_us": 20,
+            "p99_us": 20
+          },
+          "data_publish_to_applied": {
+            "samples": 3,
+            "p50_us": 376,
+            "p95_us": 1397,
+            "p99_us": 1397
+          },
+          "native_data_parse": {
+            "samples": 3,
+            "p50_us": 83,
+            "p95_us": 134,
+            "p99_us": 134
+          },
+          "native_data_apply": {
+            "samples": 3,
+            "p50_us": 89,
+            "p95_us": 99,
+            "p99_us": 99
+          },
+          "native_snapshot_apply": {
+            "samples": 13,
+            "p50_us": 495,
+            "p95_us": 2709,
+            "p99_us": 3529
+          }
+        }
+      }
+    }
+  ],
+  "contrast": [
+    {
+      "foreground_background": 19.79814571052481,
+      "primary_pair": 17.176123405576867
+    },
+    {
+      "foreground_background": 18.96800669384249,
+      "primary_pair": 17.176123405576867
+    },
+    {
+      "foreground_background": 18.96800669384249,
+      "primary_pair": 9.83750053606076
+    }
+  ]
+}

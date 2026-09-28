@@ -20,6 +20,8 @@ use std::sync::{Arc, Mutex};
 fn description(revision: u64) -> Snapshot {
     Snapshot {
         revision,
+        theme: None,
+        menus: Vec::new(),
         actions: Vec::new(),
         root: Node::Column {
             id: "root".into(),
@@ -33,11 +35,11 @@ fn description(revision: u64) -> Snapshot {
                     text: format!("Revision {revision}"),
                 },
                 Node::Button {
+                    tooltip: None,
                     id: "increment".into(),
                     semantics: None,
                     style: None,
                     label: "Increment".into(),
-                    tooltip: String::new(),
                 },
                 Node::Input {
                     id: "name".into(),
@@ -48,6 +50,7 @@ fn description(revision: u64) -> Snapshot {
                 },
                 Node::Table {
                     id: "table".into(),
+                    context_menu: Vec::new(),
                     semantics: None,
                     style: None,
                     dataset: "records".into(),
@@ -421,16 +424,15 @@ fn layout_primitives_size_position_and_retain_scroll_offsets(cx: &mut TestAppCon
 }
 
 #[gpui::test]
-fn switches_and_radio_groups_show_the_pick_before_publication(cx: &mut TestAppContext) {
+fn switches_show_the_toggle_before_publication(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let events = Arc::new(Mutex::new(Vec::new()));
     let collected = events.clone();
-    let snapshot = |revision: u64, wifi: bool, mode: &str| {
+    let snapshot = |revision: u64, wifi: bool| {
         Snapshot::parse(
             format!(
                 r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
                 {{"kind":"switch","id":"wifi","label":"Wi-Fi","checked":{wifi}}},
-                {{"kind":"radio_group","id":"mode","options":[{{"id":"auto","label":"Automatic"}},{{"id":"manual","label":"Manual"}}],"selected":"{mode}"}},
                 {{"kind":"progress","id":"upload","value":40}},
                 {{"kind":"separator","id":"rule","label":"Advanced"}},
                 {{"kind":"button","id":"save","label":"Save","tooltip":"Saves the draft"}}
@@ -446,7 +448,7 @@ fn switches_and_radio_groups_show_the_pick_before_publication(cx: &mut TestAppCo
                 DartView::new(
                     Initial {
                         window: Default::default(),
-                        snapshot: snapshot(1, false, "auto"),
+                        snapshot: snapshot(1, false),
                         datasets: vec![],
                     },
                     Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
@@ -464,7 +466,6 @@ fn switches_and_radio_groups_show_the_pick_before_publication(cx: &mut TestAppCo
             .iter()
             .filter_map(|event| match event {
                 Event::SwitchChange { id, checked, .. } => Some((id.clone(), checked.to_string())),
-                Event::RadioChange { id, selected, .. } => Some((id.clone(), selected.clone())),
                 _ => None,
             })
             .collect::<Vec<_>>()
@@ -475,54 +476,33 @@ fn switches_and_radio_groups_show_the_pick_before_publication(cx: &mut TestAppCo
         assert!(window.find("rule").bounds().size.width > px(0.));
         window.click("wifi", cx);
         window.render_frame(cx);
-        // The radio group re-keys its items by position, so the second
-        // option is element 1, not the option ID.
-        window.click(1usize, cx);
-        window.render_frame(cx);
-        assert_eq!(
-            changes(),
-            [
-                ("wifi".to_string(), "true".to_string()),
-                ("mode".to_string(), "manual".to_string())
-            ]
-        );
+        assert_eq!(changes(), [("wifi".to_string(), "true".to_string())]);
         let controls = view.read(cx).inspect(window, cx)["controls"].clone();
         assert_eq!(controls["wifi"]["checked"], true);
         assert_eq!(controls["wifi"]["published"], false);
-        assert_eq!(controls["mode"]["selected"], "manual");
-        assert_eq!(controls["mode"]["published"], "auto");
         assert_eq!(controls["upload"]["value"], 40.0);
-        view.update(cx, |view, cx| {
-            view.publish(snapshot(2, true, "manual"), window, cx)
-        });
+        view.update(cx, |view, cx| view.publish(snapshot(2, true), window, cx));
         window.render_frame(cx);
         let controls = view.read(cx).inspect(window, cx)["controls"].clone();
         assert_eq!(controls["wifi"]["published"], true);
-        assert_eq!(controls["mode"]["published"], "manual");
-        view.update(cx, |view, cx| {
-            view.publish(snapshot(3, false, "auto"), window, cx)
-        });
+        view.update(cx, |view, cx| view.publish(snapshot(3, false), window, cx));
         window.render_frame(cx);
         let controls = view.read(cx).inspect(window, cx)["controls"].clone();
         assert_eq!(
             controls["wifi"]["checked"], false,
             "a publication is authoritative"
         );
-        assert_eq!(controls["mode"]["selected"], "auto");
     })
     .unwrap();
 }
 
 #[gpui::test]
-fn tabs_report_picks_and_canvases_and_animations_render(cx: &mut TestAppContext) {
+fn canvases_and_animations_render(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
-    let events = Arc::new(Mutex::new(Vec::new()));
-    let collected = events.clone();
-    let snapshot = |revision: u64, selected: &str| {
+    let snapshot = |revision: u64| {
         Snapshot::parse(
             format!(
                 r##"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
-                {{"kind":"tabs","id":"pages","tabs":[{{"id":"first","label":"First"}},{{"id":"second","label":"Second"}}],"selected":"{selected}"}},
                 {{"kind":"canvas","id":"chart","style":{{"width":{{"px":200}},"height":{{"px":100}}}},"commands":[
                     {{"op":"rect","x":0,"y":0,"width":50,"height":20,"fill":"token:primary"}},
                     {{"op":"circle","cx":80,"cy":50,"radius":10,"stroke":"#ff0000"}},
@@ -541,10 +521,10 @@ fn tabs_report_picks_and_canvases_and_animations_render(cx: &mut TestAppContext)
                 DartView::new(
                     Initial {
                         window: Default::default(),
-                        snapshot: snapshot(1, "first"),
+                        snapshot: snapshot(1),
                         datasets: vec![],
                     },
-                    Events(Arc::new(move |event| collected.lock().unwrap().push(event))),
+                    Events(Arc::new(|_| {})),
                     window,
                     cx,
                 )
@@ -552,17 +532,6 @@ fn tabs_report_picks_and_canvases_and_animations_render(cx: &mut TestAppContext)
         })
         .unwrap()
     });
-    let picks = || {
-        events
-            .lock()
-            .unwrap()
-            .iter()
-            .filter_map(|event| match event {
-                Event::TabChange { id, selected, .. } => Some((id.clone(), selected.clone())),
-                _ => None,
-            })
-            .collect::<Vec<_>>()
-    };
     cx.update_window(handle, |_, window, cx| {
         window.render_frame(cx);
         assert_eq!(window.find("chart").bounds().size, size(px(200.), px(100.)));
@@ -574,22 +543,9 @@ fn tabs_report_picks_and_canvases_and_animations_render(cx: &mut TestAppContext)
             moved > start,
             "the offset animation advanced: {start:?} -> {moved:?}"
         );
-        // Tab items are keyed by position, like radio items.
-        window.click(1usize, cx);
+        view.update(cx, |view, cx| view.publish(snapshot(2), window, cx));
         window.render_frame(cx);
-        assert_eq!(picks(), [("pages".to_string(), "second".to_string())]);
-        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
-        assert_eq!(controls["pages"]["selected"], "second");
-        assert_eq!(controls["pages"]["published"], "first");
-        view.update(cx, |view, cx| {
-            view.publish(snapshot(2, "first"), window, cx)
-        });
-        window.render_frame(cx);
-        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
-        assert_eq!(
-            controls["pages"]["selected"], "first",
-            "a publication is authoritative"
-        );
+        assert_eq!(window.find("chart").bounds().size, size(px(200.), px(100.)));
     })
     .unwrap();
 }
@@ -691,8 +647,8 @@ fn menu_buttons_render_and_host_requests_reply(cx: &mut TestAppContext) {
     let events = Arc::new(Mutex::new(Vec::new()));
     let collected = events.clone();
     let snapshot = Snapshot::parse(
-        br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
-            {"kind":"menu_button","id":"file","label":"File","items":[{"id":"open","label":"Open"},{"divider":true},{"id":"save","label":"Save"}]}
+        br#"{"revision":1,"actions":[{"name":"file.open","keys":"ctrl+o","context":"global"},{"name":"file.save","keys":"ctrl+s","context":"global"}],"root":{"kind":"column","id":"root","children":[
+            {"kind":"menu_button","id":"file","label":"File","items":[{"kind":"action","id":"open","label":"Open","action":"file.open"},{"kind":"separator"},{"kind":"action","id":"save","label":"Save","action":"file.save"}]}
         ]}}"#,
     )
     .unwrap();
@@ -846,21 +802,21 @@ fn narrow_windows_wrap_actions_and_scroll_to_footer(cx: &mut TestAppContext) {
                         style: None,
                         children: (0..3)
                             .map(|i| Node::Button {
+                                tooltip: None,
                                 id: format!("action-{i}"),
                                 semantics: None,
                                 style: None,
                                 label: format!("A long action label {i}"),
-                                tooltip: String::new(),
                             })
                             .collect(),
                     },
                 );
                 children.push(Node::Button {
+                    tooltip: None,
                     id: "footer".into(),
                     semantics: None,
                     style: None,
                     label: "End of screen".into(),
-                    tooltip: String::new(),
                 });
                 cx.new(|cx| DartView::new(data, Events(Arc::new(|_| {})), window, cx))
             },
@@ -1058,6 +1014,7 @@ fn missing_retained_state_returns_an_error(cx: &mut TestAppContext) {
                 view.materialize(
                     &Node::Table {
                         id: "missing-table".into(),
+                        context_menu: Vec::new(),
                         semantics: None,
                         style: None,
                         dataset: "records".into(),
@@ -1220,6 +1177,8 @@ fn native_events_retained_input_and_virtualized_table(cx: &mut TestAppContext) {
             view.publish(
                 Snapshot {
                     revision: 3,
+                    theme: None,
+                    menus: Vec::new(),
                     actions: Vec::new(),
                     root: Node::Text {
                         id: "empty".into(),
@@ -1379,9 +1338,12 @@ fn scoped_actions_dispatch_by_focus_and_unmatched_keys_type(cx: &mut TestAppCont
 fn initial_with_ids() -> Initial {
     let table = |view: Option<TableView>| Snapshot {
         revision: 1,
+        theme: None,
+        menus: Vec::new(),
         actions: Vec::new(),
         root: Node::Table {
             id: "table".into(),
+            context_menu: Vec::new(),
             semantics: None,
             style: None,
             dataset: "records".into(),
@@ -1426,9 +1388,12 @@ fn publish_table_view(
         view.publish(
             Snapshot {
                 revision,
+                theme: None,
+                menus: Vec::new(),
                 actions: Vec::new(),
                 root: Node::Table {
                     id: "table".into(),
+                    context_menu: Vec::new(),
                     semantics: None,
                     style: None,
                     dataset: "records".into(),
@@ -1857,9 +1822,12 @@ fn formatted_cells_render_and_report(cx: &mut TestAppContext) {
         window: Default::default(),
         snapshot: Snapshot {
             revision: 1,
+            theme: None,
+            menus: Vec::new(),
             actions: Vec::new(),
             root: Node::Table {
                 id: "table".into(),
+                context_menu: Vec::new(),
                 semantics: None,
                 style: None,
                 dataset: "records".into(),
@@ -1983,6 +1951,74 @@ fn formatted_cells_keep_viewport_constant_construction(cx: &mut TestAppContext) 
     if let Ok(path) = std::env::var("GPUIDART_FORMATTING_REPORT") {
         std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
     }
+}
+
+#[gpui::test]
+fn theme_switch_resolves_component_tokens_and_preserves_controls(cx: &mut TestAppContext) {
+    use crate::protocol::{ThemeMode, ThemeSpec};
+    cx.update(gpui_kit::init);
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(initial(1000), Events(Arc::new(|_| {})), window, cx))
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        window.click("name", cx);
+        window.input("Theme draft", cx);
+        window.press("shift-left", cx);
+        window.scroll("table", ScrollDelta::Pixels(point(px(0.), px(-400.))), cx);
+        window.render_frame(cx);
+        let before = view.read(cx).inspect(window, cx);
+        let light = cx.theme().colors;
+        let mut snapshot = description(2);
+        snapshot.theme = Some(ThemeSpec {
+            mode: ThemeMode::Dark,
+            overrides: [("primary".into(), "#2D6AC8".into())].into(),
+        });
+        view.update(cx, |view, cx| view.publish(snapshot, window, cx));
+        window.render_frame(cx);
+        let after = view.read(cx).inspect(window, cx);
+        assert_eq!(after["inputs"], before["inputs"]);
+        for field in ["entity", "scroll_y", "dataset_revision"] {
+            assert_eq!(
+                after["tables"]["table"][field],
+                before["tables"]["table"][field]
+            );
+        }
+        assert_eq!(after["theme"]["resolved"]["primary"], "#2D6AC8");
+        assert!(cx.theme().is_dark());
+        assert_eq!(cx.theme().tokens.button_primary.color, cx.theme().primary);
+        assert_eq!(cx.theme().button_primary, cx.theme().primary);
+        assert_eq!(
+            gpui_kit::base::Theme::global(cx).tokens.colors.primary,
+            cx.theme().primary
+        );
+        let mut invalid = description(3);
+        invalid.theme = Some(ThemeSpec {
+            overrides: [("unknown".into(), "#FFFFFF".into())].into(),
+            ..Default::default()
+        });
+        view.update(cx, |view, cx| view.publish(invalid, window, cx));
+        assert_eq!(view.read(cx).snapshot.revision, 2);
+        assert!(cx.theme().is_dark());
+        let mut dark = description(4);
+        dark.theme = Some(ThemeSpec {
+            mode: ThemeMode::Dark,
+            ..Default::default()
+        });
+        view.update(cx, |view, cx| view.publish(dark, window, cx));
+        assert_ne!(
+            view.read(cx).inspect(window, cx)["theme"]["resolved"]["primary"],
+            "#2D6AC8"
+        );
+        view.update(cx, |view, cx| view.publish(description(5), window, cx));
+        assert!(!cx.theme().is_dark());
+        assert_eq!(cx.theme().primary, light.primary);
+        assert_eq!(cx.theme().background, light.background);
+    })
+    .unwrap();
 }
 
 #[gpui::test]

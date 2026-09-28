@@ -420,9 +420,12 @@ fn view_columns_must_exist_in_the_dataset() {
     };
     let snapshot = crate::protocol::Snapshot {
         revision: 1,
+        theme: None,
+        menus: Vec::new(),
         actions: vec![],
         root: Node::Table {
             id: "t".into(),
+            context_menu: Vec::new(),
             semantics: None,
             style: None,
             dataset: "records".into(),

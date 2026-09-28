@@ -4,7 +4,7 @@
 /// happens; the event is the whole contract.
 ///
 /// `keys` grammar: modifiers `ctrl|alt|shift|meta` plus one key (letters,
-/// digits, f1–f12, enter, escape, space, tab, arrows, home/end/pageup/
+/// digits, comma, f1–f12, enter, escape, space, tab, arrows, home/end/pageup/
 /// pagedown, delete, backspace), joined with `+` (e.g. `ctrl+enter`).
 /// Modifiers are literal: `ctrl` is always the control key and `meta` is the
 /// platform meta key (cmd on macOS, windows key on Windows, super on Linux) —

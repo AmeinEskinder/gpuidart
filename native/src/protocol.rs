@@ -2,14 +2,26 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+mod charts;
+pub use charts::{ChartKind, ChartSpec};
+mod menus;
+pub use menus::{MenuEntry, MenuSpec};
+mod navigation;
+pub use navigation::ChoiceOption;
 mod semantics;
+mod theme;
 pub use semantics::{SemanticRole, Semantics};
+pub use theme::{ThemeMode, ThemeSpec};
 
 pub const MAX_MESSAGE_BYTES: usize = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Snapshot {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub menus: Vec<MenuSpec>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub theme: Option<ThemeSpec>,
     pub revision: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub actions: Vec<ActionBinding>,
@@ -18,7 +30,7 @@ pub struct Snapshot {
 
 /// A key binding declared by the application: `name` fires as an `action`
 /// event when `keys` is pressed while focus is inside `context`.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ActionBinding {
     pub name: String,
@@ -87,7 +99,7 @@ impl KeystrokeSpec {
             .is_some_and(|n| (1..=12).contains(&n));
         let printable = key.len() == 1 && {
             let byte = key.as_bytes()[0];
-            byte.is_ascii_lowercase() || byte.is_ascii_digit()
+            byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b','
         };
         if !named && !printable {
             return Err(format!("Unknown key in key binding: {source}"));
@@ -131,6 +143,14 @@ pub enum Node {
         semantics: Option<Semantics>,
         text: String,
     },
+    Chart {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        chart: ChartSpec,
+    },
     Button {
         id: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -138,8 +158,8 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         semantics: Option<Semantics>,
         label: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        tooltip: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        tooltip: Option<String>,
     },
     /// An on/off toggle. Like a checkbox, the shown value follows the user
     /// until the next publication.
@@ -153,20 +173,6 @@ pub enum Node {
         checked: bool,
         #[serde(default)]
         disabled: bool,
-    },
-    /// One choice among options; `radio_change` carries the chosen option ID.
-    RadioGroup {
-        id: String,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        style: Option<Style>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        semantics: Option<Semantics>,
-        options: Vec<SelectOption>,
-        selected: Option<String>,
-        #[serde(default)]
-        disabled: bool,
-        #[serde(default)]
-        horizontal: bool,
     },
     /// A determinate bar for `value` 0 to 100, or an indeterminate one when
     /// `value` is absent.
@@ -211,6 +217,28 @@ pub enum Node {
         max: f32,
         step: f32,
         number: f32,
+        #[serde(default)]
+        disabled: bool,
+    },
+    Tabs {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        options: Vec<ChoiceOption>,
+        selected: String,
+        #[serde(default)]
+        disabled: bool,
+    },
+    RadioGroup {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        options: Vec<ChoiceOption>,
+        selected: String,
         #[serde(default)]
         disabled: bool,
     },
@@ -260,6 +288,8 @@ pub enum Node {
         dataset: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         view: Option<TableView>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        context_menu: Vec<MenuEntry>,
     },
     /// Children overlap in order. A child sits at the top left with its own
     /// size unless its style has `inset`; `width` and `height` of `full`
@@ -286,18 +316,6 @@ pub enum Node {
         axis: ScrollAxis,
         #[serde(default)]
         children: Vec<Node>,
-    },
-    /// A tab strip; `tab_change` carries the chosen tab ID.
-    Tabs {
-        id: String,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        style: Option<Style>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        semantics: Option<Semantics>,
-        tabs: Vec<SelectOption>,
-        selected: String,
-        #[serde(default)]
-        variant: TabVariant,
     },
     /// A retained draw list painted natively inside the node's bounds.
     /// Coordinates are logical px from the node's top left.
@@ -336,31 +354,6 @@ pub enum Node {
         label: String,
         items: Vec<MenuEntry>,
     },
-}
-
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(untagged, deny_unknown_fields)]
-pub enum MenuEntry {
-    Divider {
-        divider: bool,
-    },
-    Item {
-        id: String,
-        label: String,
-        #[serde(default)]
-        disabled: bool,
-        #[serde(default)]
-        checked: bool,
-    },
-}
-
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum TabVariant {
-    #[default]
-    Underline,
-    Pill,
-    Segmented,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -985,7 +978,7 @@ impl ThemeToken {
         })
     }
 
-    fn name(self) -> &'static str {
+    pub(crate) fn name(self) -> &'static str {
         match self {
             Self::Background => "background",
             Self::Foreground => "foreground",
@@ -1222,6 +1215,14 @@ impl ColumnFormat {
 }
 
 impl Node {
+    pub fn dataset(&self) -> Option<&str> {
+        match self {
+            Self::Table { dataset, .. } | Self::List { dataset, .. } => Some(dataset),
+            Self::Chart { chart, .. } => Some(&chart.dataset),
+            _ => None,
+        }
+    }
+
     pub fn id(&self) -> &str {
         match self {
             Self::Column { id, .. }
@@ -1230,6 +1231,8 @@ impl Node {
             | Self::Button { id, .. }
             | Self::Checkbox { id, .. }
             | Self::Slider { id, .. }
+            | Self::Tabs { id, .. }
+            | Self::RadioGroup { id, .. }
             | Self::Select { id, .. }
             | Self::ConfirmDialog { id, .. }
             | Self::Input { id, .. }
@@ -1237,13 +1240,12 @@ impl Node {
             | Self::Stack { id, .. }
             | Self::Scroll { id, .. }
             | Self::Switch { id, .. }
-            | Self::RadioGroup { id, .. }
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
-            | Self::Tabs { id, .. }
             | Self::Canvas { id, .. }
             | Self::MenuButton { id, .. }
-            | Self::List { id, .. } => id,
+            | Self::List { id, .. }
+            | Self::Chart { id, .. } => id,
         }
     }
 
@@ -1255,6 +1257,8 @@ impl Node {
             | Self::Button { style, .. }
             | Self::Checkbox { style, .. }
             | Self::Slider { style, .. }
+            | Self::Tabs { style, .. }
+            | Self::RadioGroup { style, .. }
             | Self::Select { style, .. }
             | Self::ConfirmDialog { style, .. }
             | Self::Input { style, .. }
@@ -1262,13 +1266,12 @@ impl Node {
             | Self::Stack { style, .. }
             | Self::Scroll { style, .. }
             | Self::Switch { style, .. }
-            | Self::RadioGroup { style, .. }
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
-            | Self::Tabs { style, .. }
             | Self::Canvas { style, .. }
             | Self::MenuButton { style, .. }
-            | Self::List { style, .. } => style.as_ref(),
+            | Self::List { style, .. }
+            | Self::Chart { style, .. } => style.as_ref(),
         }
     }
 
@@ -1280,6 +1283,8 @@ impl Node {
             | Self::Button { semantics, .. }
             | Self::Checkbox { semantics, .. }
             | Self::Slider { semantics, .. }
+            | Self::Tabs { semantics, .. }
+            | Self::RadioGroup { semantics, .. }
             | Self::Select { semantics, .. }
             | Self::ConfirmDialog { semantics, .. }
             | Self::Input { semantics, .. }
@@ -1287,14 +1292,21 @@ impl Node {
             | Self::Stack { semantics, .. }
             | Self::Scroll { semantics, .. }
             | Self::Switch { semantics, .. }
-            | Self::RadioGroup { semantics, .. }
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
-            | Self::Tabs { semantics, .. }
             | Self::Canvas { semantics, .. }
             | Self::MenuButton { semantics, .. }
-            | Self::List { semantics, .. } => semantics.as_ref(),
+            | Self::List { semantics, .. }
+            | Self::Chart { semantics, .. } => semantics.as_ref(),
         }
+    }
+
+    pub fn find(&self, id: &str) -> Option<&Self> {
+        if self.id() == id {
+            return Some(self);
+        }
+        self.children()
+            .and_then(|children| children.iter().find_map(|child| child.find(id)))
     }
 
     /// The children of a container kind; leaf kinds have none.
@@ -1329,11 +1341,16 @@ impl Snapshot {
     }
 
     pub fn validate(&self) -> Result<(), String> {
+        if let Some(theme) = &self.theme {
+            theme.colors()?;
+        }
         if self.revision == 0 {
             return Err("Revision must be positive".into());
         }
         let mut ids = HashSet::new();
         validate_tree(&self.root, 0, &mut ids)?;
+        menus::validate(&self.menus, &self.actions)?;
+        menus::validate_button_menus(&self.root, &self.actions)?;
         self.validate_actions(&ids)
     }
 }
@@ -1385,7 +1402,15 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
         }
     }
     match node {
-        Node::Table { dataset, view, .. } => {
+        Node::Table {
+            dataset,
+            view,
+            context_menu,
+            ..
+        } => {
+            if !context_menu.is_empty() {
+                menus::validate_entries(context_menu)?;
+            }
             if dataset.is_empty() {
                 return Err("Table dataset ID must be nonempty".into());
             }
@@ -1393,6 +1418,7 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
                 view.validate()?;
             }
         }
+        Node::Chart { chart, .. } => chart.validate()?,
         Node::List {
             dataset,
             column,
@@ -1457,19 +1483,24 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
             }
             validate_options(options, selected.as_ref(), "Select")?;
         }
-        Node::RadioGroup {
+        Node::Tabs {
             options, selected, ..
-        } => validate_options(options, selected.as_ref(), "Radio group")?,
+        }
+        | Node::RadioGroup {
+            options, selected, ..
+        } => navigation::validate_choices(options, selected)?,
         Node::Switch { label, .. } if label.len() > 1024 => {
             return Err("Switch label exceeds 1024 UTF-8 bytes".into());
         }
-        Node::Button { tooltip, .. } if tooltip.len() > 1024 => {
-            return Err("Button tooltip exceeds 1024 UTF-8 bytes".into());
+        Node::Button {
+            tooltip: Some(tooltip),
+            ..
+        } if tooltip.is_empty() || tooltip.len() > 1024 => {
+            return Err("Tooltip requires 1..1024 UTF-8 bytes".into());
         }
         Node::Separator { label, .. } if label.len() > 1024 => {
             return Err("Separator label exceeds 1024 UTF-8 bytes".into());
         }
-        Node::Tabs { tabs, selected, .. } => validate_options(tabs, Some(selected), "Tabs")?,
         Node::Canvas { commands, .. } => {
             if commands.len() > 4096 {
                 return Err("Canvas allows at most 4096 commands".into());
@@ -1482,29 +1513,7 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
             if label.is_empty() || label.len() > 1024 {
                 return Err("Menu button label must contain 1..1024 UTF-8 bytes".into());
             }
-            if items.is_empty() || items.len() > 64 {
-                return Err("Menu buttons carry 1..64 items".into());
-            }
-            let mut keys = HashSet::new();
-            for entry in items {
-                match entry {
-                    MenuEntry::Divider { divider } => {
-                        if !divider {
-                            return Err("Menu dividers are written as divider: true".into());
-                        }
-                    }
-                    MenuEntry::Item { id, label, .. } => {
-                        if id.is_empty()
-                            || id.len() > 256
-                            || !keys.insert(id)
-                            || label.is_empty()
-                            || label.len() > 1024
-                        {
-                            return Err("Invalid or duplicate menu item".into());
-                        }
-                    }
-                }
-            }
+            menus::validate_entries(items)?;
         }
         Node::Progress {
             value: Some(value), ..
@@ -1582,6 +1591,10 @@ pub struct Update {
     /// Replaces the bindings like a snapshot does; omission clears them.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub actions: Vec<ActionBinding>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub menus: Vec<MenuSpec>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub theme: Option<ThemeSpec>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1735,6 +1748,8 @@ impl Snapshot {
             }
         }
         let snapshot = Snapshot {
+            menus: update.menus.clone(),
+            theme: update.theme.clone(),
             revision: update.revision,
             actions: update.actions.clone(),
             root,
@@ -1841,21 +1856,6 @@ pub enum Event {
         id: String,
         checked: bool,
     },
-    RadioChange {
-        revision: u64,
-        id: String,
-        selected: String,
-    },
-    TabChange {
-        revision: u64,
-        id: String,
-        selected: String,
-    },
-    MenuSelect {
-        revision: u64,
-        id: String,
-        item: String,
-    },
     ListSelect {
         revision: u64,
         id: String,
@@ -1888,6 +1888,16 @@ pub enum Event {
         id: String,
         number: f32,
     },
+    TabChange {
+        revision: u64,
+        id: String,
+        selected: String,
+    },
+    RadioChange {
+        revision: u64,
+        id: String,
+        selected: String,
+    },
     SelectChange {
         revision: u64,
         id: String,
@@ -1902,6 +1912,14 @@ pub enum Event {
         revision: u64,
         name: String,
         context: String,
+    },
+    RowAction {
+        revision: u64,
+        id: String,
+        dataset: String,
+        dataset_revision: u64,
+        record: String,
+        action: String,
     },
     TableSelection {
         revision: u64,
@@ -2771,7 +2789,7 @@ mod tests {
             br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
                 {"kind":"button","id":"save","label":"Save","tooltip":"Ctrl+S"},
                 {"kind":"switch","id":"wifi","label":"Wi-Fi","checked":true,"semantics":{"role":"switch"}},
-                {"kind":"radio_group","id":"mode","options":[{"id":"auto","label":"Automatic"},{"id":"manual","label":"Manual"}],"selected":"auto","horizontal":true,"semantics":{"role":"radio_group","label":"Mode"}},
+                {"kind":"radio_group","id":"mode","options":[{"id":"auto","label":"Automatic"},{"id":"manual","label":"Manual"}],"selected":"auto","semantics":{"role":"radio_group","label":"Mode"}},
                 {"kind":"progress","id":"upload","value":42.5,"semantics":{"role":"progress_bar","label":"Upload"}},
                 {"kind":"progress","id":"busy"},
                 {"kind":"separator","id":"rule","label":"Advanced","semantics":{"role":"separator"}},
@@ -2780,7 +2798,9 @@ mod tests {
         )
         .unwrap();
         let children = snapshot.root.children().unwrap();
-        assert!(matches!(&children[0], Node::Button { tooltip, .. } if tooltip == "Ctrl+S"));
+        assert!(
+            matches!(&children[0], Node::Button { tooltip, .. } if tooltip.as_deref() == Some("Ctrl+S"))
+        );
         assert!(matches!(&children[4], Node::Progress { value: None, .. }));
         assert!(matches!(
             &children[6],
@@ -2789,8 +2809,8 @@ mod tests {
         for invalid in [
             format!(r#"{{"kind":"switch","id":"s","label":"{}","checked":false}}"#, "y".repeat(1025)),
             r#"{"kind":"switch","id":"s","label":"Wi-Fi"}"#.into(),
-            r#"{"kind":"radio_group","id":"m","options":[],"selected":null}"#.into(),
-            r#"{"kind":"radio_group","id":"m","options":[{"id":"a","label":"A"},{"id":"a","label":"B"}],"selected":null}"#.into(),
+            r#"{"kind":"radio_group","id":"m","options":[],"selected":"a"}"#.into(),
+            r#"{"kind":"radio_group","id":"m","options":[{"id":"a","label":"A"},{"id":"a","label":"B"}],"selected":"a"}"#.into(),
             r#"{"kind":"radio_group","id":"m","options":[{"id":"a","label":"A"}],"selected":"b"}"#.into(),
             r#"{"kind":"progress","id":"p","value":101}"#.into(),
             r#"{"kind":"progress","id":"p","value":-1}"#.into(),
@@ -2808,7 +2828,7 @@ mod tests {
     fn tabs_canvases_and_animations_validate() {
         let snapshot = Snapshot::parse(
             br##"{"revision":1,"root":{"kind":"column","id":"root","children":[
-                {"kind":"tabs","id":"pages","tabs":[{"id":"first","label":"First"},{"id":"second","label":"Second"}],"selected":"second","variant":"pill","semantics":{"role":"tab_list"}},
+                {"kind":"tabs","id":"pages","options":[{"id":"first","label":"First"},{"id":"second","label":"Second"}],"selected":"second","semantics":{"role":"tab_list"}},
                 {"kind":"canvas","id":"chart","style":{"width":{"px":200},"height":{"px":100}},"semantics":{"role":"image","label":"Chart"},"commands":[
                     {"op":"rect","x":0,"y":0,"width":50,"height":20,"fill":"token:primary","radius":4},
                     {"op":"circle","cx":80,"cy":50,"radius":10,"stroke":"#ff0000","stroke_width":2},
@@ -2821,14 +2841,12 @@ mod tests {
         )
         .unwrap();
         let children = snapshot.root.children().unwrap();
-        assert!(
-            matches!(&children[0], Node::Tabs { variant: TabVariant::Pill, selected, .. } if selected == "second")
-        );
+        assert!(matches!(&children[0], Node::Tabs { selected, .. } if selected == "second"));
         assert!(matches!(&children[1], Node::Canvas { commands, .. } if commands.len() == 4));
         for invalid in [
-            r#"{"kind":"tabs","id":"t","tabs":[{"id":"a","label":"A"}],"selected":"b"}"#.into(),
-            r#"{"kind":"tabs","id":"t","tabs":[],"selected":"a"}"#.into(),
-            r#"{"kind":"tabs","id":"t","tabs":[{"id":"a","label":"A"}],"selected":"a","variant":"round"}"#.into(),
+            r#"{"kind":"tabs","id":"t","options":[{"id":"a","label":"A"}],"selected":"b"}"#.into(),
+            r#"{"kind":"tabs","id":"t","options":[],"selected":"a"}"#.into(),
+            r#"{"kind":"tabs","id":"t","options":[{"id":"a","label":"A"}],"selected":"a","variant":"pill"}"#.into(),
             r#"{"kind":"canvas","id":"c","commands":[{"op":"rect","x":0,"y":0,"width":-1,"height":1}]}"#.into(),
             r#"{"kind":"canvas","id":"c","commands":[{"op":"rect","x":9000,"y":0,"width":1,"height":1}]}"#.into(),
             r#"{"kind":"canvas","id":"c","commands":[{"op":"line","x1":0,"y1":0,"x2":1,"y2":1,"color":"token:border","width":600}]}"#.into(),
@@ -2852,36 +2870,43 @@ mod tests {
     }
 
     #[test]
-    fn menu_buttons_validate_their_items() {
+    fn menu_buttons_take_application_menu_entries_bound_to_global_actions() {
         let snapshot = Snapshot::parse(
-            br#"{"revision":1,"root":{"kind":"menu_button","id":"file","label":"File","semantics":{"role":"button"},"items":[
-                {"id":"open","label":"Open"},
-                {"divider":true},
-                {"id":"save","label":"Save","disabled":true,"checked":false},
-                {"id":"wrap","label":"Word wrap","checked":true}
+            br#"{"revision":1,"actions":[{"name":"file.open","keys":"ctrl+o","context":"global"},{"name":"view.wrap","keys":"alt+z","context":"global"}],"root":{"kind":"menu_button","id":"file","label":"File","semantics":{"role":"button"},"items":[
+                {"kind":"action","id":"open","label":"Open","action":"file.open"},
+                {"kind":"separator"},
+                {"kind":"action","id":"wrap","label":"Word wrap","action":"view.wrap","checked":true,"disabled":true}
             ]}}"#,
         )
         .unwrap();
         let Node::MenuButton { items, .. } = &snapshot.root else {
             panic!("menu button");
         };
-        assert_eq!(items.len(), 4);
-        assert!(matches!(&items[1], MenuEntry::Divider { divider: true }));
-        assert!(matches!(&items[2], MenuEntry::Item { disabled: true, .. }));
-        for invalid in [
-            r#"{"kind":"menu_button","id":"m","label":"","items":[{"id":"a","label":"A"}]}"#.to_string(),
-            r#"{"kind":"menu_button","id":"m","label":"File","items":[]}"#.into(),
-            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A"},{"id":"a","label":"B"}]}"#.into(),
-            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"","label":"A"}]}"#.into(),
-            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"divider":false}]}"#.into(),
-            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A","icon":"x"}]}"#.into(),
-            format!(
+        assert_eq!(items.len(), 3);
+        assert!(matches!(&items[1], MenuEntry::Separator));
+        assert!(matches!(
+            &items[2],
+            MenuEntry::Action {
+                checked: true,
+                disabled: true,
+                ..
+            }
+        ));
+        let bound = r#""actions":[{"name":"file.open","keys":"ctrl+o","context":"global"}],"#;
+        for (actions, invalid) in [
+            (bound, r#"{"kind":"menu_button","id":"m","label":"","items":[{"kind":"action","id":"a","label":"A","action":"file.open"}]}"#.to_string()),
+            (bound, r#"{"kind":"menu_button","id":"m","label":"File","items":[]}"#.into()),
+            (bound, r#"{"kind":"menu_button","id":"m","label":"File","items":[{"kind":"action","id":"a","label":"A","action":"file.open"},{"kind":"action","id":"a","label":"B","action":"file.open"}]}"#.into()),
+            (bound, r#"{"kind":"menu_button","id":"m","label":"File","items":[{"kind":"action","id":"","label":"A","action":"file.open"}]}"#.into()),
+            (bound, r#"{"kind":"menu_button","id":"m","label":"File","items":[{"divider":true}]}"#.into()),
+            ("", r#"{"kind":"menu_button","id":"m","label":"File","items":[{"kind":"action","id":"a","label":"A","action":"file.open"}]}"#.into()),
+            (bound, format!(
                 r#"{{"kind":"menu_button","id":"m","label":"File","items":[{}]}}"#,
-                (0..65).map(|i| format!(r#"{{"id":"i{i}","label":"I"}}"#)).collect::<Vec<_>>().join(",")
-            ),
-            r#"{"kind":"menu_button","id":"m","label":"File","items":[{"id":"a","label":"A"}],"semantics":{"role":"switch"}}"#.into(),
+                (0..65).map(|i| format!(r#"{{"kind":"action","id":"i{i}","label":"I","action":"file.open"}}"#)).collect::<Vec<_>>().join(",")
+            )),
+            (bound, r#"{"kind":"menu_button","id":"m","label":"File","items":[{"kind":"action","id":"a","label":"A","action":"file.open"}],"semantics":{"role":"switch"}}"#.into()),
         ] {
-            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            let bytes = format!(r#"{{"revision":1,{actions}"root":{invalid}}}"#);
             assert!(Snapshot::parse(bytes.as_bytes()).is_err(), "{invalid}");
         }
     }

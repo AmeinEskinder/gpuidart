@@ -28,6 +28,7 @@ func run(queryRestarts: [String]) throws {
     AXUIElementSetMessagingTimeout(app, 3)
     var elements: [(AXUIElement, Int?)] = []
     func visit(_ element: AXUIElement, _ parent: Int?) throws {
+        if elements.contains(where: { CFEqual($0.0, element) }) { return }
         guard elements.count < 4096 else { throw ProbeError.failure("AX tree exceeds probe bound") }
         let index = elements.count
         elements.append((element, parent))
@@ -35,6 +36,8 @@ func run(queryRestarts: [String]) throws {
         for child in children { try visit(child, index) }
     }
     try visit(app, nil)
+    // AppKit menus are outside the window tree.
+    if let menu = try attribute(app, "AXMenuBar") { try visit(menu as! AXUIElement, 0) }
     func label(_ element: AXUIElement) throws -> String {
         let title = try attribute(element, "AXTitle") as? String ?? ""
         if !title.isEmpty { return title }
@@ -45,7 +48,7 @@ func run(queryRestarts: [String]) throws {
         var nodes: [[String: Any]] = []
         for (element, parent) in elements {
             var node: [String: Any] = ["name": try label(element), "parent": parent as Any? ?? NSNull()]
-            for (field, key) in [("role", "AXRole"), ("id", "AXIdentifier"), ("subrole", "AXSubrole"), ("modal", "AXModal"),
+            for (field, key) in [("description", "AXHelp"), ("role", "AXRole"), ("id", "AXIdentifier"), ("subrole", "AXSubrole"), ("modal", "AXModal"),
                                  ("value", "AXValue"), ("min", "AXMinValue"), ("max", "AXMaxValue"),
                                  ("enabled", "AXEnabled"), ("focused", "AXFocused"),
                                  ("selected", "AXSelected"), ("expanded", "AXExpanded")] {
@@ -65,6 +68,7 @@ func run(queryRestarts: [String]) throws {
         output["nodes"] = nodes
     } else {
         let matches = try elements.filter {
+            if operation == "invoke-menu", try attribute($0.0, "AXRole") as? String != "AXMenuItem" { return false }
             if !identifier.isEmpty { return try attribute($0.0, "AXIdentifier") as? String == identifier }
             return try label($0.0) == name
         }
@@ -72,7 +76,20 @@ func run(queryRestarts: [String]) throws {
         let element = matches[0].0
         let result: AXError
         switch operation {
-        case "invoke", "toggle", "select": result = AXUIElementPerformAction(element, "AXPress" as CFString)
+        case "invoke", "toggle", "select", "invoke-menu": result = AXUIElementPerformAction(element, "AXPress" as CFString)
+        case "hover":
+            guard let position = try attribute(element, "AXPosition"),
+                  let size = try attribute(element, "AXSize") else { throw ProbeError.failure("Hover target has no bounds") }
+            var point = CGPoint.zero
+            var dimensions = CGSize.zero
+            guard AXValueGetValue(position as! AXValue, .cgPoint, &point),
+                  AXValueGetValue(size as! AXValue, .cgSize, &dimensions),
+                  dimensions.width > 0, dimensions.height > 0 else { throw ProbeError.failure("Invalid hover bounds") }
+            _ = AXUIElementSetAttributeValue(app, "AXFrontmost" as CFString, kCFBooleanTrue)
+            guard let event = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved,
+                mouseCursorPosition: CGPoint(x: point.x + dimensions.width / 2, y: point.y + dimensions.height / 2), mouseButton: .left) else { throw ProbeError.failure("Cannot create hover event") }
+            event.post(tap: .cghidEventTap)
+            result = .success
         case "set-value": result = AXUIElementSetAttributeValue(element, "AXValue" as CFString, value as CFString)
         case "set-range":
             guard let number = Double(value) else { throw ProbeError.failure("Invalid number") }

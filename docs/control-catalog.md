@@ -137,24 +137,19 @@ equivalence gates. The public Dart API and semantic tests remain either way.
 `UiSwitch`, `UiRadioGroup`, `UiProgress` and `UiSeparator` follow the settings
 contract above. A switch behaves like a checkbox: `switch_change` carries the
 requested `checked` value, the switch shows the toggle at once, and the next
-publication's value is authoritative. A radio group takes the same option
-list as a select, shows the picked option at once, and reports `radio_change`
-with the option ID. Progress is display only: `value` is a percentage from 0
-to 100 and an absent value shows an indeterminate bar. A separator is a
-horizontal or vertical rule with an optional centered label. Buttons accept a
-`tooltip` of at most 1024 UTF-8 bytes. Option lists, labels and tooltips keep
-the select and dialog bounds, and semantics roles are `switch`,
-`radio_group`, `progress_bar` and `separator`.
+publication's value is authoritative. Progress is display only: `value` is a
+percentage from 0 to 100 and an absent value shows an indeterminate bar. A
+separator is a horizontal or vertical rule with an optional centered label.
+Labels keep the select and dialog bounds, and semantics roles are `switch`,
+`progress_bar` and `separator`. Radio groups, tabs and button tooltips are the
+retained, keyboard-navigable controls described in
+[navigation and charts](navigation-and-charts.md). Canvases and native
+animation are described in [canvas and animation](canvas-animation.md).
 
-`UiTabs` takes the same option list as a select plus a required `selected`
-tab ID and an `underline`, `pill` or `segmented` variant. The strip shows the
-pick at once and reports `tab_change` with the tab ID; its semantics role is
-`tab_list`. Canvases and native animation are described in
-[canvas and animation](canvas-animation.md).
-
-`UiMenuButton` is a button that opens a native popup menu of one to 64
-entries: items with a unique ID, label and optional `disabled` and `checked`
-flags, or dividers. Choosing an item reports `menu_select` with the item ID.
+`UiMenuButton` is a button that opens a popup menu of the same `UiMenuEntry`
+items application menus take: actions bound to global `UiAction` names, with
+optional `checked` and `disabled` flags, and separators. Choosing an action
+emits that action on the event channel, like a menu bar item.
 The host also exposes the platform's file and folder choosers, save dialog,
 URL handler and file manager through `pickPaths`, `pickSavePath`, `openUrl`
 and `revealPath`; dialogs resolve when they close and `openUrl` only accepts

@@ -38,6 +38,12 @@ Startup waits at most 30 seconds for reload registration. Failed startup cleans 
 
 Windows and Linux execute GPUI inside the blocking native runner isolate. macOS starts an owned native companion because AppKit needs the process main thread and its normal quit terminates that process. Dart creates and reaps the child; close waits for transport completion and child exit before disposing callbacks. The companion uses a private Unix socket with bounded frames and queues. It adds process/transport cost; Windows measurements do not quantify that cost.
 
+The [market terminal](../example/terminal/README.md) adds Watchlist / Instrument /
+Settings navigation, real app menus, record context menus, themes and dataset
+charts. Run `dart run tool/dev.dart example/terminal/main.dart`. Its data is
+fictitious and stays in memory. The [navigation and charts contract](navigation-and-charts.md)
+defines the bounded public API and event ownership.
+
 ## Application lifecycle
 
 ```dart
@@ -84,10 +90,9 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiScroll | A bounded vertical, horizontal or two-axis scroll container with a native scrollbar. Its offset is retained by ID across publications and reload. |
 | UiText / UiButton | Text and native button. Click events carry node ID and snapshot revision. |
 | UiInput | Native-retained by default. `controlled: true` enables guarded text/selection writes; native remains authoritative during composition. See [controlled inputs](controlled-inputs.md). |
-| UiCheckbox / UiSwitch / UiRadioGroup / UiSlider / UiSelect | Application values with native change-request events (`checkbox_change`, `switch_change`, `radio_change`, `slider_change`, `select_change`). The control shows the interaction immediately; the next publication's value is authoritative, so publish the accepted value. See the [settings controls contract](control-catalog.md). |
+| UiCheckbox / UiSwitch / UiSlider / UiSelect | Application values with native change-request events (`checkbox_change`, `switch_change`, `slider_change`, `select_change`). The control shows the interaction immediately; the next publication's value is authoritative, so publish the accepted value. See the [settings controls contract](control-catalog.md). |
 | UiProgress / UiSeparator | A determinate or indeterminate progress bar; a horizontal or vertical rule with an optional label. Display only. |
-| UiTabs | A tab strip over named tabs with `tab_change` events; underline, pill or segmented. The strip shows the pick at once and the next publication is authoritative. |
-| UiMenuButton | A button that opens a native popup menu of items and dividers; `menu_select` carries the chosen item ID in `GpuiEvent.item`. |
+| UiMenuButton | A button that opens a popup menu of the same `UiMenuEntry` items application menus take; choosing an action entry emits its global action, so the entry needs a global `UiAction` binding. |
 | pickPaths / pickSavePath / openUrl / revealPath | Native file and folder choosers, the OS save dialog, the OS URL handler (http, https and mailto only) and the file manager, through the host's request channel. Dialogs resolve when they close; a cancelled dialog resolves to null. Not covered by headless tests. |
 | UiCanvas | A retained draw list (rectangles, circles, lines, polylines) painted natively inside the node's bounds; the list travels as node fields, so a change sends only that node. See [canvas and animation](canvas-animation.md). |
 | UiStyle.animation | A native timeline over a node's opacity or offset with a duration, easing and optional repeat. GPUI interpolates every frame; Dart publishes nothing while it runs. |
@@ -100,6 +105,12 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. This is not a presentation fence. |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. Edit batches change cells and rows, and insert, delete or move records in order. See [datasets](datasets.md). |
 | openWindow / GpuiWindow | A secondary native window with its own description, datasets and revision sequence; events carry `GpuiEvent.window`. Closing the main window closes the application. See [secondary windows](windows.md). |
+| UiTheme | Whole-snapshot light/dark palette plus bounded opaque token overrides. `openView` reevaluates its theme builder on rebuild/reload. |
+| UiTabs / UiRadioGroup | Controlled option IDs with retained focus and keyboard navigation. Changes return on the event channel. |
+| UiMenu / UiMenuAction | Flat app menus referencing global actions; native menu bar on macOS, Kit menu bar on Windows/Linux. |
+| UiTable.contextMenu | Record-bound row commands, pointer or Shift+F10 activation, typed RowActionEvent. Requires stable row IDs. |
+| UiButton.tooltip | Bounded help text with native hover behavior and accessible description. |
+| UiChart | Read-only line/bar series from a retained dataset/view, at most 512 projected points. |
 | close / done | Close is idempotent. Normal completion follows native teardown. Failure can precede teardown on a shutdown timeout; native memory stays alive until the runner returns. Pending requests settle with success or an error. A paused event subscriber does not delay done. |
 
 Node IDs are nonempty and unique across the whole description, including nested rows. Reusing an ID and control kind preserves its native state. Removing the node releases its retained entity. Changing a table's dataset or replacing a dataset resets selection and scroll. Row indices are not stable record identities; the watchlist keeps an instrument symbol in application state.

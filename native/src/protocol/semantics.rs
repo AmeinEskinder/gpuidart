@@ -21,6 +21,7 @@ pub enum SemanticRole {
     Separator,
     TabList,
     Image,
+    Chart,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -57,16 +58,17 @@ impl Semantics {
                 Node::Checkbox { .. } => role == Checkbox,
                 Node::Slider { .. } => role == Slider,
                 Node::Input { .. } => role == Textbox,
+                Node::Tabs { .. } => role == TabList,
+                Node::RadioGroup { .. } => role == RadioGroup,
                 Node::Select { .. } => role == Combobox,
                 Node::Table { .. } => role == Table,
                 Node::Switch { .. } => role == Switch,
-                Node::RadioGroup { .. } => role == RadioGroup,
                 Node::Progress { .. } => role == ProgressBar,
                 Node::Separator { .. } => role == Separator,
-                Node::Tabs { .. } => role == TabList,
                 Node::Canvas { .. } => role == Image,
                 Node::MenuButton { .. } => role == Button,
                 Node::List { .. } => role == List,
+                Node::Chart { .. } => role == Chart,
             };
             if !valid {
                 return Err(format!(

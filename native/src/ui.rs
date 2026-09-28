@@ -5,8 +5,8 @@ use crate::{
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
         FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, MenuEntry, Node,
-        ScrollAxis, Size as StyleSize, Snapshot, Style, TabVariant, TableView, ThemeToken,
-        ViewEntry, ViewIndex,
+        ScrollAxis, Size as StyleSize, Snapshot, Style, TableView, ThemeToken, ViewEntry,
+        ViewIndex,
     },
 };
 use async_channel::Receiver;
@@ -21,11 +21,9 @@ use gpui_kit::component::{
     input::{Input, InputEvent, InputState},
     menu::PopupMenuItem,
     progress::Progress,
-    radio::{Radio, RadioGroup},
     scroll::ScrollableElement,
     separator::Separator,
     switch::Switch,
-    tab::{Tab, TabBar},
     table::{Column, DataTable, TableDelegate, TableEvent, TableState},
 };
 use gpui_kit::gpui::{
@@ -44,6 +42,8 @@ use std::{
 };
 
 struct Rows {
+    owner: WeakEntity<DartView>,
+    has_context_menu: bool,
     table_id: String,
     data: SharedDataset,
     /// View index: view row -> source row. Identity mapping when the table
@@ -208,7 +208,7 @@ impl TableDelegate for Rows {
                 .bg(cx.theme().muted),
             Some(&ViewEntry::Record(source)) => {
                 let key = self.record_key(source);
-                div()
+                let row_element = div()
                     .id(SharedString::from(key.clone()))
                     .accessibility_id(key)
                     .aria_row_index(row)
@@ -231,7 +231,8 @@ impl TableDelegate for Rows {
                                 }
                             });
                         }
-                    })
+                    });
+                self.context_row(row_element, source, cx)
             }
             None => div().id(("row-filler", row)),
         }
@@ -285,10 +286,15 @@ pub(crate) struct DartView {
     #[cfg(feature = "snapshot-experiment")]
     embedded: bool,
     snapshot: Snapshot,
+    applied_theme: Option<crate::protocol::ThemeSpec>,
+    applied_menus: menus::AppliedMenus,
+    menu_bar: Option<Entity<gpui_kit::component::menu::AppMenuBar>>,
     trace: Option<Arc<crate::trace::Trace>>,
     events: Events,
     inputs: HashMap<String, RetainedInput>,
     next_input_generation: u64,
+    charts: HashMap<String, charts::RetainedChart>,
+    choices: HashMap<String, choices::RetainedChoices>,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
     active_dialog: dialogs::ActiveDialog,
@@ -299,6 +305,8 @@ pub(crate) struct DartView {
     choice_shown: Rc<RefCell<HashMap<String, String>>>,
     /// Scroll containers keep their offset by ID across publications.
     scrolls: HashMap<String, ScrollHandle>,
+    row_menu: Option<row_menus::Session>,
+    next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
     lists: HashMap<String, RetainedList>,
     table_subscriptions: HashMap<String, Subscription>,
@@ -407,7 +415,7 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<String, Value>>();
-        json!({"revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
+        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "labels": labels, "scrolls": scrolls, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -455,6 +463,18 @@ impl DartView {
         let key_interceptor = cx.intercept_keystrokes(move |event, window, cx| {
             let view = this.read(cx);
             let Some((name, context)) = view.match_action(&event.keystroke, window, cx) else {
+                if event.keystroke.key == "f10"
+                    && event.keystroke.modifiers.shift
+                    && !event.keystroke.modifiers.control
+                    && !event.keystroke.modifiers.alt
+                    && !event.keystroke.modifiers.platform
+                {
+                    let opened = this.update(cx, |view, cx| view.keyboard_row_menu(window, cx));
+                    if opened {
+                        window.prevent_default();
+                        cx.stop_propagation();
+                    }
+                }
                 return;
             };
             view.events.emit(Event::Action {
@@ -472,16 +492,23 @@ impl DartView {
             embedded: false,
             trace: None,
             snapshot: initial.snapshot,
+            applied_theme: None,
+            applied_menus: None,
+            menu_bar: None,
             datasets: Store::new(initial.datasets),
             events,
             inputs: HashMap::new(),
             next_input_generation: 0,
+            charts: HashMap::new(),
+            choices: HashMap::new(),
             sliders: HashMap::new(),
             selects: HashMap::new(),
             active_dialog: Default::default(),
             checkbox_shown: Default::default(),
             choice_shown: Default::default(),
             scrolls: HashMap::new(),
+            row_menu: None,
+            next_row_menu: 0,
             tables: HashMap::new(),
             lists: HashMap::new(),
             table_subscriptions: HashMap::new(),
@@ -562,6 +589,14 @@ impl DartView {
     ) {
         if let Err(message) =
             datasets::validate_references(&snapshot, |id| self.datasets.entries.contains_key(id))
+                .and_then(|_| {
+                    datasets::validate_context_menus(&snapshot, |id| {
+                        self.datasets
+                            .entries
+                            .get(id)
+                            .is_some_and(|data| data.borrow().data.ids.is_some())
+                    })
+                })
                 .and_then(|_| {
                     datasets::validate_views(&snapshot, |id| {
                         self.datasets
@@ -699,8 +734,8 @@ impl DartView {
         if matches!(&update.change, Change::Release) {
             let mut referenced = false;
             self.snapshot.root.visit(&mut |node| {
-                if let Node::Table { dataset, .. } | Node::List { dataset, .. } = node {
-                    referenced |= dataset == &id;
+                if let Some(dataset) = node.dataset() {
+                    referenced |= dataset == id;
                 }
             });
             if referenced {
@@ -708,6 +743,35 @@ impl DartView {
                     request,
                     message: "Remove dataset references from the view before releasing it".into(),
                 });
+                return;
+            }
+        }
+        if let Change::Replace { data } = &update.change {
+            let validation = datasets::validate_views(&self.snapshot, |name| {
+                if name == id {
+                    Some(data.columns.len())
+                } else {
+                    self.datasets
+                        .entries
+                        .get(name)
+                        .map(|d| d.borrow().data.columns.len())
+                }
+            })
+            .and_then(|_| {
+                datasets::validate_context_menus(&self.snapshot, |name| {
+                    if name == id {
+                        data.ids.is_some()
+                    } else {
+                        self.datasets
+                            .entries
+                            .get(name)
+                            .is_some_and(|d| d.borrow().data.ids.is_some())
+                    }
+                })
+            });
+            if let Err(message) = validation {
+                self.events
+                    .emit(Event::DatasetRejected { request, message });
                 return;
             }
         }
@@ -768,6 +832,8 @@ impl DartView {
                 if list_changed {
                     cx.notify();
                 }
+                self.update_charts(&id, touched.as_ref());
+                cx.notify();
                 self.counters
                     .data_records_checked
                     .set(self.counters.data_records_checked.get() + work.records_checked as u64);
@@ -888,12 +954,17 @@ impl DartView {
     }
 
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
+        self.reconcile_theme(cx)?;
+        self.reconcile_menus(cx)?;
         self.reconcile_dialog(window, cx);
         self.reconcile_controls(window, cx);
+        self.reconcile_choices(window, cx);
+        self.reconcile_charts()?;
         let mut input_ids = HashSet::new();
         let mut table_ids = HashSet::new();
         let mut list_ids = HashSet::new();
         let mut scroll_ids = HashSet::new();
+        let owner = cx.entity().downgrade();
         let mut changed_views = Vec::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
@@ -978,7 +1049,11 @@ impl DartView {
                 }
             }
             Node::Table {
-                id, dataset, view, ..
+                id,
+                dataset,
+                view,
+                context_menu,
+                ..
             } => {
                 let Some(data) = self.datasets.entries.get(dataset).cloned() else {
                     failure = Some(format!("Missing retained dataset: {dataset}"));
@@ -986,6 +1061,14 @@ impl DartView {
                 };
                 table_ids.insert(id.clone());
                 if let Some(retained) = self.tables.get_mut(id) {
+                    if retained.state.read(cx).delegate().has_context_menu
+                        != !context_menu.is_empty()
+                    {
+                        retained.state.update(cx, |table, cx| {
+                            table.delegate_mut().has_context_menu = !context_menu.is_empty();
+                            cx.notify();
+                        });
+                    }
                     let swapped = !Rc::ptr_eq(&retained.state.read(cx).delegate().data, &data);
                     if swapped {
                         let index = retained.state.read(cx).delegate().index.clone();
@@ -1017,6 +1100,8 @@ impl DartView {
                     let table = cx.new(|cx| {
                         TableState::new(
                             Rows {
+                                owner: owner.clone(),
+                                has_context_menu: !context_menu.is_empty(),
                                 table_id: id.clone(),
                                 data: data.clone(),
                                 index,
@@ -1139,6 +1224,7 @@ impl DartView {
         for id in changed_views {
             self.recompute_table_view(&id, false, cx);
         }
+        self.reconcile_row_menu(window, cx);
         Ok(())
     }
 
@@ -1159,6 +1245,7 @@ impl DartView {
         for context in &chain {
             if let Some(binding) = self.snapshot.actions.iter().find(|binding| {
                 binding.context == *context
+                    && (context != "global" || self.menu_action_enabled(&binding.name))
                     && KeystrokeSpec::parse(&binding.keys).is_ok_and(|keys| keys == spec)
             }) {
                 return Some((binding.name.clone(), binding.context.clone()));
@@ -1184,6 +1271,11 @@ impl DartView {
         }
         for (id, slider) in &self.sliders {
             if slider.focus == focused {
+                return self.context_chain(id);
+            }
+        }
+        for (id, tabs) in &self.choices {
+            if tabs.focus.values().any(|handle| *handle == focused) {
                 return self.context_chain(id);
             }
         }
@@ -1224,7 +1316,7 @@ impl DartView {
         &self,
         node: &Node,
         colors: &ThemeColor,
-        cx: &App,
+        cx: &Context<Self>,
     ) -> Result<AnyElement, String> {
         let id = SharedString::from(node.id().to_owned());
         let materialized = match node {
@@ -1372,60 +1464,6 @@ impl DartView {
                 )
                 .into_any_element()
             }
-            Node::RadioGroup {
-                options,
-                selected,
-                disabled,
-                horizontal,
-                ..
-            } => {
-                let events = self.events.clone();
-                let event_id = node.id().to_owned();
-                let revision = self.snapshot.revision;
-                let shown = self
-                    .choice_shown
-                    .borrow()
-                    .get(node.id())
-                    .cloned()
-                    .or_else(|| selected.clone());
-                let selected_index = shown
-                    .as_ref()
-                    .and_then(|choice| options.iter().position(|option| option.id == *choice));
-                let ids: Vec<String> = options.iter().map(|option| option.id.clone()).collect();
-                let displayed = self.choice_shown.clone();
-                let group = RadioGroup::new(SharedString::from(format!("{}-radios", node.id())))
-                    .layout(if *horizontal {
-                        Axis::Horizontal
-                    } else {
-                        Axis::Vertical
-                    })
-                    .selected_index(selected_index)
-                    .disabled(*disabled)
-                    .children(options.iter().map(|option| {
-                        Radio::new(SharedString::from(format!("{}:{}", node.id(), option.id)))
-                            .label(option.label.clone())
-                    }))
-                    .on_change(move |index, window, _| {
-                        let Some(choice) = ids.get(*index) else {
-                            return;
-                        };
-                        displayed
-                            .borrow_mut()
-                            .insert(event_id.clone(), choice.clone());
-                        window.refresh();
-                        events.emit(Event::RadioChange {
-                            revision,
-                            id: event_id.clone(),
-                            selected: choice.clone(),
-                        });
-                    });
-                apply_node_style(
-                    annotate(div().id(id), node).test_support().child(group),
-                    node,
-                    colors,
-                )
-                .into_any_element()
-            }
             Node::Progress { value, .. } => {
                 let bar = Progress::new(id.clone()).accessibility_label(accessible_name(node));
                 let bar = match value {
@@ -1457,53 +1495,6 @@ impl DartView {
                 };
                 apply_node_style(
                     annotate(div().id(id), node).test_support().child(rule),
-                    node,
-                    colors,
-                )
-                .into_any_element()
-            }
-            Node::Tabs {
-                tabs,
-                selected,
-                variant,
-                ..
-            } => {
-                let events = self.events.clone();
-                let event_id = node.id().to_owned();
-                let revision = self.snapshot.revision;
-                let shown = self
-                    .choice_shown
-                    .borrow()
-                    .get(node.id())
-                    .cloned()
-                    .unwrap_or_else(|| selected.clone());
-                let selected_index = tabs.iter().position(|tab| tab.id == shown).unwrap_or(0);
-                let ids: Vec<String> = tabs.iter().map(|tab| tab.id.clone()).collect();
-                let displayed = self.choice_shown.clone();
-                let bar = TabBar::new(SharedString::from(format!("{}-tabs", node.id())))
-                    .children(tabs.iter().map(|tab| Tab::new().label(tab.label.clone())))
-                    .selected_index(selected_index)
-                    .on_click(move |index, window, _| {
-                        let Some(choice) = ids.get(*index) else {
-                            return;
-                        };
-                        displayed
-                            .borrow_mut()
-                            .insert(event_id.clone(), choice.clone());
-                        window.refresh();
-                        events.emit(Event::TabChange {
-                            revision,
-                            id: event_id.clone(),
-                            selected: choice.clone(),
-                        });
-                    });
-                let bar = match variant {
-                    TabVariant::Underline => bar.underline(),
-                    TabVariant::Pill => bar.pill(),
-                    TabVariant::Segmented => bar.segmented(),
-                };
-                apply_node_style(
-                    annotate(div().id(id), node).test_support().child(bar),
                     node,
                     colors,
                 )
@@ -1619,7 +1610,6 @@ impl DartView {
             }
             Node::MenuButton { label, items, .. } => {
                 let events = self.events.clone();
-                let event_id = node.id().to_owned();
                 let revision = self.snapshot.revision;
                 let entries = items.clone();
                 let button = DropdownButton::new(SharedString::from(format!("{}-menu", node.id())))
@@ -1632,25 +1622,25 @@ impl DartView {
                     .dropdown_menu(move |mut menu, _, _| {
                         for entry in &entries {
                             menu = match entry {
-                                MenuEntry::Divider { .. } => menu.separator(),
-                                MenuEntry::Item {
-                                    id: item_id,
+                                MenuEntry::Separator => menu.separator(),
+                                MenuEntry::Action {
                                     label,
-                                    disabled,
+                                    action,
                                     checked,
+                                    disabled,
+                                    ..
                                 } => {
                                     let events = events.clone();
-                                    let event_id = event_id.clone();
-                                    let item_id = item_id.clone();
+                                    let action = action.clone();
                                     menu.item(
                                         PopupMenuItem::new(label.clone())
                                             .disabled(*disabled)
                                             .checked(*checked)
                                             .on_click(move |_, _, _| {
-                                                events.emit(Event::MenuSelect {
+                                                events.emit(Event::Action {
                                                     revision,
-                                                    id: event_id.clone(),
-                                                    item: item_id.clone(),
+                                                    name: action.clone(),
+                                                    context: "global".into(),
                                                 });
                                             }),
                                     )
@@ -1684,8 +1674,8 @@ impl DartView {
                         .accessibility_label(accessible_name(node))
                         .primary()
                         .label(label.clone())
-                        .when(!tooltip.is_empty(), |button| {
-                            button.tooltip(tooltip.clone())
+                        .when_some(tooltip.clone(), |button, help| {
+                            semantics::description(button.tooltip(help.clone()), help)
                         })
                         .on_click(move |_, _, _| {
                             #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
@@ -1749,6 +1739,10 @@ impl DartView {
                     colors,
                 )
                 .into_any_element()
+            }
+            Node::Chart { .. } => self.chart_element(node, colors)?,
+            Node::Tabs { .. } | Node::RadioGroup { .. } => {
+                self.choices_element(node, colors, cx)?
             }
             Node::Slider { .. } => self.slider_element(node, colors, cx)?,
             Node::Select { .. } => self.select_element(node, colors)?,
@@ -2138,12 +2132,21 @@ fn apply_style<T: Styled>(element: T, style: &Style, colors: &ThemeColor) -> T {
     element
 }
 
+mod charts;
+mod choices;
 mod control_root;
 mod controls;
+mod menus;
+#[cfg(test)]
+mod menus_tests;
+mod row_menus;
 mod semantics;
 #[cfg(test)]
 mod semantics_tests;
 mod slider;
+#[cfg(test)]
+mod tabs_tests;
+mod theming;
 use semantics::{accessible_name, annotate};
 #[cfg(test)]
 mod controls_tests;
@@ -2157,7 +2160,8 @@ mod inputs;
 mod tests;
 
 impl Render for DartView {
-    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        self.reconcile_row_menu(window, cx);
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);
@@ -2175,6 +2179,7 @@ impl Render for DartView {
         }
         let root = div()
             .id("gpuidart")
+            .on_action(cx.listener(Self::invoke_menu))
             .role(Role::Group)
             .a11y_synthetic_children({
                 let modal = self.active_dialog.clone();
@@ -2189,8 +2194,14 @@ impl Render for DartView {
             .track_scroll(&self.scroll)
             .bg(cx.theme().background)
             .text_color(cx.theme().foreground)
+            .children(
+                self.menu_bar
+                    .as_ref()
+                    .map(|bar| div().h_8().w_full().child(bar.clone())),
+            )
             .child(div().w_full().p_5().child(content))
-            .vertical_scrollbar(&self.scroll);
+            .vertical_scrollbar(&self.scroll)
+            .children(self.row_menu_element());
         #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
         let root = crate::input_trace::observe(root);
         match &self.trace {
@@ -2562,3 +2573,15 @@ pub(crate) fn run(
         None => Ok(()),
     }
 }
+
+#[cfg(test)]
+#[path = "ui/tooltip_tests.rs"]
+mod tooltip_tests;
+
+#[cfg(test)]
+#[path = "ui/radio_tests.rs"]
+mod radio_tests;
+
+#[cfg(test)]
+#[path = "ui/charts_tests.rs"]
+mod charts_tests;

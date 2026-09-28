@@ -1646,6 +1646,8 @@ impl Window {
                 },
             });
 
+            platform_window.a11y_update_window_bounds();
+
             // A11y can be activated at any time, and so we cannot compute a
             // correct `TreeUpdate` on-demand. When this happens, we return a
             // default empty `TreeUpdate`.
@@ -2689,6 +2691,7 @@ impl Window {
     /// the platform window, then notifies observers. Normally called automatically
     /// by the platform's resize callback, but exposed publicly for test infrastructure.
     pub fn bounds_changed(&mut self, cx: &mut App) {
+        self.platform_window.a11y_update_window_bounds();
         self.scale_factor = self.platform_window.scale_factor();
         self.viewport_size = self.platform_window.content_size();
         self.display_id = self.platform_window.display().map(|display| display.id());

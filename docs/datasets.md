@@ -213,3 +213,14 @@ See [publication measurements](../reports/data-publication.md), [native allocati
 Windows Sandbox is not installed on this machine; a fresh Windows VM or clean machine is still needed. The computer-use helper failed after retry and reset, so visual IME composition, selection, scrolling and resizing remain unverified. Headless tests do not establish visual IME behavior.
 
 Controlled OS input-to-present measurement and matched GPUI Shell/QuickJS and GPUIX/Solid workloads remain outstanding. Current measurements establish no ranking against those runtimes.
+
+
+## Chart consumers
+
+`UiChart` shares retained datasets and `UiTableView` with tables. It validates
+label/value/view columns before accepting a snapshot or dataset replacement.
+A dataset referenced by a mounted chart cannot be released. The chart caches its
+bounded projection and reuses it through unchanged snapshots; relevant edits
+recompute it. See [chart limits and omission rules](navigation-and-charts.md#dataset-charts).
+Record IDs supply stable point alternatives, while chart rendering remains bounded
+to at most 512 candidate rows. Filtering/sorting may still examine the full source.

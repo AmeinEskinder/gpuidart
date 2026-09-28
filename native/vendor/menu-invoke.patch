@@ -1,0 +1,16 @@
+--- selection-patched/accesskit_windows-0.34.0/src/node.rs
++++ menu-patched/accesskit_windows-0.34.0/src/node.rs
+@@ -585,6 +585,13 @@
+     }
+ 
+     fn is_invoke_pattern_supported(&self) -> bool {
++        if self.node.role() == Role::MenuItem {
++            // A command menu item's selected state may describe hover/keyboard
++            // highlighting. It still invokes; it is not a SelectionItem here.
++            return self.node.is_clickable(&filter)
++                && !self.node.supports_toggle()
++                && !self.node.supports_expand_collapse();
++        }
+         self.node.is_invocable(&filter)
+     }
+ 

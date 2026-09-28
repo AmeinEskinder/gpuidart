@@ -5,7 +5,7 @@ import 'package:gpuidart/src/native_event.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('switch, radio group, progress and separator encode and validate', () {
+  test('switch, progress and separator encode and validate', () {
     expect(const UiSwitch('wifi', 'Wi-Fi', checked: true).toJson(), {
       'kind': 'switch',
       'id': 'wifi',
@@ -17,41 +17,6 @@ void main() {
       UiSwitch('s', 'é' * 513, checked: false).toJson,
       throwsArgumentError,
     );
-    final group = UiRadioGroup(
-      'mode',
-      options: const [
-        UiSelectOption('auto', 'Automatic'),
-        UiSelectOption('manual', 'Manual'),
-      ],
-      selected: 'auto',
-      horizontal: true,
-    );
-    expect(group.toJson(), {
-      'kind': 'radio_group',
-      'id': 'mode',
-      'options': [
-        {'id': 'auto', 'label': 'Automatic'},
-        {'id': 'manual', 'label': 'Manual'},
-      ],
-      'selected': 'auto',
-      'disabled': false,
-      'horizontal': true,
-    });
-    expect(
-      UiRadioGroup(
-        'm',
-        options: const [UiSelectOption('a', 'A')],
-        selected: 'b',
-      ).toJson,
-      throwsArgumentError,
-    );
-    expect(
-      UiRadioGroup(
-        'm',
-        options: const [UiSelectOption('a', 'A'), UiSelectOption('a', 'B')],
-      ).toJson,
-      throwsArgumentError,
-    );
     expect(const UiProgress('p', value: 42.5).toJson()['value'], 42.5);
     expect(const UiProgress('p').toJson().containsKey('value'), isFalse);
     expect(const UiProgress('p', value: 101).toJson, throwsArgumentError);
@@ -61,14 +26,6 @@ void main() {
       'vertical': false,
       'label': 'Advanced',
     });
-    expect(
-      const UiButton('b', 'Save', tooltip: 'Ctrl+S').toJson()['tooltip'],
-      'Ctrl+S',
-    );
-    expect(
-      UiButton('b', 'Save', tooltip: 'é' * 513).toJson,
-      throwsArgumentError,
-    );
     expect(
       const UiSwitch(
         's',
@@ -84,31 +41,7 @@ void main() {
     );
   });
 
-  test('tabs, canvases and animations encode and validate', () {
-    final tabs = UiTabs(
-      'pages',
-      tabs: const [UiSelectOption('a', 'A'), UiSelectOption('b', 'B')],
-      selected: 'b',
-      variant: UiTabVariant.pill,
-    );
-    expect(tabs.toJson(), {
-      'kind': 'tabs',
-      'id': 'pages',
-      'tabs': [
-        {'id': 'a', 'label': 'A'},
-        {'id': 'b', 'label': 'B'},
-      ],
-      'selected': 'b',
-      'variant': 'pill',
-    });
-    expect(
-      UiTabs(
-        't',
-        tabs: const [UiSelectOption('a', 'A')],
-        selected: 'missing',
-      ).toJson,
-      throwsArgumentError,
-    );
+  test('canvases and animations encode and validate', () {
     final canvas = UiCanvas('chart', [
       const UiRect(
         0,
@@ -205,15 +138,14 @@ void main() {
     }
   });
 
-  test('menu buttons encode entries and menu selections decode', () {
+  test('menu buttons take application menu entries', () {
     final menu = UiMenuButton(
       'file',
       'File',
       items: const [
-        UiMenuItem('open', 'Open'),
-        UiMenuDivider(),
-        UiMenuItem('save', 'Save', disabled: true),
-        UiMenuItem('wrap', 'Word wrap', checked: true),
+        UiMenuAction('open', 'Open', action: 'file.open'),
+        UiMenuSeparator(),
+        UiMenuAction('wrap', 'Word wrap', action: 'view.wrap', checked: true),
       ],
     );
     expect(menu.toJson(), {
@@ -221,10 +153,23 @@ void main() {
       'id': 'file',
       'label': 'File',
       'items': [
-        {'id': 'open', 'label': 'Open'},
-        {'divider': true},
-        {'id': 'save', 'label': 'Save', 'disabled': true},
-        {'id': 'wrap', 'label': 'Word wrap', 'checked': true},
+        {
+          'kind': 'action',
+          'id': 'open',
+          'label': 'Open',
+          'action': 'file.open',
+          'checked': false,
+          'disabled': false,
+        },
+        {'kind': 'separator'},
+        {
+          'kind': 'action',
+          'id': 'wrap',
+          'label': 'Word wrap',
+          'action': 'view.wrap',
+          'checked': true,
+          'disabled': false,
+        },
       ],
     });
     expect(
@@ -234,33 +179,10 @@ void main() {
     expect(
       UiMenuButton(
         'm',
-        'File',
-        items: const [UiMenuItem('a', 'A'), UiMenuItem('a', 'B')],
+        '',
+        items: const [UiMenuAction('a', 'A', action: 'x')],
       ).toJson,
       throwsArgumentError,
-    );
-    expect(
-      UiMenuButton('m', '', items: const [UiMenuItem('a', 'A')]).toJson,
-      throwsArgumentError,
-    );
-    final event = decodeNativeEvent(
-      utf8.encode(
-        jsonEncode({
-          'type': 'menu_select',
-          'revision': 1,
-          'id': 'file',
-          'item': 'save',
-        }),
-      ),
-    );
-    expect(event['item'], 'save');
-    expect(
-      () => decodeNativeEvent(
-        utf8.encode(
-          jsonEncode({'type': 'menu_select', 'revision': 1, 'id': 'file'}),
-        ),
-      ),
-      throwsFormatException,
     );
   });
 

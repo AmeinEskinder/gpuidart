@@ -84,6 +84,12 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         }
         if (value['record'] != null) string('record');
       }
+    case 'row_action':
+      integer('revision', minimum: 1);
+      integer('dataset_revision', minimum: 1);
+      for (final key in ['id', 'dataset', 'record', 'action']) {
+        string(key);
+      }
     case 'action':
       integer('revision', minimum: 1);
       string('name');
@@ -94,14 +100,6 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (value['checked'] is! bool) {
         throw const FormatException('Invalid toggle checked value');
       }
-    case 'radio_change' || 'tab_change':
-      integer('revision', minimum: 1);
-      string('id');
-      string('selected');
-    case 'menu_select':
-      integer('revision', minimum: 1);
-      string('id');
-      string('item');
     case 'list_select':
       integer('revision', minimum: 1);
       string('id');
@@ -125,6 +123,11 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (number is! num || !number.isFinite || number.abs() > 1000000) {
         throw const FormatException('Invalid slider number');
       }
+    case 'tab_change':
+    case 'radio_change':
+      integer('revision', minimum: 1);
+      string('id');
+      string('selected');
     case 'select_change':
       integer('revision', minimum: 1);
       string('id');

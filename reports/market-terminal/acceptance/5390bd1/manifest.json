@@ -1,0 +1,224 @@
+{
+  "source": "5390bd1",
+  "workflow": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478437",
+  "native_profile": "debug",
+  "scope": "Programmatic correctness, not performance, pixels, presentation latency or human screen-reader usability.",
+  "platforms": {
+    "windows": {
+      "jit": {
+        "path": "windows/jit.json",
+        "sha256": "d7d0c9d3aa25a0b1f0b58d07a70570f2b5159ac0abf9d80a6b887df410bb9a8d",
+        "passed": true,
+        "steps": 15
+      },
+      "aot": {
+        "path": "windows/aot.json",
+        "sha256": "0c1c9e2bfa01de72d132cd6f94a2dc5f6679ff9f23a5e0646e030fb23b6afe66",
+        "passed": true,
+        "steps": 15
+      },
+      "reload": {
+        "path": "windows/reload.json",
+        "sha256": "b536a644f27ab8486a3935fa696e8d57244f37adb3839eb996b0b12fe993bbc9",
+        "passed": true,
+        "data_bytes_delta": 0,
+        "theme": "dark",
+        "custom_accent": true
+      }
+    },
+    "linux": {
+      "jit": {
+        "path": "linux/jit.json",
+        "sha256": "c840cecfaff6448df723e73456c68eda41e73304c70a2ca24355b5474645baef",
+        "passed": true,
+        "steps": 15
+      },
+      "aot": {
+        "path": "linux/aot.json",
+        "sha256": "940109257f5c128db16e70d1e26c178c96ed32b095f57c3fbd1b416bc274b7e9",
+        "passed": true,
+        "steps": 15
+      },
+      "reload": {
+        "path": "linux/reload.json",
+        "sha256": "de7afb0fcdbed5561e401091f814bcf0b140d13f28cbcb97f8b760bc7c989a51",
+        "passed": true,
+        "data_bytes_delta": 0,
+        "theme": "dark",
+        "custom_accent": true
+      }
+    },
+    "macos": {
+      "jit": {
+        "path": "macos/jit.json",
+        "sha256": "3814a32771b412bbad327997aaf1f472a413ce5669380039ecce63f214807f68",
+        "passed": true,
+        "steps": 15
+      },
+      "aot": {
+        "path": "macos/aot.json",
+        "sha256": "c44ba06e1b04e4da30447229b38c1a1277aec2cc17e417d339b7d70fd6b70a75",
+        "passed": true,
+        "steps": 15
+      },
+      "reload": {
+        "path": "macos/reload.json",
+        "sha256": "14af653e45887d2ef349089e3413cd3e13a97755a604ae8e6b0334f5063acb7c",
+        "passed": true,
+        "data_bytes_delta": 0,
+        "theme": "dark",
+        "custom_accent": true
+      }
+    }
+  },
+  "gpui_kit_revision": "21622a70efd25219d26aa459164878c4da9e39f8",
+  "vendor_provenance": {
+    "accesskit_atspi_common-0.19.1": {
+      "src/node.rs": "8db3adfa613d74857b9fb0bef9b7e2ba8f8e97e5a6115122aed4bf82aef7152c"
+    },
+    "accesskit_consumer-0.38.0": {
+      "src/node.rs": "79eae090be57e25d7944d36c673e0b511d882ecae464ae3093d5a2bcc4121cab"
+    },
+    "accesskit_unix-0.22.1": {
+      "src/atspi/bus.rs": "266d1c5fbd10aa97b4375997d6bd02170dafbcd4e16bec387a3196ab7cf5adf2"
+    },
+    "accesskit_windows-0.34.0": {
+      "src/node.rs": "8d66311f950f16b6e247f64893dc258ac6b3a84495e62d28046901416c3b9785"
+    },
+    "gpui-pre-0.3.6": {
+      "src/window.rs": "fd437437d11c79204cabeb3ffe81fb993f154b8c88b94215a27ec529be905436"
+    }
+  },
+  "cargo_lock_git_blob_sha256": "53c9cd54322c043b5d9957e7c590441da55444cd8a36ca11aec7173a120800ef",
+  "workflows": {
+    "windows_sdk": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478395",
+    "macos_sdk": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478386",
+    "linux_sdk": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478378",
+    "unix_lifecycle": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478416",
+    "accessibility": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478437"
+  },
+  "publication_smokes": {
+    "windows": {
+      "source": "local Windows checkout at 5390bd1 with evidence/tool-only changes",
+      "native_profile": "debug",
+      "native_library_sha256": "9f151b1f314088a746bdd8690a58fe49308cabe8ea403b95a1686a9979bae8ce",
+      "command": "tool/capture_publication_trace.dart, JIT and compiled AOT",
+      "jit": {
+        "passed": true,
+        "rows": 100000,
+        "cell_updates": 30,
+        "snapshot_updates": 30,
+        "capture_complete": true,
+        "trace_records": 982,
+        "data_records_checked": 30,
+        "data_bytes": 4584,
+        "trace": {
+          "path": "smokes/windows/jit-trace.json",
+          "sha256": "b3fb03a518d0ccc3430bd6307a5d4eddf67e410180a8b031aa2e21b5c1c82192"
+        },
+        "log": {
+          "path": "smokes/windows/jit.log",
+          "sha256": "0d63acf417b89a64be17b90ffd8cadb73f85f0165a9bc5687f1f3ba12a4dca7c"
+        }
+      },
+      "aot": {
+        "passed": true,
+        "rows": 100000,
+        "cell_updates": 30,
+        "snapshot_updates": 30,
+        "capture_complete": true,
+        "trace_records": 979,
+        "data_records_checked": 30,
+        "data_bytes": 4584,
+        "trace": {
+          "path": "smokes/windows/aot-trace.json",
+          "sha256": "4d53df287a31588941906f66026338892d4a200618662c952dac53d5f7b11401"
+        },
+        "log": {
+          "path": "smokes/windows/aot.log",
+          "sha256": "99a9ab9e38c6b52afbc0f8442bc367828b56f4bf049bf7cef63e138b7f1374b9"
+        }
+      }
+    },
+    "macos": {
+      "source": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478386",
+      "native_profile": "debug",
+      "jit": {
+        "passed": true,
+        "rows": 100000,
+        "cell_updates": 30,
+        "snapshot_updates": 30,
+        "capture_complete": true,
+        "trace_records": 987,
+        "data_records_checked": 30,
+        "data_bytes": 4584,
+        "trace": {
+          "path": "smokes/macos/jit-trace.json",
+          "sha256": "1c6f8ed178f5e15c48aec09c8a9a94d809ef9899d6b421c6481d500aec42661f"
+        },
+        "log": {
+          "path": "smokes/macos/jit.log",
+          "sha256": "a38ec320f386e60f81be4f67fc6e12d6dd559503387c0a076f195c8bcdf7784f"
+        }
+      },
+      "aot": {
+        "passed": true,
+        "rows": 100000,
+        "cell_updates": 30,
+        "snapshot_updates": 30,
+        "capture_complete": true,
+        "trace_records": 985,
+        "data_records_checked": 30,
+        "data_bytes": 4584,
+        "trace": {
+          "path": "smokes/macos/aot-trace.json",
+          "sha256": "366f4dbffdd95f4b384d9b182cbf6c2fa2e3ff0d3affb75a55c46e0b0007d6db"
+        },
+        "log": {
+          "path": "smokes/macos/aot.log",
+          "sha256": "cf6ed99437c9dd694e68b8c03541706b7b5f5f6a1d2d6fdabd69672d087cb0b7"
+        }
+      }
+    },
+    "linux": {
+      "source": "https://github.com/AmeinEskinder/gpuidart/actions/runs/36285478378",
+      "native_profile": "debug",
+      "jit": {
+        "passed": true,
+        "rows": 100000,
+        "cell_updates": 30,
+        "snapshot_updates": 30,
+        "capture_complete": true,
+        "trace_records": 984,
+        "data_records_checked": 30,
+        "data_bytes": 4584,
+        "trace": {
+          "path": "smokes/linux/jit-trace.json",
+          "sha256": "6aba1b5d5181ca4da4ab2e68f46b86827affa179e161826fc907680f093984fd"
+        },
+        "log": {
+          "path": "smokes/linux/jit.log",
+          "sha256": "7f200900f18f5c197e44923e6325fcfec4b68f8cf3b7c162f6800917105eb7c6"
+        }
+      },
+      "aot": {
+        "passed": true,
+        "rows": 100000,
+        "cell_updates": 30,
+        "snapshot_updates": 30,
+        "capture_complete": true,
+        "trace_records": 982,
+        "data_records_checked": 30,
+        "data_bytes": 4584,
+        "trace": {
+          "path": "smokes/linux/aot-trace.json",
+          "sha256": "0b62b96e4b7a29e88295072f0c4c35da19b807f1861db6da6f24259e69140d2d"
+        },
+        "log": {
+          "path": "smokes/linux/aot.log",
+          "sha256": "a3acd94a57473557bd8d3166b216b5a4a04e446fae7c99ddd216b9218e3ddd31"
+        }
+      }
+    }
+  }
+}

@@ -85,6 +85,11 @@ impl Initial {
             upload.data.validate()?;
         }
         validate_references(&self.snapshot, |id| ids.contains(id))?;
+        validate_context_menus(&self.snapshot, |id| {
+            self.datasets
+                .iter()
+                .any(|u| u.id == id && u.data.ids.is_some())
+        })?;
         validate_views(&self.snapshot, |id| {
             self.datasets
                 .iter()
@@ -142,46 +147,55 @@ pub fn validate_views(
 ) -> Result<(), String> {
     let mut error = None;
     snapshot.root.visit(&mut |node| {
-        if let Node::List {
-            dataset,
-            column,
-            view,
-            ..
-        } = node
-        {
-            let width = columns(dataset).unwrap_or(0);
-            let over = (*column >= width).then_some(*column).or_else(|| {
-                view.as_ref().and_then(|view| {
-                    view.referenced_columns()
-                        .into_iter()
-                        .find(|column| *column >= width)
-                })
-            });
-            if let Some(column) = over {
-                error = Some(format!(
-                    "List references column {column} beyond the {width} columns of {dataset}"
-                ));
-            }
+        let (dataset, view, axes) = match node {
+            Node::Table { dataset, view, .. } => (dataset, view.as_ref(), Vec::new()),
+            Node::List {
+                dataset,
+                column,
+                view,
+                ..
+            } => (dataset, view.as_ref(), vec![*column]),
+            Node::Chart { chart, .. } => (
+                &chart.dataset,
+                chart.view.as_ref(),
+                vec![chart.label_column, chart.value_column],
+            ),
+            _ => return,
+        };
+        let width = columns(dataset).unwrap_or(0);
+        let mut referenced = axes;
+        if let Some(view) = view {
+            referenced.extend(view.referenced_columns());
         }
-        if let Node::Table {
-            dataset,
-            view: Some(view),
-            ..
-        } = node
-        {
-            let width = columns(dataset).unwrap_or(0);
-            let column = view
-                .referenced_columns()
-                .into_iter()
-                .find(|column| *column >= width);
-            if let Some(column) = column {
-                error = Some(format!(
-                    "Table view references column {column} beyond dataset {dataset}'s {width} columns"
-                ));
-            }
+        if let Some(column) = referenced.iter().find(|column| **column >= width) {
+            error = Some(format!(
+                "View references column {column} beyond dataset {dataset}'s {width} columns"
+            ));
         }
     });
     error.map_or(Ok(()), Err)
+}
+
+pub fn validate_context_menus(
+    snapshot: &Snapshot,
+    has_ids: impl Fn(&str) -> bool,
+) -> Result<(), String> {
+    let mut missing = None;
+    snapshot.root.visit(&mut |node| {
+        if let Node::Table {
+            dataset,
+            context_menu,
+            ..
+        } = node
+        {
+            if !context_menu.is_empty() && !has_ids(dataset) {
+                missing = Some(dataset.clone());
+            }
+        }
+    });
+    missing.map_or(Ok(()), |id| {
+        Err(format!("Row context menus require stable record IDs: {id}"))
+    })
 }
 
 pub fn validate_references(
@@ -190,9 +204,9 @@ pub fn validate_references(
 ) -> Result<(), String> {
     let mut missing = None;
     snapshot.root.visit(&mut |node| {
-        if let Node::Table { dataset, .. } | Node::List { dataset, .. } = node {
+        if let Some(dataset) = node.dataset() {
             if !contains(dataset) {
-                missing = Some(dataset.clone());
+                missing = Some(dataset.to_owned());
             }
         }
     });
@@ -275,6 +289,8 @@ impl Update {
 }
 
 pub struct Dataset {
+    /// The replacement revision. Cell/row edits preserve this generation.
+    pub generation: u64,
     pub id: String,
     pub revision: u64,
     pub data: TableData,
@@ -304,6 +320,7 @@ impl Store {
                 Rc::new(RefCell::new(Dataset {
                     id: upload.id,
                     revision: upload.revision,
+                    generation: upload.revision,
                     data: upload.data,
                 })),
             );
@@ -332,6 +349,7 @@ impl Store {
                 };
                 if let Some(current) = current {
                     let mut current = current.borrow_mut();
+                    current.generation = update.revision;
                     current.data = data;
                     current.revision = update.revision;
                 } else {
@@ -341,6 +359,7 @@ impl Store {
                         Rc::new(RefCell::new(Dataset {
                             id: update.id,
                             revision: update.revision,
+                            generation: update.revision,
                             data,
                         })),
                     );

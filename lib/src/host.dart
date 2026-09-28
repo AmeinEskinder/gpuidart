@@ -7,6 +7,8 @@ import 'dart:isolate';
 import 'package:ffi/ffi.dart';
 
 import 'actions.dart';
+import 'theme.dart';
+import 'menus.dart';
 import 'format.dart';
 import 'nodes.dart';
 import 'input_state.dart';
@@ -27,9 +29,17 @@ final _jsonUtf8 = JsonUtf8Encoder();
 
 /// A queued publication: the tree native will hold once it applies.
 final class _Publication {
-  const _Publication(this.described, this.actions, {required this.viaOps});
+  const _Publication(
+    this.described,
+    this.actions,
+    this.theme,
+    this.menus, {
+    required this.viaOps,
+  });
   final DescribedNode described;
   final List<UiAction> actions;
+  final UiTheme? theme;
+  final List<UiMenu> menus;
   final bool viaOps;
 }
 
@@ -197,11 +207,8 @@ final class GpuiEvent {
   /// Requested slider value, only present on `slider_change` events.
   double? get number => (data['number'] as num?)?.toDouble();
 
-  /// Requested option ID on `select_change`; null means no selection.
+  /// Requested option ID on `select_change` or `tab_change` / `radio_change`; null means no selection.
   String? get selected => data['selected'] as String?;
-
-  /// The chosen menu item ID on `menu_select`.
-  String? get item => data['item'] as String?;
 
   /// Whether the user confirmed a `dialog_result`; false means cancelled.
   bool? get confirmed => data['confirmed'] as bool?;
@@ -233,6 +240,17 @@ final class GpuiEvent {
         )
       : null;
 
+  /// A context-menu action bound to a stable dataset record.
+  RowActionEvent? get rowAction => type == 'row_action'
+      ? RowActionEvent._(
+          data['id'] as String,
+          data['dataset'] as String,
+          data['dataset_revision'] as int,
+          data['record'] as String,
+          data['action'] as String,
+        )
+      : null;
+
   /// A matched action binding. Native never executes commands; the
   /// application decides what [ActionEvent.name] means.
   ActionEvent? get action => type == 'action'
@@ -244,6 +262,21 @@ final class GpuiEvent {
       : null;
   @override
   String toString() => jsonEncode(data);
+}
+
+final class RowActionEvent {
+  const RowActionEvent._(
+    this.table,
+    this.dataset,
+    this.datasetRevision,
+    this.record,
+    this.action,
+  );
+  final String table;
+  final String dataset;
+  final int datasetRevision;
+  final String record;
+  final String action;
 }
 
 /// A matched key binding from the snapshot's `actions` list.
@@ -313,6 +346,8 @@ final class GpuiHost {
   final _dataTimers = <int, Stopwatch>{};
   final metrics = HostMetrics();
   UiNode Function()? _builder;
+  UiTheme Function()? _themeBuilder;
+  List<UiMenu> Function()? _menusBuilder;
   int _request = 0;
   late final NativeCallable<_EventNative> _callback;
   late final Pointer<Void> _handle;
@@ -339,6 +374,8 @@ final class GpuiHost {
     String? libraryPath,
     List<TableDataset> datasets = const [],
     List<UiAction> actions = const [],
+    UiTheme Function()? theme,
+    List<UiMenu> Function()? menus,
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
@@ -356,6 +393,8 @@ final class GpuiHost {
       libraryPath: libraryPath,
       datasets: datasets,
       actions: actions,
+      theme: theme?.call(),
+      menus: menus?.call() ?? const [],
       window: window,
       requestTimeout: requestTimeout,
       shutdownTimeout: shutdownTimeout,
@@ -363,6 +402,8 @@ final class GpuiHost {
       deferDatasets: deferDatasets,
     );
     host._builder = builder;
+    host._themeBuilder = theme;
+    host._menusBuilder = menus;
     host._viewActions = List.unmodifiable(actions);
     host.metrics.descriptionBuilds = 1;
     HostMetrics.sample(host.metrics.buildMicroseconds, elapsed);
@@ -384,7 +425,12 @@ final class GpuiHost {
             builder,
           );
     HostMetrics.sample(metrics.buildMicroseconds, timer.elapsedMicroseconds);
-    return publish(root, actions: _viewActions);
+    return publish(
+      root,
+      actions: _viewActions,
+      theme: _themeBuilder?.call(),
+      menus: _menusBuilder?.call() ?? const [],
+    );
   }
 
   static Future<GpuiHost> open(
@@ -392,6 +438,8 @@ final class GpuiHost {
     String? libraryPath,
     List<TableDataset> datasets = const [],
     List<UiAction> actions = const [],
+    UiTheme? theme,
+    List<UiMenu> menus = const [],
     GpuiWindowOptions window = const GpuiWindowOptions(),
     Duration requestTimeout = const Duration(seconds: 30),
     Duration shutdownTimeout = const Duration(seconds: 10),
@@ -434,6 +482,8 @@ final class GpuiHost {
       'snapshot': {
         'revision': 1,
         'root': described.json,
+        if (theme != null) 'theme': theme.toJson(),
+        if (menus.isNotEmpty) 'menus': encodeMenus(menus),
         if (actions.isNotEmpty)
           'actions': actions.map((action) => action.toJson()).toList(),
       },
@@ -644,8 +694,12 @@ final class GpuiHost {
   /// Actions are declared per snapshot like the node tree: [actions] replaces
   /// the bindings, and omitting it clears them. [openView] rebuilds redeclare
   /// the actions passed to [openView].
-  Future<void> publish(UiNode root, {List<UiAction> actions = const []}) =>
-      _main.publish(root, actions: actions);
+  Future<void> publish(
+    UiNode root, {
+    List<UiAction> actions = const [],
+    UiTheme? theme,
+    List<UiMenu> menus = const [],
+  }) => _main.publish(root, actions: actions, theme: theme, menus: menus);
 
   /// Opens a secondary window with its own description and datasets. See
   /// docs/windows.md. Completes once native has opened the window; a
@@ -963,13 +1017,13 @@ final class GpuiHost {
           event.type == 'input' ||
           event.type == 'action' ||
           event.type == 'table_selection' ||
+          event.type == 'row_action' ||
           event.type == 'checkbox_change' ||
           event.type == 'slider_change' ||
           event.type == 'select_change' ||
           event.type == 'switch_change' ||
           event.type == 'radio_change' ||
           event.type == 'tab_change' ||
-          event.type == 'menu_select' ||
           event.type == 'list_select' ||
           event.type == 'dialog_result') {
         metrics.uiCallbacks++;
@@ -1177,7 +1231,12 @@ final class _View {
   /// Tracing covers the main window only.
   GpuiTrace? get trace => window == 0 ? host._trace : null;
 
-  Future<void> publish(UiNode root, {List<UiAction> actions = const []}) {
+  Future<void> publish(
+    UiNode root, {
+    List<UiAction> actions = const [],
+    UiTheme? theme,
+    List<UiMenu> menus = const [],
+  }) {
     if (host._closing || host._closed.isCompleted) {
       throw StateError('Host is closing');
     }
@@ -1222,7 +1281,14 @@ final class _View {
               () => diffDescribed(baseline, described),
             );
       this.baseline = null;
-      status = _submitDescription(revision, described, actions, ops: ops);
+      status = _submitDescription(
+        revision,
+        described,
+        actions,
+        theme,
+        menus,
+        ops: ops,
+      );
       if (status != 0) {
         throw StateError('Native snapshot submission failed: $status');
       }
@@ -1241,7 +1307,9 @@ final class _View {
   int _submitDescription(
     int revision,
     DescribedNode described,
-    List<UiAction> actions, {
+    List<UiAction> actions,
+    UiTheme? theme,
+    List<UiMenu> menus, {
     required List<Map<String, Object?>>? ops,
   }) {
     final bindings = host._bindings;
@@ -1254,6 +1322,8 @@ final class _View {
         'ops': ?ops,
         if (actions.isNotEmpty)
           'actions': actions.map((action) => action.toJson()).toList(),
+        if (theme != null) 'theme': theme.toJson(),
+        if (menus.isNotEmpty) 'menus': encodeMenus(menus),
       },
       'snapshot',
       revision,
@@ -1271,6 +1341,8 @@ final class _View {
       inFlight[revision] = _Publication(
         described,
         actions,
+        theme,
+        menus,
         viaOps: ops != null,
       );
     }
@@ -1317,6 +1389,8 @@ final class _View {
         revision,
         latest.described,
         latest.actions,
+        latest.theme,
+        latest.menus,
         ops: null,
       );
       if (status != 0) {
@@ -1403,9 +1477,14 @@ final class GpuiWindow {
   }
 
   /// Publishes to this window with the same rules as [GpuiHost.publish].
-  Future<void> publish(UiNode root, {List<UiAction> actions = const []}) {
+  Future<void> publish(
+    UiNode root, {
+    List<UiAction> actions = const [],
+    UiTheme? theme,
+    List<UiMenu> menus = const [],
+  }) {
     _checkOpen();
-    return _view.publish(root, actions: actions);
+    return _view.publish(root, actions: actions, theme: theme, menus: menus);
   }
 
   /// Native inspection addressed to this window; see [GpuiHost.diagnose].

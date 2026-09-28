@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'style.dart';
+import 'menus.dart';
 import 'semantics.dart';
 import 'table_view.dart';
+
+part 'charts.dart';
 
 sealed class UiNode {
   const UiNode(this.id, {this.style, this.semantics});
@@ -133,22 +136,26 @@ final class UiText extends UiNode {
   };
 }
 
+/// A native button. [tooltip] supplies hover help and its accessible description.
 final class UiButton extends UiNode {
   const UiButton(
     super.id,
     this.label, {
-    this.tooltip = '',
+    this.tooltip,
     super.style,
     super.semantics,
   });
   final String label;
-
-  /// Native hover text, at most 1024 UTF-8 bytes; empty shows none.
-  final String tooltip;
+  final String? tooltip;
   @override
   Map<String, Object> props() {
-    if (utf8.encode(tooltip).length > 1024) {
-      throw ArgumentError.value(tooltip, 'tooltip', 'Maximum 1024 UTF-8 bytes');
+    if (tooltip != null &&
+        (tooltip!.isEmpty || utf8.encode(tooltip!).length > 1024)) {
+      throw ArgumentError.value(
+        tooltip,
+        'tooltip',
+        'Requires 1..1024 UTF-8 bytes',
+      );
     }
     return {
       'kind': 'button',
@@ -156,7 +163,7 @@ final class UiButton extends UiNode {
       if (semantics != null) 'semantics': semantics!.toJson('button'),
       if (style != null) 'style': style!.toJson(),
       'label': label,
-      if (tooltip.isNotEmpty) 'tooltip': tooltip,
+      'tooltip': ?tooltip,
     };
   }
 }
@@ -189,40 +196,6 @@ final class UiSwitch extends UiNode {
       'label': label,
       'checked': checked,
       'disabled': disabled,
-    };
-  }
-}
-
-/// One choice among options. Publish `radio_change` event.selected to accept
-/// it; the group shows the pick at once. Options follow [UiSelectOption]'s
-/// identity and label bounds.
-final class UiRadioGroup extends UiNode {
-  UiRadioGroup(
-    super.id, {
-    required List<UiSelectOption> options,
-    this.selected,
-    this.disabled = false,
-    this.horizontal = false,
-    super.style,
-    super.semantics,
-  }) : options = List.unmodifiable(options);
-  final List<UiSelectOption> options;
-  final String? selected;
-  final bool disabled;
-  final bool horizontal;
-
-  @override
-  Map<String, Object> props() {
-    _validateOptions(options, selected);
-    return {
-      'kind': 'radio_group',
-      'id': id,
-      if (semantics != null) 'semantics': semantics!.toJson('radio_group'),
-      if (style != null) 'style': style!.toJson(),
-      'options': options.map((o) => o.toJson()).toList(),
-      'selected': ?selected,
-      'disabled': disabled,
-      'horizontal': horizontal,
     };
   }
 }
@@ -326,51 +299,9 @@ final class UiList extends UiNode {
   }
 }
 
-/// One entry of a [UiMenuButton] menu.
-sealed class UiMenuEntry {
-  const UiMenuEntry();
-  Map<String, Object> toJson();
-}
-
-final class UiMenuItem extends UiMenuEntry {
-  const UiMenuItem(
-    this.id,
-    this.label, {
-    this.disabled = false,
-    this.checked = false,
-  });
-  final String id;
-  final String label;
-  final bool disabled;
-  final bool checked;
-
-  @override
-  Map<String, Object> toJson() {
-    if (id.isEmpty ||
-        utf8.encode(id).length > 256 ||
-        label.isEmpty ||
-        utf8.encode(label).length > 1024) {
-      throw ArgumentError(
-        'Menu items need an ID of 1..256 and a label of 1..1024 UTF-8 bytes',
-      );
-    }
-    return {
-      'id': id,
-      'label': label,
-      if (disabled) 'disabled': true,
-      if (checked) 'checked': true,
-    };
-  }
-}
-
-final class UiMenuDivider extends UiMenuEntry {
-  const UiMenuDivider();
-  @override
-  Map<String, Object> toJson() => const {'divider': true};
-}
-
-/// A button that opens a native popup menu. `menu_select` carries the chosen
-/// item ID in [GpuiEvent.item]. One to 64 entries with unique item IDs.
+/// A button that opens a native popup menu of [UiMenuEntry] items, the same
+/// entries application menus take. Choosing an action entry emits its global
+/// action on the event channel, like a menu bar item.
 final class UiMenuButton extends UiNode {
   UiMenuButton(
     super.id,
@@ -387,15 +318,7 @@ final class UiMenuButton extends UiNode {
     if (label.isEmpty || utf8.encode(label).length > 1024) {
       throw ArgumentError.value(label, 'label', '1..1024 UTF-8 bytes');
     }
-    if (items.isEmpty || items.length > 64) {
-      throw ArgumentError('Menu buttons carry 1..64 items');
-    }
-    final ids = <String>{};
-    for (final item in items.whereType<UiMenuItem>()) {
-      if (!ids.add(item.id)) {
-        throw ArgumentError.value(item.id, 'id', 'Duplicate menu item');
-      }
-    }
+    validateMenuEntries(items);
     return {
       'kind': 'menu_button',
       'id': id,
@@ -403,45 +326,6 @@ final class UiMenuButton extends UiNode {
       if (style != null) 'style': style!.toJson(),
       'label': label,
       'items': items.map((item) => item.toJson()).toList(),
-    };
-  }
-}
-
-enum UiTabVariant {
-  underline('underline'),
-  pill('pill'),
-  segmented('segmented');
-
-  const UiTabVariant(this.wire);
-  final String wire;
-}
-
-/// A tab strip. Publish `tab_change` event.selected to accept a choice; the
-/// strip shows the pick at once. Tabs follow [UiSelectOption]'s bounds.
-final class UiTabs extends UiNode {
-  UiTabs(
-    super.id, {
-    required List<UiSelectOption> tabs,
-    required this.selected,
-    this.variant = UiTabVariant.underline,
-    super.style,
-    super.semantics,
-  }) : tabs = List.unmodifiable(tabs);
-  final List<UiSelectOption> tabs;
-  final String selected;
-  final UiTabVariant variant;
-
-  @override
-  Map<String, Object> props() {
-    _validateOptions(tabs, selected);
-    return {
-      'kind': 'tabs',
-      'id': id,
-      if (semantics != null) 'semantics': semantics!.toJson('tabs'),
-      if (style != null) 'style': style!.toJson(),
-      'tabs': tabs.map((tab) => tab.toJson()).toList(),
-      'selected': selected,
-      if (variant != UiTabVariant.underline) 'variant': variant.wire,
     };
   }
 }
@@ -614,25 +498,6 @@ final class UiPolyline extends UiDraw {
       if (fill != null) 'fill': fill!.toJson(),
       if (close) 'close': true,
     };
-  }
-}
-
-void _validateOptions(List<UiSelectOption> options, String? selected) {
-  if (options.isEmpty || options.length > 256) {
-    throw ArgumentError('Options require 1..256 entries');
-  }
-  final ids = <String>{};
-  for (final option in options) {
-    if (option.id.isEmpty ||
-        utf8.encode(option.id).length > 256 ||
-        !ids.add(option.id) ||
-        option.label.isEmpty ||
-        utf8.encode(option.label).length > 1024) {
-      throw ArgumentError('Invalid or duplicate option');
-    }
-  }
-  if (selected != null && !ids.contains(selected)) {
-    throw ArgumentError.value(selected, 'selected', 'Not an option ID');
   }
 }
 
@@ -863,11 +728,15 @@ final class UiTable extends UiNode {
     super.semantics,
     required this.dataset,
     this.view,
+    this.contextMenu = const [],
   });
   final String dataset;
 
   /// Presentation-only sort/filter view over the dataset.
   final UiTableView? view;
+
+  /// Row commands require dataset record IDs. Right-click or Shift+F10 opens.
+  final List<UiMenuEntry> contextMenu;
   @override
   Map<String, Object> props() => {
     'kind': 'table',
@@ -876,5 +745,102 @@ final class UiTable extends UiNode {
     if (style != null) 'style': style!.toJson(),
     'dataset': dataset,
     if (view != null) 'view': view!.toJson(),
+    if (contextMenu.isNotEmpty) 'context_menu': _encodeContextMenu(contextMenu),
   };
+}
+
+/// A stable choice identity with a separate display label and enabled state.
+final class UiChoiceOption {
+  const UiChoiceOption(this.id, this.label, {this.disabled = false});
+  final String id;
+  final String label;
+  final bool disabled;
+  Map<String, Object> toJson() => {
+    'id': id,
+    'label': label,
+    'disabled': disabled,
+  };
+}
+
+void _validateChoices(List<UiChoiceOption> options, String selected) {
+  if (options.isEmpty || options.length > 32) {
+    throw ArgumentError('Choice groups require 1..32 options');
+  }
+  final ids = <String>{};
+  for (final option in options) {
+    if (option.id.isEmpty ||
+        utf8.encode(option.id).length > 256 ||
+        !ids.add(option.id) ||
+        option.label.isEmpty ||
+        utf8.encode(option.label).length > 1024) {
+      throw ArgumentError('Invalid or duplicate choice option');
+    }
+  }
+  if (!options.any((o) => o.id == selected && !o.disabled)) {
+    throw ArgumentError('Selected choice must be an enabled option');
+  }
+}
+
+/// A tab strip. The application publishes the active page as a separate node.
+/// Arrows/Home/End move focus; Enter/Space activate. Publish the requested
+/// `tab_change` event.selected to accept a choice. Only one tab is a tab stop.
+final class UiTabs extends UiNode {
+  UiTabs(
+    super.id, {
+    required List<UiChoiceOption> options,
+    required this.selected,
+    this.disabled = false,
+    super.style,
+    super.semantics,
+  }) : options = List.unmodifiable(options);
+  final List<UiChoiceOption> options;
+  final String selected;
+  final bool disabled;
+  @override
+  Map<String, Object> props() {
+    _validateChoices(options, selected);
+    return {
+      'kind': 'tabs',
+      'id': id,
+      'options': options.map((o) => o.toJson()).toList(),
+      'selected': selected,
+      'disabled': disabled,
+      if (style != null) 'style': style!.toJson(),
+      if (semantics != null) 'semantics': semantics!.toJson('tabs'),
+    };
+  }
+}
+
+/// A controlled radio group. Arrows/Home/End move focus and request selection.
+/// Space selects the focused option. Publish radio_change event.selected to accept.
+final class UiRadioGroup extends UiNode {
+  UiRadioGroup(
+    super.id, {
+    required List<UiChoiceOption> options,
+    required this.selected,
+    this.disabled = false,
+    super.style,
+    super.semantics,
+  }) : options = List.unmodifiable(options);
+  final List<UiChoiceOption> options;
+  final String selected;
+  final bool disabled;
+  @override
+  Map<String, Object> props() {
+    _validateChoices(options, selected);
+    return {
+      'kind': 'radio_group',
+      'id': id,
+      'options': options.map((o) => o.toJson()).toList(),
+      'selected': selected,
+      'disabled': disabled,
+      if (style != null) 'style': style!.toJson(),
+      if (semantics != null) 'semantics': semantics!.toJson('radio_group'),
+    };
+  }
+}
+
+List<Map<String, Object>> _encodeContextMenu(List<UiMenuEntry> entries) {
+  validateMenuEntries(entries);
+  return entries.map((entry) => entry.toJson()).toList();
 }
