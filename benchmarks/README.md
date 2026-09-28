@@ -1,17 +1,17 @@
-# Four implementation comparison
+# Implementation comparison
 
 The production GPUI-Dart adapter is unchanged. These fixtures use its existing whole-view snapshots and dataset API.
 
 ## Build
 
-From the repository root, with the existing Rust/MSVC, Dart and Bun toolchains:
+From the repository root, with the existing Rust/MSVC, Dart and Bun toolchains, plus the Flutter SDK and Visual Studio 2022 Build Tools with the C++ workload for the Flutter fixture (`-NoFlutter` skips it):
 
 ```powershell
 ./benchmarks/build.ps1
 ./benchmarks/install-presentmon.ps1
 ```
 
-The native reference uses Rust state and GPUI Kit controls directly. Shell uses QuickJS, its stock component host for buttons, and `uniform_list` for table rows. Solid uses the published `@gpuix/solid` and native addon, both 0.10.0. Dart is compiled to an AOT executable. Pins, build descriptions, lockfile hashes and payload hashes are in [artifacts.json](../reports/comparison/artifacts.json).
+The native reference uses Rust state and GPUI Kit controls directly. Shell uses QuickJS, its stock component host for buttons, and `uniform_list` for table rows. Solid uses the published `@gpuix/solid` and native addon, both 0.10.0. Dart is compiled to an AOT executable. Flutter is a stock Windows desktop application: a `ListView.builder` with a fixed item extent over the same records, Material tonal buttons, `setState` on the page for the update workloads, and a release build with the engine DLL and AOT data directory beside the executable. Pins, build descriptions, lockfile hashes and payload hashes are in [artifacts.json](../reports/comparison/artifacts.json).
 
 The Shell component `DataTable` is unsuitable for this fixture at the pinned revision: its data callback exceeds the host's 4,096-value/1,024-object-key limits. Its default columns are also 100 pixels, with no exposed width setter. The virtual-list fixture avoids modifying those host limits. It is a different widget implementation from GPUI Kit's DataTable; results must retain that qualification. Shell's `check` command also panics on this virtual-list fixture because it materializes outside a rendering view. The live window checks pass.
 
@@ -23,9 +23,9 @@ The Shell component `DataTable` is unsuitable for this fixture at the pinned rev
 ./benchmarks/test-analysis.ps1
 ```
 
-Background checks post window messages to the application's own HWND. They verify edits, scrolling and the native window's rendered image through `PrintWindow`. They do not measure physical input or display presentation. The analyzer excludes them from performance results.
+Background checks post window messages to the window that owns the pixels under the target point (Flutter hosts its content in a child view; the GPUI fixtures have none). They verify edits, scrolling and the native window's rendered image through `PrintWindow`. They do not measure physical input or display presentation. The analyzer excludes them from performance results. Flutter's embedder reads the wheel position from the real cursor rather than from the message, so its background scroll check cannot pass; its scroll workload is verified by the foreground runner only.
 
-Each fixture has 100,000 identical records, three 200-pixel columns, 32-pixel rows, a 320-pixel table viewport, 16-pixel text and an 860 × 650 logical-pixel client area. Captures on this machine are 1075 × 812 physical pixels at 125% scaling. The Dart benchmark selects per-monitor DPI awareness before starting GPUI; without that startup setting, Windows bitmap scaling makes its render resolution different. This setup is confined to the benchmark entry point. All fixtures construct only rows near the viewport; Solid retains a window of 32 row components. GPUI Kit adds selection, column controls and a scrollbar that the two list fixtures do not reproduce. Header separators and rounding also differ slightly.
+Each fixture has 100,000 identical records, three 200-pixel columns, 32-pixel rows, a 320-pixel table viewport, 16-pixel text and an 860 × 650 logical-pixel client area. Captures on this machine are 1075 × 812 physical pixels at 125% scaling. The Dart benchmark selects per-monitor DPI awareness before starting GPUI; without that startup setting, Windows bitmap scaling makes its render resolution different. This setup is confined to the benchmark entry point. All fixtures construct only rows near the viewport; Solid retains a window of 32 row components, and Flutter builds rows inside its cache extent (the viewport plus 250 logical pixels on each side) and rebuilds the visible ones on every `setState`. The Flutter runner declares per-monitor DPI awareness in its manifest. GPUI Kit adds selection, column controls and a scrollbar that the two list fixtures do not reproduce. Header separators and rounding also differ slightly.
 
 The workloads run in fresh processes after a three-second warmup:
 
@@ -36,7 +36,7 @@ The workloads run in fresh processes after a three-second warmup:
 | Cell | 5 clicks/second, each changes row 0's price |
 | Burst | 30 clicks/second, each changes prices in visible rows 0–7 |
 
-GPUIX's wheel input uses 60 pixels for a -120 wheel delta on this machine; Kit/Shell use 78. The runner uses -156 for GPUIX and -120 for the other fixtures. Recheck calibration after changing display, OS scrolling settings or dependencies. The driver waits on a high resolution waitable timer and places the pointer over the target before measuring input. Late driver deadlines are counted and skipped, and every injected click must match the application's update count. These are **missed input deadlines**, not missed display frames.
+GPUIX moves 60 logical pixels for a -120 wheel delta on this machine and Flutter moves 80 (linear in the delta, measured with [calibrate-wheel.ps1](calibrate-wheel.ps1) at 60 events per second); Kit/Shell move 78. The runner uses -156 for GPUIX, -117 for Flutter and -120 for the other fixtures, so every fixture moves 78 logical pixels per event. Recheck calibration after changing display, OS scrolling settings or dependencies. The driver waits on a high resolution waitable timer and places the pointer over the target before measuring input. Late driver deadlines are counted and skipped, and every injected click must match the application's update count. These are **missed input deadlines**, not missed display frames.
 
 ## Capture foreground measurements
 
@@ -68,7 +68,7 @@ To compare Dart with the JavaScript fixtures in three rotated orders:
 ./benchmarks/summarize-pair.ps1 -RunPrefix dart-js -Repetitions 3 -Implementations dart,solid,shell
 ```
 
-The summary defaults to Rust/Dart and accepts an explicit implementation list. It retains all attempts, keeps publication/drawing percentiles per run, and summarizes process CPU and memory across completed runs. Solid's overlay and Shell's build counters remain separate from Dart's native diagnostics. After an interruption, use a fresh run ID such as `paired-1-retry1` for that case. The runner refuses to reuse an attempt with a result or failure record. The summary includes retry directories alongside the original failure. The schedule uses an integer slot count to prevent input at or beyond the requested interval boundary.
+The same pair of commands with `-Implementations dart,flutter` and a `dart-flutter` run ID compares the SDK with a Flutter Windows application built on the same machine. The summary defaults to Rust/Dart and accepts an explicit implementation list. It retains all attempts, keeps publication/drawing percentiles per run, and summarizes process CPU and memory across completed runs. Solid's overlay and Shell's build counters remain separate from Dart's native diagnostics. After an interruption, use a fresh run ID such as `paired-1-retry1` for that case. The runner refuses to reuse an attempt with a result or failure record. The summary includes retry directories alongside the original failure. The schedule uses an integer slot count to prevent input at or beyond the requested interval boundary.
 
 If Windows denies programmatic foreground activation, the runner temporarily exposes its own window, verifies the activation point belongs to that window, clicks an empty area, and restores ordinary window ordering before warmup. Activation clicks are recorded separately from workload input.
 
@@ -103,7 +103,7 @@ To check a copied runtime package with an unrelated working directory and a Wind
 ./benchmarks/run.ps1 -Implementation dart -Workload cell -Seconds 2 -RunId package-check -BackgroundSmoke -Packaged
 ```
 
-Repeat for `rust`, `shell`, and `solid`. This remains a development-machine check, not a clean-machine test.
+Repeat for `rust`, `shell`, `solid` and `flutter`. This remains a development-machine check, not a clean-machine test.
 
 Before ranking implementations, inspect screenshots, wheel displacement, input counts and machine load. Keep incorrect-work and unequal-cadence observations in the reliability report, and exclude them from the equal-work timing subset. Run the fixtures serially. Record display mode, power mode and graphics driver versions with the captures; [environment.json](../reports/environment.json) is the existing machine inventory.
 
@@ -112,7 +112,7 @@ Before ranking implementations, inspect screenshots, wheel displacement, input c
 | Output | Boundary and limitations |
 | --- | --- |
 | `run.json` | QPC input times, measured interval, driver misses, process CPU, private bytes, working set and executable hash. CPU percent uses one logical core as 100%. |
-| `application.json` | Data/scroll correctness and implementation-specific diagnostics. Rust/Dart histograms include startup and warmup. GPUIX exports the last 1,000 draws, p90 and p99, without p95. These histories are not directly comparable. |
+| `application.json` | Data/scroll correctness and implementation-specific diagnostics. Rust/Dart histograms include startup and warmup. GPUIX exports the last 1,000 draws, p90 and p99, without p95. Flutter reports `FrameTiming` build, raster and total-span percentiles over every frame since startup, plus its row build count. These histories are not directly comparable. |
 | `present.csv` | PresentMon 2.6.0 ETW records. The analyzer filters to the target PID and CPU-start QPC interval, and rejects multiple swapchains. It excludes the first interval that started outside the measured window. |
 | `analysis.json` | Per-run process metrics, application diagnostics with their original scope, present/display intervals and undisplayed-frame count, when available. Process/presentation percentiles use nearest rank; application histograms retain their own estimators. No averages of percentiles across runs. |
 | `failure.json` | Interrupted or legacy failed observation, error and any recorded input schedule. Kept in reliability accounting. Completed correctness failures remain in `run.json`. |

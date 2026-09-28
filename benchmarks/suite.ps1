@@ -2,7 +2,7 @@ param(
     [string]$RunId = (Get-Date -Format 'yyyyMMdd-HHmmss'),
     [ValidateRange(1,100)][int]$Repetitions = 3,
     [ValidateRange(2,120)][int]$Seconds = 10,
-    [ValidateSet('rust','dart','solid','shell')][string[]]$Implementations = @('rust','shell','solid','dart'),
+    [ValidateSet('rust','dart','solid','shell','flutter')][string[]]$Implementations = @('rust','shell','solid','dart'),
     [switch]$BackgroundSmoke,
     [switch]$CapturePresent
 )

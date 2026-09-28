@@ -1,3 +1,4 @@
+param([switch]$NoFlutter)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
@@ -27,4 +28,22 @@ try {
     & bun run build
     if ($LASTEXITCODE) { throw 'Solid comparison compilation failed' }
 } finally { Pop-Location }
-& "$PSScriptRoot/package.ps1"
+if (-not $NoFlutter) {
+    # Flutter's CMake build finds Visual Studio itself; the portable MSVC variables from env.ps1 must not leak into it.
+    $saved = @{}
+    foreach ($name in @('CC','CXX','AR','INCLUDE','LIB','CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER')) {
+        $saved[$name] = [Environment]::GetEnvironmentVariable($name)
+        [Environment]::SetEnvironmentVariable($name, $null)
+    }
+    Push-Location benchmarks/flutter
+    try {
+        & flutter pub get --enforce-lockfile
+        if ($LASTEXITCODE) { throw 'Flutter dependency restore failed' }
+        & flutter build windows --release
+        if ($LASTEXITCODE) { throw 'Flutter comparison build failed' }
+    } finally {
+        Pop-Location
+        foreach ($name in $saved.Keys) { [Environment]::SetEnvironmentVariable($name, $saved[$name]) }
+    }
+}
+& "$PSScriptRoot/package.ps1" -NoFlutter:$NoFlutter

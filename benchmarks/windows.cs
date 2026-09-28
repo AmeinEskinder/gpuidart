@@ -41,6 +41,8 @@ public static class BenchmarkWindow {
     [DllImport("user32.dll")] static extern bool MoveWindow(IntPtr window, int x, int y, int width, int height, bool repaint);
     [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int width, int height, uint flags);
     [DllImport("user32.dll")] static extern IntPtr WindowFromPoint(Point point);
+    [DllImport("user32.dll")] static extern IntPtr RealChildWindowFromPoint(IntPtr parent, Point point);
+    [DllImport("user32.dll")] static extern bool ScreenToClient(IntPtr window, ref Point point);
     [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr window, uint flags);
     [DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll", SetLastError = true)] static extern uint SendInput(uint count, Input[] inputs, int size);
@@ -143,18 +145,31 @@ public static class BenchmarkWindow {
         RequireFocus(window);
         return Mouse(Packet(2, 0, sequence), Packet(4, 0, sequence));
     }
+    // Posted messages go to the window that owns the pixels: Flutter hosts its
+    // content in a child view, GPUI windows have no children. The point is
+    // rewritten into the target's client coordinates.
+    static IntPtr MessageTarget(IntPtr window, ref Point client) {
+        IntPtr child = RealChildWindowFromPoint(window, client);
+        if (child == IntPtr.Zero || child == window) return window;
+        Point screen = client;
+        ClientToScreen(window, ref screen);
+        ScreenToClient(child, ref screen);
+        client = screen;
+        return child;
+    }
     public static void MessageClick(IntPtr window, double y) {
-        int x = (int)(140 * Scale(window));
-        int pointY = (int)(y * Scale(window));
-        IntPtr position = new IntPtr((pointY << 16) | x);
-        PostMessage(window, 0x200, IntPtr.Zero, position);
-        PostMessage(window, 0x201, new IntPtr(1), position);
-        PostMessage(window, 0x202, IntPtr.Zero, position);
+        Point point = new Point { X = (int)(140 * Scale(window)), Y = (int)(y * Scale(window)) };
+        IntPtr target = MessageTarget(window, ref point);
+        IntPtr position = new IntPtr((point.Y << 16) | (point.X & 0xffff));
+        PostMessage(target, 0x200, IntPtr.Zero, position);
+        PostMessage(target, 0x201, new IntPtr(1), position);
+        PostMessage(target, 0x202, IntPtr.Zero, position);
     }
     public static void MessageWheel(IntPtr window, int delta) {
         Point point = new Point { X = (int)(400 * Scale(window)), Y = (int)(270 * Scale(window)) };
-        ClientToScreen(window, ref point);
-        PostMessage(window, 0x20A, new IntPtr(unchecked(delta << 16)), new IntPtr((point.Y << 16) | (point.X & 0xffff)));
+        IntPtr target = MessageTarget(window, ref point);
+        ClientToScreen(target, ref point);
+        PostMessage(target, 0x20A, new IntPtr(unchecked(delta << 16)), new IntPtr((point.Y << 16) | (point.X & 0xffff)));
     }
     public static void Wheel(IntPtr window, int delta) {
         RequireFocus(window);

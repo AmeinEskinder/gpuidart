@@ -150,7 +150,7 @@ Node IDs must be nonempty and unique throughout one description. An input or tab
 
 The Windows release checks have a [setup guide](docs/windows-test-setup.md), an automatic Sandbox runner and an observation sheet. [Real Japanese IME composition and reload passed](reports/ime/windows-japanese-20260926/README.md) through owner-authorized agent observation. Other IMEs and display configurations remain unverified. Windows feature installation requires administrator access; neither generated test files nor installed language components count as completed verification.
 
-The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid and Dart AOT fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
+The [implementation benchmark](benchmarks/README.md) contains Rust, Shell/QuickJS, GPUIX/Solid, Dart AOT and Flutter Windows fixtures, repeatable Windows input, and separate publication/presentation measurements. See the [comparison status](reports/comparison/README.md) for completed checks and measurement gaps.
 
 - One application host with a main window and optional [secondary windows](docs/windows.md). Windows and Linux X11 use a blocking native runner isolate; macOS uses a native companion process whose main thread owns GPUI.
 - One description per publication, sent whole or as operations against the applied tree. No signals, child-view snapshots or Rust executable embedding the Dart VM.

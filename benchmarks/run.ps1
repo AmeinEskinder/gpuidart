@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('rust','dart','solid','shell')][string]$Implementation = 'dart',
+    [ValidateSet('rust','dart','solid','shell','flutter')][string]$Implementation = 'dart',
     [ValidateSet('idle','scroll','cell','burst')][string]$Workload = 'idle',
     [ValidateRange(2,120)][int]$Seconds = 10,
     [string]$RunId = 'pilot',
@@ -26,6 +26,7 @@ $exe = switch ($Implementation) {
     dart { Join-Path $root 'build/gpui-dart-comparison.exe' }
     solid { Join-Path $root 'benchmarks/solid/dist/gpui-solid-comparison.exe' }
     shell { Join-Path $root 'target/release/gpui-component-shell.exe' }
+    flutter { Join-Path $root 'benchmarks/flutter/build/windows/x64/runner/Release/gpui_flutter_comparison.exe' }
 }
 $arguments = if ($Implementation -eq 'shell') { '"' + (Join-Path $root 'benchmarks/shell') + '"' } else { '"' + $appOutput + '"' }
 $env:GPUIDART_LIBRARY = Join-Path $root 'target/release/gpuidart.dll'
@@ -98,7 +99,7 @@ try {
     $timer = [Diagnostics.Stopwatch]::StartNew()
     $period = switch ($Workload) { idle { [double]::PositiveInfinity } scroll { 1000.0 / 60 } cell { 200.0 } burst { 1000.0 / 30 } }
     $plannedInputs = $Seconds * $(switch ($Workload) { idle { 0 } scroll { 60 } cell { 5 } burst { 30 } })
-    $wheelDelta = if ($Implementation -eq 'solid') { -156 } else { -120 }
+    $wheelDelta = switch ($Implementation) { solid { -156 } flutter { -117 } default { -120 } }
     $nextInput = 0.0
     $nextSlot = 0
     $nextSample = 0.0
@@ -171,11 +172,12 @@ try {
         dart { $verification.native.tables.table.visible_rows.start }
         shell { $verification.visible_range[0] }
         solid { $verification.mounted_window.start }
+        flutter { $verification.visible_rows.start }
     }
     if ($Workload -eq 'scroll' -and $visibleStart -le 0) { $verificationIssues.Add('Scroll input did not advance the visible row window') }
-    $scrollY = switch ($Implementation) { rust { $verification.scroll_y }; dart { $verification.native.tables.table.scroll_y }; solid { $verification.scroll_offset[1] }; default { $null } }
+    $scrollY = switch ($Implementation) { rust { $verification.scroll_y }; dart { $verification.native.tables.table.scroll_y }; solid { $verification.scroll_offset[1] }; flutter { $verification.scroll_y }; default { $null } }
     $expectedScrollY = if ($Workload -eq 'scroll') { -78 * $inputTimes.Count } else { 0 }
-    if ($Implementation -in @('rust','dart','solid') -and ($null -eq $scrollY -or [math]::Abs($scrollY - $expectedScrollY) -gt 0.01)) { $verificationIssues.Add('Native scroll displacement does not match injected wheel input') }
+    if ($Implementation -in @('rust','dart','solid','flutter') -and ($null -eq $scrollY -or [math]::Abs($scrollY - $expectedScrollY) -gt 0.01)) { $verificationIssues.Add('Native scroll displacement does not match injected wheel input') }
     if ($Implementation -eq 'shell' -and $verification.cell_builds -le 0) { $verificationIssues.Add('Shell did not materialize any table cells') }
     if ($CapturePresent -and -not $trace.HasExited) { $trace.WaitForExit(15000) | Out-Null }
     $report = @{

@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$RunPrefix,
     [ValidateRange(1,100)][int]$Repetitions = 3,
-    [ValidateSet('rust','dart','solid','shell')][string[]]$Implementations = @('rust','dart')
+    [ValidateSet('rust','dart','solid','shell','flutter')][string[]]$Implementations = @('rust','dart')
 )
 $ErrorActionPreference = 'Stop'
 if (@($Implementations | Select-Object -Unique).Count -ne $Implementations.Count) { throw 'Implementations must be distinct' }
@@ -43,6 +43,7 @@ $groups = @(foreach ($workload in @('idle','scroll','cell','burst')) {
             window_available_ms = AcrossRuns $completed.window_available_ms
             native_draw_by_run = @($completed | Where-Object { $null -ne $_.native_diagnostics } | ForEach-Object { @{ run_id = $_.run_id; histogram = $_.native_diagnostics.draw; scope = $_.native_diagnostics.scope } })
             solid_draw_by_run = @($completed | Where-Object { $null -ne $_.solid_draw_overlay } | ForEach-Object { @{ run_id = $_.run_id; overlay = $_.solid_draw_overlay } })
+            flutter_frames_by_run = @($completed | Where-Object { $null -ne $_.flutter_frame_timing } | ForEach-Object { @{ run_id = $_.run_id; frames = $_.flutter_frame_timing } })
             application_work_by_run = @($completed | ForEach-Object { @{ run_id = $_.run_id; work = $_.application_work } })
             publication_by_run = @($completed | Where-Object { $null -ne $_.dart_publication } | ForEach-Object { @{ run_id = $_.run_id; publication = $_.dart_publication } })
         }

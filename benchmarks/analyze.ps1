@@ -67,6 +67,7 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
             shell_visible_range = $application.visible_range
             solid_row_components_created = $application.row_components_created
             solid_mounted_window = $application.mounted_window; solid_scroll_offset = $application.scroll_offset
+            flutter_row_builds = $application.row_builds; flutter_visible_rows = $application.visible_rows; flutter_scroll_y = $application.scroll_y
         } } else { $null })
         native_diagnostics = $(if ($native) { @{
             scope = $application.scope
@@ -77,6 +78,10 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
         } } else { $null })
         solid_draw_overlay = $(if ($run.implementation -eq 'solid') { @{
             scope = $application.scope; statistics = $application.draw_overlay
+        } } else { $null })
+        flutter_frame_timing = $(if ($run.implementation -eq 'flutter') { @{
+            scope = $application.frames.scope; build_us = $application.frames.build_us; raster_us = $application.frames.raster_us; total_us = $application.frames.total_us
+            limit = 'Flutter FrameTiming build and raster phases for every frame since startup; the estimator matches the process percentiles but the history is cumulative'
         } } else { $null })
         dart_publication = $(if ($run.implementation -eq 'dart') { @{
             scope = 'Dataset edits from delivered workload clicks, through the applied acknowledgement; initial upload reported separately'

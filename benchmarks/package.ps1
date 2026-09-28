@@ -1,3 +1,4 @@
+param([switch]$NoFlutter)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
@@ -10,10 +11,14 @@ $sourceFiles = [ordered]@{
     solid = @('benchmarks/solid/dist/gpui-solid-comparison.exe','benchmarks/solid/dist/gpuix-native.win32-x64-msvc.node')
     shell = @('target/release/gpui-component-shell.exe','benchmarks/shell/main.js')
 }
+# The Flutter release directory is copied whole: the executable, the engine DLL and the data directory with the AOT snapshot and assets.
+$flutterRelease = Join-Path $root 'benchmarks/flutter/build/windows/x64/runner/Release'
+if (-not $NoFlutter) { $sourceFiles.flutter = @() }
 $packages = foreach ($implementation in $sourceFiles.Keys) {
     $folder = Join-Path $packageRoot $implementation
     New-Item -ItemType Directory -Force $folder | Out-Null
     foreach ($source in $sourceFiles[$implementation]) { Copy-Item -LiteralPath (Join-Path $root $source) -Destination $folder }
+    if ($implementation -eq 'flutter') { Copy-Item -Path (Join-Path $flutterRelease '*') -Destination $folder -Recurse -Force }
     if (Test-Path -LiteralPath build/windows-x64/vcruntime140.dll) {
         Copy-Item -LiteralPath build/windows-x64/vcruntime140.dll -Destination $folder
     } else {
@@ -26,11 +31,10 @@ $packages = foreach ($implementation in $sourceFiles.Keys) {
             [IO.Compression.ZipFileExtensions]::ExtractToFile($entries[0], (Join-Path $folder 'vcruntime140.dll'), $true)
         } finally { $archive.Dispose() }
     }
-    Copy-Item -LiteralPath .cache/gpui-kit/LICENSE-APACHE -Destination (Join-Path $folder 'GPUI-Kit-LICENSE.txt')
-    $names = @($sourceFiles[$implementation] | ForEach-Object { Split-Path -Leaf $_ }) + @('vcruntime140.dll','GPUI-Kit-LICENSE.txt')
-    $files = @($names | ForEach-Object {
-        $file = Get-Item -LiteralPath (Join-Path $folder $_)
-        @{ name = $file.Name; bytes = $file.Length; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $file.FullName).Hash.ToLowerInvariant() }
+    # Flutter ships its own notices in data/flutter_assets/NOTICES.Z; the GPUI Kit license applies to the other four.
+    if ($implementation -ne 'flutter') { Copy-Item -LiteralPath .cache/gpui-kit/LICENSE-APACHE -Destination (Join-Path $folder 'GPUI-Kit-LICENSE.txt') }
+    $files = @(Get-ChildItem -LiteralPath $folder -File -Recurse | Sort-Object FullName | ForEach-Object {
+        @{ name = $_.FullName.Substring($folder.Length + 1).Replace([char]92, '/'); bytes = $_.Length; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash.ToLowerInvariant() }
     })
     @{
         implementation = $implementation; files = $files
@@ -41,6 +45,7 @@ $packages = foreach ($implementation in $sourceFiles.Keys) {
 $versions = @{
     rust = ((& .tools/cargo/bin/rustc.exe --version) -join '')
     dart = ((& dart --version 2>&1) -join '')
+    flutter = $(if ($NoFlutter) { 'not built' } else { ((& flutter --version 2>&1) | Select-Object -First 1) -join '' })
     bun = ((& bun --version) -join '')
     kit_revision = '0c830f4d257e69fdd17200650533ab4ca9a40cc0'
     gpui_pre = '0.3.7'; gpui_shell = '0.7.0'
@@ -50,6 +55,7 @@ $versions = @{
     gpuix_binary_provenance = 'published npm artifact pinned by bun.lock integrity; upstream does not publish gitHead for this artifact'
     rust_build = 'cargo --release (optimized); profiler enabled for native reference and GPUI-Dart'
     solid_build = 'Bun compile + minify + Solid production plugin; npm Windows native addon'
+    flutter_build = 'flutter build windows --release (AOT); engine DLL and data directory copied whole; CRT from the system'
     presentmon = '2.6.0'
     root_lock_sha256 = (Get-FileHash Cargo.lock).Hash
     shell_lock_sha256 = (Get-FileHash .cache/gpui-kit/Cargo.lock).Hash

@@ -1,0 +1,6 @@
+# The fixture is its own package; the repository options file is not
+# applied here, so analysis inside it does not need the root lints package.
+analyzer:
+  exclude:
+    - build/**
+    - windows/**
