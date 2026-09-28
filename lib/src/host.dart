@@ -210,6 +210,9 @@ final class GpuiEvent {
   /// Requested option ID on `select_change` or `tab_change` / `radio_change`; null means no selection.
   String? get selected => data['selected'] as String?;
 
+  /// Requested `YYYY-MM-DD` date on `date_change`; null means cleared.
+  String? get date => data['date'] as String?;
+
   /// Whether the user confirmed a `dialog_result`; false means cancelled.
   bool? get confirmed => data['confirmed'] as bool?;
 
@@ -1044,6 +1047,7 @@ final class GpuiHost {
           event.type == 'checkbox_change' ||
           event.type == 'slider_change' ||
           event.type == 'select_change' ||
+          event.type == 'date_change' ||
           event.type == 'switch_change' ||
           event.type == 'radio_change' ||
           event.type == 'tab_change' ||

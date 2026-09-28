@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'input_state.dart';
+import 'nodes.dart';
 
 /// Validates the native wire format before host state or completers are touched.
 Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
@@ -135,6 +136,18 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         throw const FormatException('Missing select selected value');
       }
       if (value['selected'] != null) string('selected');
+    case 'date_change':
+      integer('revision', minimum: 1);
+      string('id');
+      if (!value.containsKey('date')) {
+        throw const FormatException('Missing date');
+      }
+      if (value['date'] != null) {
+        string('date');
+        if (!isCalendarDate(value['date'] as String)) {
+          throw const FormatException('Invalid date');
+        }
+      }
     case 'dialog_result':
       integer('revision', minimum: 1);
       string('id');

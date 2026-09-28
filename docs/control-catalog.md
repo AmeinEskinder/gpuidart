@@ -146,6 +146,22 @@ retained, keyboard-navigable controls described in
 [navigation and charts](navigation-and-charts.md). Canvases and native
 animation are described in [canvas and animation](canvas-animation.md).
 
+`UiDatePicker` is a calendar picker holding one `YYYY-MM-DD` date or none,
+with a placeholder and a disabled flag. It follows the settings contract:
+`date_change` carries `revision`, `id` and the nullable requested `date`
+(null when the user clears it), the picker shows the choice at once, and the
+next publication's value is authoritative. Both sides reject a value that is
+not a real calendar date, and its semantics role is `combobox`.
+
+`UiIcon` shows one Lucide icon from the catalog GPUI Kit bundles, by file
+stem (`search`, `chevron-down`); the Dart side checks the name's shape and
+native rejects a name the catalog lacks, so a typo is a rejected description
+rather than a blank. `UiImage` shows a raster or SVG image from a file path,
+recognised by extension, or from inline bytes with an explicit format; the
+bytes travel base64 encoded, are decoded once per node and content, and the
+decode is dropped when the node leaves the description. Both take the `image`
+semantics role and are display only.
+
 `UiMenuButton` is a button that opens a popup menu of the same `UiMenuEntry`
 items application menus take: actions bound to global `UiAction` names, with
 optional `checked` and `disabled` flags, and separators. Choosing an action

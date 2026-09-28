@@ -233,6 +233,195 @@ final class UiProgress extends UiNode {
   }
 }
 
+/// A calendar picker holding one date as `YYYY-MM-DD`, or none. A
+/// `date_change` event carries the requested date (null when cleared); the
+/// control shows the choice at once and the next publication's value is
+/// authoritative, like the other settings controls.
+final class UiDatePicker extends UiNode {
+  const UiDatePicker(
+    super.id, {
+    this.value,
+    this.placeholder = '',
+    this.disabled = false,
+    super.style,
+    super.semantics,
+  });
+  final String? value;
+  final String placeholder;
+  final bool disabled;
+
+  @override
+  Map<String, Object> props() {
+    final value = this.value;
+    if (value != null && !isCalendarDate(value)) {
+      throw ArgumentError.value(value, 'value', 'Dates are YYYY-MM-DD');
+    }
+    if (utf8.encode(placeholder).length > 1024) {
+      throw ArgumentError.value(
+        placeholder,
+        'placeholder',
+        'Maximum 1024 UTF-8 bytes',
+      );
+    }
+    return {
+      'kind': 'date_picker',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('date_picker'),
+      if (style != null) 'style': style!.toJson(),
+      'value': ?value,
+      'placeholder': placeholder,
+      'disabled': disabled,
+    };
+  }
+}
+
+/// Whether [text] is a real calendar date written as `YYYY-MM-DD`.
+bool isCalendarDate(String text) {
+  if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(text)) return false;
+  final parsed = DateTime.tryParse(text);
+  if (parsed == null) return false;
+  final year = parsed.year.toString().padLeft(4, '0');
+  final month = parsed.month.toString().padLeft(2, '0');
+  final day = parsed.day.toString().padLeft(2, '0');
+  return '$year-$month-$day' == text;
+}
+
+/// A Lucide icon from the bundled catalog, by file stem such as `search`
+/// or `chevron-down`; native rejects names outside the catalog. [size] is
+/// the square edge in logical pixels, [color] a theme token or hex color.
+final class UiIcon extends UiNode {
+  const UiIcon(
+    super.id,
+    this.name, {
+    this.size,
+    this.color,
+    super.style,
+    super.semantics,
+  });
+  final String name;
+  final double? size;
+  final UiColor? color;
+
+  @override
+  Map<String, Object> props() {
+    if (!RegExp(r'^[a-z0-9-]{1,64}$').hasMatch(name)) {
+      throw ArgumentError.value(
+        name,
+        'name',
+        'Icon names are 1..64 lowercase letters, digits or hyphens',
+      );
+    }
+    final size = this.size;
+    if (size != null && (!size.isFinite || size < 8 || size > 256)) {
+      throw ArgumentError.value(size, 'size', 'Icon size is 8..256');
+    }
+    return {
+      'kind': 'icon',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('icon'),
+      if (style != null) 'style': style!.toJson(),
+      'name': name,
+      'size': ?size,
+      if (color != null) 'color': color!.toJson(),
+    };
+  }
+}
+
+/// How an image fills its bounds; the names follow CSS object-fit.
+enum UiImageFit { contain, cover, fill, scaleDown, none }
+
+/// The encoding of inline image bytes.
+enum UiImageFormat { png, jpeg, webp, gif, svg, bmp, tiff, ico }
+
+/// A raster or SVG image from a file [path] (by extension) or inline
+/// [bytes] with an explicit [format], fitted into the node's bounds.
+/// [width] and [height] are logical pixels; without them the node takes
+/// its style size or the image's own. Inline bytes travel base64 encoded and
+/// are decoded once per node; keep them to a few MiB.
+final class UiImage extends UiNode {
+  const UiImage.path(
+    super.id,
+    String this.path, {
+    this.width,
+    this.height,
+    this.fit = UiImageFit.contain,
+    super.style,
+    super.semantics,
+  }) : bytes = null,
+       format = null;
+
+  UiImage.bytes(
+    super.id,
+    List<int> bytes, {
+    required UiImageFormat this.format,
+    this.width,
+    this.height,
+    this.fit = UiImageFit.contain,
+    super.style,
+    super.semantics,
+  }) : path = null,
+       bytes = base64Encode(bytes);
+
+  final String? path;
+  final String? bytes;
+  final UiImageFormat? format;
+  final double? width;
+  final double? height;
+  final UiImageFit fit;
+
+  @override
+  Map<String, Object> props() {
+    final path = this.path;
+    if (path != null) {
+      final extension = path.contains('.')
+          ? path.substring(path.lastIndexOf('.') + 1).toLowerCase()
+          : '';
+      if (path.isEmpty ||
+          utf8.encode(path).length > 4096 ||
+          !const {
+            'png',
+            'jpg',
+            'jpeg',
+            'webp',
+            'gif',
+            'svg',
+            'bmp',
+            'tif',
+            'tiff',
+            'ico',
+          }.contains(extension)) {
+        throw ArgumentError.value(
+          path,
+          'path',
+          'Image paths need a png, jpeg, webp, gif, svg, bmp, tiff or ico extension',
+        );
+      }
+    } else if (bytes!.isEmpty || bytes!.length > (8 << 20) * 4 ~/ 3 + 4) {
+      throw ArgumentError('Image bytes must be 1 byte through 8 MiB');
+    }
+    for (final (name, value) in [('width', width), ('height', height)]) {
+      if (value != null && (!value.isFinite || value < 1 || value > 8192)) {
+        throw ArgumentError.value(value, name, 'Image $name is 1..8192');
+      }
+    }
+    return {
+      'kind': 'image',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('image'),
+      if (style != null) 'style': style!.toJson(),
+      'path': ?path,
+      'bytes': ?bytes,
+      if (format != null) 'format': format!.name,
+      'width': ?width,
+      'height': ?height,
+      'fit': switch (fit) {
+        UiImageFit.scaleDown => 'scale_down',
+        _ => fit.name,
+      },
+    };
+  }
+}
+
 /// A horizontal or vertical rule with an optional centered label.
 final class UiSeparator extends UiNode {
   const UiSeparator(

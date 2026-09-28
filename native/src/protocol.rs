@@ -320,6 +320,56 @@ pub enum Node {
         #[serde(default)]
         children: Vec<Node>,
     },
+    /// A calendar picker holding one date as `YYYY-MM-DD`; `date_change`
+    /// carries the requested value and the next publication is authoritative.
+    DatePicker {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        value: Option<String>,
+        #[serde(default)]
+        placeholder: String,
+        #[serde(default)]
+        disabled: bool,
+    },
+    /// A Lucide icon from the bundled catalog, by file stem such as `search`.
+    Icon {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        name: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        size: Option<f32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        color: Option<Color>,
+    },
+    /// A raster or SVG image from a file path or inline bytes, fitted into
+    /// the node's bounds.
+    Image {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        path: Option<String>,
+        /// Base64 of the encoded image; `format` names its encoding.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        bytes: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        format: Option<ImageEncoding>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        width: Option<f32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        height: Option<f32>,
+        #[serde(default)]
+        fit: ImageFit,
+    },
     /// A retained draw list painted natively inside the node's bounds.
     /// Coordinates are logical px from the node's top left.
     Canvas {
@@ -1007,6 +1057,59 @@ impl ThemeToken {
     }
 }
 
+/// A `YYYY-MM-DD` calendar date.
+pub fn parse_date(value: &str) -> Option<chrono::NaiveDate> {
+    (value.len() == 10)
+        .then(|| chrono::NaiveDate::parse_from_str(value, "%Y-%m-%d").ok())
+        .flatten()
+}
+
+/// The wire form of a calendar date, `YYYY-MM-DD`.
+pub fn format_date(date: chrono::NaiveDate) -> String {
+    date.format("%Y-%m-%d").to_string()
+}
+
+/// Whether the bundled asset catalog carries `icons/<name>.svg`.
+pub fn icon_exists(name: &str) -> bool {
+    use gpui_kit::gpui::AssetSource;
+    matches!(
+        gpui_kit::assets::Assets.load(&format!("icons/{name}.svg")),
+        Ok(Some(_))
+    )
+}
+
+/// Standard base64 with padding, the form `dart:convert` produces.
+pub fn decode_base64(text: &str) -> Option<Vec<u8>> {
+    use base64::Engine;
+    base64::engine::general_purpose::STANDARD.decode(text).ok()
+}
+
+/// The encoding of inline image bytes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ImageEncoding {
+    Png,
+    Jpeg,
+    Webp,
+    Gif,
+    Svg,
+    Bmp,
+    Tiff,
+    Ico,
+}
+
+/// How an image fills its bounds; names follow CSS object-fit.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ImageFit {
+    #[default]
+    Contain,
+    Cover,
+    Fill,
+    ScaleDown,
+    None,
+}
+
 /// `"token:<name>"` or `"#RRGGBB"` / `"#RRGGBBAA"`; hex is stored as 0xRRGGBBAA.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Color {
@@ -1232,7 +1335,10 @@ impl Node {
 
     pub fn id(&self) -> &str {
         match self {
-            Self::Column { id, .. }
+            Self::DatePicker { id, .. }
+            | Self::Icon { id, .. }
+            | Self::Image { id, .. }
+            | Self::Column { id, .. }
             | Self::Row { id, .. }
             | Self::Text { id, .. }
             | Self::Button { id, .. }
@@ -1258,7 +1364,10 @@ impl Node {
 
     pub fn style(&self) -> Option<&Style> {
         match self {
-            Self::Column { style, .. }
+            Self::DatePicker { style, .. }
+            | Self::Icon { style, .. }
+            | Self::Image { style, .. }
+            | Self::Column { style, .. }
             | Self::Row { style, .. }
             | Self::Text { style, .. }
             | Self::Button { style, .. }
@@ -1284,7 +1393,10 @@ impl Node {
 
     pub fn semantics(&self) -> Option<&Semantics> {
         match self {
-            Self::Column { semantics, .. }
+            Self::DatePicker { semantics, .. }
+            | Self::Icon { semantics, .. }
+            | Self::Image { semantics, .. }
+            | Self::Column { semantics, .. }
             | Self::Row { semantics, .. }
             | Self::Text { semantics, .. }
             | Self::Button { semantics, .. }
@@ -1572,6 +1684,93 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
             value: Some(value), ..
         } if !value.is_finite() || !(0. ..=100.).contains(value) => {
             return Err("Progress value must be between 0 and 100".into());
+        }
+        Node::DatePicker {
+            value, placeholder, ..
+        } => {
+            if placeholder.len() > 1024 {
+                return Err("Date picker placeholder must contain at most 1024 UTF-8 bytes".into());
+            }
+            if let Some(value) = value
+                && parse_date(value).is_none()
+            {
+                return Err(format!(
+                    "Date picker value {value} is not a YYYY-MM-DD date"
+                ));
+            }
+        }
+        Node::Icon { name, size, .. } => {
+            if name.is_empty()
+                || name.len() > 64
+                || !name
+                    .bytes()
+                    .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+            {
+                return Err("Icon name must be 1..64 lowercase letters, digits or hyphens".into());
+            }
+            if !icon_exists(name) {
+                return Err(format!("Icon {name} is not in the bundled catalog"));
+            }
+            if let Some(size) = size
+                && (!size.is_finite() || !(8. ..=256.).contains(size))
+            {
+                return Err("Icon size must be between 8 and 256".into());
+            }
+        }
+        Node::Image {
+            path,
+            bytes,
+            format,
+            width,
+            height,
+            ..
+        } => {
+            match (path, bytes) {
+                (Some(path), None) => {
+                    if path.is_empty() || path.len() > 4096 {
+                        return Err("Image path must contain 1..4096 UTF-8 bytes".into());
+                    }
+                    let extension = std::path::Path::new(path)
+                        .extension()
+                        .and_then(|e| e.to_str())
+                        .map(str::to_ascii_lowercase);
+                    if !matches!(
+                        extension.as_deref(),
+                        Some(
+                            "png"
+                                | "jpg"
+                                | "jpeg"
+                                | "webp"
+                                | "gif"
+                                | "svg"
+                                | "bmp"
+                                | "tif"
+                                | "tiff"
+                                | "ico"
+                        )
+                    ) {
+                        return Err("Image path needs a png, jpeg, webp, gif, svg, bmp, tiff or ico extension".into());
+                    }
+                }
+                (None, Some(bytes)) => {
+                    if format.is_none() {
+                        return Err("Inline image bytes need a format".into());
+                    }
+                    let decoded = decode_base64(bytes)
+                        .ok_or_else(|| "Image bytes must be valid base64".to_owned())?;
+                    if decoded.is_empty() || decoded.len() > 8 << 20 {
+                        return Err("Image bytes must decode to 1 byte through 8 MiB".into());
+                    }
+                }
+                _ => return Err("Image takes exactly one of path or bytes".into()),
+            }
+            for (name, value) in [("width", width), ("height", height)] {
+                if let Some(value) = value
+                    && (!value.is_finite() || !(1. ..=8192.).contains(value))
+                {
+                    return Err(format!("Image {name} must be between 1 and 8192"));
+                }
+            }
         }
         Node::ConfirmDialog {
             label,
@@ -1870,6 +2069,11 @@ pub enum Event {
         id: String,
         selected: Option<String>,
     },
+    DateChange {
+        revision: u64,
+        id: String,
+        date: Option<String>,
+    },
     DialogResult {
         revision: u64,
         id: String,
@@ -1907,6 +2111,96 @@ pub enum Event {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn date_pickers_validate_their_value() {
+        let ok = br#"{"revision":1,"root":{"kind":"date_picker","id":"due","value":"2026-09-29","placeholder":"Due"}}"#;
+        assert!(matches!(
+            super::Snapshot::parse(ok).unwrap().root,
+            super::Node::DatePicker { ref value, .. } if value.as_deref() == Some("2026-09-29")
+        ));
+        assert!(
+            super::Snapshot::parse(br#"{"revision":1,"root":{"kind":"date_picker","id":"due"}}"#)
+                .is_ok()
+        );
+        for value in ["2026-02-30", "2026-9-9", "tomorrow", "20260929"] {
+            let bytes = format!(
+                r#"{{"revision":1,"root":{{"kind":"date_picker","id":"due","value":"{value}"}}}}"#
+            );
+            assert!(
+                super::Snapshot::parse(bytes.as_bytes())
+                    .unwrap_err()
+                    .contains("YYYY-MM-DD"),
+                "{value}"
+            );
+        }
+        assert_eq!(
+            super::parse_date("2024-02-29")
+                .map(super::format_date)
+                .as_deref(),
+            Some("2024-02-29")
+        );
+    }
+
+    #[test]
+    fn icons_and_images_validate() {
+        let ok = br#"{"revision":1,"root":{"kind":"column","id":"root","children":[
+            {"kind":"icon","id":"i","name":"search","size":20,"color":"token:primary"},
+            {"kind":"image","id":"p","path":"C:/pictures/logo.png","width":64,"fit":"cover"},
+            {"kind":"image","id":"b","bytes":"iVBORw0KGgo=","format":"png"}]}}"#;
+        let snapshot = super::Snapshot::parse(ok).unwrap();
+        assert!(matches!(
+            snapshot.root.find("b"),
+            Some(super::Node::Image {
+                fit: super::ImageFit::Contain,
+                format: Some(super::ImageEncoding::Png),
+                ..
+            })
+        ));
+        assert!(matches!(
+            snapshot.root.find("p"),
+            Some(super::Node::Image {
+                fit: super::ImageFit::Cover,
+                ..
+            })
+        ));
+        for (invalid, message) in [
+            (
+                r#"{"kind":"icon","id":"i","name":"no-such-icon-name"}"#,
+                "catalog",
+            ),
+            (r#"{"kind":"icon","id":"i","name":"Search"}"#, "lowercase"),
+            (
+                r#"{"kind":"icon","id":"i","name":"search","size":4}"#,
+                "size",
+            ),
+            (
+                r#"{"kind":"image","id":"p","path":"notes.txt"}"#,
+                "extension",
+            ),
+            (r#"{"kind":"image","id":"p"}"#, "exactly one"),
+            (
+                r#"{"kind":"image","id":"p","path":"a.png","bytes":"AA=="}"#,
+                "exactly one",
+            ),
+            (r#"{"kind":"image","id":"p","bytes":"AA=="}"#, "format"),
+            (
+                r#"{"kind":"image","id":"p","bytes":"not base64!","format":"png"}"#,
+                "base64",
+            ),
+            (
+                r#"{"kind":"image","id":"p","path":"a.png","width":0}"#,
+                "width",
+            ),
+            (
+                r#"{"kind":"image","id":"p","path":"a.png","semantics":{"role":"button"}}"#,
+                "incompatible",
+            ),
+        ] {
+            let bytes = format!(r#"{{"revision":1,"root":{invalid}}}"#);
+            let error = super::Snapshot::parse(bytes.as_bytes()).unwrap_err();
+            assert!(error.contains(message), "{invalid}: {error}");
+        }
+    }
     use super::*;
 
     #[test]

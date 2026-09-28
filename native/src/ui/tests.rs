@@ -424,6 +424,134 @@ fn layout_primitives_size_position_and_retain_scroll_offsets(cx: &mut TestAppCon
 }
 
 #[gpui::test]
+fn date_pickers_follow_publications(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, value: Option<&str>, disabled: bool| {
+        let value = value.map_or("null".to_owned(), |v| format!("\"{v}\""));
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"date_picker","id":"due","value":{value},"placeholder":"Due","disabled":{disabled}}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, Some("2026-09-29"), false),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.find("due").bounds().size.width > px(0.));
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(controls["due"]["kind"], "date_picker");
+        assert_eq!(controls["due"]["value"], "2026-09-29");
+        assert_eq!(controls["due"]["disabled"], false);
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(2, Some("2026-10-01"), true), window, cx)
+        });
+        window.render_frame(cx);
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(
+            controls["due"]["value"], "2026-10-01",
+            "a publication is authoritative"
+        );
+        assert_eq!(controls["due"]["disabled"], true);
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(3, None, false), window, cx)
+        });
+        window.render_frame(cx);
+        let controls = view.read(cx).inspect(window, cx)["controls"].clone();
+        assert_eq!(
+            controls["due"]["value"],
+            serde_json::Value::Null,
+            "an absent value clears the picker"
+        );
+    })
+    .unwrap();
+}
+
+#[gpui::test]
+fn icons_and_inline_images_render_and_keep_their_decode(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    // A 1 by 1 opaque PNG.
+    let png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+    let snapshot = |revision: u64, size: u32| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"row","id":"root","children":[
+                {{"kind":"icon","id":"glyph","name":"search","size":{size},"color":"token:primary"}},
+                {{"kind":"image","id":"brand","bytes":"{png}","format":"png","width":24,"height":24,"fit":"cover"}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, 16),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.find("glyph").bounds().size.width > px(0.));
+        assert_eq!(window.find("brand").bounds().size, size(px(24.), px(24.)));
+        let first = view.read(cx).images.borrow()["brand"].image.clone();
+        view.update(cx, |view, cx| view.publish(snapshot(2, 24), window, cx));
+        window.render_frame(cx);
+        let second = view.read(cx).images.borrow()["brand"].image.clone();
+        assert!(
+            Arc::ptr_eq(&first, &second),
+            "unchanged bytes keep one decoded image"
+        );
+        view.update(cx, |view, cx| {
+            view.publish(
+                Snapshot::parse(
+                    br#"{"revision":3,"root":{"kind":"row","id":"root","children":[]}}"#,
+                )
+                .unwrap(),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        assert!(
+            view.read(cx).images.borrow().is_empty(),
+            "removed images drop their decode"
+        );
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn switches_show_the_toggle_before_publication(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let events = Arc::new(Mutex::new(Vec::new()));

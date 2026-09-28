@@ -58,7 +58,7 @@ final class UiSemantics {
       'checkbox' => {UiRole.checkbox},
       'slider' => {UiRole.slider},
       'input' => {UiRole.textbox},
-      'select' => {UiRole.combobox},
+      'select' || 'date_picker' => {UiRole.combobox},
       'table' => {UiRole.table},
       'list' => {UiRole.list},
       'switch' => {UiRole.toggle},
@@ -66,7 +66,7 @@ final class UiSemantics {
       'progress' => {UiRole.progressBar},
       'separator' => {UiRole.separator},
       'tabs' => {UiRole.tabList},
-      'canvas' => {UiRole.image},
+      'canvas' || 'icon' || 'image' => {UiRole.image},
       'chart' => {UiRole.chart},
       _ => throw ArgumentError.value(kind, 'kind'),
     };

@@ -5,6 +5,130 @@ import 'package:gpuidart/src/native_event.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('date pickers encode, validate and decode their changes', () {
+    expect(
+      const UiDatePicker(
+        'due',
+        value: '2026-09-29',
+        placeholder: 'Due',
+      ).toJson(),
+      {
+        'kind': 'date_picker',
+        'id': 'due',
+        'value': '2026-09-29',
+        'placeholder': 'Due',
+        'disabled': false,
+      },
+    );
+    expect(const UiDatePicker('due').toJson().containsKey('value'), isFalse);
+    for (final invalid in ['2026-02-30', '2026-9-9', 'tomorrow', '20260929']) {
+      expect(UiDatePicker('due', value: invalid).toJson, throwsArgumentError);
+    }
+    expect(
+      const UiDatePicker(
+        'due',
+        semantics: UiSemantics(role: UiRole.textbox),
+      ).toJson,
+      throwsArgumentError,
+    );
+    Map<String, dynamic> decode(Map<String, Object?> event) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(event)));
+    final changed = decode({
+      'type': 'date_change',
+      'revision': 3,
+      'id': 'due',
+      'date': '2026-10-01',
+    });
+    expect(changed['date'], '2026-10-01');
+    expect(
+      decode({
+        'type': 'date_change',
+        'revision': 3,
+        'id': 'due',
+        'date': null,
+      })['date'],
+      isNull,
+    );
+    expect(
+      () => decode({'type': 'date_change', 'revision': 3, 'id': 'due'}),
+      throwsFormatException,
+    );
+    expect(
+      () => decode({
+        'type': 'date_change',
+        'revision': 3,
+        'id': 'due',
+        'date': '2026-13-01',
+      }),
+      throwsFormatException,
+    );
+  });
+
+  test('icons and images encode and validate', () {
+    expect(
+      const UiIcon(
+        'i',
+        'search',
+        size: 20,
+        color: UiColor.token(ThemeToken.primary),
+      ).toJson(),
+      {
+        'kind': 'icon',
+        'id': 'i',
+        'name': 'search',
+        'size': 20.0,
+        'color': 'token:primary',
+      },
+    );
+    expect(const UiIcon('i', 'Search').toJson, throwsArgumentError);
+    expect(const UiIcon('i', 'search', size: 4).toJson, throwsArgumentError);
+    expect(
+      const UiImage.path('p', r'C:\pictures\logo.PNG', width: 64).toJson(),
+      {
+        'kind': 'image',
+        'id': 'p',
+        'path': r'C:\pictures\logo.PNG',
+        'width': 64.0,
+        'fit': 'contain',
+      },
+    );
+    expect(const UiImage.path('p', 'notes.txt').toJson, throwsArgumentError);
+    final inline = UiImage.bytes(
+      'b',
+      [1, 2, 3],
+      format: UiImageFormat.png,
+      fit: UiImageFit.scaleDown,
+    ).toJson();
+    expect(inline['bytes'], base64Encode([1, 2, 3]));
+    expect(inline['format'], 'png');
+    expect(inline['fit'], 'scale_down');
+    expect(inline.containsKey('path'), isFalse);
+    expect(
+      UiImage.bytes('b', const [], format: UiImageFormat.png).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiImage.path('p', 'a.png', height: 0).toJson,
+      throwsArgumentError,
+    );
+    expect(
+      const UiImage.path(
+        'p',
+        'a.png',
+        semantics: UiSemantics(role: UiRole.image, label: 'Logo'),
+      ).toJson()['semantics'],
+      {'role': 'image', 'label': 'Logo'},
+    );
+    expect(
+      const UiIcon(
+        'i',
+        'search',
+        semantics: UiSemantics(role: UiRole.button),
+      ).toJson,
+      throwsArgumentError,
+    );
+  });
+
   test('switch, progress and separator encode and validate', () {
     expect(const UiSwitch('wifi', 'Wi-Fi', checked: true).toJson(), {
       'kind': 'switch',

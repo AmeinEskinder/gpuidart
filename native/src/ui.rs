@@ -4,9 +4,9 @@ use crate::{
     Command, Events,
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
-        FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, MenuEntry, Node,
-        ScrollAxis, Size as StyleSize, Snapshot, Style, TableView, ThemeToken, Touched, TreeIndex,
-        ViewEntry, ViewIndex, apply_in_place, rollback,
+        FontWeight as StyleFontWeight, ImageEncoding, ImageFit, Justify as StyleJustify,
+        KeystrokeSpec, MenuEntry, Node, ScrollAxis, Size as StyleSize, Snapshot, Style, TableView,
+        ThemeToken, Touched, TreeIndex, ViewEntry, ViewIndex, apply_in_place, rollback,
     },
 };
 use async_channel::Receiver;
@@ -15,7 +15,7 @@ use gpui_kit::assets::IconName;
 use gpui_kit::base::{ScrollbarHandle, TestSupportExt};
 use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
-    ActiveTheme, Disableable, Icon, StyledExt,
+    ActiveTheme, Disableable, Icon, IconNamed, Sizable, StyledExt,
     button::{Button, ButtonVariants, DropdownButton},
     checkbox::Checkbox,
     input::{Input, InputEvent, InputState},
@@ -312,6 +312,20 @@ enum ViewSelection {
     Clamp,
 }
 
+/// A Lucide icon addressed by its asset path, for names that arrive as text.
+struct LucideIcon(SharedString);
+
+impl IconNamed for LucideIcon {
+    fn path(self) -> SharedString {
+        self.0
+    }
+}
+
+struct RetainedImage {
+    hash: u64,
+    image: Arc<gpui::Image>,
+}
+
 pub(crate) struct DartView {
     #[cfg(all(test, feature = "snapshot-experiment"))]
     experiment_bounds: Option<Rc<RefCell<HashMap<String, Bounds<Pixels>>>>>,
@@ -329,6 +343,7 @@ pub(crate) struct DartView {
     choices: HashMap<String, choices::RetainedChoices>,
     sliders: HashMap<String, controls::RetainedSlider>,
     selects: HashMap<String, controls::RetainedSelect>,
+    date_pickers: HashMap<String, controls::RetainedDatePicker>,
     active_dialog: dialogs::ActiveDialog,
     /// Checkbox and switch values toggled by the user since the last commit.
     /// Shown until the next publication, whose values are authoritative.
@@ -343,6 +358,9 @@ pub(crate) struct DartView {
     lists: HashMap<String, RetainedList>,
     /// Cached containers by node ID.
     subtrees: HashMap<String, RetainedSubtree>,
+    /// Decoded inline images by node ID, so a frame reuses the decode and
+    /// GPUI's cache sees one image identity per node and content.
+    images: RefCell<HashMap<String, RetainedImage>>,
     /// This view, for element handlers built outside its own render.
     handle: gpui::WeakEntity<DartView>,
     /// IDs and parents of the applied tree, kept in step by operation updates.
@@ -558,6 +576,7 @@ impl DartView {
             choices: HashMap::new(),
             sliders: HashMap::new(),
             selects: HashMap::new(),
+            date_pickers: HashMap::new(),
             active_dialog: Default::default(),
             checkbox_shown: Default::default(),
             choice_shown: Default::default(),
@@ -567,6 +586,7 @@ impl DartView {
             tables: HashMap::new(),
             lists: HashMap::new(),
             subtrees: HashMap::new(),
+            images: RefCell::new(HashMap::new()),
             table_subscriptions: HashMap::new(),
             scroll: ScrollHandle::new(),
             counters: Rc::new(Counters::default()),
@@ -1413,6 +1433,15 @@ impl DartView {
             }
         });
         self.subtrees.retain(|id, _| subtree_ids.contains(id));
+        let mut image_ids = HashSet::new();
+        self.snapshot.root.visit(&mut |node| {
+            if let Node::Image { id, .. } = node {
+                image_ids.insert(id.clone());
+            }
+        });
+        self.images
+            .borrow_mut()
+            .retain(|id, _| image_ids.contains(id));
         self.inputs.retain(|id, _| input_ids.contains(id));
         self.lists.retain(|id, _| list_ids.contains(id));
         self.scrolls.retain(|id, _| scroll_ids.contains(id));
@@ -1521,6 +1550,41 @@ impl DartView {
 
     /// `bypass_cache` renders a cached container itself; the placeholder
     /// path hands it to its entity instead.
+    /// The decoded image for an inline-bytes node, decoded once per content.
+    fn inline_image(&self, id: &str, bytes: &str, format: ImageEncoding) -> Arc<gpui::Image> {
+        use std::hash::{Hash, Hasher};
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        bytes.hash(&mut hasher);
+        format.hash(&mut hasher);
+        let hash = hasher.finish();
+        let mut images = self.images.borrow_mut();
+        if let Some(retained) = images.get(id)
+            && retained.hash == hash
+        {
+            return retained.image.clone();
+        }
+        let decoded = crate::protocol::decode_base64(bytes).unwrap_or_default();
+        let format = match format {
+            ImageEncoding::Png => gpui::ImageFormat::Png,
+            ImageEncoding::Jpeg => gpui::ImageFormat::Jpeg,
+            ImageEncoding::Webp => gpui::ImageFormat::Webp,
+            ImageEncoding::Gif => gpui::ImageFormat::Gif,
+            ImageEncoding::Svg => gpui::ImageFormat::Svg,
+            ImageEncoding::Bmp => gpui::ImageFormat::Bmp,
+            ImageEncoding::Tiff => gpui::ImageFormat::Tiff,
+            ImageEncoding::Ico => gpui::ImageFormat::Ico,
+        };
+        let image = Arc::new(gpui::Image::from_bytes(format, decoded));
+        images.insert(
+            id.to_owned(),
+            RetainedImage {
+                hash,
+                image: image.clone(),
+            },
+        );
+        image
+    }
+
     fn materialize_node(
         &self,
         node: &Node,
@@ -1716,6 +1780,60 @@ impl DartView {
                 };
                 apply_node_style(
                     annotate(div().id(id), node).test_support().child(rule),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Icon {
+                name, size, color, ..
+            } => {
+                let mut icon =
+                    gpui_kit::component::Icon::new(LucideIcon(format!("icons/{name}.svg").into()));
+                if let Some(size) = size {
+                    icon = icon.with_size(gpui_kit::component::Size::Size(px(*size)));
+                }
+                if let Some(color) = color {
+                    icon = icon.text_color(resolve_color(*color, colors));
+                }
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(icon),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Image {
+                path,
+                bytes,
+                format,
+                width,
+                height,
+                fit,
+                ..
+            } => {
+                let source: gpui::ImageSource = match (path, bytes, format) {
+                    (Some(path), _, _) => std::path::PathBuf::from(path).into(),
+                    (None, Some(bytes), Some(format)) => {
+                        self.inline_image(node.id(), bytes, *format).into()
+                    }
+                    _ => return Err(format!("Image {} has no source", node.id())),
+                };
+                let mut image = gpui::img(source).object_fit(match fit {
+                    ImageFit::Contain => gpui::ObjectFit::Contain,
+                    ImageFit::Cover => gpui::ObjectFit::Cover,
+                    ImageFit::Fill => gpui::ObjectFit::Fill,
+                    ImageFit::ScaleDown => gpui::ObjectFit::ScaleDown,
+                    ImageFit::None => gpui::ObjectFit::None,
+                });
+                if let Some(width) = width {
+                    image = image.w(px(*width));
+                }
+                if let Some(height) = height {
+                    image = image.h(px(*height));
+                }
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(image),
                     node,
                     colors,
                 )
@@ -1967,6 +2085,7 @@ impl DartView {
             }
             Node::Slider { .. } => self.slider_element(node, colors, cx)?,
             Node::Select { .. } => self.select_element(node, colors)?,
+            Node::DatePicker { .. } => self.date_picker_element(node, colors)?,
             Node::ConfirmDialog { .. } => self.dialog_element(node, colors)?,
             Node::Input { id, .. } => {
                 let state = &self

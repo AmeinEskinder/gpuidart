@@ -6,6 +6,8 @@ use gpui_kit::base::TestSupportExt;
 use gpui_kit::component::slider::{SliderEvent, SliderState};
 use gpui_kit::component::{
     IndexPath,
+    calendar::Date,
+    date_picker::{DatePicker, DatePickerEvent, DatePickerState},
     select::{Select, SelectEvent, SelectItem, SelectState},
 };
 use gpui_kit::prelude::FluentBuilder;
@@ -13,6 +15,12 @@ use gpui_kit::prelude::FluentBuilder;
 pub(super) struct RetainedSlider {
     pub state: Entity<SliderState>,
     pub focus: FocusHandle,
+    _subscription: Subscription,
+}
+
+pub(super) struct RetainedDatePicker {
+    pub state: Entity<DatePickerState>,
+    disabled: bool,
     _subscription: Subscription,
 }
 
@@ -36,6 +44,7 @@ impl SelectItem for SelectOption {
 impl DartView {
     pub(super) fn reconcile_controls(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.reconcile_selects(window, cx);
+        self.reconcile_date_pickers(window, cx);
         let mut sliders = HashSet::new();
         self.snapshot.root.visit(&mut |node| {
             if let Node::Slider {
@@ -106,6 +115,18 @@ impl DartView {
             controls.insert(id.clone(), json!({"kind":"select", "selected":state.selected_value(),
                 "entity":retained.state.entity_id().as_u64(), "focused":state.focus_handle(cx).is_focused(window)}));
         }
+        for (id, retained) in &self.date_pickers {
+            let state = retained.state.read(cx);
+            let value = match state.date() {
+                Date::Single(Some(date)) => Some(crate::protocol::format_date(date)),
+                _ => None,
+            };
+            controls.insert(
+                id.clone(),
+                json!({"kind":"date_picker", "value":value, "disabled":retained.disabled,
+                "entity":retained.state.entity_id().as_u64()}),
+            );
+        }
         self.snapshot.root.visit(&mut |node| {
             if let Node::Tabs { id, selected, disabled, options, .. } | Node::RadioGroup { id, selected, disabled, options, .. } = node {
                 let focused = self.choices.get(id).and_then(|tabs| tabs.focus.iter().find(|(_,f)| f.is_focused(window)).map(|(id,_)| id));
@@ -128,6 +149,102 @@ impl DartView {
             }
         });
         controls.into()
+    }
+
+    fn reconcile_date_pickers(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let mut ids = HashSet::new();
+        self.snapshot.root.visit(&mut |node| {
+            let Node::DatePicker {
+                id,
+                value,
+                disabled,
+                ..
+            } = node
+            else {
+                return;
+            };
+            ids.insert(id.clone());
+            let published = value.as_deref().and_then(crate::protocol::parse_date);
+            if let Some(retained) = self.date_pickers.get_mut(id) {
+                retained.disabled = *disabled;
+                let shown = match retained.state.read(cx).date() {
+                    Date::Single(date) => date,
+                    Date::Range(start, _) => start,
+                };
+                if shown != published {
+                    retained.state.update(cx, |state, cx| {
+                        state.set_date(Date::Single(published), window, cx);
+                        cx.notify();
+                    });
+                }
+            } else {
+                let state = cx.new(|cx| {
+                    let mut state = DatePickerState::new(window, cx);
+                    if published.is_some() {
+                        state.set_date(Date::Single(published), window, cx);
+                    }
+                    state
+                });
+                let event_id = id.clone();
+                let subscription =
+                    cx.subscribe(&state, move |this, _, event: &DatePickerEvent, _| {
+                        let DatePickerEvent::Change(value) = event;
+                        this.events.emit(Event::DateChange {
+                            revision: this.snapshot.revision,
+                            id: event_id.clone(),
+                            date: value
+                                .start()
+                                .map(|v| crate::protocol::format_date(v.date())),
+                        });
+                    });
+                self.date_pickers.insert(
+                    id.clone(),
+                    RetainedDatePicker {
+                        state,
+                        disabled: *disabled,
+                        _subscription: subscription,
+                    },
+                );
+            }
+        });
+        self.date_pickers.retain(|id, _| ids.contains(id));
+    }
+
+    pub(super) fn date_picker_element(
+        &self,
+        node: &Node,
+        colors: &ThemeColor,
+    ) -> Result<AnyElement, String> {
+        let Node::DatePicker {
+            id,
+            placeholder,
+            disabled,
+            ..
+        } = node
+        else {
+            return Err("Date picker materializer received a different node kind".into());
+        };
+        let retained = self
+            .date_pickers
+            .get(id)
+            .ok_or_else(|| format!("Missing retained date picker: {id}"))?;
+        let picker = DatePicker::new(&retained.state)
+            .cleanable(true)
+            .disabled(*disabled);
+        let picker = if placeholder.is_empty() {
+            picker
+        } else {
+            picker.placeholder(placeholder.clone())
+        };
+        Ok(apply_node_style(
+            annotate(div().id(SharedString::from(id.clone())), node)
+                .test_support()
+                .w_full()
+                .child(picker),
+            node,
+            colors,
+        )
+        .into_any_element())
     }
 
     fn reconcile_selects(&mut self, window: &mut Window, cx: &mut Context<Self>) {

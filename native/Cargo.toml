@@ -20,6 +20,8 @@ required-features = ["snapshot-experiment"]
 
 [dependencies]
 async-channel = "2"
+base64 = "0.22"
+chrono = "0.4"
 gpui-kit = { git = "https://github.com/longbridge/gpui-kit", rev = "0c830f4d257e69fdd17200650533ab4ca9a40cc0", features = ["profiler"] }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
