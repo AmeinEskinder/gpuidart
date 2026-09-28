@@ -17,8 +17,10 @@ debug = 1
 [profile.release]
 panic = "unwind"
 
-# Narrow accessibility adapter fixes; provenance and patch-only diff are in
-# native/vendor/README.md. GPUI/Kit revisions and dependency versions are unchanged.
+# Vendored copies with narrow patches; provenance and patch-only diffs are in
+# native/vendor/README.md. Each copy is the version the lockfile already
+# resolved, so dependency versions are unchanged; GPUI Kit itself stays a git
+# pin in native/Cargo.toml.
 [patch.crates-io]
 accesskit_atspi_common = { path = "native/vendor/accesskit_atspi_common-0.19.1" }
 accesskit_consumer = { path = "native/vendor/accesskit_consumer-0.38.0" }

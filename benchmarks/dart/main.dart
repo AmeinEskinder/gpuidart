@@ -33,6 +33,10 @@ Future<void> main(List<String> args) async {
       UiTable('table', dataset: 'quotes'),
     ]),
     datasets: [data],
+    // The SDK's path for large datasets: the window opens first and the
+    // records follow, so window availability measures the host, not the
+    // upload.
+    deferDatasets: true,
   );
   var updates = 0;
   var cellsWritten = 0;

@@ -80,7 +80,10 @@ the collection when a requested font is missing keeps its immediate check.
 Measured in a fresh process on this machine (`startup_platform_costs`, the
 ignored probe test in the native crate), the first enumeration took 85 to 163
 ms with the check and 1 ms without it, which was most of the time between the
-native run entry and window creation. The crate is copied from the registry
+native run entry and window creation. The copy is a maintenance surface an
+upstream change would remove: the call lives in Zed's `gpui_windows`
+`DirectWriteTextSystem::new`, and either an upstream `false` or a platform
+option to skip the startup check would let the vendored crate go. The crate is copied from the registry
 archive with the same provenance rules as GPUI above; only `src`, the manifest,
 the build script and the license are included.
 
