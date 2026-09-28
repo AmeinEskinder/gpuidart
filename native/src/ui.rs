@@ -892,6 +892,9 @@ impl DartView {
         // over the dataset is stale afterwards, spec or not.
         let structural = matches!(&update.change, Change::Edit { edits } if edits.iter().any(Edit::is_structural))
             || matches!(&update.change, Change::Append { .. });
+        // A slice with more to follow is stored and acknowledged only; the
+        // views recompute and the tables notify at the last slice.
+        let deferred = matches!(&update.change, Change::Append { more: true, .. });
         // Columns an edit touches, for the view-recompute check. Row edits
         // touch every column; Replace is handled separately.
         let touched: Option<HashSet<usize>> = match &update.change {
@@ -960,6 +963,22 @@ impl DartView {
             }
         }
         match self.datasets.apply(update) {
+            Ok(work) if deferred => {
+                self.counters
+                    .data_records_checked
+                    .set(self.counters.data_records_checked.get() + work.records_checked as u64);
+                self.counters
+                    .data_cells_written
+                    .set(self.counters.data_cells_written.get() + work.cells_written as u64);
+                self.events.emit(Event::DatasetApplied {
+                    request,
+                    id,
+                    revision,
+                    parse_us,
+                    apply_us: timer.elapsed().as_micros() as u64,
+                    work,
+                });
+            }
             Ok(work) => {
                 let table_ids: Vec<String> = self
                     .tables

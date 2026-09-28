@@ -17,6 +17,7 @@ final class HostMetrics {
   int dataRecordsChecked = 0;
   int dataCellsWritten = 0;
   final List<int> dataEncodeMicroseconds = [];
+  final List<int> dataPackMicroseconds = [];
   final List<int> dataApplyMicroseconds = [];
   final List<int> nativeDataParseMicroseconds = [];
   final List<int> nativeDataApplyMicroseconds = [];
@@ -64,6 +65,7 @@ final class HostMetrics {
     'data_records_checked': dataRecordsChecked,
     'data_cells_written': dataCellsWritten,
     'data_encode': _percentiles(dataEncodeMicroseconds),
+    'data_pack': _percentiles(dataPackMicroseconds),
     'data_publish_to_applied': _percentiles(dataApplyMicroseconds),
     'native_data_parse': _percentiles(nativeDataParseMicroseconds),
     'native_data_apply': _percentiles(nativeDataApplyMicroseconds),

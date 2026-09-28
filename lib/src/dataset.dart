@@ -124,12 +124,68 @@ final class TableDataset {
     };
   }
 
-  /// Records [start] to [end] as an append behind the ones already uploaded.
-  Map<String, Object> _appendChange(int start, int end) => {
-    'op': 'append',
-    'rows': _rows.sublist(start, end),
-    if (_rowIds != null) 'ids': _rowIds!.sublist(start, end),
-  };
+  /// Records [start] to [end] as an append behind the ones already uploaded:
+  /// a JSON header and the cells as length-prefixed UTF-8, which spares both
+  /// sides the JSON quoting of every cell. [more] tells native that further
+  /// slices follow, so it recomputes views once at the last one.
+  _PackedAppend _appendPacked(int start, int end, {bool more = false}) {
+    final packing = Stopwatch()..start();
+    final ids = _rowIds;
+    // One pass: the buffer is sized for the widest UTF-8 the code units can
+    // take and trimmed to what was written, so no cell is walked twice.
+    var capacity = 9;
+    for (var i = start; i < end; i++) {
+      for (final cell in _rows[i]) {
+        capacity += 4 + 3 * cell.length;
+      }
+      if (ids != null) capacity += 4 + 3 * ids[i].length;
+    }
+    final buffer = Uint8List(capacity);
+    var at = 0;
+    void u32(int value) {
+      buffer[at] = value & 0xFF;
+      buffer[at + 1] = (value >> 8) & 0xFF;
+      buffer[at + 2] = (value >> 16) & 0xFF;
+      buffer[at + 3] = (value >> 24) & 0xFF;
+      at += 4;
+    }
+
+    void text(String value) {
+      final lengthAt = at;
+      at += 4;
+      final begin = at;
+      at = _writeUtf8(value, buffer, at);
+      final length = at - begin;
+      buffer[lengthAt] = length & 0xFF;
+      buffer[lengthAt + 1] = (length >> 8) & 0xFF;
+      buffer[lengthAt + 2] = (length >> 16) & 0xFF;
+      buffer[lengthAt + 3] = (length >> 24) & 0xFF;
+    }
+
+    u32(end - start);
+    u32(_columns.length);
+    buffer[at++] = ids == null ? 0 : 1;
+    for (var i = start; i < end; i++) {
+      for (final cell in _rows[i]) {
+        text(cell);
+      }
+    }
+    if (ids != null) {
+      for (var i = start; i < end; i++) {
+        text(ids[i]);
+      }
+    }
+    return (
+      header: {
+        'op': 'append',
+        'rows': const <List<String>>[],
+        if (ids != null) 'ids': const <String>[],
+        if (more) 'more': true,
+      },
+      body: Uint8List.sublistView(buffer, 0, at),
+      packMicroseconds: packing.elapsedMicroseconds,
+    );
+  }
 
   /// Records are uploaded in messages of about this many encoded bytes; JSON
   /// escapes and non-ASCII text can triple the estimate, still under the
@@ -199,6 +255,25 @@ List<List<String>> _copyRows(List<List<String>> rows) {
   return rows.map((row) => List<String>.unmodifiable(row)).toList();
 }
 
+/// Native holds text as UTF-8, which cannot carry an unpaired UTF-16
+/// surrogate. Edits are checked here before they leave Dart; records are
+/// checked as they are packed, and native rejects the JSON forms. A scan of
+/// every record at construction would cost about a quarter second per
+/// million, so the constructor does not.
+void _checkText(String text, String what) {
+  for (var i = 0; i < text.length; i++) {
+    final unit = text.codeUnitAt(i);
+    if (unit & 0xF800 != 0xD800) continue;
+    if (unit <= 0xDBFF &&
+        i + 1 < text.length &&
+        text.codeUnitAt(i + 1) & 0xFC00 == 0xDC00) {
+      i++;
+      continue;
+    }
+    throw ArgumentError('Dataset $what has an unpaired surrogate at $i');
+  }
+}
+
 void _validateData(List<String> columns, List<List<String>> rows) {
   if (columns.isEmpty || columns.length > 64 || rows.length > maxDatasetRows) {
     throw ArgumentError(
@@ -256,6 +331,7 @@ final class CellEdit extends TableEdit {
     if (column < 0 || column >= shape.columns) {
       throw RangeError.range(column, 0, shape.columns - 1, 'column');
     }
+    _checkText(value, 'cell');
   }
 
   @override
@@ -285,6 +361,9 @@ final class RowEdit extends TableEdit {
     shape.checkRow(row, 'row');
     if (values.length != shape.columns) {
       throw ArgumentError('Row width does not match columns');
+    }
+    for (final value in values) {
+      _checkText(value, 'cell');
     }
   }
 
@@ -319,6 +398,9 @@ final class InsertRow extends TableEdit {
     if (values.length != shape.columns) {
       throw ArgumentError('Row width does not match columns');
     }
+    for (final value in values) {
+      _checkText(value, 'cell');
+    }
     if (shape.rows >= maxDatasetRows) {
       throw ArgumentError('Dataset allows at most $maxDatasetRows rows');
     }
@@ -328,6 +410,7 @@ final class InsertRow extends TableEdit {
         'Insert carries a record ID exactly when the dataset has record IDs',
       );
     }
+    if (record != null) _checkText(record, 'record ID');
     if (record != null &&
         (record.isEmpty || (shape.tracksIds && !shape.live.add(record)))) {
       throw ArgumentError.value(
@@ -408,6 +491,45 @@ final class MoveRow extends TableEdit {
   Map<String, Object> _toJson() => {'kind': 'move', 'row': row, 'to': to};
 }
 
+/// Encodes [text] as UTF-8 into [out] from [at]; returns the next offset.
+/// An unpaired surrogate has no UTF-8 form and throws an [ArgumentError].
+int _writeUtf8(String text, Uint8List out, int at) {
+  for (var i = 0; i < text.length; i++) {
+    final unit = text.codeUnitAt(i);
+    if (unit < 0x80) {
+      out[at++] = unit;
+    } else if (unit < 0x800) {
+      out[at++] = 0xC0 | (unit >> 6);
+      out[at++] = 0x80 | (unit & 0x3F);
+    } else if (unit & 0xF800 == 0xD800) {
+      if (unit > 0xDBFF ||
+          i + 1 == text.length ||
+          text.codeUnitAt(i + 1) & 0xFC00 != 0xDC00) {
+        throw ArgumentError('Dataset text has an unpaired surrogate at $i');
+      }
+      final point =
+          0x10000 + ((unit - 0xD800) << 10) + (text.codeUnitAt(++i) - 0xDC00);
+      out[at++] = 0xF0 | (point >> 18);
+      out[at++] = 0x80 | ((point >> 12) & 0x3F);
+      out[at++] = 0x80 | ((point >> 6) & 0x3F);
+      out[at++] = 0x80 | (point & 0x3F);
+    } else {
+      out[at++] = 0xE0 | (unit >> 12);
+      out[at++] = 0x80 | ((unit >> 6) & 0x3F);
+      out[at++] = 0x80 | (unit & 0x3F);
+    }
+  }
+  return at;
+}
+
+/// One appended slice: its JSON header, the packed records behind it and
+/// the time spent packing them, which the message encoding metric excludes.
+typedef _PackedAppend = ({
+  Map<String, Object> header,
+  Uint8List body,
+  int packMicroseconds,
+});
+
 extension _DatasetTransactions on GpuiHost {
   /// Sends the records the initial message left out: a deferred dataset as
   /// one replacement, a dataset too large for one message as appended slices
@@ -425,11 +547,56 @@ extension _DatasetTransactions on GpuiHost {
         }, () {});
       }
     } else {
-      for (final (start, end) in chunks) {
-        await _transact(dataset, dataset._appendChange(start, end), () {});
-      }
+      await _appendSlices(dataset, dataset, chunks, 0, (_, _) {});
     }
     dataset._releaseRecords();
+  }
+
+  /// Sends [chunks] of [source] from [first] on as packed appends to
+  /// [dataset], packing each slice while native applies the previous one;
+  /// [commit] runs for a slice once native acknowledges it.
+  Future<void> _appendSlices(
+    TableDataset dataset,
+    TableDataset source,
+    List<(int, int)> chunks,
+    int first,
+    void Function(int start, int end) commit,
+  ) async {
+    _PackedAppend pack(int index) {
+      final (start, end) = chunks[index];
+      final slice = source._appendPacked(
+        start,
+        end,
+        more: index < chunks.length - 1,
+      );
+      HostMetrics.sample(metrics.dataPackMicroseconds, slice.packMicroseconds);
+      return slice;
+    }
+
+    var slice = pack(first);
+    for (var index = first; index < chunks.length; index++) {
+      final (start, end) = chunks[index];
+      final sent = _transact(
+        dataset,
+        slice.header,
+        () => commit(start, end),
+        body: slice.body,
+      );
+      _PackedAppend? next;
+      Object? failure;
+      StackTrace? failureStack;
+      if (index + 1 < chunks.length) {
+        try {
+          next = pack(index + 1);
+        } catch (error, stack) {
+          failure = error;
+          failureStack = stack;
+        }
+      }
+      await sent;
+      if (failure != null) Error.throwWithStackTrace(failure, failureStack!);
+      if (next != null) slice = next;
+    }
   }
 
   /// Registers a dataset under an unused ID: its first slice as a replacement
@@ -443,8 +610,8 @@ extension _DatasetTransactions on GpuiHost {
       create: true,
       window: window,
     );
-    for (final (start, end) in chunks.skip(1)) {
-      await _transact(dataset, dataset._appendChange(start, end), () {});
+    if (chunks.length > 1) {
+      await _appendSlices(dataset, dataset, chunks, 1, (_, _) {});
     }
     dataset._releaseRecords();
   }
@@ -455,6 +622,7 @@ extension _DatasetTransactions on GpuiHost {
     void Function() commit, {
     bool create = false,
     int window = 0,
+    Uint8List? body,
   }) async {
     if (_closing || _closed.isCompleted) throw StateError('Host is closing');
     if (dataset._busy) {
@@ -493,6 +661,7 @@ extension _DatasetTransactions on GpuiHost {
             ? _bindings.dataset(_handle, bytes, length)
             : _bindings.windows!.dataset(_handle, target, bytes, length),
         traced: target == 0,
+        attachment: body,
       );
       if (status != 0) {
         final error = StateError('Dataset submission failed: $status');

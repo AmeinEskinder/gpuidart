@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 
@@ -600,6 +601,9 @@ final class GpuiHost {
           ),
       ]);
     } catch (_) {
+      // A rejected or unpackable upload is a failed open: the window closes
+      // and the error reaches the caller.
+      host._beginClose();
       await host.done.catchError((Object _) {});
       rethrow;
     }
@@ -612,11 +616,12 @@ final class GpuiHost {
     int request,
     T Function(Pointer<Uint8>, int) action, {
     bool traced = true,
+    Uint8List? attachment,
   }) {
     final trace = traced ? _trace : null;
     final timer = Stopwatch()..start();
     final encodingStart = trace?._clock.now();
-    final List<int> data;
+    List<int> data;
     // Internal comparison control; the default build removes this legacy path.
     if (const bool.fromEnvironment('gpuidart.legacy_json')) {
       final json = trace == null
@@ -639,6 +644,15 @@ final class GpuiHost {
               request,
               () => _jsonUtf8.convert(message),
             );
+    }
+    if (attachment != null) {
+      // A framed message: magic, header length, JSON header, packed records.
+      final framed = Uint8List(8 + data.length + attachment.length);
+      framed.setRange(0, 4, const [0x47, 0x44, 0x50, 0x31]);
+      ByteData.sublistView(framed).setUint32(4, data.length, Endian.little);
+      framed.setRange(8, 8 + data.length, data);
+      framed.setRange(8 + data.length, framed.length, attachment);
+      data = framed;
     }
     final copyStart = trace?._clock.now();
     final bytes = calloc<Uint8>(data.length);
@@ -852,8 +866,8 @@ final class GpuiHost {
         }
       },
     );
-    for (final (start, end) in chunks.skip(1)) {
-      await _transact(dataset, replacement._appendChange(start, end), () {
+    if (chunks.length > 1) {
+      await _appendSlices(dataset, replacement, chunks, 1, (start, end) {
         dataset._rowCount += end - start;
         if (dataset.retainRecords) {
           dataset._rows.addAll(replacement._rows.sublist(start, end));

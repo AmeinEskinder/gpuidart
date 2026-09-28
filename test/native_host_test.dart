@@ -496,6 +496,78 @@ void main() {
     timeout: const Timeout(Duration(seconds: 120)),
   );
 
+  test('packed records carry every UTF-16 shape as native UTF-8', () async {
+    // A first record past the slice estimate puts the rest in a packed
+    // slice of their own, so every text shape below travels packed.
+    final cells = [
+      'x' * 4500000,
+      'plain',
+      '',
+      'caf\u00e9 \u65e5\u672c\u8a9e',
+      'pair \ud83d\ude00 end',
+      '\udbff\udfff',
+      '\u07ff\u0800\uffff',
+    ];
+    final dataset = TableDataset(
+      'text',
+      columns: ['Text'],
+      rows: [
+        for (final cell in cells) [cell],
+      ],
+      rowIds: [for (final (i, cell) in cells.indexed) 'id$i:${cell.length}'],
+      retainRecords: false,
+    );
+    final host = await GpuiHost.open(
+      const UiTable('table', dataset: 'text'),
+      datasets: [dataset],
+    );
+    try {
+      expect(dataset.revision, 3, reason: 'schema, then two packed slices');
+      for (var row = 1; row < cells.length; row++) {
+        final read = await host.diagnose('cell', {
+          'dataset': 'text',
+          'row': row,
+          'column': 0,
+        });
+        expect(read['value'], cells[row], reason: 'row $row');
+      }
+      // Native alone holds the records and the IDs it decoded from the
+      // same frame, so the duplicate is its rejection.
+      await expectLater(
+        host.editDataset(dataset, [
+          InsertRow(0, ['dup'], id: 'id3:${cells[3].length}'),
+        ]),
+        throwsStateError,
+      );
+      // An unpaired surrogate is refused before any message leaves Dart.
+      expect(
+        () => host.editDataset(dataset, [const CellEdit(1, 0, 'lone \ud83d')]),
+        throwsArgumentError,
+      );
+      expect(dataset.revision, 3);
+    } finally {
+      await host.close();
+    }
+    // In a packed slice the same text fails the open, which closes the
+    // window rather than waiting for it.
+    await expectLater(
+      GpuiHost.open(
+        const UiTable('table', dataset: 'text'),
+        datasets: [
+          TableDataset(
+            'text',
+            columns: ['Text'],
+            rows: [
+              [cells.first],
+              ['lone \ud83d'],
+            ],
+          ),
+        ],
+      ),
+      throwsArgumentError,
+    );
+  });
+
   test('structural edits keep record identity, views and selection', () async {
     final dataset = TableDataset(
       'records',

@@ -296,6 +296,11 @@ pub enum Change {
         rows: Vec<Vec<String>>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         ids: Option<Vec<String>>,
+        /// More slices of the same upload follow: the records are stored and
+        /// acknowledged, but views, tables and charts wait for the last slice,
+        /// so an upload of many slices recomputes each view once.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        more: bool,
     },
     Edit {
         edits: Vec<Edit>,
@@ -344,20 +349,111 @@ impl Edit {
     }
 }
 
+/// Prefix of a framed dataset message: `GDP1`, a little-endian u32 header
+/// length, the JSON header, then the records as `u32 count, u32 columns,
+/// u8 has_ids`, every cell as `u32 length` and UTF-8 bytes row by row, and
+/// the record IDs the same way. The header is an append whose `rows` and
+/// `ids` are empty; the body supplies them without JSON quoting.
+pub const PACKED_MAGIC: &[u8; 4] = b"GDP1";
+
 impl Update {
     pub fn parse(bytes: &[u8]) -> Result<Self, String> {
         if bytes.len() > MAX_MESSAGE_BYTES {
             return Err("Dataset message exceeds 16 MiB".into());
         }
+        if let Some(framed) = bytes.strip_prefix(PACKED_MAGIC) {
+            return Self::parse_packed(framed);
+        }
         let update: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
-        if update.id.is_empty()
-            || update.request == 0
-            || update.base_revision.checked_add(1) != Some(update.revision)
+        update.checked()
+    }
+
+    fn checked(self) -> Result<Self, String> {
+        if self.id.is_empty()
+            || self.request == 0
+            || self.base_revision.checked_add(1) != Some(self.revision)
         {
             return Err("Dataset update requires an ID and the next revision".into());
         }
-        Ok(update)
+        Ok(self)
     }
+
+    fn parse_packed(bytes: &[u8]) -> Result<Self, String> {
+        let (header_len, rest) = read_u32(bytes)?;
+        if header_len as usize > rest.len() {
+            return Err("Packed dataset header exceeds the message".into());
+        }
+        let (header, body) = rest.split_at(header_len as usize);
+        let mut update: Self = serde_json::from_slice(header).map_err(|e| e.to_string())?;
+        let Change::Append { rows, ids, .. } = &mut update.change else {
+            return Err("Packed records need an append header".into());
+        };
+        if !rows.is_empty() || ids.as_ref().is_some_and(|ids| !ids.is_empty()) {
+            return Err("Packed append carries its records in the body only".into());
+        }
+        let (count, body) = read_u32(body)?;
+        let (width, body) = read_u32(body)?;
+        let (has_ids, mut cursor) = read_u8(body)?;
+        if width == 0 || width > 64 || count as usize > MAX_ROWS || has_ids > 1 {
+            return Err(
+                "Packed records need 1..64 columns, at most the row cap and a 0/1 id flag".into(),
+            );
+        }
+        let mut decoded = Vec::with_capacity(count as usize);
+        for _ in 0..count {
+            let mut row = Vec::with_capacity(width as usize);
+            for _ in 0..width {
+                let (cell, rest) = read_text(cursor)?;
+                row.push(cell);
+                cursor = rest;
+            }
+            decoded.push(row);
+        }
+        let decoded_ids = if has_ids == 1 {
+            let mut list = Vec::with_capacity(count as usize);
+            for _ in 0..count {
+                let (id, rest) = read_text(cursor)?;
+                list.push(id);
+                cursor = rest;
+            }
+            Some(list)
+        } else {
+            None
+        };
+        if !cursor.is_empty() {
+            return Err("Packed records have trailing bytes".into());
+        }
+        *rows = decoded;
+        *ids = decoded_ids;
+        update.checked()
+    }
+}
+
+fn read_u32(bytes: &[u8]) -> Result<(u32, &[u8]), String> {
+    let (head, rest) = bytes
+        .split_at_checked(4)
+        .ok_or("Packed records end inside a length")?;
+    Ok((
+        u32::from_le_bytes(head.try_into().expect("four bytes")),
+        rest,
+    ))
+}
+
+fn read_u8(bytes: &[u8]) -> Result<(u8, &[u8]), String> {
+    let (&flag, rest) = bytes
+        .split_first()
+        .ok_or("Packed records end before the id flag")?;
+    Ok((flag, rest))
+}
+
+fn read_text(bytes: &[u8]) -> Result<(String, &[u8]), String> {
+    let (len, rest) = read_u32(bytes)?;
+    let (text, rest) = rest
+        .split_at_checked(len as usize)
+        .ok_or("Packed record text exceeds the message")?;
+    let text = String::from_utf8(text.to_vec())
+        .map_err(|_| "Packed record text is not UTF-8".to_owned())?;
+    Ok((text, rest))
 }
 
 pub struct Dataset {
@@ -366,6 +462,91 @@ pub struct Dataset {
     pub id: String,
     pub revision: u64,
     pub data: TableData,
+    /// Sorted 64-bit hashes of every record ID, eight bytes per record, so
+    /// appends and inserts check uniqueness by binary search. A hit is
+    /// confirmed against the records themselves, so a collision costs a scan
+    /// rather than a wrong answer. Deleted IDs leave their hash behind (the
+    /// index is a superset of the live IDs) and the index is rebuilt once the
+    /// stale entries outnumber the live ones.
+    ids_index: Vec<u64>,
+    stale_ids: usize,
+}
+
+fn index_of(data: &TableData) -> Vec<u64> {
+    let mut hashes: Vec<u64> = data
+        .ids
+        .as_ref()
+        .map(|ids| ids.iter().map(|id| id_hash(id)).collect())
+        .unwrap_or_default();
+    hashes.sort_unstable();
+    hashes
+}
+
+fn id_hash(id: &str) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    id.hash(&mut hasher);
+    hasher.finish()
+}
+
+impl Dataset {
+    /// Whether a record with this ID exists.
+    fn has_id(&self, id: &str) -> bool {
+        self.ids_index.binary_search(&id_hash(id)).is_ok()
+            && self
+                .data
+                .ids
+                .as_ref()
+                .is_some_and(|ids| ids.iter().any(|existing| existing == id))
+    }
+
+    fn index_ids<'a>(&mut self, ids: impl IntoIterator<Item = &'a String>) {
+        self.index_hashes(ids.into_iter().map(|id| id_hash(id)).collect());
+    }
+
+    /// Merges sorted or unsorted hashes into the index in one pass over it,
+    /// so an appended slice costs its own size plus the index length.
+    fn index_hashes(&mut self, mut tail: Vec<u64>) {
+        tail.sort_unstable();
+        let head = std::mem::take(&mut self.ids_index);
+        let mut merged = Vec::with_capacity(head.len() + tail.len());
+        let (mut i, mut j) = (0, 0);
+        while i < head.len() && j < tail.len() {
+            if head[i] <= tail[j] {
+                merged.push(head[i]);
+                i += 1;
+            } else {
+                merged.push(tail[j]);
+                j += 1;
+            }
+        }
+        merged.extend_from_slice(&head[i..]);
+        merged.extend_from_slice(&tail[j..]);
+        self.ids_index = merged;
+    }
+}
+
+/// Whether two sorted slices share a value.
+fn sorted_overlap(a: &[u64], b: &[u64]) -> bool {
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() && j < b.len() {
+        match a[i].cmp(&b[j]) {
+            std::cmp::Ordering::Less => i += 1,
+            std::cmp::Ordering::Greater => j += 1,
+            std::cmp::Ordering::Equal => return true,
+        }
+    }
+    false
+}
+
+impl Dataset {
+    fn unindex_id(&mut self) {
+        self.stale_ids += 1;
+        if self.stale_ids > self.ids_index.len() / 2 {
+            self.ids_index = index_of(&self.data);
+            self.stale_ids = 0;
+        }
+    }
 }
 
 pub type SharedDataset = Rc<RefCell<Dataset>>;
@@ -387,6 +568,7 @@ impl Store {
         let mut store = Self::default();
         for upload in uploads {
             store.used_ids.insert(upload.id.clone());
+            let ids_index = index_of(&upload.data);
             store.entries.insert(
                 upload.id.clone(),
                 Rc::new(RefCell::new(Dataset {
@@ -394,6 +576,8 @@ impl Store {
                     revision: upload.revision,
                     generation: upload.revision,
                     data: upload.data,
+                    ids_index,
+                    stale_ids: 0,
                 })),
             );
         }
@@ -419,10 +603,13 @@ impl Store {
                     records_checked: data.rows.len(),
                     cells_written: data.rows.len() * data.columns.len(),
                 };
+                let ids_index = index_of(&data);
                 if let Some(current) = current {
                     let mut current = current.borrow_mut();
                     current.generation = update.revision;
                     current.data = data;
+                    current.ids_index = ids_index;
+                    current.stale_ids = 0;
                     current.revision = update.revision;
                 } else {
                     self.used_ids.insert(update.id.clone());
@@ -433,12 +620,14 @@ impl Store {
                             revision: update.revision,
                             generation: update.revision,
                             data,
+                            ids_index,
+                            stale_ids: 0,
                         })),
                     );
                 }
                 Ok(work)
             }
-            Change::Append { rows, ids } => {
+            Change::Append { rows, ids, .. } => {
                 let mut current = current.ok_or("Unknown dataset")?.borrow_mut();
                 let width = current.data.columns.len();
                 if rows.is_empty() {
@@ -450,15 +639,28 @@ impl Store {
                 if rows.iter().any(|row| row.len() != width) {
                     return Err("Dataset row width does not match its columns".into());
                 }
+                let mut hashes = Vec::new();
                 match (&current.data.ids, &ids) {
                     (None, None) => {}
-                    (Some(existing), Some(new)) => {
+                    (Some(_), Some(new)) => {
                         if new.len() != rows.len() {
                             return Err("Dataset ids must parallel its rows".into());
                         }
-                        let mut seen: HashSet<&str> = existing.iter().map(String::as_str).collect();
-                        if new.iter().any(|id| id.is_empty() || !seen.insert(id)) {
+                        if new.iter().any(String::is_empty) {
                             return Err("Dataset ids must be nonempty and unique".into());
+                        }
+                        hashes = new.iter().map(|id| id_hash(id)).collect();
+                        hashes.sort_unstable();
+                        // Only a hash repeated in the slice or present in the
+                        // index can be a duplicate ID, so the IDs themselves
+                        // are compared only then.
+                        if hashes.windows(2).any(|pair| pair[0] == pair[1])
+                            || sorted_overlap(&current.ids_index, &hashes)
+                        {
+                            let mut batch: HashSet<&str> = HashSet::with_capacity(new.len());
+                            if new.iter().any(|id| current.has_id(id) || !batch.insert(id)) {
+                                return Err("Dataset ids must be nonempty and unique".into());
+                            }
                         }
                     }
                     _ => {
@@ -472,11 +674,15 @@ impl Store {
                     records_checked: rows.len(),
                     cells_written: rows.len() * width,
                 };
-                current.data.rows.extend(rows);
-                if let (Some(existing), Some(new)) = (&mut current.data.ids, ids) {
-                    existing.extend(new);
+                let dataset = &mut *current;
+                dataset.data.rows.extend(rows);
+                if let Some(new) = ids {
+                    dataset.index_hashes(hashes);
+                    if let Some(existing) = &mut dataset.data.ids {
+                        existing.extend(new);
+                    }
                 }
-                current.revision = update.revision;
+                dataset.revision = update.revision;
                 Ok(work)
             }
             Change::Edit { edits } => {
@@ -492,7 +698,10 @@ impl Store {
                 let width = current.data.columns.len();
                 let identity = current.data.ids.is_some();
                 let mut len = current.data.rows.len();
-                let mut live: Option<HashSet<&str>> = None;
+                // IDs deleted earlier in the batch stay in the index until the
+                // batch applies, so they stay reserved; IDs inserted earlier
+                // in the batch are tracked here.
+                let mut batch_ids: HashSet<&str> = HashSet::new();
                 for edit in &edits {
                     match edit {
                         Edit::Cell { row, column, .. } if *row < len && *column < width => {}
@@ -506,15 +715,8 @@ impl Store {
                             match (identity, id) {
                                 (false, None) => {}
                                 (true, Some(id)) => {
-                                    let live = live.get_or_insert_with(|| {
-                                        current
-                                            .data
-                                            .ids
-                                            .as_ref()
-                                            .map(|ids| ids.iter().map(String::as_str).collect())
-                                            .unwrap_or_default()
-                                    });
-                                    if id.is_empty() || !live.insert(id) {
+                                    if id.is_empty() || current.has_id(id) || !batch_ids.insert(id)
+                                    {
                                         return Err(format!(
                                             "Dataset insert needs a nonempty unused record ID: {id}"
                                         ));
@@ -538,40 +740,45 @@ impl Store {
                     records_checked: edits.len(),
                     ..Work::default()
                 };
+                let dataset = &mut *current;
                 for edit in edits {
                     match edit {
                         Edit::Cell { row, column, value } => {
-                            current.data.rows[row][column] = value;
+                            dataset.data.rows[row][column] = value;
                             work.cells_written += 1;
                         }
                         Edit::Row { row, values } => {
                             work.cells_written += values.len();
-                            current.data.rows[row] = values;
+                            dataset.data.rows[row] = values;
                         }
                         Edit::Insert { at, values, id } => {
                             work.cells_written += values.len();
-                            current.data.rows.insert(at, values);
-                            if let (Some(ids), Some(id)) = (&mut current.data.ids, id) {
-                                ids.insert(at, id);
+                            dataset.data.rows.insert(at, values);
+                            if let Some(id) = id {
+                                dataset.index_ids(std::iter::once(&id));
+                                if let Some(ids) = &mut dataset.data.ids {
+                                    ids.insert(at, id);
+                                }
                             }
                         }
                         Edit::Delete { row } => {
-                            current.data.rows.remove(row);
-                            if let Some(ids) = &mut current.data.ids {
+                            dataset.data.rows.remove(row);
+                            if let Some(ids) = &mut dataset.data.ids {
                                 ids.remove(row);
+                                dataset.unindex_id();
                             }
                         }
                         Edit::Move { row, to } => {
-                            let record = current.data.rows.remove(row);
-                            current.data.rows.insert(to, record);
-                            if let Some(ids) = &mut current.data.ids {
+                            let record = dataset.data.rows.remove(row);
+                            dataset.data.rows.insert(to, record);
+                            if let Some(ids) = &mut dataset.data.ids {
                                 let id = ids.remove(row);
                                 ids.insert(to, id);
                             }
                         }
                     }
                 }
-                current.revision = update.revision;
+                dataset.revision = update.revision;
                 Ok(work)
             }
             Change::Release => {

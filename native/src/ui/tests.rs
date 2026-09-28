@@ -424,6 +424,84 @@ fn layout_primitives_size_position_and_retain_scroll_offsets(cx: &mut TestAppCon
 }
 
 #[gpui::test]
+fn sliced_appends_recompute_views_once_at_the_last_slice(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = Snapshot::parse(
+        br#"{"revision":1,"root":{"kind":"table","id":"table","dataset":"records","view":{"sort":[{"column":0,"direction":"desc"}]}}}"#,
+    )
+    .unwrap();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot,
+                        datasets: vec![crate::datasets::Upload {
+                            id: "records".into(),
+                            revision: 1,
+                            data: crate::protocol::TableData {
+                                columns: vec!["A".into()],
+                                rows: vec![],
+                                ids: None,
+                                format: None,
+                            },
+                        }],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let append = |base: u64, value: &str, more: bool| Update {
+        request: base,
+        id: "records".into(),
+        base_revision: base,
+        revision: base + 1,
+        change: Change::Append {
+            rows: vec![vec![value.to_owned()]],
+            ids: None,
+            more,
+        },
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let before = view.read(cx).inspect(window, cx)["native"]["view_recomputes"]
+            .as_u64()
+            .unwrap();
+        view.update(cx, |view, cx| {
+            view.update_dataset(append(1, "b", true), 0, cx)
+        });
+        view.update(cx, |view, cx| {
+            view.update_dataset(append(2, "c", true), 0, cx)
+        });
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(
+            inspect["native"]["view_recomputes"].as_u64().unwrap(),
+            before,
+            "pending slices do not recompute"
+        );
+        assert_eq!(inspect["tables"]["table"]["dataset_revision"], 3);
+        view.update(cx, |view, cx| {
+            view.update_dataset(append(3, "a", false), 0, cx)
+        });
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(
+            inspect["native"]["view_recomputes"].as_u64().unwrap(),
+            before + 1,
+            "the last slice recomputes once"
+        );
+        assert_eq!(inspect["tables"]["table"]["row_count"], 3);
+    })
+    .unwrap();
+}
+
+#[gpui::test]
 fn date_pickers_follow_publications(cx: &mut TestAppContext) {
     cx.update(gpui_kit::init);
     let snapshot = |revision: u64, value: Option<&str>, disabled: bool| {

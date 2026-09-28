@@ -409,6 +409,44 @@ fn structural_edits_apply_in_order_and_reject_as_a_whole() {
 }
 
 #[test]
+fn deleted_ids_free_their_slot_once_their_delete_applies() {
+    let mut store = Store::new(vec![Upload {
+        id: "records".into(),
+        revision: 1,
+        data: TableData {
+            columns: vec!["A".into()],
+            rows: (0..8).map(|i| vec![i.to_string()]).collect(),
+            ids: Some((0..8).map(|i| format!("r{i}")).collect()),
+            format: None,
+        },
+    }]);
+    // One delete per batch, enough for the stale hashes to outnumber the live
+    // ones and rebuild the index on the way.
+    for base in 1..=6 {
+        store
+            .apply(edit(base, vec![Edit::Delete { row: 0 }]))
+            .unwrap();
+    }
+    let insert = |id: &str| Edit::Insert {
+        at: 0,
+        values: vec!["again".into()],
+        id: Some(id.into()),
+    };
+    // r0 left before the rebuild and r5 after it; both slots are free.
+    store
+        .apply(edit(7, vec![insert("r0"), insert("r5")]))
+        .unwrap();
+    for id in ["r6", "r7", "r0", "r5"] {
+        assert!(
+            store.apply(edit(8, vec![insert(id)])).is_err(),
+            "{id} is live and stays reserved"
+        );
+    }
+    let data = &store.entries["records"].borrow().data;
+    assert_eq!(data.ids.as_ref().unwrap(), &["r5", "r0", "r6", "r7"]);
+}
+
+#[test]
 fn view_columns_must_exist_in_the_dataset() {
     let view = crate::protocol::TableView {
         sort: vec![crate::protocol::SortKey {
@@ -526,6 +564,7 @@ fn append(base: u64, rows: Vec<Vec<&str>>, ids: Option<Vec<&str>>) -> Update {
                 .map(|row| row.into_iter().map(str::to_owned).collect())
                 .collect(),
             ids: ids.map(|ids| ids.into_iter().map(str::to_owned).collect()),
+            more: false,
         },
     }
 }
@@ -589,8 +628,83 @@ fn appends_extend_records_and_ids_and_keep_the_shape_checks() {
     )
     .unwrap();
     assert!(
-        matches!(parsed.change, Change::Append { ref rows, ids: Some(ref ids) } if rows.len() == 1 && ids[0] == "r4")
+        matches!(parsed.change, Change::Append { ref rows, ids: Some(ref ids), .. } if rows.len() == 1 && ids[0] == "r4")
     );
+    let sliced = Update::parse(
+        br#"{"request":1,"id":"records","base_revision":2,"revision":3,"change":{"op":"append","rows":[["w"]],"ids":["r4"],"more":true}}"#,
+    )
+    .unwrap();
+    assert!(matches!(sliced.change, Change::Append { more: true, .. }));
+}
+
+fn packed(header: &str, count: u32, width: u32, ids: Option<&[&str]>, cells: &[&str]) -> Vec<u8> {
+    let mut frame = PACKED_MAGIC.to_vec();
+    frame.extend((header.len() as u32).to_le_bytes());
+    frame.extend(header.as_bytes());
+    frame.extend(count.to_le_bytes());
+    frame.extend(width.to_le_bytes());
+    frame.push(u8::from(ids.is_some()));
+    for text in cells.iter().chain(ids.unwrap_or_default()) {
+        frame.extend((text.len() as u32).to_le_bytes());
+        frame.extend(text.as_bytes());
+    }
+    frame
+}
+
+#[test]
+fn packed_appends_decode_their_body_and_reject_malformed_frames() {
+    let header = r#"{"request":1,"id":"records","base_revision":1,"revision":2,"change":{"op":"append","rows":[],"more":true}}"#;
+    let update = Update::parse(&packed(header, 2, 2, None, &["3", "é", "4", "new"])).unwrap();
+    let Change::Append { rows, ids, more } = &update.change else {
+        panic!("expected an append")
+    };
+    assert_eq!(
+        rows,
+        &[
+            vec!["3".to_owned(), "é".to_owned()],
+            vec!["4".to_owned(), "new".to_owned()]
+        ]
+    );
+    assert!(ids.is_none() && *more);
+    let mut store = Store::new(vec![upload(3)]);
+    let work = store.apply(update).unwrap();
+    assert_eq!((work.records_checked, work.cells_written), (2, 4));
+    assert_eq!(store.entries["records"].borrow().data.rows.len(), 5);
+
+    let with_ids = r#"{"request":1,"id":"records","base_revision":1,"revision":2,"change":{"op":"append","rows":[],"ids":[]}}"#;
+    let update = Update::parse(&packed(with_ids, 1, 1, Some(&["r9"]), &["x"])).unwrap();
+    assert!(
+        matches!(&update.change, Change::Append { ids: Some(ids), .. } if ids == &["r9".to_owned()])
+    );
+
+    let bad_utf8 = {
+        let mut frame = packed(header, 1, 1, None, &["ab"]);
+        let at = frame.len() - 2;
+        frame[at] = 0xFF;
+        frame
+    };
+    let mut truncated = packed(header, 1, 2, None, &["a", "b"]);
+    truncated.truncate(truncated.len() - 1);
+    let mut trailing = packed(header, 1, 2, None, &["a", "b"]);
+    trailing.push(0);
+    let rows_in_header = r#"{"request":1,"id":"records","base_revision":1,"revision":2,"change":{"op":"append","rows":[["x"]]}}"#;
+    let not_append =
+        r#"{"request":1,"id":"records","base_revision":1,"revision":2,"change":{"op":"release"}}"#;
+    for (frame, message) in [
+        (bad_utf8, "UTF-8"),
+        (truncated, "exceeds"),
+        (trailing, "trailing"),
+        (packed(rows_in_header, 1, 1, None, &["x"]), "body only"),
+        (packed(not_append, 1, 1, None, &["x"]), "append header"),
+        (packed(header, 1, 0, None, &[]), "columns"),
+        (
+            packed(header, 1, 1, None, &["x"])[..12].to_vec(),
+            "header exceeds",
+        ),
+    ] {
+        let error = Update::parse(&frame).err().expect("the frame is rejected");
+        assert!(error.contains(message), "{message}: {error}");
+    }
 }
 
 #[test]

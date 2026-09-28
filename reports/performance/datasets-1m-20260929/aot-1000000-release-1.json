@@ -1,0 +1,171 @@
+﻿{
+  "rows": 1000000,
+  "retain_records": false,
+  "slices": 13,
+  "build_ms": 1609,
+  "open_ms": 1149,
+  "sort_publish_to_inspect_ms": 147,
+  "memory": {
+    "at_start": {
+      "rss_mib": 15.89453125,
+      "native": {
+        "working_set": 16564224,
+        "private_commit": 8970240
+      }
+    },
+    "after_records": {
+      "rss_mib": 361.515625,
+      "native": {
+        "working_set": 379076608,
+        "private_commit": 373710848
+      }
+    },
+    "after_upload": {
+      "rss_mib": 629.7578125,
+      "native": {
+        "working_set": 660348928,
+        "private_commit": 743149568
+      }
+    },
+    "after_settle": {
+      "rss_mib": 390.38671875,
+      "native": {
+        "working_set": 409350144,
+        "private_commit": 453402624
+      }
+    },
+    "after_sort": {
+      "rss_mib": 394.60546875,
+      "native": {
+        "working_set": 413773824,
+        "private_commit": 453402624
+      }
+    }
+  },
+  "metrics": {
+    "description_builds": 0,
+    "encoded_snapshots": 1,
+    "operation_publications": 1,
+    "resubmitted_publications": 0,
+    "patches": 0,
+    "encoded_bytes": 173,
+    "ffi_callbacks": 19,
+    "ui_callbacks": 0,
+    "diagnostic_callbacks": 3,
+    "description_build": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "encode": {
+      "samples": 1,
+      "p50_us": 14,
+      "p95_us": 14,
+      "p99_us": 14
+    },
+    "publish_to_applied": {
+      "samples": 1,
+      "p50_us": 141827,
+      "p95_us": 141827,
+      "p99_us": 141827
+    },
+    "initial": {
+      "bytes": 253,
+      "encode_us": 68
+    },
+    "data_messages": 13,
+    "data_bytes": 52588387,
+    "data_records_checked": 1000000,
+    "data_cells_written": 3000000,
+    "data_encode": {
+      "samples": 13,
+      "p50_us": 6053,
+      "p95_us": 13324,
+      "p99_us": 13789
+    },
+    "data_pack": {
+      "samples": 13,
+      "p50_us": 24735,
+      "p95_us": 56083,
+      "p99_us": 58598
+    },
+    "data_publish_to_applied": {
+      "samples": 13,
+      "p50_us": 68593,
+      "p95_us": 97553,
+      "p99_us": 101198
+    },
+    "native_data_parse": {
+      "samples": 13,
+      "p50_us": 33030,
+      "p95_us": 36864,
+      "p99_us": 39504
+    },
+    "native_data_apply": {
+      "samples": 13,
+      "p50_us": 12909,
+      "p95_us": 26317,
+      "p99_us": 32434
+    },
+    "native_snapshot_apply": {
+      "samples": 1,
+      "p50_us": 141226,
+      "p95_us": 141226,
+      "p99_us": 141226
+    }
+  },
+  "table_before_sort": {
+    "entity": 4294967298,
+    "visible_rows": {
+      "start": 0,
+      "end": 9
+    },
+    "row_count": 1000000,
+    "dataset": "records",
+    "dataset_revision": 14,
+    "scroll_y": 0.0,
+    "view": {
+      "source_rows": 1000000,
+      "view_rows": 1000000,
+      "groups": 0,
+      "spec_hash": null
+    },
+    "selection": {
+      "row": null,
+      "record": null
+    },
+    "focused": false
+  },
+  "table_after_sort": {
+    "entity": 4294967298,
+    "visible_rows": {
+      "start": 999991,
+      "end": 1000000
+    },
+    "row_count": 1000000,
+    "dataset": "records",
+    "dataset_revision": 14,
+    "scroll_y": -31999714.0,
+    "view": {
+      "source_rows": 1000000,
+      "view_rows": 1000000,
+      "groups": 0,
+      "spec_hash": 9088661227295587578
+    },
+    "selection": {
+      "row": null,
+      "record": null
+    },
+    "focused": false
+  },
+  "native_counters": {
+    "materializations": 4,
+    "rows_constructed": 22,
+    "cells_constructed": 76,
+    "data_records_checked": 1000000,
+    "data_cells_written": 3000000,
+    "view_recomputes": 2
+  },
+  "scope": "One process on one machine; open_ms includes window creation and every appended slice; the sort time spans publish, native view recompute and one inspect round trip."
+}
