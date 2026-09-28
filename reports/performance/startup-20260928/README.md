@@ -69,6 +69,20 @@ that work, rather than after `gd_create`, is the next structural option and
 would overlap up to that much. Memory at zero rows (private commit about 99
 MB) is not touched by this change.
 
+## Memory at zero rows
+
+The probe's fourth run also reads the test process's private commit after
+each step: 2.6 MB at the start, 6.4 MB after the DirectWrite factory and both
+font collections, 41.5 MB after the DXGI factory and D3D11 device (35 MB of
+driver allocations), and 74.1 MB with a GPUI application constructed on top,
+which creates its own device again (about 33 MB more). In the host process the
+capture reports 13 MB of Dart VM resident memory before the library loads and
+94 MB private commit once the window is ready, so roughly a third of the
+zero-row footprint is the graphics driver's device state, an eighth the Dart
+runtime, and the remainder the window's swap chain and composition surfaces,
+glyph atlas, GPUI Kit globals and the Rust heap. No SDK-level change reaches
+the driver's share; the font collection patch does not change memory.
+
 These figures come from one machine within one session and are not comparable
 with the [September baselines](../baselines/README.md), whose absolute startup
 figures differ by day.

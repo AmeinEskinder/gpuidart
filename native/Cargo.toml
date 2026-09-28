@@ -30,4 +30,4 @@ gpui-kit = { git = "https://github.com/longbridge/gpui-kit", rev = "0c830f4d257e
 
 # Startup timing probe only; the same crate version the pinned Windows platform uses.
 [target.'cfg(windows)'.dev-dependencies]
-windows = { version = "0.62", features = ["Win32_Foundation", "Win32_Graphics_Direct3D", "Win32_Graphics_Direct3D11", "Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi", "Win32_Graphics_Dxgi_Common"] }
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_Graphics_Direct3D", "Win32_Graphics_Direct3D11", "Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi", "Win32_Graphics_Dxgi_Common", "Win32_System_ProcessStatus", "Win32_System_Threading"] }

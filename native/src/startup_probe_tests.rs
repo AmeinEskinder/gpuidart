@@ -25,9 +25,33 @@ fn ms(since: Instant) -> f64 {
     since.elapsed().as_secs_f64() * 1000.0
 }
 
+/// Private commit and working set of this process in bytes.
+fn memory() -> (u64, u64) {
+    use windows::Win32::System::ProcessStatus::{GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS};
+    use windows::Win32::System::Threading::GetCurrentProcess;
+    let mut counters = PROCESS_MEMORY_COUNTERS::default();
+    unsafe {
+        GetProcessMemoryInfo(
+            GetCurrentProcess(),
+            &mut counters,
+            std::mem::size_of::<PROCESS_MEMORY_COUNTERS>() as u32,
+        )
+    }
+    .expect("process memory counters");
+    (
+        counters.PagefileUsage as u64,
+        counters.WorkingSetSize as u64,
+    )
+}
+
+fn mib(bytes: u64) -> f64 {
+    (bytes as f64 / 1048576.0 * 100.0).round() / 100.0
+}
+
 #[test]
 #[ignore = "timing probe for startup work; run explicitly"]
 fn startup_platform_costs() {
+    let at_start = memory();
     let started = Instant::now();
     let factory: IDWriteFactory5 =
         unsafe { DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED) }.expect("DirectWrite factory");
@@ -47,6 +71,7 @@ fn startup_platform_costs() {
     unsafe { factory.GetSystemFontCollection(false, &mut cached, false) }
         .expect("system font collection without update check");
     let system_fonts_cached_ms = ms(started);
+    let after_fonts = memory();
 
     let started = Instant::now();
     let dxgi: IDXGIFactory6 =
@@ -79,10 +104,12 @@ fn startup_platform_costs() {
     }
     .expect("D3D11 device");
     let d3d11_device_ms = ms(started);
+    let after_device = memory();
 
     let started = Instant::now();
     let application = gpui_kit::application();
     let application_ms = ms(started);
+    let with_application = memory();
     drop(application);
 
     let started = Instant::now();
@@ -101,6 +128,18 @@ fn startup_platform_costs() {
             "d3d11_device_ms": d3d11_device_ms,
             "application_ms": application_ms,
             "second_application_ms": second_application_ms,
+            "private_commit_mib": {
+                "at_start": mib(at_start.0),
+                "after_fonts": mib(after_fonts.0),
+                "after_device": mib(after_device.0),
+                "with_application": mib(with_application.0),
+            },
+            "working_set_mib": {
+                "at_start": mib(at_start.1),
+                "after_fonts": mib(after_fonts.1),
+                "after_device": mib(after_device.1),
+                "with_application": mib(with_application.1),
+            },
         })
     );
 }
