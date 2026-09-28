@@ -87,3 +87,12 @@ optimization brought the diff to 1,252 us and the acknowledgement to 3,317 us.
 - Native applies operations on a clone of the tree with a walk per operation;
   the dispatch stage includes that work and the full re-validation.
 - Trunk and head ran one after the other rather than interleaved.
+
+## Second run: in-place application
+
+[`inplace-20260928/`](inplace-20260928/README.md) repeats the gate with the
+merge commit `da40c23` as trunk and `96de75f` as head, which applies
+operations in place against an ID index instead of cloning and revalidating
+the tree. Native dispatch at 2,048 nodes fell to about a tenth for every
+operation kind.
+

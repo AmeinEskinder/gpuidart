@@ -154,6 +154,14 @@ trunk for a property change at 2,048 nodes. The Dart describe plus diff and
 the native clone plus revalidation are the remaining costs, which is why a
 binary wire is not the next step.
 
+[The second gate run](../reports/performance/update-gate/inplace-20260928/README.md)
+measured the in-place native path at the merge commit `da40c23` against
+`96de75f` on the same workload. At 2,048 nodes native dispatch fell to about a
+tenth for every operation kind (1,254 to 132 us for a property change) and
+publish to ack to 0.61 through 0.80 of trunk; the describe stage rose by
+about a third on a fixture that rebuilds every node, which the reuse below
+turns to advantage when an application keeps instances.
+
 `tool/performance/bench_memo.dart` times describe and diff for one field
 change in a form of memoized rows, fresh rows against rows handed back by
 `UiMemo`. JIT medians over 100 rounds on 2026-09-28, while a release build
