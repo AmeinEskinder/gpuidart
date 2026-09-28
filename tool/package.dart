@@ -130,7 +130,7 @@ Future<void> main(List<String> args) async {
   await File('${kitRoot.path}/LICENSE-APACHE')
       .copy('${stage.path}/GPUI-Kit-LICENSE.txt');
   await File('LICENSE').copy('${stage.path}/LICENSE');
-  await File('native/vendor/gpui-pre-0.3.6/LICENSE-APACHE')
+  await File('native/vendor/gpui-pre-0.3.7/LICENSE-APACHE')
       .copy('${stage.path}/GPUI-LICENSE-APACHE.txt');
   await File('native/vendor/GPUI-NOTICE').copy('${stage.path}/GPUI-NOTICE.txt');
   await File('native/vendor/NOTICE').copy('${stage.path}/AccessKit-NOTICE.txt');

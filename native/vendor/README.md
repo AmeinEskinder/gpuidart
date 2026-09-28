@@ -3,7 +3,7 @@
 The four AccessKit crates come from the existing lockfile, upstream commit
 `c88605b96d04431f9c3c792464a0f2f253480e94`. They are path overrides in the workspace
 Cargo.toml; dependency versions and feature sets stay the same. GPUI Kit keeps
-its original git revision. GPUI 0.3.6 additionally has the focus hook below. Each UPSTREAM.json records the original registry archive checksum (verified
+its original git revision. GPUI 0.3.7 additionally has the focus hook below. Each UPSTREAM.json records the original registry archive checksum (verified
 against the local cached crate), original copied-file hashes and patched hashes.
 Only source, normalized manifest, README and provenance are copied. No build cache
 is included. Licenses are the upstream MIT/Apache-2.0 alternatives, retained here
@@ -37,7 +37,7 @@ not a claim that unmodified upstream already handles these cases.
 
 ## GPUI focus association
 
-[focus.patch](focus.patch) adds one Window method to gpui-pre 0.3.6: an existing
+[focus.patch](focus.patch) adds one Window method to gpui-pre 0.3.7 (recorded against 0.3.6; both hunks apply to 0.3.7 at an offset): an existing
 semantic node can use an editor's focus handle for accessibility while keeping
 its presentation frame's original keyboard/tab tree. The host calls it during
 prepaint, with the semantic node already present. It also routes the platform

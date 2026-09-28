@@ -11,7 +11,7 @@ void main() {
     'accesskit_atspi_common-0.19.1',
     'accesskit_consumer-0.38.0',
     'accesskit_windows-0.34.0',
-    'gpui-pre-0.3.6',
+    'gpui-pre-0.3.7',
     'accesskit_unix-0.22.1',
   ]) {
     final directory = Directory('native/vendor/$name');

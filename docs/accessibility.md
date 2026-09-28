@@ -7,8 +7,8 @@ This is not a human screen-reader usability claim. Design reference: `3a72688`.
 
 ## Platform spike
 
-The pinned GPUI Kit revision is `21622a70efd25219d26aa459164878c4da9e39f8`;
-it uses `gpui-pre` 0.3.6. The source contains actual AccessKit adapters:
+The pinned GPUI Kit revision is `0c830f4d257e69fdd17200650533ab4ca9a40cc0`;
+it uses `gpui-pre` 0.3.7. The source contains actual AccessKit adapters:
 
 | Backend | Adapter | External client for this milestone |
 | --- | --- | --- |

@@ -109,7 +109,7 @@ The fixture seeds state through a development extension. Separate headless tests
 ## Environment and outstanding checks
 
 - ${environment['os']['Caption']} ${environment['os']['BuildNumber']}; ${environment['cpu'][0]['Name']}.
-- ${environment['dart']}; GPUI Kit `21622a70efd25219d26aa459164878c4da9e39f8`, GPUI 0.3.6, Rust 1.98.1, native release build with profiler enabled.
+- ${environment['dart']}; GPUI Kit `0c830f4d257e69fdd17200650533ab4ca9a40cc0`, GPUI 0.3.7, Rust 1.98.1, native release build with profiler enabled.
 - Installed GPUs: ${(environment['gpu'] as List).map((gpu) => gpu['Name']).join(', ')}. The report does not identify which adapter rendered the window.
 - Seven native tests, one live Dart integration test and Dart analysis passed during this milestone.
 - Human visual inspection, including IME composition, is pending: the desktop automation connection failed after retry and reset. Windows Sandbox is not installed on this machine.

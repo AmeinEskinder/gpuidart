@@ -40,7 +40,7 @@ try {
     $kitRoot = Split-Path (Split-Path (Split-Path $kit.manifest_path -Parent) -Parent) -Parent
     Copy-Item -LiteralPath (Join-Path $kitRoot 'LICENSE-APACHE') -Destination "$packageDirectory/GPUI-Kit-LICENSE.txt"
     Copy-Item -LiteralPath "$projectRoot/LICENSE" -Destination "$packageDirectory/LICENSE"
-    Copy-Item -LiteralPath "$projectRoot/native/vendor/gpui-pre-0.3.6/LICENSE-APACHE" -Destination "$packageDirectory/GPUI-LICENSE-APACHE.txt"
+    Copy-Item -LiteralPath "$projectRoot/native/vendor/gpui-pre-0.3.7/LICENSE-APACHE" -Destination "$packageDirectory/GPUI-LICENSE-APACHE.txt"
     Copy-Item -LiteralPath "$projectRoot/native/vendor/GPUI-NOTICE" -Destination "$packageDirectory/GPUI-NOTICE.txt"
     Copy-Item -LiteralPath "$projectRoot/native/vendor/NOTICE" -Destination "$packageDirectory/AccessKit-NOTICE.txt"
     Copy-Item -LiteralPath "$projectRoot/native/vendor/LICENSE-MIT" -Destination "$packageDirectory/AccessKit-LICENSE-MIT.txt"
@@ -113,7 +113,7 @@ See the source lockfiles for dependencies. This is an evaluation ZIP, not a sign
         dart = ((& dart --version) -join ' ').Trim(); rustc = ((& rustc --version) -join ' ').Trim()
         cargo = ((& cargo --version) -join ' ').Trim(); built_at_utc = [DateTime]::UtcNow.ToString('o')
     }
-    [ordered]@{architecture='windows-x64'; project_license='MIT'; executable="$Name.exe"; entry_point=$EntryPoint; dpi_awareness='PerMonitorV2'; native_abi=1; kit_revision='21622a70efd25219d26aa459164878c4da9e39f8'; build=$build; files=@($files)} |
+    [ordered]@{architecture='windows-x64'; project_license='MIT'; executable="$Name.exe"; entry_point=$EntryPoint; dpi_awareness='PerMonitorV2'; native_abi=1; kit_revision='0c830f4d257e69fdd17200650533ab4ca9a40cc0'; build=$build; files=@($files)} |
         ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "$packageDirectory/manifest.json" -Encoding UTF8
     $paths = @($names + 'manifest.json' | ForEach-Object { Join-Path $packageDirectory $_ })
     Compress-Archive -LiteralPath $paths -DestinationPath "build/$Name-windows-x64.zip" -CompressionLevel Optimal -Force

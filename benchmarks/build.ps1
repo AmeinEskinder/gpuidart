@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 . ./tool/env.ps1
-$kitRevision = '21622a70efd25219d26aa459164878c4da9e39f8'
+$kitRevision = '0c830f4d257e69fdd17200650533ab4ca9a40cc0'
 if (-not (Test-Path .cache/gpui-kit/Cargo.toml)) {
     git clone https://github.com/longbridge/gpui-kit .cache/gpui-kit
     if ($LASTEXITCODE) { throw 'GPUI Kit clone failed' }

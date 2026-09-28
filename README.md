@@ -159,7 +159,7 @@ The [four-implementation benchmark](benchmarks/README.md) contains Rust, Shell/Q
 - The adapter exposes thirteen node kinds and bounded typed styles, themes, menus and button tooltips. It is not the full GPUI Kit catalog. Confirmation content is title/message/buttons; arbitrary dialog content, sheets and general virtual lists are not bound. Charts are read-only, bounded single-series line/bar projections. [Typed semantics and native accessibility adapters](docs/accessibility.md) pass external UIA, X11 AT-SPI and macOS AX checks in Settings and Watchlist. Human screen-reader behavior, offscreen table navigation and Linux editable text remain unverified or unsupported; see the [evidence and limits](reports/accessibility/README.md).
 - Controlled inputs reject Dart writes during native composition. New controlled-write tests use GPUI's input handler; earlier Windows/Linux OS IME observations cover the default input path. macOS IME remains unverified.
 
-GPUI Kit is pinned to commit `21622a70efd25219d26aa459164878c4da9e39f8`; its GPUI dependency is `gpui-pre` 0.3.6. Both Cargo and Dart dependency lockfiles are included.
+GPUI Kit is pinned to v0.7.0, commit `0c830f4d257e69fdd17200650533ab4ca9a40cc0`; its GPUI dependency is `gpui-pre` 0.3.7. Both Cargo and Dart dependency lockfiles are included.
 
 ## License
 

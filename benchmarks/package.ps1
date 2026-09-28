@@ -42,8 +42,8 @@ $versions = @{
     rust = ((& .tools/cargo/bin/rustc.exe --version) -join '')
     dart = ((& dart --version 2>&1) -join '')
     bun = ((& bun --version) -join '')
-    kit_revision = '21622a70efd25219d26aa459164878c4da9e39f8'
-    gpui_pre = '0.3.6'; gpui_shell = '0.6.5'
+    kit_revision = '0c830f4d257e69fdd17200650533ab4ca9a40cc0'
+    gpui_pre = '0.3.7'; gpui_shell = '0.7.0'
     quickjs_jit_revision = '82d3808f3aa7d1c4ad2f360f5b3bd5979501d599'
     quickjs_jit_stdlib_revision = '605da483611a3548edb8c33fdff602e3f5f42076'
     gpuix_native = '0.10.0'; gpuix_solid = '0.10.0'; solid_js = '1.9.15'
