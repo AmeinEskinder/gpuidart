@@ -160,6 +160,10 @@ Feasibility verdicts recorded on this machine:
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
 
-Verification at the end of the series: 75 native tests and 83 Dart tests
-including the live-window suite, on the debug library, plus the repository's
-full check gate.
+Verification: at `9c9d081` the native library suite runs 91 tests and the
+Dart suite 104, including the live-window, list and secondary-window suites
+and the tab, radio, menu, theme, chart and tooltip suites merged from `main`,
+on the debug library, plus the repository's full check gate. Earlier counts in
+this document and in commit messages are the totals at those revisions.
+Secondary windows and in-place updates have run on Windows only; the branch
+has not been pushed, so no macOS or Linux CI run exists for them.
