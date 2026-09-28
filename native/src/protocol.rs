@@ -2,10 +2,13 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+mod apply;
+pub use apply::{Touched, TreeIndex, apply_in_place, get as node_by_id, rollback};
 mod charts;
 pub use charts::{ChartKind, ChartSpec};
 mod menus;
 pub use menus::{MenuEntry, MenuSpec};
+pub(crate) use menus::{validate_button_menus, validate_button_menus_shallow};
 mod navigation;
 pub use navigation::ChoiceOption;
 mod semantics;
@@ -1355,6 +1358,40 @@ impl Snapshot {
     }
 }
 
+/// Bindings name existing contexts, parse and do not repeat.
+pub fn validate_bindings(actions: &[ActionBinding], ids: &HashSet<String>) -> Result<(), String> {
+    if actions.len() > 256 {
+        return Err("At most 256 action bindings per snapshot".into());
+    }
+    let mut names = HashSet::new();
+    let mut keys = HashMap::new();
+    for binding in actions {
+        if binding.name.is_empty() {
+            return Err("Action name must be nonempty".into());
+        }
+        if binding.context != "global" && !ids.contains(&binding.context) {
+            return Err(format!(
+                "Action context is not a node in this snapshot: {}",
+                binding.context
+            ));
+        }
+        let spec = KeystrokeSpec::parse(&binding.keys)?;
+        if !names.insert((&binding.name, &binding.context)) {
+            return Err(format!(
+                "Duplicate action binding: {} in {}",
+                binding.name, binding.context
+            ));
+        }
+        if let Some(existing) = keys.insert((spec, &binding.context), &binding.name) {
+            return Err(format!(
+                "Keys {} in {} are bound to both {} and {}",
+                binding.keys, binding.context, existing, binding.name
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// Options carry stable IDs and visible labels; `selected` must name one.
 fn validate_options(
     options: &[SelectOption],
@@ -1545,36 +1582,7 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
 
 impl Snapshot {
     fn validate_actions(&self, ids: &HashSet<String>) -> Result<(), String> {
-        if self.actions.len() > 256 {
-            return Err("At most 256 action bindings per snapshot".into());
-        }
-        let mut names = HashSet::new();
-        let mut keys = HashMap::new();
-        for binding in &self.actions {
-            if binding.name.is_empty() {
-                return Err("Action name must be nonempty".into());
-            }
-            if binding.context != "global" && !ids.contains(&binding.context) {
-                return Err(format!(
-                    "Action context is not a node in this snapshot: {}",
-                    binding.context
-                ));
-            }
-            let spec = KeystrokeSpec::parse(&binding.keys)?;
-            if !names.insert((&binding.name, &binding.context)) {
-                return Err(format!(
-                    "Duplicate action binding: {} in {}",
-                    binding.name, binding.context
-                ));
-            }
-            if let Some(existing) = keys.insert((spec, &binding.context), &binding.name) {
-                return Err(format!(
-                    "Keys {} in {} are bound to both {} and {}",
-                    binding.keys, binding.context, existing, binding.name
-                ));
-            }
-        }
-        Ok(())
+        validate_bindings(&self.actions, ids)
     }
 }
 
@@ -1615,6 +1623,16 @@ pub enum Op {
 const MAX_OPS: usize = 4096;
 
 impl Update {
+    /// The snapshot-level checks after operations applied: theme colors,
+    /// bindings against the resulting IDs, and application menus.
+    pub fn validate_globals(&self, ids: &HashSet<String>) -> Result<(), String> {
+        if let Some(theme) = &self.theme {
+            theme.colors()?;
+        }
+        validate_bindings(&self.actions, ids)?;
+        menus::validate(&self.menus, &self.actions)
+    }
+
     pub fn parse(bytes: &[u8]) -> Result<Self, String> {
         if bytes.len() > MAX_MESSAGE_BYTES {
             return Err("Update exceeds 16 MiB".into());
@@ -1671,94 +1689,26 @@ impl Update {
 }
 
 impl Snapshot {
-    /// The description after `update`, or the first failing operation. `self`
-    /// is never modified. The caller checks `base_revision` against the
-    /// applied revision first.
+    /// Test helper: the description after `update`, through the in-place
+    /// path the view uses.
+    #[cfg(test)]
     pub fn apply(&self, update: &Update) -> Result<Snapshot, String> {
         let mut root = self.root.clone();
-        let mut ids = HashSet::new();
-        root.visit(&mut |node| {
-            ids.insert(node.id().to_owned());
-        });
-        for op in &update.ops {
-            match op {
-                Op::Insert { parent, node } => {
-                    let mut inserted = Vec::new();
-                    node.visit(&mut |node| inserted.push(node.id().to_owned()));
-                    for id in inserted {
-                        if !ids.insert(id.clone()) {
-                            return Err(format!("Insert repeats an existing node ID: {id}"));
-                        }
-                    }
-                    let target = find_mut(&mut root, parent)
-                        .ok_or_else(|| format!("Insert parent is missing: {parent}"))?;
-                    children_mut(target)
-                        .ok_or_else(|| format!("Insert parent has no children: {parent}"))?
-                        .push(node.clone());
-                }
-                Op::Reparent { id, parent } => {
-                    let node = detach(&mut root, id)
-                        .ok_or_else(|| format!("Reparent target is missing or the root: {id}"))?;
-                    let target = find_mut(&mut root, parent).ok_or_else(|| {
-                        format!("Reparent parent is missing or inside the moved subtree: {parent}")
-                    })?;
-                    children_mut(target)
-                        .ok_or_else(|| format!("Reparent parent has no children: {parent}"))?
-                        .push(node);
-                }
-                Op::Remove { id } => {
-                    let node = detach(&mut root, id)
-                        .ok_or_else(|| format!("Remove target is missing or the root: {id}"))?;
-                    node.visit(&mut |node| {
-                        ids.remove(node.id());
-                    });
-                }
-                Op::Set { id, node } => {
-                    let target = find_mut(&mut root, id)
-                        .ok_or_else(|| format!("Set target is missing: {id}"))?;
-                    if std::mem::discriminant(target) != std::mem::discriminant(node) {
-                        return Err(format!("Set changes the kind of node: {id}"));
-                    }
-                    let mut replacement = node.clone();
-                    if let Some(old) = children_mut(target) {
-                        if let Some(new) = children_mut(&mut replacement) {
-                            *new = std::mem::take(old);
-                        }
-                    }
-                    *target = replacement;
-                }
-                Op::Children { id, children } => {
-                    let target = find_mut(&mut root, id)
-                        .ok_or_else(|| format!("Children target is missing: {id}"))?;
-                    let current = children_mut(target)
-                        .ok_or_else(|| format!("Children target has no children: {id}"))?;
-                    if current.len() != children.len() {
-                        return Err(format!("Children order must list every child once: {id}"));
-                    }
-                    let mut by_id: HashMap<String, Node> = std::mem::take(current)
-                        .into_iter()
-                        .map(|node| (node.id().to_owned(), node))
-                        .collect();
-                    for child in children {
-                        current.push(by_id.remove(child).ok_or_else(|| {
-                            format!("Children order names a node that is not a child: {child}")
-                        })?);
-                    }
-                }
-            }
-        }
-        let snapshot = Snapshot {
+        let mut index = TreeIndex::of(&root);
+        apply_in_place(&mut root, &mut index, update)?;
+        update.validate_globals(&index.ids)?;
+        menus::validate_button_menus(&root, &update.actions)?;
+        Ok(Snapshot {
             menus: update.menus.clone(),
             theme: update.theme.clone(),
             revision: update.revision,
             actions: update.actions.clone(),
             root,
-        };
-        snapshot.validate()?;
-        Ok(snapshot)
+        })
     }
 }
 
+#[cfg(feature = "snapshot-experiment")]
 pub(crate) fn find_mut<'a>(node: &'a mut Node, id: &str) -> Option<&'a mut Node> {
     if node.id() == id {
         return Some(node);
@@ -1785,6 +1735,7 @@ pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
 
 /// Removes and returns the node with `id` from below `node`. The root itself
 /// is never detached.
+#[cfg(feature = "snapshot-experiment")]
 pub(crate) fn detach(node: &mut Node, id: &str) -> Option<Node> {
     if let Some(children) = children_mut(node) {
         if let Some(index) = children.iter().position(|child| child.id() == id) {

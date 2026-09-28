@@ -56,7 +56,7 @@ pub(super) fn validate(menus: &[MenuSpec], actions: &[ActionBinding]) -> Result<
 
 /// Menu buttons take the same entries as application menus, and their
 /// actions need the same global bindings.
-pub(super) fn validate_button_menus(root: &Node, actions: &[ActionBinding]) -> Result<(), String> {
+pub(crate) fn validate_button_menus(root: &Node, actions: &[ActionBinding]) -> Result<(), String> {
     let mut error = None;
     root.visit(&mut |node| {
         if error.is_some() {
@@ -78,6 +78,29 @@ pub(super) fn validate_button_menus(root: &Node, actions: &[ActionBinding]) -> R
         }
     });
     error.map_or(Ok(()), Err)
+}
+
+/// The binding check for one node's own menu entries, without its subtree.
+pub(crate) fn validate_button_menus_shallow(
+    node: &Node,
+    actions: &[ActionBinding],
+) -> Result<(), String> {
+    let Node::MenuButton { items, .. } = node else {
+        return Ok(());
+    };
+    for entry in items {
+        if let MenuEntry::Action { action, .. } = entry {
+            if !actions
+                .iter()
+                .any(|binding| binding.name == *action && binding.context == "global")
+            {
+                return Err(format!(
+                    "Menu action requires a global action binding: {action}"
+                ));
+            }
+        }
+    }
+    Ok(())
 }
 
 pub(crate) fn validate_entries(items: &[MenuEntry]) -> Result<(), String> {

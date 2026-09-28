@@ -176,6 +176,60 @@ pub fn validate_views(
     error.map_or(Ok(()), Err)
 }
 
+/// The dataset checks for one node: its reference, row menus and view
+/// columns. Whole publications visit every node; updates visit the touched
+/// ones.
+pub fn validate_dataset_node(
+    node: &Node,
+    contains: &impl Fn(&str) -> bool,
+    columns: &impl Fn(&str) -> Option<usize>,
+    has_ids: &impl Fn(&str) -> bool,
+) -> Result<(), String> {
+    if let Some(dataset) = node.dataset() {
+        if !contains(dataset) {
+            return Err(format!("Unknown dataset: {dataset}"));
+        }
+    }
+    if let Node::Table {
+        dataset,
+        context_menu,
+        ..
+    } = node
+    {
+        if !context_menu.is_empty() && !has_ids(dataset) {
+            return Err(format!(
+                "Row context menus require stable record IDs: {dataset}"
+            ));
+        }
+    }
+    let (dataset, view, axes) = match node {
+        Node::Table { dataset, view, .. } => (dataset, view.as_ref(), Vec::new()),
+        Node::List {
+            dataset,
+            column,
+            view,
+            ..
+        } => (dataset, view.as_ref(), vec![*column]),
+        Node::Chart { chart, .. } => (
+            &chart.dataset,
+            chart.view.as_ref(),
+            vec![chart.label_column, chart.value_column],
+        ),
+        _ => return Ok(()),
+    };
+    let width = columns(dataset).unwrap_or(0);
+    let mut referenced = axes;
+    if let Some(view) = view {
+        referenced.extend(view.referenced_columns());
+    }
+    if let Some(column) = referenced.iter().find(|column| **column >= width) {
+        return Err(format!(
+            "View references column {column} beyond dataset {dataset}'s {width} columns"
+        ));
+    }
+    Ok(())
+}
+
 pub fn validate_context_menus(
     snapshot: &Snapshot,
     has_ids: impl Fn(&str) -> bool,

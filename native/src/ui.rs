@@ -5,8 +5,8 @@ use crate::{
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
         FontWeight as StyleFontWeight, Justify as StyleJustify, KeystrokeSpec, MenuEntry, Node,
-        ScrollAxis, Size as StyleSize, Snapshot, Style, TableView, ThemeToken, ViewEntry,
-        ViewIndex,
+        ScrollAxis, Size as StyleSize, Snapshot, Style, TableView, ThemeToken, Touched, TreeIndex,
+        ViewEntry, ViewIndex, apply_in_place, rollback,
     },
 };
 use async_channel::Receiver;
@@ -309,6 +309,8 @@ pub(crate) struct DartView {
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
     lists: HashMap<String, RetainedList>,
+    /// IDs and parents of the applied tree, kept in step by operation updates.
+    index: TreeIndex,
     table_subscriptions: HashMap<String, Subscription>,
     scroll: ScrollHandle,
     datasets: Store,
@@ -491,6 +493,7 @@ impl DartView {
             #[cfg(feature = "snapshot-experiment")]
             embedded: false,
             trace: None,
+            index: TreeIndex::of(&initial.snapshot.root),
             snapshot: initial.snapshot,
             applied_theme: None,
             applied_menus: None,
@@ -571,13 +574,30 @@ impl DartView {
             });
             return;
         }
-        match self.snapshot.apply(&update) {
-            Ok(snapshot) => self.commit(snapshot, timer, window, cx),
-            Err(message) => self.events.emit(Event::Rejected {
+        let (touched, undo) =
+            match apply_in_place(&mut self.snapshot.root, &mut self.index, &update) {
+                Ok(applied) => applied,
+                Err(message) => {
+                    self.events.emit(Event::Rejected {
+                        revision: update.revision,
+                        message,
+                    });
+                    return;
+                }
+            };
+        if let Err(message) = self.check_update(&update, &touched) {
+            rollback(&mut self.snapshot.root, &mut self.index, undo);
+            self.events.emit(Event::Rejected {
                 revision: update.revision,
                 message,
-            }),
+            });
+            return;
         }
+        self.snapshot.revision = update.revision;
+        self.snapshot.actions = update.actions;
+        self.snapshot.menus = update.menus;
+        self.snapshot.theme = update.theme;
+        self.finish_commit(timer, window, cx);
     }
 
     fn commit(
@@ -613,6 +633,14 @@ impl DartView {
             return;
         }
         self.snapshot = snapshot;
+        self.index = TreeIndex::of(&self.snapshot.root);
+        self.finish_commit(timer, window, cx);
+    }
+
+    /// Shared tail of whole and operation commits: shown control values
+    /// yield to the publication, retained entities reconcile, and the
+    /// application learns the revision.
+    fn finish_commit(&mut self, timer: Instant, window: &mut Window, cx: &mut Context<Self>) {
         self.checkbox_shown.borrow_mut().clear();
         self.choice_shown.borrow_mut().clear();
         if let Err(message) = self.reconcile(window, cx) {
@@ -624,6 +652,55 @@ impl DartView {
             native_apply_us: timer.elapsed().as_micros() as u64,
         });
         cx.notify();
+    }
+
+    /// What an operation update can break beyond its own operations: the
+    /// theme, bindings and menus it carries, and the datasets its touched
+    /// nodes reference. Own fields were validated when the update parsed.
+    fn check_update(
+        &self,
+        update: &crate::protocol::Update,
+        touched: &Touched,
+    ) -> Result<(), String> {
+        update.validate_globals(&self.index.ids)?;
+        let contains = |id: &str| self.datasets.entries.contains_key(id);
+        let columns = |id: &str| {
+            self.datasets
+                .entries
+                .get(id)
+                .map(|data| data.borrow().data.columns.len())
+        };
+        let has_ids = |id: &str| {
+            self.datasets
+                .entries
+                .get(id)
+                .is_some_and(|data| data.borrow().data.ids.is_some())
+        };
+        for id in &touched.set {
+            let node = crate::protocol::node_by_id(&self.snapshot.root, &self.index, id)
+                .ok_or_else(|| format!("Set target vanished: {id}"))?;
+            datasets::validate_dataset_node(node, &contains, &columns, &has_ids)?;
+            crate::protocol::validate_button_menus_shallow(node, &update.actions)?;
+        }
+        for id in &touched.inserted {
+            let node = crate::protocol::node_by_id(&self.snapshot.root, &self.index, id)
+                .ok_or_else(|| format!("Inserted subtree vanished: {id}"))?;
+            let mut error = None;
+            node.visit(&mut |node| {
+                if error.is_none() {
+                    if let Err(message) =
+                        datasets::validate_dataset_node(node, &contains, &columns, &has_ids)
+                    {
+                        error = Some(message);
+                    }
+                }
+            });
+            if let Some(message) = error {
+                return Err(message);
+            }
+            crate::protocol::validate_button_menus(node, &update.actions)?;
+        }
+        Ok(())
     }
 
     pub(crate) fn cell(&self, dataset: &str, row: usize, column: usize) -> Value {
