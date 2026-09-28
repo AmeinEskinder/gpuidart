@@ -38,6 +38,27 @@ void main() {
   });
 
   test(
+    'a dataset without retained records keeps its count and rejects reads',
+    () {
+      final dataset = TableDataset(
+        'records',
+        columns: ['A'],
+        rows: [
+          ['x'],
+          ['y'],
+        ],
+        rowIds: ['r1', 'r2'],
+        retainRecords: false,
+      );
+      expect(dataset.rowCount, 2);
+      expect(() => dataset.cell(0, 0), throwsStateError);
+      expect(() => dataset.row(1), throwsStateError);
+      expect(() => dataset.rowId(0), throwsStateError);
+      expect(dataset.columns, ['A']);
+    },
+  );
+
+  test(
     'snapshot encoding retains table references without publishing records',
     () {
       final children = <UiNode>[

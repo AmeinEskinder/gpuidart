@@ -38,6 +38,8 @@ await host.replaceDataset(
 
 `columns` and the result of `row()` are immutable. Successful transactions commit values to the Dart dataset and advance its revision. Rejection leaves both sides unchanged. Await each transaction before starting another on the same dataset.
 
+`TableDataset(..., retainRecords: false)` releases the Dart copy of the records once they are uploaded, so native holds the only one. `rowCount`, edits by index, structural edits and `replaceDataset` keep working; native validates record IDs on inserts, so a duplicate is a rejected transaction rather than an `ArgumentError`; `row`, `cell` and `rowId` throw a `StateError`. Read values back with the `cell` diagnostic when needed. At a million records this returns about 230 MiB of process memory once the collector has run ([measured](../reports/performance/datasets-1m-20260928/README.md)).
+
 ## Operations and lifetime
 
 | Operation | Transfer and native work |
@@ -189,7 +191,7 @@ Data acknowledgements report native parsing time, application time, records chec
 
 ## Cost and limits
 
-- Initial upload, replacement and storage grow with total records. Messages are limited to 16 MiB; datasets have at most 1,000,000 rows and 64 columns, and records that would exceed one message travel as appended slices of about 4 MiB each (`append` on the wire), so a large upload costs one transaction per slice. [One million records](../reports/performance/datasets-1m-20260928/README.md) upload in 13 slices in about 3 s and sort in about 110 ms, holding roughly 345 MiB in Dart and 250 MiB natively.
+- Initial upload, replacement and storage grow with total records. Messages are limited to 16 MiB; datasets have at most 1,000,000 rows and 64 columns, and records that would exceed one message travel as appended slices of about 4 MiB each (`append` on the wire), so a large upload costs one transaction per slice. [One million records](../reports/performance/datasets-1m-20260928/README.md) upload in 13 slices in about 3 s and sort in about 110 ms, holding roughly 345 MiB in Dart and 250 MiB natively; with `retainRecords: false` the Dart share is released after the upload, about 230 MiB of process memory once collected.
 - Snapshots contain no records; their cost grows with view size.
 - Batches visit only their edits. Dart copies one immutable row when committing a cell, at most 64 columns. Rust replaces the indexed string directly.
 - Rust's shared dataset belongs to the UI thread. `TableData` has no `Clone` or `PartialEq` implementation, preventing accidental full-data cloning or comparison in reconciliation.

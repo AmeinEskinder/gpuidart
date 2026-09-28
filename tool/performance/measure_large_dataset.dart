@@ -7,11 +7,13 @@ import 'package:gpuidart/src/runtime_info.dart';
 /// Opens a table over ROWS records (default 1,000,000) with the window first
 /// and the records appended in slices, then sorts the view, and prints one
 /// JSON record: process memory before and after the upload and the sort, the
-/// upload and sort wall times, the slice count and the native counters. Point
-/// GPUIDART_LIBRARY at a release library; the debug build's timings are not
-/// representative.
+/// upload and sort wall times, the slice count and the native counters. A
+/// second argument `release` drops the Dart copy of the records after the
+/// upload (`retainRecords: false`). Point GPUIDART_LIBRARY at a release
+/// library; the debug build's timings are not representative.
 Future<void> main(List<String> args) async {
   final rows = args.isEmpty ? 1000000 : int.parse(args.first);
+  final retain = args.length < 2 || args[1] != 'release';
   Map<String, Object?> memory() {
     final info = readRuntimeInfo();
     return {
@@ -30,6 +32,7 @@ Future<void> main(List<String> args) async {
       (i) => ['$i', 'Instrument $i', (100 + i / 100).toStringAsFixed(2)],
     ),
     rowIds: List.generate(rows, (i) => 'r$i'),
+    retainRecords: retain,
   );
   final buildMs = building.elapsedMilliseconds;
   final afterRecords = memory();
@@ -42,6 +45,16 @@ Future<void> main(List<String> args) async {
   final openMs = opening.elapsedMilliseconds;
   try {
     final afterUpload = memory();
+    // The VM keeps freed heap pages until a major collection; churn enough
+    // short-lived allocation to force one, then let it settle, so a released
+    // Dart copy shows in the process figures.
+    for (var round = 0; round < 8; round++) {
+      final churn = List<List<int>>.generate(200000, (i) => List.filled(16, i));
+      if (churn.length == 1) stdout.writeln(churn);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final afterSettle = memory();
     final inspectBefore = await host.diagnose('inspect');
     final sorting = Stopwatch()..start();
     await host.publish(
@@ -58,6 +71,7 @@ Future<void> main(List<String> args) async {
     stdout.writeln(
       const JsonEncoder.withIndent('  ').convert({
         'rows': rows,
+        'retain_records': retain,
         'slices': dataset.revision - 1,
         'build_ms': buildMs,
         'open_ms': openMs,
@@ -66,6 +80,7 @@ Future<void> main(List<String> args) async {
           'at_start': atStart,
           'after_records': afterRecords,
           'after_upload': afterUpload,
+          'after_settle': afterSettle,
           'after_sort': afterSort,
         },
         'metrics': host.metrics.read(),

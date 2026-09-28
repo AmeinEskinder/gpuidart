@@ -840,15 +840,22 @@ final class GpuiHost {
       {'op': 'replace', 'data': replacement._dataRange(0, first)},
       () {
         dataset._columns = replacement._columns;
-        dataset._rows = replacement._rows.sublist(0, first);
-        dataset._rowIds = replacement._rowIds?.sublist(0, first);
+        dataset._identity = replacement._identity;
         dataset._formats = replacement._formats;
+        dataset._rowCount = first;
+        if (dataset.retainRecords) {
+          dataset._rows = replacement._rows.sublist(0, first);
+          dataset._rowIds = replacement._rowIds?.sublist(0, first);
+        }
       },
     );
     for (final (start, end) in chunks.skip(1)) {
       await _transact(dataset, replacement._appendChange(start, end), () {
-        dataset._rows.addAll(replacement._rows.sublist(start, end));
-        dataset._rowIds?.addAll(replacement._rowIds!.sublist(start, end));
+        dataset._rowCount += end - start;
+        if (dataset.retainRecords) {
+          dataset._rows.addAll(replacement._rows.sublist(start, end));
+          dataset._rowIds?.addAll(replacement._rowIds!.sublist(start, end));
+        }
       });
     }
   }

@@ -439,6 +439,63 @@ void main() {
     }
   }, timeout: const Timeout(Duration(seconds: 120)));
 
+  test(
+    'datasets without a Dart copy stay editable through native checks',
+    () async {
+      final dataset = TableDataset(
+        'lean',
+        columns: ['ID', 'Text'],
+        rows: List.generate(120000, (i) => ['$i', 'x' * 60]),
+        rowIds: List.generate(120000, (i) => 'r$i'),
+        retainRecords: false,
+      );
+      final host = await GpuiHost.open(
+        const UiTable('table', dataset: 'lean'),
+        datasets: [dataset],
+      );
+      try {
+        expect(dataset.revision, greaterThan(2));
+        expect(dataset.rowCount, 120000);
+        expect(() => dataset.cell(0, 0), throwsStateError);
+        await host.editDataset(dataset, [const CellEdit(119999, 1, 'edited')]);
+        final edited = await host.diagnose('cell', {
+          'dataset': 'lean',
+          'row': 119999,
+          'column': 1,
+        });
+        expect(edited['value'], 'edited');
+        // Native still owns identity: a duplicate ID is rejected there.
+        await expectLater(
+          host.editDataset(dataset, [
+            InsertRow(120000, ['dup', 'x'], id: 'r5'),
+          ]),
+          throwsStateError,
+        );
+        expect(dataset.rowCount, 120000);
+        await host.editDataset(dataset, [
+          InsertRow(120000, ['new', 'x'], id: 'fresh'),
+          const DeleteRow(0),
+        ]);
+        expect(dataset.rowCount, 120000);
+        var state = await host.diagnose('inspect');
+        expect(state['tables']['table']['row_count'], 120000);
+        await host.replaceDataset(
+          dataset,
+          columns: ['ID', 'Text'],
+          rows: List.generate(30000, (i) => ['$i', 'y']),
+        );
+        expect(dataset.rowCount, 30000);
+        expect(() => dataset.cell(0, 0), throwsStateError);
+        state = await host.diagnose('inspect');
+        expect(state['tables']['table']['row_count'], 30000);
+        expect(state['tables']['table']['dataset_revision'], dataset.revision);
+      } finally {
+        await host.close();
+      }
+    },
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
   test('structural edits keep record identity, views and selection', () async {
     final dataset = TableDataset(
       'records',

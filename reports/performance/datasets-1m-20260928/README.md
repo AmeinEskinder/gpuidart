@@ -42,9 +42,32 @@ Process memory, MiB (working set / private commit):
 
 At 1,000,000 rows the Dart records take about 345 MiB and the native copy
 with the window about 250 MiB more; the sort's view index adds nothing
-visible. The cap is a memory bound: an application that holds a million
-records pays for them twice, once in Dart and once natively, until the Dart
-mirror becomes optional.
+visible. The cap is a memory bound: an application that keeps the Dart copy
+pays for a million records twice, once in Dart and once natively; the next
+section releases the Dart copy.
+
+## Without the Dart copy
+
+`TableDataset(..., retainRecords: false)` releases the Dart records once
+native holds them. The tool's `release` mode measures it, with a settle step
+that churns short-lived allocation so the VM runs a major collection before
+the reading; [aot-1000000-retain.json](aot-1000000-retain.json) and
+[aot-1000000-release.json](aot-1000000-release.json) are the two runs, taken
+minutes apart with the same library.
+
+| Point, 1,000,000 rows | Retained, RSS MiB | Released, RSS MiB |
+| --- | ---: | ---: |
+| Records built in Dart | 361 | 360 |
+| After upload, before the collector runs | 632 | 632 |
+| After the settle step | 619 | 387 |
+| After sort | 620 | 388 |
+| Private commit after settle | 662 | 430 |
+
+Releasing the copy returns about 230 MiB of the process at a million records
+once the collector has run; until then the pages stay with the VM. The
+upload itself is unchanged (13 slices, open 2.0 and 1.9 s, sort 73 and
+78 ms), and the records stay editable by index with native validating record
+IDs.
 
 ## Limits
 

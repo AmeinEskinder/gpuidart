@@ -11,6 +11,12 @@ const int maxDatasetRows = 1000000;
 /// several messages: its columns and formats go first and its records follow
 /// in slices, each advancing [revision] by one, before `open`,
 /// `registerDataset` or `replaceDataset` completes.
+///
+/// With `retainRecords: false` the Dart copy of the records is released once
+/// they are uploaded: [rowCount] and edits by index keep working, native
+/// validates record IDs, and [row], [cell] and [rowId] throw. Native holds
+/// the only copy, which at a million records saves the application a few
+/// hundred MiB.
 final class TableDataset {
   TableDataset(
     this.id, {
@@ -18,9 +24,12 @@ final class TableDataset {
     required List<List<String>> rows,
     List<String>? rowIds,
     Map<int, UiColumnFormat>? formats,
+    this.retainRecords = true,
   }) : _columns = List.unmodifiable(columns),
        _rows = _copyRows(rows),
        _rowIds = rowIds?.toList(),
+       _identity = rowIds != null,
+       _rowCount = rows.length,
        _formats = formats == null
            ? null
            : Map<int, UiColumnFormat>.unmodifiable(formats) {
@@ -35,9 +44,14 @@ final class TableDataset {
   }
 
   final String id;
+
+  /// Whether Dart keeps its own copy of the records after uploading them.
+  final bool retainRecords;
   List<String> _columns;
   List<List<String>> _rows;
   List<String>? _rowIds;
+  bool _identity;
+  int _rowCount;
   Map<int, UiColumnFormat>? _formats;
   int _revision = 0;
   GpuiHost? _owner;
@@ -47,15 +61,36 @@ final class TableDataset {
   bool _busy = false;
 
   int get revision => _revision;
-  int get rowCount => _rows.length;
+  int get rowCount => retainRecords ? _rows.length : _rowCount;
   List<String> get columns => _columns;
-  List<String> row(int index) => _rows[index];
-  String cell(int row, int column) => _rows[row][column];
+  List<String> row(int index) => _records[index];
+  String cell(int row, int column) => _records[row][column];
 
   /// The stable record ID for [index], when this dataset has record IDs.
   /// Row edits never change a record's ID; `replaceDataset` may supply a new
   /// ID set.
-  String? rowId(int index) => _rowIds?[index];
+  String? rowId(int index) {
+    if (!retainRecords) throw _notRetained();
+    return _rowIds?[index];
+  }
+
+  List<List<String>> get _records {
+    if (!retainRecords) throw _notRetained();
+    return _rows;
+  }
+
+  StateError _notRetained() => StateError(
+    'Dataset "$id" does not retain its records; construct it with '
+    'retainRecords: true to read them in Dart',
+  );
+
+  /// Drops the Dart copy once native holds the records, when not retained.
+  void _releaseRecords() {
+    if (retainRecords) return;
+    _rowCount = _rows.length;
+    _rows = [];
+    _rowIds = _identity ? [] : null;
+  }
 
   Map<String, Object> _data() => {
     'columns': _columns,
@@ -181,15 +216,18 @@ void _validateData(List<String> columns, List<List<String>> rows) {
 /// batch, matching the native check.
 final class _DatasetShape {
   _DatasetShape(this._dataset)
-    : rows = _dataset._rows.length,
+    : rows = _dataset.rowCount,
       columns = _dataset._columns.length,
-      identity = _dataset._rowIds != null;
+      identity = _dataset._identity;
   final TableDataset _dataset;
   int rows;
   final int columns;
   final bool identity;
   Set<String>? _live;
 
+  /// Record IDs are only known here while the records are retained; native
+  /// still rejects a duplicate or empty ID.
+  bool get tracksIds => _dataset.retainRecords;
   Set<String> get live => _live ??= _dataset._rowIds!.toSet();
 
   void checkRow(int row, String name) {
@@ -222,6 +260,7 @@ final class CellEdit extends TableEdit {
 
   @override
   void _apply(TableDataset dataset) {
+    if (!dataset.retainRecords) return;
     final values = dataset._rows[row].toList();
     values[column] = value;
     dataset._rows[row] = List.unmodifiable(values);
@@ -251,6 +290,7 @@ final class RowEdit extends TableEdit {
 
   @override
   void _apply(TableDataset dataset) {
+    if (!dataset.retainRecords) return;
     dataset._rows[row] = values;
   }
 
@@ -288,7 +328,8 @@ final class InsertRow extends TableEdit {
         'Insert carries a record ID exactly when the dataset has record IDs',
       );
     }
-    if (record != null && (record.isEmpty || !shape.live.add(record))) {
+    if (record != null &&
+        (record.isEmpty || (shape.tracksIds && !shape.live.add(record)))) {
       throw ArgumentError.value(
         record,
         'id',
@@ -300,6 +341,10 @@ final class InsertRow extends TableEdit {
 
   @override
   void _apply(TableDataset dataset) {
+    if (!dataset.retainRecords) {
+      dataset._rowCount++;
+      return;
+    }
     dataset._rows.insert(at, values);
     dataset._rowIds?.insert(at, id!);
   }
@@ -327,6 +372,10 @@ final class DeleteRow extends TableEdit {
 
   @override
   void _apply(TableDataset dataset) {
+    if (!dataset.retainRecords) {
+      dataset._rowCount--;
+      return;
+    }
     dataset._rows.removeAt(row);
     dataset._rowIds?.removeAt(row);
   }
@@ -349,6 +398,7 @@ final class MoveRow extends TableEdit {
 
   @override
   void _apply(TableDataset dataset) {
+    if (!dataset.retainRecords) return;
     dataset._rows.insert(to, dataset._rows.removeAt(row));
     final ids = dataset._rowIds;
     if (ids != null) ids.insert(to, ids.removeAt(row));
@@ -374,11 +424,12 @@ extension _DatasetTransactions on GpuiHost {
           'data': dataset._data(),
         }, () {});
       }
-      return;
+    } else {
+      for (final (start, end) in chunks) {
+        await _transact(dataset, dataset._appendChange(start, end), () {});
+      }
     }
-    for (final (start, end) in chunks) {
-      await _transact(dataset, dataset._appendChange(start, end), () {});
-    }
+    dataset._releaseRecords();
   }
 
   /// Registers a dataset under an unused ID: its first slice as a replacement
@@ -395,6 +446,7 @@ extension _DatasetTransactions on GpuiHost {
     for (final (start, end) in chunks.skip(1)) {
       await _transact(dataset, dataset._appendChange(start, end), () {});
     }
+    dataset._releaseRecords();
   }
 
   Future<void> _transact(
