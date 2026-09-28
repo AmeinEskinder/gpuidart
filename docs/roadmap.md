@@ -180,7 +180,12 @@ ignored startup probe) and the Dart suite 113, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
 library, plus the repository's full check gate. Earlier counts in this
-document and in commit messages are the totals at those revisions.
+document and in commit messages are the totals at those revisions. The gate
+now ends with `tool/docs_check.dart`, which fails when this sentence's counts
+differ from the Windows full gate it just ran, when the README's node-kind
+count or the Dart node classes differ from the native `Node` enum, when a
+node class is missing from the SDK reference, or when the README overview
+calls a publication a whole description.
 The branch is pushed; the Windows, Linux and macOS SDK checks and the
 accessibility probes pass on it, and the Linux and macOS window jobs run the
 live-window suite that holds the secondary-window and patch tests.
