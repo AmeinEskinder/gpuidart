@@ -52,8 +52,13 @@ Future<void> main(List<String> args) async {
       int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
   final viewWorkload =
       Platform.environment['GPUIDART_BENCH_WORKLOAD'] == 'view';
+  // The SDK's mode for large datasets releases the Dart copy of the records
+  // once native holds them; the runner selects it with GPUIDART_BENCH_RETAIN=0
+  // and the report then reads the first price from native.
+  final retainRecords = Platform.environment['GPUIDART_BENCH_RETAIN'] != '0';
   final data = TableDataset(
     'quotes',
+    retainRecords: retainRecords,
     columns: ['ID', 'Instrument', 'Price', if (viewWorkload) 'Sector'],
     rows: List.generate(
       rows,
@@ -123,9 +128,14 @@ Future<void> main(List<String> args) async {
         const JsonEncoder.withIndent('  ').convert({
           'implementation': 'dart',
           'rows': data.rowCount,
+          'retain_records': retainRecords,
           'updates': updates,
           'cells_written': cellsWritten,
-          'first_price': data.rowCount == 0 ? null : data.cell(0, 2),
+          'first_price': data.rowCount == 0
+              ? null
+              : retainRecords
+              ? data.cell(0, 2)
+              : nativeCell?['value'],
           'first_frame_ms_since_launch': readyMsSinceLaunch,
           'native_first_price': nativeCell,
           if (viewWorkload)
@@ -203,7 +213,7 @@ Future<void> main(List<String> args) async {
         'column': 2,
       });
       trace('state_observed', sequence, {
-        'value': data.cell(0, 2),
+        'value': retainRecords ? data.cell(0, 2) : null,
         'native': nativeCell,
       });
     }

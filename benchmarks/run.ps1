@@ -8,6 +8,8 @@ param(
     [switch]$Packaged,
     [switch]$TraceInput,
     [switch]$NoPointerWarmup,
+    [switch]$ReleaseRecords,
+    [switch]$FlutterIsolate,
     [ValidateRange(0,1000000)][int]$Rows = 100000
 )
 $ErrorActionPreference = 'Stop'
@@ -34,6 +36,12 @@ $arguments = if ($Implementation -eq 'shell') { '"' + (Join-Path $root 'benchmar
 $env:GPUIDART_LIBRARY = Join-Path $root 'target/release/gpuidart.dll'
 $env:GPUIDART_BENCH_ROWS = "$Rows"
 $env:GPUIDART_BENCH_WORKLOAD = $Workload
+# The Dart fixture releases its copy of the records with -ReleaseRecords; the
+# Flutter fixture sorts on a worker isolate with -FlutterIsolate.
+$env:GPUIDART_BENCH_RETAIN = if ($ReleaseRecords) { '0' } else { '1' }
+$env:GPUIDART_BENCH_FLUTTER_SORT = if ($FlutterIsolate) { 'isolate' } else { 'ui' }
+if ($ReleaseRecords -and $Implementation -ne 'dart') { throw 'ReleaseRecords applies to the Dart fixture' }
+if ($FlutterIsolate -and $Implementation -ne 'flutter') { throw 'FlutterIsolate applies to the Flutter fixture' }
 if ($Rows -ne 100000 -and $Workload -notin @('idle','view')) { throw 'Only the idle and view workloads run with a row count other than 100000' }
 $env:GPUIDART_INPUT_TRACE = $null
 $env:GPUIDART_NATIVE_TRACE = $null
@@ -237,6 +245,7 @@ try {
         input_trace = [bool]$TraceInput; pointer_warmup = -not [bool]$NoPointerWarmup
         activation_clicks = [BenchmarkWindow]::ActivationClicks
         rows = $Rows; seconds_requested = $Seconds; duration_ms = $durationMs
+        release_records = [bool]$ReleaseRecords; flutter_isolate = [bool]$FlutterIsolate
         harness_timer_resolution_ms = [BenchmarkWindow]::TimerResolution / 10000.0
         driver_wait = 'one-millisecond high resolution waitable timer'
         driver_priority = $(if ([BenchmarkWindow]::ElevatedPriority) { 'high priority class, highest thread priority' } else { 'normal; elevation failed' })

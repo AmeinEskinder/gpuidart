@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui' show FramePhase, PlatformDispatcher;
 
 import 'package:flutter/material.dart';
@@ -20,6 +23,13 @@ import 'package:flutter/scheduler.dart';
 final rowCount =
     int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
 final viewWorkload = Platform.environment['GPUIDART_BENCH_WORKLOAD'] == 'view';
+
+/// Where the view workload computes a stage: on the UI isolate in the click
+/// handler, as a naive application does, or on a worker isolate that holds
+/// its own copy of the keys and sends the index back as transferable typed
+/// data, as a careful application does to keep the UI isolate painting.
+final isolateSort =
+    Platform.environment['GPUIDART_BENCH_FLUTTER_SORT'] == 'isolate';
 const columnWidth = 200.0;
 const rowHeight = 32.0;
 const viewportHeight = 320.0;
@@ -100,10 +110,46 @@ class _BenchmarkState extends State<Benchmark> {
   final frameTimes = <int, ({int vsync, int rasterFinish})>{};
   final viewChanges = <_ViewChange>[];
 
+  // The worker isolate for the isolate-sort mode: spawned at startup with
+  // its own copy of the prices and sector indices, asked for a stage by
+  // number, answering with the entries and headers of that stage.
+  SendPort? worker;
+  final workerReplies = ReceivePort();
+  Completer<_StageResult>? workerPending;
+
   @override
   void initState() {
     super.initState();
     SchedulerBinding.instance.addTimingsCallback(_recordFrames);
+    if (viewWorkload && isolateSort) _spawnWorker();
+  }
+
+  Future<void> _spawnWorker() async {
+    final ready = Completer<SendPort>();
+    workerReplies.listen((message) {
+      if (message is SendPort) {
+        ready.complete(message);
+      } else if (message is _StageResult) {
+        workerPending?.complete(message);
+        workerPending = null;
+      }
+    });
+    final sectors = Uint8List(rowCount);
+    for (var i = 0; i < rowCount; i++) {
+      sectors[i] = i % 12;
+    }
+    await Isolate.spawn(
+      _stageWorker,
+      _WorkerInit(
+        replies: workerReplies.sendPort,
+        prices: TransferableTypedData.fromList([
+          Float64List.fromList(prices).buffer.asUint8List(),
+        ]),
+        sectors: TransferableTypedData.fromList([sectors]),
+        rows: rowCount,
+      ),
+    );
+    worker = await ready.future;
   }
 
   @override
@@ -160,6 +206,24 @@ class _BenchmarkState extends State<Benchmark> {
     viewChanges.add(change);
     stage = (stage + 1) % viewStages.length;
     updates++;
+    if (isolateSort) {
+      final port = worker;
+      if (port == null) throw StateError('Sort worker is not ready');
+      final pending = Completer<_StageResult>();
+      workerPending = pending;
+      port.send(stage);
+      viewComputeUs.add(clock.elapsedMicroseconds);
+      pending.future.then((result) {
+        headers
+          ..clear()
+          ..addAll(result.headers);
+        display = stage == 0
+            ? null
+            : result.entries.materialize().asInt32List();
+        _showStage(clock, change);
+      });
+      return;
+    }
     headers.clear();
     display = switch (stage) {
       1 => _sorted(),
@@ -168,6 +232,12 @@ class _BenchmarkState extends State<Benchmark> {
       _ => null,
     };
     viewComputeUs.add(clock.elapsedMicroseconds);
+    _showStage(clock, change);
+  }
+
+  /// Schedules the frame that shows the stage and records when it has been
+  /// built, laid out and painted.
+  void _showStage(Stopwatch clock, _ViewChange change) {
     viewClock = clock;
     awaitingViewFrame = true;
     setState(() {});
@@ -246,6 +316,61 @@ class _BenchmarkState extends State<Benchmark> {
 
   int get itemCount => display?.length ?? rowCount;
 
+  /// The stage computed on the worker isolate over its own copies of the
+  /// keys: the same sort, filter and grouping as the UI-isolate path, with
+  /// the entries sent back as transferable typed data.
+  static void _stageWorker(_WorkerInit init) {
+    final prices = init.prices.materialize().asFloat64List();
+    final sectors = init.sectors.materialize().asUint8List();
+    final rows = init.rows;
+    final requests = ReceivePort();
+    init.replies.send(requests.sendPort);
+    requests.listen((message) {
+      final stage = message as int;
+      var order = <int>[];
+      final headers = <List<String>>[];
+      if (stage >= 1) {
+        order = List<int>.generate(rows, (i) => i);
+        order.sort((a, b) => prices[b].compareTo(prices[a]));
+      }
+      if (stage >= 2) {
+        order = order.where((i) => prices[i] > filterAbove).toList();
+      }
+      List<int> entries = order;
+      if (stage == 3) {
+        final groups = <int, List<int>>{};
+        for (final i in order) {
+          (groups[sectors[i]] ??= []).add(i);
+        }
+        entries = <int>[];
+        for (final MapEntry(key: sector, value: members) in groups.entries) {
+          var sum = 0.0;
+          var maximum = double.negativeInfinity;
+          for (final i in members) {
+            sum += prices[i];
+            maximum = max(maximum, prices[i]);
+          }
+          headers.add([
+            'Sector $sector',
+            '${members.length}',
+            (sum / members.length).toStringAsFixed(2),
+            maximum.toStringAsFixed(2),
+          ]);
+          entries.add(-headers.length);
+          entries.addAll(members);
+        }
+      }
+      init.replies.send(
+        _StageResult(
+          entries: TransferableTypedData.fromList([
+            Int32List.fromList(entries).buffer.asUint8List(),
+          ]),
+          headers: headers,
+        ),
+      );
+    });
+  }
+
   Future<void> report() async {
     // The engine reports frame timings in batches up to a second apart; the
     // last view change's frame must be in before its gaps are read.
@@ -259,6 +384,7 @@ class _BenchmarkState extends State<Benchmark> {
       const JsonEncoder.withIndent('  ').convert({
         'implementation': 'flutter',
         'rows': rowCount,
+        'isolate_sort': isolateSort,
         'updates': updates,
         'cells_written': cellsWritten,
         'first_price': rows.isEmpty ? null : rows[0][2],
@@ -369,6 +495,29 @@ class _BenchmarkState extends State<Benchmark> {
       ),
     );
   }
+}
+
+/// What the sort worker starts with: a port to answer on and its own copies
+/// of the keys.
+class _WorkerInit {
+  const _WorkerInit({
+    required this.replies,
+    required this.prices,
+    required this.sectors,
+    required this.rows,
+  });
+  final SendPort replies;
+  final TransferableTypedData prices;
+  final TransferableTypedData sectors;
+  final int rows;
+}
+
+/// A stage as the worker computed it: the entries (a record index, or a
+/// negative index into [headers]) and the group headers.
+class _StageResult {
+  const _StageResult({required this.entries, required this.headers});
+  final TransferableTypedData entries;
+  final List<List<String>> headers;
 }
 
 /// A view change's frame bounds: the frame current when the click ran and
