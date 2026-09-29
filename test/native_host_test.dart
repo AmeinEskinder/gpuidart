@@ -813,6 +813,96 @@ void main() {
     },
   );
 
+  test('generated datasets upload from a helper isolate', () async {
+    const rows = 250000;
+    final dataset = TableDataset.generated(
+      'gen',
+      columns: ['ID', 'Value'],
+      rowCount: rows,
+      rowAt: _generatedRow,
+      rowIdAt: _generatedId,
+    );
+    expect(dataset.rowCount, rows);
+    expect(dataset.retainRecords, isFalse);
+    expect(() => dataset.cell(0, 0), throwsStateError);
+    final host = await GpuiHost.open(
+      const UiTable(
+        'table',
+        dataset: 'gen',
+        view: UiTableView(sort: [UiSort(1, direction: UiSortDirection.asc)]),
+      ),
+      datasets: [dataset],
+      deferDatasets: true,
+    );
+    try {
+      // The upload arrived in slices from the helper; the revision counts
+      // them behind the schema.
+      expect(dataset.revision, greaterThan(1));
+      await host.viewsSettled;
+      final state = await host.diagnose('inspect');
+      expect(state['tables']['table']['row_count'], rows);
+      expect(state['tables']['table']['view']['view_rows'], rows);
+      expect(state['native']['dataset_copies'], 0);
+      Future<String> shown(int row) async =>
+          (await host.diagnose('formatted_cell', {
+                'table': 'table',
+                'row': row,
+                'column': 0,
+              }))['text']
+              as String;
+      expect(await shown(0), 'R${rows - 1}', reason: 'ascending value');
+      expect(
+        (await host.diagnose('cell', {
+          'dataset': 'gen',
+          'row': 12345,
+          'column': 1,
+        }))['value'],
+        '${rows - 12345}',
+      );
+      // Edits address the generated records like any other.
+      final before = dataset.revision;
+      await host.editDataset(dataset, [const CellEdit(0, 1, '0')]);
+      expect(dataset.revision, before + 1);
+      await host.viewsSettled;
+      expect(await shown(0), 'R0', reason: 'value 0 sorts first');
+      expect(
+        (await host.diagnose('cell', {
+          'dataset': 'gen',
+          'row': 0,
+          'column': 1,
+        }))['value'],
+        '0',
+      );
+      // A registered generated dataset takes the same path.
+      final second = TableDataset.generated(
+        'gen2',
+        columns: ['ID', 'Value'],
+        rowCount: 3000,
+        rowAt: _generatedRow,
+      );
+      await host.registerDataset(second);
+      expect(second.revision, greaterThan(1));
+      await host.publish(const UiTable('table', dataset: 'gen2'));
+      await host.viewsSettled;
+      expect(
+        (await host.diagnose('inspect'))['tables']['table']['row_count'],
+        3000,
+      );
+      // A repeated record ID is native's rejection, surfaced as the
+      // upload's error.
+      final repeated = TableDataset.generated(
+        'gen3',
+        columns: ['ID'],
+        rowCount: 20000,
+        rowAt: _generatedRow1,
+        rowIdAt: _repeatedId,
+      );
+      await expectLater(host.registerDataset(repeated), throwsStateError);
+    } finally {
+      await host.close();
+    }
+  });
+
   test('structural edits keep record identity, views and selection', () async {
     final dataset = TableDataset(
       'records',
@@ -1060,3 +1150,13 @@ void main() {
     timeout: const Timeout(Duration(seconds: 30)),
   );
 }
+
+/// Row generators for the generated-dataset test: top-level functions, so
+/// the helper isolate can receive them.
+List<String> _generatedRow(int index) => ['R$index', '${250000 - index}'];
+
+List<String> _generatedRow1(int index) => ['R$index'];
+
+String _generatedId(int index) => 'R$index';
+
+String _repeatedId(int index) => 'R${index % 15000}';

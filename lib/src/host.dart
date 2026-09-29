@@ -28,6 +28,17 @@ part 'input_commands.dart';
 
 final _jsonUtf8 = JsonUtf8Encoder();
 
+/// A framed dataset message: magic, header length, JSON header, packed
+/// records.
+Uint8List _frame(List<int> header, Uint8List attachment) {
+  final framed = Uint8List(8 + header.length + attachment.length);
+  framed.setRange(0, 4, const [0x47, 0x44, 0x50, 0x31]);
+  ByteData.sublistView(framed).setUint32(4, header.length, Endian.little);
+  framed.setRange(8, 8 + header.length, header);
+  framed.setRange(8 + header.length, framed.length, attachment);
+  return framed;
+}
+
 /// A queued publication: the tree native will hold once it applies.
 final class _Publication {
   const _Publication(
@@ -113,7 +124,7 @@ final class _WindowBindings {
 }
 
 final class _Bindings {
-  _Bindings(String path) : library = DynamicLibrary.open(path) {
+  _Bindings(this.path) : library = DynamicLibrary.open(path) {
     const expected = 1;
     int version;
     try {
@@ -134,6 +145,7 @@ final class _Bindings {
     }
   }
   final DynamicLibrary library;
+  final String path;
   late final create = library.lookupFunction<_CreateNative, _CreateDart>(
     'gd_create',
   );
@@ -364,6 +376,18 @@ final class GpuiHost {
   final _ready = Completer<void>();
   final _closed = Completer<void>();
   final _diagnostics = <int, Completer<Map<String, dynamic>>>{};
+
+  /// Generated uploads in progress by dataset ID; their acknowledgements
+  /// carry requests the helper isolate numbered.
+  final _generatedUploads = <String, _GeneratedUpload>{};
+
+  _GeneratedUpload? _generatedUploadFor(int request) {
+    for (final upload in _generatedUploads.values) {
+      if (upload.owns(request)) return upload;
+    }
+    return null;
+  }
+
   final _inputPending =
       <
         int,
@@ -509,7 +533,8 @@ final class GpuiHost {
     final describeStart = trace?._clock.now();
     final described = DescribedNode.describe(root);
     final plans = {
-      for (final dataset in datasets) dataset.id: dataset._chunks(),
+      for (final dataset in datasets)
+        dataset.id: dataset._generated ? const [(0, 0)] : dataset._chunks(),
     };
     final initial = <String, Object>{
       'snapshot': {
@@ -522,7 +547,7 @@ final class GpuiHost {
       },
       'datasets': [
         for (final dataset in datasets)
-          deferDatasets || plans[dataset.id]!.length > 1
+          dataset._generated || deferDatasets || plans[dataset.id]!.length > 1
               ? dataset._uploadSchema()
               : dataset._upload(),
       ],
@@ -671,15 +696,7 @@ final class GpuiHost {
               () => _jsonUtf8.convert(message),
             );
     }
-    if (attachment != null) {
-      // A framed message: magic, header length, JSON header, packed records.
-      final framed = Uint8List(8 + data.length + attachment.length);
-      framed.setRange(0, 4, const [0x47, 0x44, 0x50, 0x31]);
-      ByteData.sublistView(framed).setUint32(4, data.length, Endian.little);
-      framed.setRange(8, 8 + data.length, data);
-      framed.setRange(8 + data.length, framed.length, attachment);
-      data = framed;
-    }
+    if (attachment != null) data = _frame(data, attachment);
     final copyStart = trace?._clock.now();
     final bytes = calloc<Uint8>(data.length);
     try {
@@ -993,6 +1010,10 @@ final class GpuiHost {
       pending.completion.completeError(error, stack);
     }
     _dataPending.clear();
+    for (final upload in _generatedUploads.values) {
+      if (!upload.done.isCompleted) upload.done.completeError(error, stack);
+    }
+    _generatedUploads.clear();
     _dataTimers.clear();
     for (final pending in _diagnostics.values) {
       pending.completeError(error, stack);
@@ -1129,6 +1150,23 @@ final class GpuiHost {
               .completeError(StateError(event.data['message'] as String));
         case 'window_closed':
           _windows.remove(event.window)?._closed();
+        case 'dataset_applied'
+            when _generatedUploadFor(event.data['request'] as int) != null:
+          _viewFor(event)?.syncPendingViews(event);
+          HostMetrics.sample(
+            metrics.nativeDataParseMicroseconds,
+            event.data['parse_us'] as int,
+          );
+          HostMetrics.sample(
+            metrics.nativeDataApplyMicroseconds,
+            event.data['apply_us'] as int,
+          );
+          metrics.dataRecordsChecked +=
+              event.data['work']['records_checked'] as int;
+          metrics.dataCellsWritten +=
+              event.data['work']['cells_written'] as int;
+          _generatedUploadFor(event.data['request'] as int)!
+              .applied(event.revision!);
         case 'dataset_applied':
           _viewFor(event)?.syncPendingViews(event);
           final pending = _dataPending[event.data['request']];
@@ -1164,6 +1202,8 @@ final class GpuiHost {
               .remove(event.data['request'])
               ?.completion
               .completeError(StateError(event.data['message'] as String));
+          _generatedUploadFor(event.data['request'] as int)
+              ?.rejected(event.data['message'] as String);
         case 'diagnostic':
           _diagnostics
               .remove(event.data['request'])

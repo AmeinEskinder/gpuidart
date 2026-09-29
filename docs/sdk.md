@@ -116,6 +116,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | UiMemo | Keeps a built subtree while its inputs compare equal, so a rebuild reuses it by identity. See [retained tree](retained-tree.md). |
 | patch | Writes one published node's own fields as a single `set` operation, with no build, describe or diff; the node keeps its ID and kind and carries no children. The write stands until the next publication, which carries the application's value. |
 | registerDataset / editDataset / replaceDataset / releaseDataset | Revisioned transactions; Dart data commits after native acknowledgement. Edit batches change cells and rows, and insert, delete or move records in order. See [datasets](datasets.md). |
+| TableDataset.generated | Records produced on demand by a generator and uploaded slice by slice from a short-lived helper isolate, so the calling isolate never holds them; the path for a million records. See [datasets](datasets.md#operations-and-lifetime). |
 | openWindow / GpuiWindow | A secondary native window with its own description, datasets and revision sequence; events carry `GpuiEvent.window`. Closing the main window closes the application. See [secondary windows](windows.md). |
 | UiTheme | Whole-snapshot light/dark palette plus bounded opaque token overrides. `openView` reevaluates its theme builder on rebuild/reload. |
 | UiTabs / UiRadioGroup | Controlled option IDs with retained focus and keyboard navigation. Changes return on the event channel. |

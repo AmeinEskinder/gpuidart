@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:gpuidart/gpuidart.dart';
-import 'package:gpuidart/src/runtime_info.dart';
 
 /// The view workload cycles the table through these stages, one per click:
 /// a descending sort on the price, the sort with a filter that keeps about
@@ -53,24 +52,24 @@ Future<void> main(List<String> args) async {
       int.tryParse(Platform.environment['GPUIDART_BENCH_ROWS'] ?? '') ?? 100000;
   final viewWorkload =
       Platform.environment['GPUIDART_BENCH_WORKLOAD'] == 'view';
-  // The SDK's mode for large datasets releases the Dart copy of the records
-  // once native holds them; the runner selects it with GPUIDART_BENCH_RETAIN=0
-  // and the report then reads the first price from native.
+  // The SDK's mode for large datasets generates the records in a helper
+  // isolate that uploads them itself, so this isolate never holds them; the
+  // runner selects it with GPUIDART_BENCH_RETAIN=0 and the report then reads
+  // the first price from native.
   final retainRecords = Platform.environment['GPUIDART_BENCH_RETAIN'] != '0';
-  final data = TableDataset(
-    'quotes',
-    retainRecords: retainRecords,
-    columns: ['ID', 'Instrument', 'Price', if (viewWorkload) 'Sector'],
-    rows: List.generate(
-      rows,
-      (i) => [
-        '$i',
-        'Instrument $i',
-        (100 + (viewWorkload ? (i * 7919) % rows : i) / 100).toStringAsFixed(2),
-        if (viewWorkload) 'Sector ${i % 12}',
-      ],
-    ),
-  );
+  final columns = ['ID', 'Instrument', 'Price', if (viewWorkload) 'Sector'];
+  final data = retainRecords
+      ? TableDataset(
+          'quotes',
+          columns: columns,
+          rows: List.generate(rows, (i) => _record(i, rows, viewWorkload)),
+        )
+      : TableDataset.generated(
+          'quotes',
+          columns: columns,
+          rowCount: rows,
+          rowAt: viewWorkload ? _viewRecordAt(rows) : _recordAt(rows),
+        );
   final launchUtcMs = int.tryParse(
     Platform.environment['GPUIDART_BENCH_LAUNCH_UTC_MS'] ?? '',
   );
@@ -117,30 +116,6 @@ Future<void> main(List<String> args) async {
     if (event.type == 'error') throw StateError('$event');
     if (event.type != 'click') return;
     if (event.id == 'report') {
-      // With the Dart copy released, the VM keeps the freed heap pages until
-      // a major collection, which a short run never provokes; churn enough
-      // short-lived allocation to force one, after the measured phase, and
-      // read the process figures once more so the report shows what a
-      // released copy leaves once collected.
-      Map<String, Object?>? afterCollection;
-      if (!retainRecords) {
-        for (var round = 0; round < 8; round++) {
-          final churn = List<List<int>>.generate(
-            200000,
-            (i) => List.filled(16, i),
-          );
-          if (churn.length == 1) stdout.writeln(churn);
-          await Future<void>.delayed(const Duration(milliseconds: 50));
-        }
-        await Future<void>.delayed(const Duration(milliseconds: 500));
-        afterCollection = {
-          'dart_rss_bytes': ProcessInfo.currentRss,
-          'memory_bytes': readRuntimeInfo()['memory_bytes'],
-          'scope':
-              'after the measured phase: eight rounds of 200,000 short-lived '
-              'lists to force a major collection, then half a second',
-        };
-      }
       final state = await host.diagnose('inspect');
       final nativeCell = data.rowCount == 0
           ? null
@@ -154,7 +129,7 @@ Future<void> main(List<String> args) async {
           'implementation': 'dart',
           'rows': data.rowCount,
           'retain_records': retainRecords,
-          'memory_after_collection': ?afterCollection,
+          'records_mode': retainRecords ? 'retained' : 'generated',
           'updates': updates,
           'cells_written': cellsWritten,
           'first_price': data.rowCount == 0
@@ -280,3 +255,20 @@ Map<String, Object?> distribution(List<int> samples) {
     'sequence': samples,
   };
 }
+
+/// One record of the fixture: a permuted price in the view workload so a
+/// sort has work to do, a rising one otherwise.
+List<String> _record(int i, int rows, bool view) => [
+  '$i',
+  'Instrument $i',
+  (100 + (view ? (i * 7919) % rows : i) / 100).toStringAsFixed(2),
+  if (view) 'Sector ${i % 12}',
+];
+
+/// Generators the helper isolate can receive: they capture the row count
+/// only.
+List<String> Function(int) _recordAt(int rows) =>
+    (i) => _record(i, rows, false);
+
+List<String> Function(int) _viewRecordAt(int rows) =>
+    (i) => _record(i, rows, true);

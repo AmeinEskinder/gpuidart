@@ -30,12 +30,54 @@ final class TableDataset {
        _rowIds = rowIds?.toList(),
        _identity = rowIds != null,
        _rowCount = rows.length,
+       _rowAt = null,
+       _rowIdAt = null,
        _formats = formats == null
            ? null
            : Map<int, UiColumnFormat>.unmodifiable(formats) {
     if (id.isEmpty) throw ArgumentError('Dataset ID must be nonempty');
     _validateData(_columns, _rows);
     _validateIds(_rowIds, _rows.length);
+    if (_formats != null) {
+      for (final column in _formats!.keys) {
+        RangeError.checkValueInInterval(column, 0, _columns.length - 1);
+      }
+    }
+  }
+
+  /// Records produced on demand, never held in the calling isolate.
+  ///
+  /// [rowAt] returns row [index] and [rowIdAt] its record ID. The upload
+  /// runs in a short-lived helper isolate that generates and packs the
+  /// records one slice at a time, submits each slice to native itself and
+  /// exits, so the process holds native's copy of the records and one
+  /// slice in flight, and nothing waits for a collection. The dataset then
+  /// behaves as one that does not retain its records: edits address its
+  /// rows and [cell], [row] and [rowId] throw. Record IDs must be unique;
+  /// native rejects the slice that repeats one. Main-window datasets only.
+  TableDataset.generated(
+    this.id, {
+    required List<String> columns,
+    required int rowCount,
+    required List<String> Function(int index) rowAt,
+    String Function(int index)? rowIdAt,
+    Map<int, UiColumnFormat>? formats,
+  }) : retainRecords = false,
+       _columns = List.unmodifiable(columns),
+       _rows = const [],
+       _rowIds = rowIdAt == null ? null : const [],
+       _identity = rowIdAt != null,
+       _rowCount = rowCount,
+       // ignore: prefer_initializing_formals
+       _rowAt = rowAt,
+       // ignore: prefer_initializing_formals
+       _rowIdAt = rowIdAt,
+       _formats = formats == null
+           ? null
+           : Map<int, UiColumnFormat>.unmodifiable(formats) {
+    if (id.isEmpty) throw ArgumentError('Dataset ID must be nonempty');
+    _validateData(_columns, const []);
+    RangeError.checkValueInInterval(rowCount, 0, maxDatasetRows, 'rowCount');
     if (_formats != null) {
       for (final column in _formats!.keys) {
         RangeError.checkValueInInterval(column, 0, _columns.length - 1);
@@ -53,6 +95,11 @@ final class TableDataset {
   bool _identity;
   int _rowCount;
   Map<int, UiColumnFormat>? _formats;
+
+  /// The generators of a dataset built by [TableDataset.generated].
+  final List<String> Function(int index)? _rowAt;
+  final String Function(int index)? _rowIdAt;
+  bool get _generated => _rowAt != null;
   int _revision = 0;
   GpuiHost? _owner;
 
@@ -128,64 +175,13 @@ final class TableDataset {
   /// a JSON header and the cells as length-prefixed UTF-8, which spares both
   /// sides the JSON quoting of every cell. [more] tells native that further
   /// slices follow, so it recomputes views once at the last one.
-  _PackedAppend _appendPacked(int start, int end, {bool more = false}) {
-    final packing = Stopwatch()..start();
-    final ids = _rowIds;
-    // One pass: the buffer is sized for the widest UTF-8 the code units can
-    // take and trimmed to what was written, so no cell is walked twice.
-    var capacity = 9;
-    for (var i = start; i < end; i++) {
-      for (final cell in _rows[i]) {
-        capacity += 4 + 3 * cell.length;
-      }
-      if (ids != null) capacity += 4 + 3 * ids[i].length;
-    }
-    final buffer = Uint8List(capacity);
-    var at = 0;
-    void u32(int value) {
-      buffer[at] = value & 0xFF;
-      buffer[at + 1] = (value >> 8) & 0xFF;
-      buffer[at + 2] = (value >> 16) & 0xFF;
-      buffer[at + 3] = (value >> 24) & 0xFF;
-      at += 4;
-    }
-
-    void text(String value) {
-      final lengthAt = at;
-      at += 4;
-      final begin = at;
-      at = _writeUtf8(value, buffer, at);
-      final length = at - begin;
-      buffer[lengthAt] = length & 0xFF;
-      buffer[lengthAt + 1] = (length >> 8) & 0xFF;
-      buffer[lengthAt + 2] = (length >> 16) & 0xFF;
-      buffer[lengthAt + 3] = (length >> 24) & 0xFF;
-    }
-
-    u32(end - start);
-    u32(_columns.length);
-    buffer[at++] = ids == null ? 0 : 1;
-    for (var i = start; i < end; i++) {
-      for (final cell in _rows[i]) {
-        text(cell);
-      }
-    }
-    if (ids != null) {
-      for (var i = start; i < end; i++) {
-        text(ids[i]);
-      }
-    }
-    return (
-      header: {
-        'op': 'append',
-        'rows': const <List<String>>[],
-        if (ids != null) 'ids': const <String>[],
-        if (more) 'more': true,
-      },
-      body: Uint8List.sublistView(buffer, 0, at),
-      packMicroseconds: packing.elapsedMicroseconds,
-    );
-  }
+  _PackedAppend _appendPacked(int start, int end, {bool more = false}) =>
+      _packRecords(
+        _rows.sublist(start, end),
+        _rowIds?.sublist(start, end),
+        _columns.length,
+        more: more,
+      );
 
   /// Records are uploaded in messages of about this many encoded bytes; JSON
   /// escapes and non-ASCII text can triple the estimate, still under the
@@ -530,15 +526,223 @@ typedef _PackedAppend = ({
   int packMicroseconds,
 });
 
+/// [rows] with their [ids] as an append behind the records already uploaded:
+/// a JSON header and the cells as length-prefixed UTF-8, which spares both
+/// sides the JSON quoting of every cell. [more] tells native that further
+/// slices follow, so it recomputes views once at the last one.
+_PackedAppend _packRecords(
+  List<List<String>> rows,
+  List<String>? ids,
+  int columns, {
+  required bool more,
+}) {
+  final packing = Stopwatch()..start();
+  // One pass: the buffer is sized for the widest UTF-8 the code units can
+  // take and trimmed to what was written, so no cell is walked twice.
+  var capacity = 9;
+  for (var i = 0; i < rows.length; i++) {
+    for (final cell in rows[i]) {
+      capacity += 4 + 3 * cell.length;
+    }
+    if (ids != null) capacity += 4 + 3 * ids[i].length;
+  }
+  final buffer = Uint8List(capacity);
+  var at = 0;
+  void u32(int value) {
+    buffer[at] = value & 0xFF;
+    buffer[at + 1] = (value >> 8) & 0xFF;
+    buffer[at + 2] = (value >> 16) & 0xFF;
+    buffer[at + 3] = (value >> 24) & 0xFF;
+    at += 4;
+  }
+
+  void text(String value) {
+    final lengthAt = at;
+    at += 4;
+    final begin = at;
+    at = _writeUtf8(value, buffer, at);
+    final length = at - begin;
+    buffer[lengthAt] = length & 0xFF;
+    buffer[lengthAt + 1] = (length >> 8) & 0xFF;
+    buffer[lengthAt + 2] = (length >> 16) & 0xFF;
+    buffer[lengthAt + 3] = (length >> 24) & 0xFF;
+  }
+
+  u32(rows.length);
+  u32(columns);
+  buffer[at++] = ids == null ? 0 : 1;
+  for (final row in rows) {
+    for (final cell in row) {
+      text(cell);
+    }
+  }
+  if (ids != null) {
+    for (final id in ids) {
+      text(id);
+    }
+  }
+  return (
+    header: {
+      'op': 'append',
+      'rows': const <List<String>>[],
+      if (ids != null) 'ids': const <String>[],
+      if (more) 'more': true,
+    },
+    body: Uint8List.sublistView(buffer, 0, at),
+    packMicroseconds: packing.elapsedMicroseconds,
+  );
+}
+
+/// What the helper isolate needs to generate, pack and submit the records of
+/// a generated dataset: it opens the native library itself and calls the
+/// dataset entry point with the host's handle, one slice at a time.
+final class _GeneratedJob {
+  const _GeneratedJob({
+    required this.libraryPath,
+    required this.handle,
+    required this.id,
+    required this.columns,
+    required this.rowCount,
+    required this.rowAt,
+    required this.rowIdAt,
+    required this.firstRequest,
+  });
+  final String libraryPath;
+  final int handle;
+  final String id;
+  final int columns;
+  final int rowCount;
+  final List<String> Function(int index) rowAt;
+  final String Function(int index)? rowIdAt;
+  final int firstRequest;
+}
+
+/// Runs in the helper isolate: generates the records slice by slice, packs
+/// each slice, submits it and drops it, then returns the number of slices.
+/// Slice k carries revision k + 1 behind the schema at revision 1; the
+/// acknowledgements reach the main isolate's event port as usual.
+int _generateAndUpload(_GeneratedJob job) {
+  final library = DynamicLibrary.open(job.libraryPath);
+  final submit = library.lookupFunction<_PublishNative, _PublishDart>(
+    'gd_dataset',
+  );
+  final handle = Pointer<Void>.fromAddress(job.handle);
+  final rows = <List<String>>[];
+  final ids = job.rowIdAt == null ? null : <String>[];
+  var next = 0;
+  var revision = 1;
+  var request = job.firstRequest;
+  var slices = 0;
+  while (next < job.rowCount) {
+    rows.clear();
+    ids?.clear();
+    var bytes = 0;
+    while (next < job.rowCount) {
+      final row = job.rowAt(next);
+      if (row.length != job.columns) {
+        throw StateError(
+          'Generated row $next has ${row.length} cells for ${job.columns} columns',
+        );
+      }
+      var rowBytes = 4;
+      for (final cell in row) {
+        _checkText(cell, 'Generated row $next');
+        rowBytes += cell.length + 3;
+      }
+      String? id;
+      if (ids != null) {
+        id = job.rowIdAt!(next);
+        if (id.isEmpty) throw StateError('Generated row $next has an empty ID');
+        _checkText(id, 'Generated row $next ID');
+        rowBytes += id.length + 3;
+      }
+      if (bytes + rowBytes > TableDataset._chunkBytes && rows.isNotEmpty) break;
+      rows.add(row);
+      ids?.add(id!);
+      bytes += rowBytes;
+      next++;
+    }
+    final packed = _packRecords(
+      rows,
+      ids,
+      job.columns,
+      more: next < job.rowCount,
+    );
+    revision++;
+    final header = _jsonUtf8.convert({
+      'request': request,
+      'id': job.id,
+      'base_revision': revision - 1,
+      'revision': revision,
+      'change': packed.header,
+    });
+    final framed = _frame(header, packed.body);
+    final pointer = calloc<Uint8>(framed.length);
+    try {
+      pointer.asTypedList(framed.length).setAll(0, framed);
+      // A full command queue (-3) means native is behind by 64 messages;
+      // wait for it rather than fail the upload.
+      var status = submit(handle, pointer, framed.length);
+      for (var attempt = 0; status == -3 && attempt < 5000; attempt++) {
+        sleep(const Duration(milliseconds: 2));
+        status = submit(handle, pointer, framed.length);
+      }
+      if (status != 0) throw StateError('Dataset submission failed: $status');
+    } finally {
+      calloc.free(pointer);
+    }
+    request++;
+    slices++;
+  }
+  return slices;
+}
+
+/// The main isolate's side of a generated upload: the acknowledgements it
+/// counts while the helper isolate submits the slices.
+final class _GeneratedUpload {
+  _GeneratedUpload(this.dataset, this.firstRequest);
+  final TableDataset dataset;
+  final done = Completer<void>();
+  int? finalRevision;
+
+  /// The requests the helper numbers: a block after [firstRequest] the
+  /// main isolate leaves unused, so an acknowledgement or rejection is
+  /// routed here by its request.
+  final int firstRequest;
+  bool owns(int request) =>
+      request >= firstRequest && request <= firstRequest + maxDatasetRows;
+
+  void rejected(String message) {
+    if (!done.isCompleted) done.completeError(StateError(message));
+  }
+
+  void applied(int revision) {
+    dataset._revision = revision;
+    settle();
+  }
+
+  void settle() {
+    final last = finalRevision;
+    if (last != null && dataset._revision >= last && !done.isCompleted) {
+      done.complete();
+    }
+  }
+}
+
 extension _DatasetTransactions on GpuiHost {
   /// Sends the records the initial message left out: a deferred dataset as
   /// one replacement, a dataset too large for one message as appended slices
-  /// behind the schema already uploaded at revision 1.
+  /// behind the schema already uploaded at revision 1, a generated dataset
+  /// from its helper isolate.
   Future<void> _uploadRecords(
     TableDataset dataset,
     List<(int, int)> chunks, {
     required bool deferred,
   }) async {
+    if (dataset._generated) {
+      await _runGeneratedUpload(dataset);
+      return;
+    }
     if (chunks.length == 1) {
       if (deferred) {
         await _transact(dataset, {
@@ -600,8 +804,20 @@ extension _DatasetTransactions on GpuiHost {
   }
 
   /// Registers a dataset under an unused ID: its first slice as a replacement
-  /// at revision 1, the rest appended.
+  /// at revision 1, the rest appended; a generated dataset as its schema at
+  /// revision 1 and the records from the helper isolate.
   Future<void> _register(TableDataset dataset, {required int window}) async {
+    if (dataset._generated) {
+      await _transact(
+        dataset,
+        {'op': 'replace', 'data': dataset._uploadSchema()['data']!},
+        () {},
+        create: true,
+        window: window,
+      );
+      await _runGeneratedUpload(dataset);
+      return;
+    }
     final chunks = dataset._chunks();
     await _transact(
       dataset,
@@ -614,6 +830,54 @@ extension _DatasetTransactions on GpuiHost {
       await _appendSlices(dataset, dataset, chunks, 1, (_, _) {});
     }
     dataset._releaseRecords();
+  }
+
+  /// Generates, packs and submits a generated dataset's records from a
+  /// short-lived helper isolate and waits for native to acknowledge every
+  /// slice. The dataset is busy meanwhile.
+  Future<void> _runGeneratedUpload(TableDataset dataset) async {
+    if (dataset._window != 0) {
+      throw UnsupportedError('Generated datasets upload to the main window');
+    }
+    if (dataset._busy) {
+      throw StateError('Await the previous dataset transaction');
+    }
+    // Requests the helper numbers itself, from a block the main isolate
+    // will not use.
+    final firstRequest = _request + 1;
+    _request += maxDatasetRows + 1;
+    final upload = _GeneratedUpload(dataset, firstRequest);
+    _generatedUploads[dataset.id] = upload;
+    dataset._busy = true;
+    final timer = Stopwatch()..start();
+    try {
+      final job = _GeneratedJob(
+        libraryPath: _bindings.path,
+        handle: _handle.address,
+        id: dataset.id,
+        columns: dataset._columns.length,
+        rowCount: dataset._rowCount,
+        rowAt: dataset._rowAt!,
+        rowIdAt: dataset._rowIdAt,
+        firstRequest: firstRequest,
+      );
+      _trace?._point('dart.request', 'dataset', firstRequest);
+      final slices = await Isolate.run(() => _generateAndUpload(job));
+      upload.finalRevision = 1 + slices;
+      upload.settle();
+      await _withDeadline(
+        upload.done.future,
+        'generated upload of ${dataset.id}',
+      );
+      HostMetrics.sample(
+        metrics.dataApplyMicroseconds,
+        timer.elapsedMicroseconds,
+      );
+      _trace?._point('dart.commit', 'dataset', firstRequest);
+    } finally {
+      _generatedUploads.remove(dataset.id);
+      dataset._busy = false;
+    }
   }
 
   Future<void> _transact(
