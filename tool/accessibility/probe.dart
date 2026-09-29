@@ -57,5 +57,11 @@ Future<void> main(List<String> args) async {
     }
     file.writeAsStringSync(const JsonEncoder.withIndent('  ').convert(report));
     stdout.writeln('Saved ${file.path}: passed=${report['passed']}');
+    // The report is an artifact; the log should say why a run failed too.
+    if (report['error'] case final Object error)
+      stdout.writeln('Error: $error');
+    if (report['close_error'] case final Object error) {
+      stdout.writeln('Close error: $error');
+    }
   }
 }
