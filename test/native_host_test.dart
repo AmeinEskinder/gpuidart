@@ -692,7 +692,9 @@ void main() {
   test(
     'large views compute off the frame thread and settle in order',
     () async {
-      const rows = 60000;
+      // Large enough that the debug library's sort outlasts an inspect round
+      // trip, so the index shown right after an acknowledgement is observable.
+      const rows = 150000;
       final dataset = TableDataset(
         'big',
         columns: ['ID', 'Value'],
@@ -727,30 +729,69 @@ void main() {
         var state = await host.diagnose('inspect');
         expect(state['tables']['table']['view']['pending'], false);
         expect(state['tables']['table']['view']['view_rows'], rows);
-        expect(state['native']['view_jobs'], 1);
+        // The upload arrives in slices, so the count of jobs and settled
+        // views so far depends on the slice count; later checks are relative.
+        final baseJobs = state['native']['view_jobs'] as int;
+        final baseRevision = dataset.revision;
         expect(await shown(0), 'R${rows - 1}', reason: 'ascending value');
-        expect(settled, hasLength(1));
-        expect(settled.single.table, 'table');
-        expect(settled.single.rows, rows);
-        expect(settled.single.datasetRevision, 1);
+        expect(settled, isNotEmpty);
+        final baseSettled = settled.length;
+        expect(settled.last.table, 'table');
+        expect(settled.last.rows, rows);
+        expect(settled.last.datasetRevision, baseRevision);
+        // A new spec is acknowledged before its index exists: the table keeps
+        // showing the old order until viewsSettled, then the new one.
+        await host.publish(
+          const UiTable(
+            'table',
+            dataset: 'big',
+            view: UiTableView(
+              sort: [UiSort(1, direction: UiSortDirection.desc)],
+            ),
+          ),
+        );
+        state = await host.diagnose('inspect');
+        expect(state['tables']['table']['view']['pending'], true);
+        expect(await shown(0), 'R${rows - 1}', reason: 'still ascending');
+        await host.viewsSettled;
+        state = await host.diagnose('inspect');
+        expect(state['tables']['table']['view']['pending'], false);
+        expect(await shown(0), 'R0', reason: 'descending once settled');
+        expect(settled, hasLength(baseSettled + 1));
+        await host.publish(
+          const UiTable(
+            'table',
+            dataset: 'big',
+            view: UiTableView(
+              sort: [UiSort(1, direction: UiSortDirection.asc)],
+            ),
+          ),
+        );
+        await host.viewsSettled;
+        expect(settled, hasLength(baseSettled + 2));
         // Two edits to the sort column: the first starts a job, the second is
         // sent while it runs and applies after it, in order.
         await host.editDataset(dataset, [const CellEdit(0, 1, '0')]);
         await host.editDataset(dataset, [const CellEdit(1, 1, '${rows + 5}')]);
-        expect(dataset.revision, 3);
+        expect(dataset.revision, baseRevision + 2);
         await host.viewsSettled;
         state = await host.diagnose('inspect');
         expect(state['tables']['table']['view']['pending'], false);
-        expect(state['tables']['table']['dataset_revision'], 3);
-        expect(state['native']['view_jobs'], 3);
+        expect(state['tables']['table']['dataset_revision'], baseRevision + 2);
+        expect(state['native']['view_jobs'], baseJobs + 4);
+        expect(
+          state['native']['dataset_copies'],
+          0,
+          reason: 'edits waited for the job instead of copying the records',
+        );
         expect(await shown(0), 'R0', reason: 'value 0 sorts first');
         expect(
           await shown(rows - 1),
           'R1',
           reason: 'the largest value sorts last',
         );
-        expect(settled, hasLength(3));
-        expect(settled.last.datasetRevision, 3);
+        expect(settled, hasLength(baseSettled + 4));
+        expect(settled.last.datasetRevision, baseRevision + 2);
         // A view over fewer records computes in place and still reports.
         await host.replaceDataset(
           dataset,
@@ -763,7 +804,7 @@ void main() {
         );
         await host.viewsSettled;
         expect(await shown(0), 'b');
-        expect(settled, hasLength(4));
+        expect(settled, hasLength(baseSettled + 5));
         expect(settled.last.rows, 2);
         await subscription.cancel();
       } finally {

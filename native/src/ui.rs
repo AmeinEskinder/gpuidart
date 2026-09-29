@@ -694,10 +694,12 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<String, Value>>();
+        let mut native = self.counters.read();
+        native["dataset_copies"] = json!(self.datasets.copies.get());
         json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "panes": panes, "trees": trees, "active_sheet": self.active_sheet.clone(), "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
-            "native": self.counters.read(),
+            "native": native,
             "frame_gaps": self.frame_gaps.read(),
             "draw": histogram!(frames.draw_duration_histogram),
             "dirty_to_present_submit": histogram!(frames.dirty_to_present_histogram),

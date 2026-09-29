@@ -571,6 +571,10 @@ pub type SharedDataset = Rc<RefCell<Dataset>>;
 pub struct Store {
     pub entries: HashMap<String, SharedDataset>,
     used_ids: HashSet<String>,
+    /// Times a mutation copied a dataset's records because a view job still
+    /// held the snapshot. The view queue is meant to keep this at zero; the
+    /// diagnostics report it so a run can prove it.
+    pub copies: std::cell::Cell<u64>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
@@ -691,6 +695,9 @@ impl Store {
                     cells_written: rows.len() * width,
                 };
                 let dataset = &mut *current;
+                if Arc::strong_count(&dataset.data) > 1 {
+                    self.copies.set(self.copies.get() + 1);
+                }
                 let data = Arc::make_mut(&mut dataset.data);
                 data.rows.extend(rows);
                 if let Some(new) = ids {
@@ -758,6 +765,9 @@ impl Store {
                     ..Work::default()
                 };
                 let dataset = &mut *current;
+                if Arc::strong_count(&dataset.data) > 1 {
+                    self.copies.set(self.copies.get() + 1);
+                }
                 for edit in edits {
                     let data = Arc::make_mut(&mut dataset.data);
                     match edit {

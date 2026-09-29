@@ -761,7 +761,9 @@ final class GpuiHost {
   /// shows its last rows meanwhile, and a `table_view` event follows when
   /// the index lands. Edits to that dataset sent in between apply, and are
   /// acknowledged, after it. Smaller views compute in place and this
-  /// completes immediately.
+  /// completes immediately. Anything that inspects a table after a
+  /// publication or edit awaits this first; the future completes after the
+  /// last `table_view` event has reached [events] listeners.
   Future<void> get viewsSettled => _main.viewsSettled;
 
   /// Opens a secondary window with its own description and datasets. See
@@ -1127,8 +1129,6 @@ final class GpuiHost {
               .completeError(StateError(event.data['message'] as String));
         case 'window_closed':
           _windows.remove(event.window)?._closed();
-        case 'table_view':
-          _viewFor(event)?.viewSettled(event.id!);
         case 'dataset_applied':
           _viewFor(event)?.syncPendingViews(event);
           final pending = _dataPending[event.data['request']];
@@ -1213,6 +1213,9 @@ final class GpuiHost {
       }
       if (event.window == 0) _trace?._acknowledged(event.data);
       _events.add(event);
+      // After the event is on the stream, so a listener sees the landed view
+      // before an awaiter of viewsSettled resumes.
+      if (event.type == 'table_view') _viewFor(event)?.viewSettled(event.id!);
     } catch (error, stack) {
       _fail(error, stack);
     } finally {

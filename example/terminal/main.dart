@@ -16,6 +16,9 @@ Future<void> main(List<String> args) async {
   if (!const bool.fromEnvironment('dart.vm.product')) {
     registerExtension('ext.gpuidart.inspect', (_, _) async {
       await app.idle;
+      // A view over 10,000 records lands after its acknowledgement; the
+      // verifiers read the settled index, not the one it replaces.
+      await app.host.viewsSettled;
       return ServiceExtensionResponse.result(
         jsonEncode({
           'app': app.describe(),

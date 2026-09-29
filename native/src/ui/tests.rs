@@ -3285,9 +3285,11 @@ fn large_views_compute_off_the_frame_thread_and_queue_edits(cx: &mut TestAppCont
             [ViewEntry::Record(rows + 4)],
             "descending price over the replacement"
         );
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["scroll_y"], 0.0);
         assert_eq!(
-            view.read(cx).inspect(window, cx)["tables"]["table"]["scroll_y"],
-            0.0
+            inspect["native"]["dataset_copies"], 0,
+            "no mutation copied the records: every edit waited for the job reading them"
         );
     })
     .unwrap();

@@ -35,6 +35,7 @@ Future<void> main(List<String> args) async {
     final process =
         (await host.diagnose('inspect'))['native_process_id'] as int;
     Future<Map<String, dynamic>> observe() async {
+      await host.viewsSettled;
       await terminal.idle;
       if (terminal.failure != null) {
         throw StateError('App failure: ${terminal.failure}');
