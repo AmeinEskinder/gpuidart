@@ -143,6 +143,23 @@ range, and bounded point text alternatives with stable record IDs. Charts are
 read-only in this milestone. Programmatic alternatives establish data agreement,
 not visual graph quality or human screen-reader usability.
 
+## Track 4: the widened catalog (2026-09-29)
+
+The terminal was rebuilt on the six kinds the catalog work added, keeping every
+node ID the verifier and the accessibility probes address:
+
+| Kind | Where it is in the terminal |
+| --- | --- |
+| `UiPanes` | The shell splits a navigation tree from the page content; the Watchlist page splits its table from an instrument notes pane. Dragged widths survive publications. |
+| `UiTree` | Navigation: the three pages plus a Help folder; selecting a page navigates like the tabs, and the tree's selection follows `page`. |
+| `UiSheet` | "Keyboard shortcuts" in the tree opens a sheet from the right edge; its close button reports `sheet_close` and the application publishes it closed. |
+| `UiRichText` | The shortcuts sheet and the notes pane render markdown (a heading and a table of the selected instrument's price, change and shortlist state). |
+| `UiPopover` | "Find" in the notes pane opens a popup holding the jump control. |
+| `UiSelect(searchable: true)` | The jump control: a combobox over the first two hundred symbols; choosing one selects that record. |
+
+The Find popover sits in the notes pane rather than the toolbar so the tab
+order the verifier walks (search, four buttons, table) is unchanged.
+
 ## Verification and delivery
 
 1. Commit this design and source spike findings.

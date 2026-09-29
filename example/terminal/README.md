@@ -9,6 +9,12 @@ Build the native host, then run from the repository root:
 dart run tool/dev.dart example/terminal/main.dart
 ```
 
+The window is two resizable panes: a navigation tree (the three pages and a
+Help folder whose "Keyboard shortcuts" item opens a sheet of rich text) and
+the page content. Watchlist splits again into the instrument table and a
+notes pane that renders the selected instrument as markdown, with a Find
+popover holding a searchable select that jumps to a symbol.
+
 Watchlist starts with 1,000 instruments. Search symbols, sort prices, select a
 record and simulate a price tick. Right-click a row or focus the table and press
 Shift+F10 for record commands. Open Instrument to see line and bar charts of that

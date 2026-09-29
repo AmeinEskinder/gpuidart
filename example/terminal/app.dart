@@ -28,6 +28,7 @@ final class TerminalApplication {
   bool customAccent = false;
   String displayName = 'Dart user';
   String notice = 'Select an instrument to inspect its sample history.';
+  bool helpOpen = false;
   final eventCounts = <String, int>{};
   String get heading => 'Market terminal';
   Future<void> get idle => _pending;
@@ -67,6 +68,9 @@ final class TerminalApplication {
         'table_selection',
         'row_action',
         'action',
+        'tree_select',
+        'sheet_close',
+        'select_change',
       ].contains(event.type)) {
         return;
       }
@@ -156,29 +160,110 @@ final class TerminalApplication {
       'Fictitious instruments and history. No live feed or trading.',
       style: UiStyle(foreground: UiColor.token(ThemeToken.mutedForeground)),
     ),
-    UiTabs(
-      'pages',
-      options: const [
-        UiChoiceOption('watchlist', 'Watchlist'),
-        UiChoiceOption('instrument', 'Instrument'),
-        UiChoiceOption('settings', 'Settings'),
+    // A navigation tree beside the pages, in resizable panes whose dragged
+    // widths native keeps across publications.
+    UiPanes(
+      'shell',
+      [
+        _navigation(),
+        UiColumn('content', [
+          UiTabs(
+            'pages',
+            options: const [
+              UiChoiceOption('watchlist', 'Watchlist'),
+              UiChoiceOption('instrument', 'Instrument'),
+              UiChoiceOption('settings', 'Settings'),
+            ],
+            selected: page,
+            semantics: const UiSemantics(label: 'Terminal pages'),
+          ),
+          switch (page) {
+            'instrument' => _instrument(),
+            'settings' => _settings(),
+            _ => _watchlist(),
+          },
+          UiText(
+            'terminal-notice',
+            notice,
+            style: const UiStyle(
+              foreground: UiColor.token(ThemeToken.mutedForeground),
+            ),
+          ),
+        ], style: const UiStyle(gap: 8, padding: [0, 0, 0, 12])),
       ],
-      selected: page,
-      semantics: const UiSemantics(label: 'Terminal pages'),
+      panes: const [UiPane(size: 180, minSize: 140, maxSize: 320), UiPane()],
+      style: const UiStyle(height: UiSize.px(600)),
     ),
-    switch (page) {
-      'instrument' => _instrument(),
-      'settings' => _settings(),
-      _ => _watchlist(),
-    },
-    UiText(
-      'terminal-notice',
-      notice,
-      style: const UiStyle(
-        foreground: UiColor.token(ThemeToken.mutedForeground),
-      ),
+    // The shortcuts sheet slides in from the right while help is open; its
+    // close button reports back and the application publishes it closed.
+    UiSheet(
+      'help-sheet',
+      'Keyboard shortcuts',
+      [UiRichText('shortcuts', shortcutsMarkdown, selectable: true)],
+      open: helpOpen,
+      size: 380,
     ),
   ], style: const UiStyle(gap: 8));
+
+  UiNode _navigation() => UiTree(
+    'nav',
+    items: const [
+      UiTreeItem('watchlist', 'Watchlist'),
+      UiTreeItem('instrument', 'Instrument'),
+      UiTreeItem('settings', 'Settings'),
+      UiTreeItem(
+        'help',
+        'Help',
+        expanded: true,
+        children: [UiTreeItem('shortcuts', 'Keyboard shortcuts')],
+      ),
+    ],
+    selected: helpOpen ? 'shortcuts' : page,
+    semantics: const UiSemantics(label: 'Terminal navigation'),
+  );
+
+  String get shortcutsMarkdown {
+    final mod = Platform.isMacOS ? 'Command' : 'Control';
+    return '''
+# Keyboard shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| $mod+1 / $mod+2 | Watchlist / Instrument |
+| $mod+, | Settings |
+| $mod+F | Search instruments |
+| $mod+R | Simulate a price tick |
+| $mod+B | Toggle the selected record's shortlist flag |
+| $mod+Q | Close the terminal |
+
+Right-click a watchlist row, or focus the table and press Shift+F10, for
+record commands.
+''';
+  }
+
+  /// The first two hundred instruments, for the find popover's combobox.
+  List<UiSelectOption> get _jumpOptions => [
+    for (final item in market.instruments.take(200))
+      UiSelectOption(item.symbol, '${item.symbol} · ${item.company}'),
+  ];
+
+  String get _notesMarkdown {
+    final selected = market.selected;
+    if (selected == null) {
+      return 'Select a row to see the instrument here, or use **Find** to jump to a symbol.';
+    }
+    return '''
+## ${selected.symbol}
+
+${selected.company}
+
+| | |
+| --- | --- |
+| Price | ${selected.price} |
+| Change | ${selected.changeRaw} % |
+| Shortlist | ${selected.shortlisted ? 'saved' : 'not saved'} |
+''';
+  }
 
   UiNode _watchlist() => UiColumn('watchlist-page', [
     const UiInput(
@@ -204,20 +289,53 @@ final class TerminalApplication {
       ),
       UiButton('sort-price', market.sortLabel),
     ], style: const UiStyle(gap: 8)),
-    UiTable(
-      'watchlist',
-      dataset: market.dataset.id,
-      view: market.view,
-      semantics: const UiSemantics(label: 'Instruments'),
-      style: const UiStyle(height: UiSize.px(330)),
-      contextMenu: const [
-        UiMenuAction('open', 'Open instrument', action: 'instrument.open'),
-        UiMenuAction(
-          'shortlist',
-          'Toggle shortlist',
-          action: 'instrument.shortlist',
+    // The table and the selected instrument's notes share the width.
+    UiPanes(
+      'watchlist-panes',
+      [
+        UiTable(
+          'watchlist',
+          dataset: market.dataset.id,
+          view: market.view,
+          semantics: const UiSemantics(label: 'Instruments'),
+          style: const UiStyle(height: UiSize.px(330)),
+          contextMenu: const [
+            UiMenuAction('open', 'Open instrument', action: 'instrument.open'),
+            UiMenuAction(
+              'shortlist',
+              'Toggle shortlist',
+              action: 'instrument.shortlist',
+            ),
+          ],
         ),
+        UiColumn('details', [
+          // A popover holding a searchable select: type part of a symbol to
+          // jump to that instrument.
+          UiPopover('find', 'Find', [
+            const UiText('find-hint', 'Jump to an instrument by symbol.'),
+            UiSelect(
+              'jump',
+              options: _jumpOptions,
+              selected:
+                  market.instruments
+                      .take(200)
+                      .any((item) => item.symbol == market.selectedSymbol)
+                  ? market.selectedSymbol
+                  : null,
+              placeholder: 'Symbol',
+              searchable: true,
+              semantics: const UiSemantics(label: 'Jump to instrument'),
+            ),
+          ]),
+          UiRichText(
+            'instrument-notes',
+            _notesMarkdown,
+            style: const UiStyle(padding: [0, 0, 0, 12]),
+          ),
+        ], style: const UiStyle(gap: 8)),
       ],
+      panes: const [UiPane(size: 520, minSize: 360), UiPane(minSize: 180)],
+      style: const UiStyle(height: UiSize.px(330)),
     ),
     UiText('selection', market.selectedSymbol ?? 'No instrument selected'),
   ], style: const UiStyle(gap: 8));
@@ -450,6 +568,23 @@ final class TerminalApplication {
       await _command(action.name);
     } else if (event.type == 'tab_change') {
       await navigate(event.selected!);
+    } else if (event.type == 'tree_select') {
+      switch (event.item) {
+        case 'watchlist' || 'instrument' || 'settings':
+          if (helpOpen) helpOpen = false;
+          await navigate(event.item!);
+          await host.rebuild();
+        case 'shortcuts':
+          helpOpen = true;
+          await host.rebuild();
+      }
+    } else if (event.type == 'sheet_close' && event.id == 'help-sheet') {
+      helpOpen = false;
+      await host.rebuild();
+    } else if (event.type == 'select_change' && event.id == 'jump') {
+      if (event.selected case final symbol?) {
+        await _select(symbol);
+      }
     } else if (event.type == 'radio_change') {
       if (event.id == 'period') {
         period = event.selected!;
@@ -482,6 +617,7 @@ final class TerminalApplication {
     'theme': mode.name,
     'custom_accent': customAccent,
     'display_name': displayName,
+    'help_open': helpOpen,
     'selected': market.selectedSymbol,
     'query': market.query,
     'ticks': market.ticks,
