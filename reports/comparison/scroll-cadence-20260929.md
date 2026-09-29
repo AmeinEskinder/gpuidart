@@ -51,3 +51,54 @@ input-to-present row is claimed for scroll.
 CPU during the eligible runs sat between 22 and 28 percent of one logical
 core for both fixtures, within the earlier series' ranges. These runs
 measure cadence only; memory and CPU rows still come from the rotated series.
+
+## The drift, traced (2026-09-29, later)
+
+The fifth audit asked for the one-percent drift to be resolved or
+explained. Nine more scroll runs of the Dart fixture ran the same day with
+the trace library (`-TraceInput`), unattended, in three series:
+[scroll-trace-20260929b-0](scroll-trace-20260929b-0) to [-2](scroll-trace-20260929b-2),
+[c-0](scroll-trace-20260929c-0) to [c-2](scroll-trace-20260929c-2) and
+[d-0](scroll-trace-20260929d-0) to [d-2](scroll-trace-20260929d-2). The
+runner now tags each wheel packet with its sequence number as it does the
+clicks (`e0075b3`), and the trace build records every wheel event GPUI
+dispatches with its delta and line height and, at every painted frame,
+the table's vertical offset.
+
+Every one of the nine runs delivered its 600 wheel events (599 in c-0,
+where the driver skipped one deadline) and ended with the table's offset
+exactly 78 px per delivered event: the drift did not reproduce. The
+per-frame offsets, recorded from the c series on (the b traces came out
+empty because the trace kept its events in a thread-local list and saved
+them from another thread, fixed in `8e3d764`), move by exactly 78 px in
+every frame that moved, except for frames that absorbed two events and
+moved 156 px: one such frame in c-0 and c-1, none in c-2, and 20 to 27 in
+the d series, which ran at 22 to 26 percent of a core against 34 to 39 in
+c. No frame moved by any other amount.
+
+| Run | Wheel events delivered | Final offset, px | Frames painted | Frames moving 78 px | Frames moving 156 px |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| c-0 | 599 | -46,722 | 606 | 597 | 1 |
+| c-1 | 600 | -46,800 | 605 | 598 | 1 |
+| c-2 | 600 | -46,800 | 606 | 600 | 0 |
+| d-0 | 600 | -46,800 | 585 | 554 | 23 |
+| d-1 | 600 | -46,800 | 579 | 546 | 27 |
+| d-2 | 600 | -46,800 | 587 | 560 | 20 |
+
+What the code says about the path: GPUI's Windows backend turns each
+`WM_MOUSEWHEEL` into a line delta (`-120` wheel units times the system's
+scroll-lines setting, 3), and the Kit table's scroll mask consumes the
+vertical delta in the capture phase, converting lines to pixels with the
+line height it captured at its paint (26 px, hence 78 px per event) and
+clamping to the content. For the offset to drift, an event must be lost
+before that handler or a handler must convert with another line height;
+the traced runs show neither. The wheel-event stage itself recorded
+nothing in these nine runs: the listener that records it was registered
+after the content and so ran after the mask had stopped propagation (the
+fix registers it first, `native/src/paint_trace.rs`); the next traced
+series will show, for any run that drifts again, whether the missing or
+extra displacement came with missing or extra events at GPUI's door or
+with an odd per-frame step inside the table. Until such a run occurs the
+drift stays an unreproduced observation from two runs in the earlier
+series, with the displacement exact in the fifteen scroll runs since.
+
