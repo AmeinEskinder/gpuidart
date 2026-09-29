@@ -29,15 +29,19 @@ $results = @(foreach ($file in Get-ChildItem -LiteralPath $Directory -Filter run
     if (Test-Path -LiteralPath $tracePath) {
         $traceRows = @(Import-Csv -LiteralPath $tracePath)
         if ($traceRows.Count -gt 0) {
-            foreach ($required in @('CPUStartQPC','ProcessID','DisplayedTime','MsBetweenPresents','MsBetweenDisplayChange')) {
+            foreach ($required in @('CPUStartQPC','ProcessID','MsBetweenPresents','MsBetweenDisplayChange')) {
                 if ($required -notin $traceRows[0].PSObject.Properties.Name) { throw "PresentMon CSV is missing $required" }
             }
+            # PresentMon 2.6 marks a displayed frame by MsUntilDisplayed; earlier
+            # 2.x releases by DisplayedTime. Either is NA for a frame that was not.
+            $displayedColumn = @('DisplayedTime','MsUntilDisplayed') | Where-Object { $_ -in $traceRows[0].PSObject.Properties.Name } | Select-Object -First 1
+            if (-not $displayedColumn) { throw 'PresentMon CSV is missing DisplayedTime or MsUntilDisplayed' }
             $frames = @($traceRows | Where-Object { [int]$_.ProcessID -eq $run.process_id -and [double]$_.CPUStartQPC -ge $run.start_qpc -and [double]$_.CPUStartQPC -lt $run.end_qpc })
             $swapchains = @($frames.SwapChainAddress | Sort-Object -Unique)
             if ($swapchains.Count -gt 1) { throw 'Multiple swapchains require explicit selection before aggregation' }
         }
     }
-    $displayed = @($frames | Where-Object { $_.DisplayedTime -ne 'NA' })
+    $displayed = @($frames | Where-Object { $_.$displayedColumn -ne 'NA' })
     $inputAnalysisPath = Join-Path $file.DirectoryName 'input-analysis.json'
     $responseLatency = if (Test-Path -LiteralPath $inputAnalysisPath) { (Get-Content -Raw -LiteralPath $inputAnalysisPath | ConvertFrom-Json).response_presentation } else { $null }
     $correlated = $null -ne $responseLatency -and $responseLatency.frames_correlated -gt 0

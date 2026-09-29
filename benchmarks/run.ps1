@@ -65,13 +65,14 @@ $observationExitCode = 0
 [BenchmarkWindow]::Initialize()
 try {
     if ($CapturePresent) {
-        # Every process, not the fixture by name: without elevation PresentMon
-        # cannot name a process started in this session, so a name filter
-        # matches nothing; the analyzer keeps the fixture's records by process
-        # ID. The session name is unique per run (one runner process starts
-        # many runs) and the capture ends itself shortly after the run.
+        # The session name is unique per run: one runner process starts many
+        # runs, and runs that shared a name collided on one ETW session and
+        # recorded nothing. The capture follows the fixture by name, which a
+        # non-elevated PresentMon resolves for a process of this account, and
+        # ends itself shortly after the run; the analyzer keeps the fixture's
+        # records by process ID either way.
         $trace = Start-Process -FilePath (Join-Path $root '.tools/presentmon/PresentMon.exe') -ArgumentList @(
-            '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
+            '--process_name', [IO.Path]::GetFileName($exe), '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
             '--qpc_time', '--timed', ($Seconds + 25), '--terminate_after_timed', '--no_console_stats', '--session_name', ('gpuidart-' + [guid]::NewGuid().ToString('N').Substring(0, 12))
         ) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $folder 'present.stdout.log') -RedirectStandardError (Join-Path $folder 'present.stderr.log')
         Start-Sleep -Milliseconds 700

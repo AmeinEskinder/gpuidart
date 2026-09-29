@@ -66,8 +66,10 @@ $observations = @(foreach ($input in $run.inputs) {
             $present = @($presentRows | Where-Object { [double]$_.CPUStartQPC -ge $paintQpc } | Select-Object -First 1)
             if ($present.Count -eq 1 -and $null -ne $input.qpc) {
                 $inputToPresentMs = QpcToMs ([double]$present[0].CPUStartQPC - [double]$input.qpc)
-                if ($null -ne $inputToPresentMs -and ($present[0].PSObject.Properties.Name -contains 'DisplayLatency') -and $present[0].DisplayLatency -ne 'NA') {
-                    $inputToDisplayMs = [math]::Round($inputToPresentMs + [double]$present[0].DisplayLatency, 3)
+                # PresentMon 2.6 names the present-to-display time MsUntilDisplayed; earlier 2.x releases DisplayLatency.
+                $untilDisplayed = @('DisplayLatency','MsUntilDisplayed') | Where-Object { $present[0].PSObject.Properties.Name -contains $_ } | Select-Object -First 1
+                if ($null -ne $inputToPresentMs -and $untilDisplayed -and $present[0].$untilDisplayed -ne 'NA') {
+                    $inputToDisplayMs = [math]::Round($inputToPresentMs + [double]$present[0].$untilDisplayed, 3)
                 }
             }
         }
