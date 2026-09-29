@@ -210,9 +210,9 @@ public static class BenchmarkWindow {
         ClientToScreen(target, ref point);
         PostMessage(target, 0x20A, new IntPtr(unchecked(delta << 16)), new IntPtr((point.Y << 16) | (point.X & 0xffff)));
     }
-    public static void Wheel(IntPtr window, int delta) {
+    public static uint Wheel(IntPtr window, int delta, uint sequence = 0) {
         RequireFocus(window);
-        Mouse(Packet(0x800, unchecked((uint)delta)));
+        return Mouse(Packet(0x800, unchecked((uint)delta), sequence));
     }
     public static void Close(IntPtr window) { PostMessage(window, 0x10, IntPtr.Zero, IntPtr.Zero); }
     public static void Capture(IntPtr window, string path) {

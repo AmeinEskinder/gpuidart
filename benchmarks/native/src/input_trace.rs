@@ -45,6 +45,24 @@ pub fn observe<E: InteractiveElement>(root: E) -> E {
             json!({"x": f32::from(event.position.x), "y": f32::from(event.position.y)}),
         );
     })
+    // Bubble phase: the scrolled element's listener has applied the delta
+    // by now, so a table offset recorded at the next paint is this event's.
+    .on_scroll_wheel(|event, window, _| {
+        let (kind, x, y) = match event.delta {
+            gpui_kit::ScrollDelta::Lines(delta) => ("lines", delta.x, delta.y),
+            gpui_kit::ScrollDelta::Pixels(delta) => ("pixels", f32::from(delta.x), f32::from(delta.y)),
+        };
+        record(
+            "gpui_scroll_wheel",
+            json!({"kind": kind, "x": x, "y": y, "line_height": f32::from(window.line_height()), "position_y": f32::from(event.position.y)}),
+        );
+    })
+}
+
+/// A table's vertical offset at a paint, so the offset trajectory can be
+/// read against the wheel deltas that produced it.
+pub fn record_table_scroll(id: &str, frame: u64, y: f32) {
+    record_sequence("table_scroll_painted", None, json!({"id": id, "frame": frame, "y": y}));
 }
 
 pub fn save() {

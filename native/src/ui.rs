@@ -3317,6 +3317,11 @@ impl Render for DartView {
             .materializations
             .set(self.counters.materializations.get() + 1);
         self.frame_gaps.frame(Instant::now());
+        #[cfg(all(feature = "benchmark-trace", target_os = "windows"))]
+        for (id, retained) in &self.tables {
+            let y = f32::from(retained.state.read(cx).vertical_scroll_handle.offset().y);
+            crate::input_trace::record_table_scroll(id, self.counters.materializations.get(), y);
+        }
         let colors = cx.theme().colors.clone();
         let content = match self.materialize(&self.snapshot.root, &colors, cx) {
             Ok(content) => content,
