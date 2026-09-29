@@ -112,7 +112,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | GpuiEvent.tableView / viewsSettled | A table's view index landed: over 10,000 records the index computes off the frame thread after the acknowledgement, and `viewsSettled` completes when no table is waiting for one. See [table views](datasets.md#table-views). |
-| Repaint on update (Windows) | After a publication, an operation update or a dataset update has been applied, the host asks Windows to repaint the window at once instead of at the next vsync tick; see [frame scheduling on Windows](#frame-scheduling-on-windows). |
+| Repaint on update (Windows, off by default) | With `GPUIDART_DRAW_ON_UPDATE=1`, after a publication, an operation update or a dataset update has been applied the host asks Windows to repaint the window at once instead of at the next vsync tick; see [frame scheduling on Windows](#frame-scheduling-on-windows). |
 | publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. Subtrees handed back as the same `UiNode` instances (const nodes, `UiMemo`) are neither re-described nor re-diffed. This is not a presentation fence. |
 | UiMemo | Keeps a built subtree while its inputs compare equal, so a rebuild reuses it by identity. See [retained tree](retained-tree.md). |
 | patch | Writes one published node's own fields as a single `set` operation, with no build, describe or diff; the node keeps its ID and kind and carries no children. The write stands until the next publication, which carries the application's value. |
@@ -140,21 +140,28 @@ the application sends in answer to an input, that tick is up to a frame
 away from the moment the change is applied: the traced click chain of the
 comparison benchmark measured 8 ms at the median and 15 ms at the 95th
 percentile between an edit applied natively and its frame, against a
-0.3 ms round trip through Dart. On Windows the host therefore asks the
-window to repaint as soon as a publication, an operation update or a
-dataset update has been applied (`RedrawWindow` with an invalidation, the
-same request the vsync tick makes). GPUI still draws only what is dirty and
-draws nothing at the following tick if the change is already on screen, so
-a burst of updates paints no more than before; the request is made at most
-once every 4 ms. Measured on the cell workload, the frame carrying the
-change reached the display about 17 ms sooner at the median and 20 ms
-sooner at the 95th percentile. Publications that are not answers to input
-get the same treatment; an application that publishes continuously is
-bounded by the 4 ms interval and by its own publication rate.
+0.3 ms round trip through Dart. On Windows the host can ask the window to
+repaint as soon as a publication, an operation update or a dataset update
+has been applied (`RedrawWindow` with an invalidation, the same request the
+vsync tick makes), at most once every 4 ms. Set
+`GPUIDART_DRAW_ON_UPDATE=1` in the process environment to turn it on; the
+setting is read once at startup, and macOS and Linux always draw at the
+tick.
 
-Set `GPUIDART_DRAW_ON_UPDATE=0` in the process environment to leave drawing
-to the vsync tick, which is the behavior on macOS and Linux and the one to
-compare against. The setting is read once at startup.
+It is off by default because of what it costs under load. Measured on the
+comparison fixture with six runs a side
+([the click tail](../reports/comparison/click-tail-20260930.md)): on a
+click every 200 ms the frame carrying the change reached the display 19 ms
+sooner at the median and 14 ms sooner at the 95th percentile, with one
+present per click either way. On a burst of thirty clicks a second the
+window is dirty at every vsync tick anyway, so the immediate repaint adds a
+frame the tick paints again before the display takes either: about 890
+presents in ten seconds against 600 on a 60 Hz display, one present per
+click rendered and never shown, for a gain of 4 ms at the median and 16 ms
+at the 95th percentile of the time to the display. Scrolling does not go
+through an update and is unchanged. An application whose updates answer
+single inputs gains the most from turning it on; one that publishes
+continuously pays a frame per publication.
 
 ## Package an AOT application
 

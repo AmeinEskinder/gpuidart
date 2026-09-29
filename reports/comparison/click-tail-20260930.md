@@ -38,10 +38,12 @@ of 0.3 ms. Everything else is under a millisecond except the driver's own
 cursor positioning before the injection (up to 20 ms at the 95th percentile
 of a run, charged to no fixture).
 
-The adapter now asks Windows to repaint the window as soon as a publication,
+The adapter can ask Windows to repaint the window as soon as a publication,
 an operation update or a dataset update is applied (`RedrawWindow` with an
-invalidation, at most once every 4 ms, Windows only, off with
-`GPUIDART_DRAW_ON_UPDATE=0`; see [the SDK guide](../../docs/sdk.md#frame-scheduling-on-windows)).
+invalidation, at most once every 4 ms, Windows only, on with
+`GPUIDART_DRAW_ON_UPDATE=1`; see [the SDK guide](../../docs/sdk.md#frame-scheduling-on-windows)).
+The A/B below was run with the switch on against off; the default is
+decided at the end.
 Six runs each side, run by the owner on 2026-09-30 in one session:
 [click-a-20260930-0](click-a-20260930-0) to [-5](click-a-20260930-5) with the
 switch off and [click-b-20260930-0](click-b-20260930-0) to
@@ -102,10 +104,65 @@ high at the end of a window.
 
 ## Burst and scroll
 
-Not yet measured with the switch on either side. The same A/B, six runs per
-side per workload with `click_series.ps1 -Workload burst` and `-Workload
-scroll`, is scheduled for the next idle sitting of the desktop; the default
-stays on only if neither workload regresses in presents never taken or CPU.
+The same A/B on the burst workload (thirty clicks a second, 300 in the
+window) and the scroll workload (sixty wheel events a second, 600 in the
+window), six runs a side, run unattended on 2026-09-30 at 02:13 to 02:20
+([burst-a-20260930-0](burst-a-20260930-0) to [-5](burst-a-20260930-5) and
+[burst-b-20260930-0](burst-b-20260930-0) to [-5](burst-b-20260930-5),
+[scroll-a-20260930-0](scroll-a-20260930-0) to [-5](scroll-a-20260930-5) and
+[scroll-b-20260930-0](scroll-b-20260930-0) to [-5](scroll-b-20260930-5)).
+Three runs were stopped by the driver when the benchmark window lost the
+foreground to a window of another session working on the same desktop
+(burst off run 0, burst on run 5, scroll off run 4; their `failure.json`
+names the window), and two burst runs with the switch off missed two and
+three driver deadlines; those five do not count. Medians of the counting
+runs with the per-run range, from the injection completed:
+
+| Burst | Off (3 runs) | On (5 runs) |
+| --- | --- | --- |
+| Input to present p50 / p95, ms | 13.2 [8.3, 16.6] / 19.8 [19.2, 23.9] | 3.4 [3.2, 10.3] / 5.6 [5.1, 14.4] |
+| Input to display p50 / p95, ms | 39.7 [34.5, 55.8] / 54.2 [46.2, 77.2] | 35.2 [28.2, 38.1] / 38.5 [32.0, 51.7] |
+| Presents in the window (300 clicks) | 596 [596, 598] | 893 [888, 896] |
+| Presents the display never took | 107 [3, 218] | 297 [292, 317] |
+| CPU, percent of one core | 27.2 [21.2, 43.7] | 21.7 [17.7, 45.2] |
+
+| Scroll | Off (5 runs) | On (6 runs) |
+| --- | --- | --- |
+| Input to present p50 / p95, ms | 10.4 [3.6, 14.5] / 16.6 [10.7, 17.2] | 10.8 [3.7, 13.2] / 16.8 [12.3, 17.2] |
+| Input to display p50 / p95, ms | 38.7 [32.2, 41.7] / 44.6 [38.7, 45.7] | 39.4 [32.2, 41.9] / 45.1 [40.7, 45.6] |
+| Presents in the window (600 events) | 599 [599, 600] | 599 [599, 600] |
+| Presents the display never took | 0 [0, 4] | 0 [0, 0] |
+| CPU, percent of one core | 23.6 [20.2, 29.7] | 22.3 [20.9, 23.4] |
+
+Scroll is unchanged, as expected: a wheel event moves the table natively
+and sends no update through Dart, so the switch never fires. Burst is
+where the switch costs: at thirty clicks a second the window is dirty at
+every vsync tick anyway, so the tick paints every frame with the switch
+off (596 presents in ten seconds on a 60 Hz display) and the immediate
+repaint adds one present per click that the tick's next present supersedes
+before a vertical blank (893 presents, 597 of them shown, one per refresh).
+The change still reaches the display sooner (4 ms at the median, 16 ms at
+the 95th percentile over the counting runs), and CPU did not rise, but
+a third of the frames rendered are never shown. Two caveats on this table:
+the other session's fixtures were running on the same desktop during the
+series, which is visible in the off runs 3 and 5 and the on run 4 (display
+p95 of 77, 54 and 52 ms, CPU up to 45 percent) and widens every range; and
+"presents the display never took" counts presents no statistics reading
+reported shown, which at the display rate also misses a present shown
+between two readings that straddled two vertical blanks, so the off side's
+107 and 218 overstate, while the on side's 297 is arithmetic (893 presented,
+597 shown).
+
+## The default
+
+Off. The rule for this A/B was that the default stays on only if neither
+burst nor scroll regresses in presents never taken or in CPU; burst
+regresses in presents never taken, by about one rendered and unshown
+frame per click. The switch stays available as `GPUIDART_DRAW_ON_UPDATE=1`
+for an application whose updates answer single inputs, where it takes the
+changed frame to the display 19 ms sooner at the median on the cell
+workload, and the SDK guide says what it costs under a burst. The board
+of 2026-09-30 is measured with the default.
 
 ## Where the Dart fixture's display half comes from
 

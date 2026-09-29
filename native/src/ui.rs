@@ -3432,13 +3432,15 @@ impl Windows {
     }
 }
 
-/// Closes the window's sheet, if one is open, without leasing Kit's root.
 /// Asks Windows to repaint the window now that an update from the
 /// application has landed. GPUI draws a dirty window at the next vsync tick,
 /// which is up to a frame away from a change that is already applied; the
-/// repaint request draws it at once (GPUI still draws only what is dirty,
-/// and the tick then finds nothing left), at most once per 4 ms. Off with
-/// `GPUIDART_DRAW_ON_UPDATE=0`, for measuring the difference.
+/// repaint request draws it at once, at most once per 4 ms. Off unless
+/// `GPUIDART_DRAW_ON_UPDATE=1`: on a burst of thirty clicks a second the
+/// window is dirty at every tick anyway, so the extra frame is rendered and
+/// presented but never displayed (about ninety presents a second on a
+/// sixty hertz display); on a click every 200 ms it takes the changed
+/// frame to the display 17 to 20 ms sooner.
 #[cfg(windows)]
 fn draw_now(
     cx: &mut gpui::AsyncApp,
@@ -3447,8 +3449,7 @@ fn draw_now(
 ) {
     use raw_window_handle::{HasWindowHandle, RawWindowHandle};
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    if !*ENABLED.get_or_init(|| std::env::var("GPUIDART_DRAW_ON_UPDATE").map_or(true, |v| v != "0"))
-    {
+    if !*ENABLED.get_or_init(|| std::env::var("GPUIDART_DRAW_ON_UPDATE").is_ok_and(|v| v == "1")) {
         return;
     }
     if last
