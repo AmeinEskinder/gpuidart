@@ -165,11 +165,12 @@ Feasibility verdicts recorded on this machine:
   91.5 MiB of private commit at this head, level with the 75.87 and 94.57 MiB
   of the `e9c0c27` baseline and under the 85 MB line the order of play set
   ([floor report](../reports/performance/floor-20260929/README.md)). The
-  Windows runtime probe now lists every mapped image: the graphics driver's
-  shader compiler maps 82.7 MiB, the native library 25 MiB (built with
-  link-time optimization, 9 percent smaller on disk than before, which did
-  not move the resident floor), the Direct3D driver 17 MiB; the resident
-  split per image is not measured yet.
+  Windows runtime probe lists every mapped image (the graphics driver's
+  shader compiler maps 82.7 MiB, the native library 25 MiB built with
+  link-time optimization, the Direct3D driver 17 MiB) and walks the working
+  set to say which pages are resident: 34.7 MiB of the floor sit inside the
+  images, 4.9 of them the native library's and almost all of it shared with
+  other processes, and 39 MiB are private heap outside every image.
 - **View recomputes parse each column once.** The view workload's first
   series ([report](../reports/comparison/view-1m-20260929.md)) put the Dart
   fixture at about half the Flutter fixture's time per view change, and its
@@ -212,7 +213,7 @@ below carries its state and the commit or report that shows it.
 | E, packed record slices with one recompute | Met with a miss: two recomputes against thirteen (the deferred schema counts one), and the 1.5 s open met on the quiet runs and missed by up to 0.4 s on loaded ones (1.15 to 1.86 s over six); released-copy memory unchanged, retained-copy 30 to 40 MiB above a single earlier run. | `cab7c41`, [one million records](../reports/performance/datasets-1m-20260929/README.md) |
 | F, sort, filter and group at a million rows | Measured, exit line not met: the Dart fixture completes view changes in about half the Flutter fixture's time, not a tenth. The series exposed the native comparator parsing per comparison (a real sort 5.4 to 7.5 s); columns now parse once (149 to 164 ms in the probe). The series on permuted prices is the next capture. | `f0c8f43`, `47ea24b`, [view workload](../reports/comparison/view-1m-20260929.md) |
 | G, binding table, six kinds, terminal | Met for the kinds and the terminal: panes, tree, popover, sheet, searchable select as the combobox, rich text (twenty-nine kinds), the terminal rebuilt on them with the accessibility workflow green. The "binding table" is a document mapping Kit's modules to kinds, not a generator; every kind is still bound by hand in the protocol, the materializer, the Dart node and the docs. The fifth audit withdrew the generator from the critical path. | `62653d1` to `aaa7cff`, `b38dc6b`, [binding table](binding-table.md) |
-| H, memory floor under 85 MB or attribution | Half met: the working set of 75 to 77 MiB is under the line, the private commit of 91.5 MiB is above it, and the attribution is by mapped image size rather than resident pages; a working-set walk is the next step. | `7a99693`, [floor](../reports/performance/floor-20260929/README.md) |
+| H, memory floor under 85 MB or attribution | Half met on the number, met on the attribution: the working set of 74 to 77 MiB is under the line and the private commit of 91.5 to 92.2 MiB above it. A working-set walk now attributes the resident pages: 34.7 MiB inside the 69 mapped images (the native library 4.9, the graphics stack about 8, almost all shared with other processes) and 39 MiB of private heap outside every image, the Dart runtime's, the window's and the driver's allocations. | `7a99693`, `fef037d`, [floor](../reports/performance/floor-20260929/README.md) |
 | I, embedding spike | Blocked on a machine for it. | |
 | J, checkmate capture | Blocked on C. | |
 
