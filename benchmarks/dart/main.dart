@@ -89,6 +89,9 @@ Future<void> main(List<String> args) async {
   var updates = 0;
   var cellsWritten = 0;
   final viewApplyUs = <int>[];
+  final viewSettleUs = <int>[];
+  final viewFrames = <int>[];
+  final viewLongestGapUs = <int>[];
   final traceEnabled = Platform.environment['GPUIDART_INPUT_TRACE'] == '1';
   final inputTrace = <Map<String, Object?>>[];
   final traceClock = Stopwatch()..start();
@@ -132,10 +135,20 @@ Future<void> main(List<String> args) async {
               'displayed_rows': state['tables']['table']['view']['view_rows'],
               'table': state['tables']['table'],
               'apply_us': distribution(viewApplyUs),
+              'settle_us': distribution(viewSettleUs),
+              'jank': {
+                'longest_gap_us': distribution(viewLongestGapUs),
+                'frames_during': viewFrames,
+              },
               'scope':
-                  'per click: from the click handler through the rebuild '
-                  'acknowledgement, after native has recomputed the view '
-                  'and notified the table; the frame that shows it follows',
+                  'per click: apply_us runs from the click handler through '
+                  'the rebuild acknowledgement, which native sends before '
+                  'the view index computes off the frame thread; settle_us '
+                  'runs on to the table_view event that reports the index '
+                  'in place; jank counts the frames native rendered from a '
+                  'mark set in the handler to that event and the longest '
+                  'interval between two of them, with the pointer moving '
+                  'over the rows at 60 Hz meanwhile',
             },
           if (traceEnabled) 'input_trace': inputTrace,
           'native': state,
@@ -158,9 +171,15 @@ Future<void> main(List<String> args) async {
     if (viewWorkload && event.id == 'cell') {
       stage = (stage + 1) % viewStages.length;
       updates++;
+      await host.diagnose('frame_gaps', {'mark': true});
       final applying = Stopwatch()..start();
       await host.rebuild();
       viewApplyUs.add(applying.elapsedMicroseconds);
+      await host.viewsSettled;
+      viewSettleUs.add(applying.elapsedMicroseconds);
+      final gaps = await host.diagnose('frame_gaps');
+      viewFrames.add(gaps['frames'] as int);
+      viewLongestGapUs.add(gaps['longest_gap_us'] as int);
       return;
     }
     final count = event.id == 'burst' ? 8 : 1;

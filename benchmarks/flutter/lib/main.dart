@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' show FramePhase, PlatformDispatcher;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -92,6 +93,13 @@ class _BenchmarkState extends State<Benchmark> {
   Stopwatch? viewClock;
   var awaitingViewFrame = false;
 
+  // Every rasterized frame's vsync and raster-finish timestamps by frame
+  // number, and per view change the frame current at the click and at the
+  // post-frame callback that shows it, so the frames between them and the
+  // gaps around them can be read after the fact.
+  final frameTimes = <int, ({int vsync, int rasterFinish})>{};
+  final viewChanges = <_ViewChange>[];
+
   @override
   void initState() {
     super.initState();
@@ -116,6 +124,10 @@ class _BenchmarkState extends State<Benchmark> {
       }
     }
     for (final timing in timings) {
+      frameTimes[timing.frameNumber] = (
+        vsync: timing.timestampInMicroseconds(FramePhase.vsyncStart),
+        rasterFinish: timing.timestampInMicroseconds(FramePhase.rasterFinish),
+      );
       buildUs.add(timing.buildDuration.inMicroseconds);
       rasterUs.add(timing.rasterDuration.inMicroseconds);
       totalUs.add(timing.totalSpan.inMicroseconds);
@@ -142,6 +154,10 @@ class _BenchmarkState extends State<Benchmark> {
   /// the frame that shows them follows the `setState`.
   void cycleView() {
     final clock = Stopwatch()..start();
+    final change = _ViewChange(
+      clickFrame: PlatformDispatcher.instance.frameData.frameNumber,
+    );
+    viewChanges.add(change);
     stage = (stage + 1) % viewStages.length;
     updates++;
     headers.clear();
@@ -157,7 +173,41 @@ class _BenchmarkState extends State<Benchmark> {
     setState(() {});
     SchedulerBinding.instance.addPostFrameCallback((_) {
       viewFrameUs.add(clock.elapsedMicroseconds);
+      change.settleFrame = PlatformDispatcher.instance.frameData.frameNumber;
     });
+  }
+
+  /// Per view change: the frames rasterized after the frame current at the
+  /// click through the one that shows the change, the longest interval
+  /// between consecutive raster finishes from the click's frame on, and
+  /// whether every frame's timing had been reported.
+  Map<String, Object?> _jank() {
+    final longest = <int>[];
+    final counts = <int>[];
+    var incomplete = 0;
+    for (final change in viewChanges) {
+      final settle = change.settleFrame;
+      if (settle == null) {
+        incomplete++;
+        continue;
+      }
+      final window = [
+        for (var frame = change.clickFrame; frame <= settle; frame++)
+          if (frameTimes[frame] case final timing?) timing,
+      ];
+      if (window.length < settle - change.clickFrame + 1) incomplete++;
+      var gap = 0;
+      for (var i = 1; i < window.length; i++) {
+        gap = max(gap, window[i].rasterFinish - window[i - 1].rasterFinish);
+      }
+      longest.add(gap);
+      counts.add(max(0, window.length - 1));
+    }
+    return {
+      'longest_gap_us': _distribution(longest),
+      'frames_during': counts,
+      'changes_with_missing_timings': incomplete,
+    };
   }
 
   List<int> _sorted() {
@@ -197,6 +247,11 @@ class _BenchmarkState extends State<Benchmark> {
   int get itemCount => display?.length ?? rowCount;
 
   Future<void> report() async {
+    // The engine reports frame timings in batches up to a second apart; the
+    // last view change's frame must be in before its gaps are read.
+    if (viewWorkload) {
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+    }
     final offset = controller.offset;
     final start = (offset / rowHeight).floor();
     final end = min(itemCount, ((offset + viewportHeight) / rowHeight).ceil());
@@ -222,12 +277,17 @@ class _BenchmarkState extends State<Benchmark> {
             'compute_us': _distribution(viewComputeUs),
             'frame_us': _distribution(viewFrameUs),
             'frame_total_us': _distribution(viewFrameTotalUs),
+            'jank': _jank(),
             'scope':
                 'per click: compute_us is the handler computing the stage on '
                 'the UI isolate; frame_us runs from the handler to the post-frame '
                 'callback of the frame that shows it (build, layout and paint '
                 'done, raster pending); frame_total_us is that frame\'s '
-                'FrameTiming total span',
+                'FrameTiming total span; jank counts the frames rasterized '
+                'between the frame current at the click and the one showing '
+                'the change, and the longest interval between consecutive '
+                'raster finishes from the click\'s frame on, with the pointer '
+                'moving over the rows at 60 Hz meanwhile',
           },
         'frames': {
           'scope':
@@ -311,22 +371,46 @@ class _BenchmarkState extends State<Benchmark> {
   }
 }
 
-class _Row extends StatelessWidget {
+/// A view change's frame bounds: the frame current when the click ran and
+/// the frame whose post-frame callback showed the change.
+class _ViewChange {
+  _ViewChange({required this.clickFrame});
+  final int clickFrame;
+  int? settleFrame;
+}
+
+/// A row that repaints on hover, as the Kit table's rows do, so a pointer
+/// moving over the rows produces frames.
+class _Row extends StatefulWidget {
   const _Row({required this.cells, this.header = false});
 
   final List<String> cells;
   final bool header;
 
   @override
+  State<_Row> createState() => _RowState();
+}
+
+class _RowState extends State<_Row> {
+  var hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    final style = header
+    final style = widget.header
         ? textStyle.copyWith(fontWeight: FontWeight.w600)
         : textStyle;
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12)),
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovered = true),
+      onExit: (_) => setState(() => hovered = false),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: hovered ? Colors.black.withValues(alpha: 0.04) : null,
+          border: const Border(bottom: BorderSide(color: Colors.black12)),
+        ),
+        child: Row(
+          children: [for (final cell in widget.cells) _cell(cell, style)],
+        ),
       ),
-      child: Row(children: [for (final cell in cells) _cell(cell, style)]),
     );
   }
 

@@ -114,6 +114,14 @@ try {
     $nextSlot = 0
     $nextSample = 0.0
     $missedInputDeadlines = 0
+    # The view workload keeps the pointer moving over the rows at 60 Hz, so
+    # the fixture has a hover to repaint for while a view change computes: a
+    # gap between its frames is then a stall, not idleness.
+    $hovering = $Workload -eq 'view' -and -not $BackgroundSmoke
+    $hoverPeriod = 1000.0 / 60
+    $nextHover = 0.0
+    $hoverStep = 0
+    $hoverMoves = 0
     # PowerShell compiles a loop body to IL after its sixteenth execution and
     # the compile stalls the driver for several milliseconds, so the same loop
     # runs once as a dry phase at the workload cadence, sending zero-length
@@ -146,6 +154,13 @@ try {
                 $nextSlot++
                 $nextInput = $nextSlot * $period
             }
+            if ($hovering -and $elapsed -ge $nextHover) {
+                $hoverStep++
+                [BenchmarkWindow]::Hover($window, 400, 230 + 40 * ($hoverStep % 6))
+                $hoverMoves++
+                $nextHover += $hoverPeriod
+                if ($nextHover -lt $elapsed) { $nextHover = $elapsed + $hoverPeriod }
+            }
             # Process sampling costs a few milliseconds; keep it out of the slack
             # just before an input deadline.
             if ($measuring -and $elapsed -ge $nextSample -and ($nextSlot -ge $plannedInputs -or $nextInput - $elapsed -gt 8)) {
@@ -159,6 +174,7 @@ try {
         if (-not $measuring) {
             $inputTimes.Clear(); $samples.Clear()
             $nextInput = 0.0; $nextSlot = 0; $nextSample = 0.0; $missedInputDeadlines = 0
+            $nextHover = 0.0; $hoverStep = 0; $hoverMoves = 0
             $app.Refresh()
             $cpuStart = $app.TotalProcessorTime.TotalMilliseconds
             $startQpc = [Diagnostics.Stopwatch]::GetTimestamp()
@@ -225,6 +241,7 @@ try {
         driver_priority = $(if ([BenchmarkWindow]::ElevatedPriority) { 'high priority class, highest thread priority' } else { 'normal; elevation failed' })
         driver_warmup = -not [bool]$BackgroundSmoke
         input_count = $inputTimes.Count; input_deadlines_missed = $missedInputDeadlines
+        hover_moves = $hoverMoves
         planned_inputs = $plannedInputs
         correctness = @{
             passed = $verificationIssues.Count -eq 0; issues = @($verificationIssues.ToArray())
