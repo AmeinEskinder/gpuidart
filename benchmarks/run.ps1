@@ -65,9 +65,14 @@ $observationExitCode = 0
 [BenchmarkWindow]::Initialize()
 try {
     if ($CapturePresent) {
+        # Every process, not the fixture by name: without elevation PresentMon
+        # cannot name a process started in this session, so a name filter
+        # matches nothing; the analyzer keeps the fixture's records by process
+        # ID. The session name is unique per run (one runner process starts
+        # many runs) and the capture ends itself shortly after the run.
         $trace = Start-Process -FilePath (Join-Path $root '.tools/presentmon/PresentMon.exe') -ArgumentList @(
-            '--process_name', [IO.Path]::GetFileName($exe), '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
-            '--qpc_time', '--timed', ($Seconds + 60), '--terminate_after_timed', '--terminate_on_proc_exit', '--no_console_stats', '--session_name', ('gpuidart-' + $PID)
+            '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
+            '--qpc_time', '--timed', ($Seconds + 25), '--terminate_after_timed', '--no_console_stats', '--session_name', ('gpuidart-' + [guid]::NewGuid().ToString('N').Substring(0, 12))
         ) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $folder 'present.stdout.log') -RedirectStandardError (Join-Path $folder 'present.stderr.log')
         Start-Sleep -Milliseconds 700
         $trace.Refresh()
@@ -236,7 +241,7 @@ try {
     $expectedScrollY = if ($Workload -eq 'scroll') { -78 * $inputTimes.Count } else { 0 }
     if ($Implementation -in @('rust','dart','solid','flutter') -and ($null -eq $scrollY -or [math]::Abs($scrollY - $expectedScrollY) -gt 0.01)) { $verificationIssues.Add('Native scroll displacement does not match injected wheel input') }
     if ($Implementation -eq 'shell' -and $verification.cell_builds -le 0) { $verificationIssues.Add('Shell did not materialize any table cells') }
-    if ($CapturePresent -and -not $trace.HasExited) { $trace.WaitForExit(15000) | Out-Null }
+    if ($CapturePresent -and -not $trace.HasExited) { $trace.WaitForExit(40000) | Out-Null }
     $report = @{
         implementation = $Implementation; workload = $Workload; run_id = $RunId
         process_id = $app.Id; launch_qpc = $launchQpc

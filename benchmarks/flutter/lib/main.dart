@@ -115,7 +115,10 @@ class _BenchmarkState extends State<Benchmark> {
   // number, answering with the entries and headers of that stage.
   SendPort? worker;
   final workerReplies = ReceivePort();
-  Completer<_StageResult>? workerPending;
+  // Replies carry the request number they answer, so a click that arrives
+  // while the previous stage still computes settles its own change.
+  var workerRequests = 0;
+  final workerPending = <int, Completer<_StageResult>>{};
 
   @override
   void initState() {
@@ -130,8 +133,7 @@ class _BenchmarkState extends State<Benchmark> {
       if (message is SendPort) {
         ready.complete(message);
       } else if (message is _StageResult) {
-        workerPending?.complete(message);
-        workerPending = null;
+        workerPending.remove(message.request)?.complete(message);
       }
     });
     final sectors = Uint8List(rowCount);
@@ -210,14 +212,16 @@ class _BenchmarkState extends State<Benchmark> {
       final port = worker;
       if (port == null) throw StateError('Sort worker is not ready');
       final pending = Completer<_StageResult>();
-      workerPending = pending;
-      port.send(stage);
+      final request = ++workerRequests;
+      final requested = stage;
+      workerPending[request] = pending;
+      port.send((request: request, stage: stage));
       viewComputeUs.add(clock.elapsedMicroseconds);
       pending.future.then((result) {
         headers
           ..clear()
           ..addAll(result.headers);
-        display = stage == 0
+        display = requested == 0
             ? null
             : result.entries.materialize().asInt32List();
         _showStage(clock, change);
@@ -326,7 +330,7 @@ class _BenchmarkState extends State<Benchmark> {
     final requests = ReceivePort();
     init.replies.send(requests.sendPort);
     requests.listen((message) {
-      final stage = message as int;
+      final (:request, :stage) = message as ({int request, int stage});
       var order = <int>[];
       final headers = <List<String>>[];
       if (stage >= 1) {
@@ -362,6 +366,7 @@ class _BenchmarkState extends State<Benchmark> {
       }
       init.replies.send(
         _StageResult(
+          request: request,
           entries: TransferableTypedData.fromList([
             Int32List.fromList(entries).buffer.asUint8List(),
           ]),
@@ -515,7 +520,12 @@ class _WorkerInit {
 /// A stage as the worker computed it: the entries (a record index, or a
 /// negative index into [headers]) and the group headers.
 class _StageResult {
-  const _StageResult({required this.entries, required this.headers});
+  const _StageResult({
+    required this.request,
+    required this.entries,
+    required this.headers,
+  });
+  final int request;
   final TransferableTypedData entries;
   final List<List<String>> headers;
 }
