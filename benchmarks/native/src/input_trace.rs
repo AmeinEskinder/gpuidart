@@ -1,6 +1,6 @@
 use gpui_kit::InteractiveElement;
 use serde_json::{Value, json};
-use std::cell::RefCell;
+use std::sync::Mutex;
 
 #[link(name = "user32")]
 unsafe extern "system" {
@@ -11,9 +11,10 @@ unsafe extern "system" {
     fn QueryPerformanceCounter(value: *mut i64) -> i32;
 }
 
-thread_local! {
-    static EVENTS: RefCell<Vec<Value>> = const { RefCell::new(Vec::new()) };
-}
+/// Process-wide, not thread-local: the events are recorded on the thread
+/// that runs the GPUI loop and saved when `gd_run` returns, and a
+/// thread-local list left the saved trace empty once those differed.
+static EVENTS: Mutex<Vec<Value>> = Mutex::new(Vec::new());
 
 pub fn sequence() -> Option<u64> {
     let tag = unsafe { GetMessageExtraInfo() } as u64;
@@ -27,9 +28,7 @@ pub fn record(stage: &str, data: Value) {
 pub fn record_sequence(stage: &str, sequence: Option<u64>, data: Value) {
     let mut qpc = 0;
     unsafe { QueryPerformanceCounter(&mut qpc) };
-    EVENTS.with_borrow_mut(|events| {
-        events.push(json!({"stage": stage, "sequence": sequence, "qpc": qpc, "raw_message_extra": unsafe { GetMessageExtraInfo() }.to_string(), "data": data}));
-    });
+    EVENTS.lock().unwrap_or_else(|poisoned| poisoned.into_inner()).push(json!({"stage": stage, "sequence": sequence, "qpc": qpc, "raw_message_extra": unsafe { GetMessageExtraInfo() }.to_string(), "data": data}));
 }
 
 pub fn observe<E: InteractiveElement>(root: E) -> E {
@@ -45,18 +44,19 @@ pub fn observe<E: InteractiveElement>(root: E) -> E {
             json!({"x": f32::from(event.position.x), "y": f32::from(event.position.y)}),
         );
     })
-    // Bubble phase: the scrolled element's listener has applied the delta
-    // by now, so a table offset recorded at the next paint is this event's.
-    .on_scroll_wheel(|event, window, _| {
-        let (kind, x, y) = match event.delta {
-            gpui_kit::ScrollDelta::Lines(delta) => ("lines", delta.x, delta.y),
-            gpui_kit::ScrollDelta::Pixels(delta) => ("pixels", f32::from(delta.x), f32::from(delta.y)),
-        };
-        record(
-            "gpui_scroll_wheel",
-            json!({"kind": kind, "x": x, "y": y, "line_height": f32::from(window.line_height()), "position_y": f32::from(event.position.y)}),
-        );
-    })
+}
+
+/// A wheel event GPUI dispatched, with the delta it carried and the line
+/// height the scrolled element turns line deltas into pixels with.
+pub fn record_wheel(event: &gpui_kit::ScrollWheelEvent, line_height: f32) {
+    let (kind, x, y) = match event.delta {
+        gpui_kit::ScrollDelta::Lines(delta) => ("lines", delta.x, delta.y),
+        gpui_kit::ScrollDelta::Pixels(delta) => ("pixels", f32::from(delta.x), f32::from(delta.y)),
+    };
+    record(
+        "gpui_scroll_wheel",
+        json!({"kind": kind, "x": x, "y": y, "line_height": line_height, "position_y": f32::from(event.position.y)}),
+    );
 }
 
 /// A table's vertical offset at a paint, so the offset trajectory can be
@@ -71,8 +71,9 @@ pub fn record_table_scroll(id: &str, frame: u64, y: f32) {
 
 pub fn save() {
     if let Some(path) = std::env::var_os("GPUIDART_NATIVE_TRACE") {
-        EVENTS.with_borrow(|events| {
-            std::fs::write(path, serde_json::to_vec_pretty(events).unwrap()).unwrap();
-        });
+        let events = EVENTS
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        std::fs::write(path, serde_json::to_vec_pretty(&*events).unwrap()).unwrap();
     }
 }

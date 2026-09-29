@@ -139,5 +139,14 @@ impl Element for PaintMarker {
                 serde_json::json!({"revision": self.revision}),
             );
         }
+        // Capture phase, before any element: an element-level wheel listener
+        // fires only on the scroll target under the pointer, so the root's
+        // never saw the table's events.
+        let line_height = f32::from(window.line_height());
+        window.on_mouse_event(move |event: &gpui_kit::ScrollWheelEvent, phase, _, _| {
+            if phase.capture() {
+                crate::input_trace::record_wheel(event, line_height);
+            }
+        });
     }
 }
