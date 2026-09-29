@@ -359,3 +359,32 @@ property round-trip. A dead/unresponsive root still fails. It does not use cache
 PID/name as proof of liveness. Final query failures also retain an application
 inspect attempt to separate provider reads from application exits. No action
 retry or partial-tree acceptance was added.
+
+## Windows query timeout retained (`2489008`)
+
+The Windows probe failed once at `2489008`, the commit that makes the host
+repaint as soon as an update from the application is applied, and passed at
+`4f776ba` before it. The report from the run's artifact is retained as
+`windows-spike-2.json` (run
+[36633135956](https://github.com/AmeinEskinder/gpuidart/actions/runs/36633135956);
+`gh run download` times out against the artifact store from this machine, the
+API's zip endpoint through curl works). The very first platform query timed out
+after 20 seconds, at `probe.dart:26` and before any Invoke, so the two
+suspected mechanisms, the repaint diagnostic's frame count and a paint between
+the Invoke and the section change, are not what happened: neither had run yet.
+A passing probe on that runner takes 6.5 seconds end to end, so the query hung
+rather than ran slowly.
+
+Not reproduced. The probe passed 29 of 29 local runs with the repaint on, and
+the Windows job passed six CI runs in a row on the same native code
+(`70db97e` pushed, four dispatched samples, `9f825a2` pushed). The same step
+also failed at `6731fca` on 2026-09-28, before the repaint existed, with a
+thread-local panic at shutdown, so the step has a history that one failure
+against one pass does not settle. The cause is open.
+
+So that a recurrence explains itself, `9f825a2` makes the Windows client write
+its stage on stderr (window found, elements counted, descriptions read, nodes
+built) and the query deadline error carries those stages; the probe records
+whether the host still answered an inspect after a failure
+(`host_after_failure`), which separates a blocked host thread from a client
+that hung on its own. Stage lines are kept out of the retained responses.
