@@ -160,6 +160,16 @@ Feasibility verdicts recorded on this machine:
   Build Tools 17.14 installed the fixture is built and measured; the two
   series and their qualifications are in the
   [comparison status](../reports/comparison/README.md).
+- **The memory floor holds at the widened catalog.** An almost empty host
+  (one window, one text node) settles at 75 to 77 MiB of working set and
+  91.5 MiB of private commit at this head, level with the 75.87 and 94.57 MiB
+  of the `e9c0c27` baseline and under the 85 MB line the order of play set
+  ([floor report](../reports/performance/floor-20260929/README.md)). The
+  Windows runtime probe now lists every mapped image: the graphics driver's
+  shader compiler maps 82.7 MiB, the native library 25 MiB (built with
+  link-time optimization, 9 percent smaller on disk than before, which did
+  not move the resident floor), the Direct3D driver 17 MiB; the resident
+  split per image is not measured yet.
 - **View recomputes parse each column once.** The view workload's first
   series ([report](../reports/comparison/view-1m-20260929.md)) put the Dart
   fixture at about half the Flutter fixture's time per view change, and its

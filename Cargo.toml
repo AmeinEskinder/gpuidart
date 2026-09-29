@@ -16,6 +16,10 @@ debug = 1
 
 [profile.release]
 panic = "unwind"
+# Whole-program optimization and one codegen unit shrink the native library,
+# whose mapped pages are part of every host's memory floor.
+lto = "fat"
+codegen-units = 1
 
 # Vendored copies with narrow patches; provenance and patch-only diffs are in
 # native/vendor/README.md. Each copy is the version the lockfile already

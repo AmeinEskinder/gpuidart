@@ -3289,8 +3289,11 @@ pub(crate) fn run(
                             });
                             continue;
                         };
-                        if handle
-                            .update(cx, |_, w, cx| {
+                        // A publication may open or close the window's
+                        // sheet, which updates Kit's root: reach the window
+                        // without leasing the root.
+                        if cx
+                            .update_window(handle.into(), |_, w, cx| {
                                 view.update(cx, |view, cx| view.publish(snapshot, w, cx))
                             })
                             .is_err()
@@ -3307,8 +3310,8 @@ pub(crate) fn run(
                             });
                             continue;
                         };
-                        if handle
-                            .update(cx, |_, w, cx| {
+                        if cx
+                            .update_window(handle.into(), |_, w, cx| {
                                 view.update(cx, |view, cx| view.apply_update(update, w, cx))
                             })
                             .is_err()

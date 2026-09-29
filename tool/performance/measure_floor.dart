@@ -43,15 +43,11 @@ Future<void> main(List<String> args) async {
   );
   try {
     final afterOpen = readRuntimeInfo()['memory_bytes'];
-    // Let startup work finish and the collector run, as the dataset
-    // measurement does, before reading the settled counters.
+    // Let startup work finish before reading the settled counters. Nothing
+    // provokes the collector: churning allocation in an idle process grows
+    // the Dart heap and would report that growth as the floor; the dataset
+    // measurement covers the released-copy case.
     await Future<void>.delayed(const Duration(seconds: 3));
-    for (var round = 0; round < 4; round++) {
-      final churn = List<List<int>>.generate(100000, (i) => List.filled(16, i));
-      if (churn.length == 1) stdout.writeln(churn);
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-    }
-    await Future<void>.delayed(const Duration(milliseconds: 500));
     final settled = readRuntimeInfo();
     final images = (settled['loaded_images'] as List? ?? const [])
         .cast<Map<String, dynamic>>();

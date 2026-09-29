@@ -23,7 +23,7 @@ Four new controls are sufficient:
 | `UiSelect` / `select` | Choose appearance from named choices | Component Select and retained SelectState |
 | `UiConfirmDialog` / `confirm_dialog` | Confirm reset without losing the draft on cancellation | Component Dialog with a trigger and standard footer |
 
-Radio groups, switches, tabs, tooltips, sheets, and general lists are deferred.
+Radio groups, switches, tabs, tooltips, sheets, and general lists were deferred at this milestone; the later milestones bound them ([binding table](binding-table.md)).
 The screen does not require them. Dialog content is intentionally a bounded
 title/message and confirm/cancel labels, not an arbitrary nested UI tree.
 
