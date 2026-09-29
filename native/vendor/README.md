@@ -100,3 +100,21 @@ requires InvokePattern and verifies the resulting page change.
 This follows Microsoft's [MenuItem control contract](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-supportmenuitemcontroltype):
 a command item exposes Invoke; selection among options uses SelectionItem. It
 changes no other role's pattern selection and makes no speech/navigation claim.
+
+## Windows present feedback
+
+[present-feedback.patch](present-feedback.patch) adds a measurement aid to
+the Windows renderer of gpui-pre 0.3.7. With `GPUI_PRESENT_FEEDBACK` set to a
+file path, every `Present` call is appended to that file with its count and
+the QPC time before and after the call, beside the swap chain's frame
+statistics read right after it (`IDXGISwapChain::GetFrameStatistics`: the last
+present count that reached the display and the QPC time of the vertical blank
+it was shown at). The renderer's drop reads the statistics once more so the
+last presents are named too. Nothing changes when the variable is unset: one
+`Option` check per present.
+
+The benchmark runner sets the variable for the GPUI fixtures when it captures
+or traces. The reason is in the capture report of 2026-09-29: PresentMon, with
+or without elevation, follows almost none of a composed flip-model swap
+chain's presents to the display on this system and drops part of them from
+its record, while the swap chain reports both.

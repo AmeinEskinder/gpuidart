@@ -24,6 +24,78 @@ use crate::*;
 use gpui::*;
 
 pub(crate) const DISABLE_DIRECT_COMPOSITION: &str = "GPUI_DISABLE_DIRECT_COMPOSITION";
+/// With this variable set to a file path, every present is recorded there
+/// with its count and the QPC time of the call, beside the swap chain's frame
+/// statistics, which name the last present that reached the display and the
+/// vertical blank it was shown at. A measurement aid: external tracing does
+/// not follow composed flips to the display on every system, the swap chain
+/// does.
+pub(crate) const PRESENT_FEEDBACK: &str = "GPUI_PRESENT_FEEDBACK";
+
+struct PresentFeedback {
+    path: std::path::PathBuf,
+    lines: Vec<String>,
+    written: bool,
+}
+
+impl PresentFeedback {
+    fn from_env() -> Option<Self> {
+        let path = std::env::var_os(PRESENT_FEEDBACK)?;
+        Some(Self {
+            path: path.into(),
+            lines: Vec::new(),
+            written: false,
+        })
+    }
+
+    fn qpc() -> i64 {
+        let mut value = 0;
+        unsafe {
+            windows::Win32::System::Performance::QueryPerformanceCounter(&mut value).ok();
+        }
+        value
+    }
+
+    fn record(&mut self, swap_chain: &IDXGISwapChain1, start: i64) {
+        let end = Self::qpc();
+        let count = unsafe { swap_chain.GetLastPresentCount() }.unwrap_or(0);
+        let mut statistics = DXGI_FRAME_STATISTICS::default();
+        let known = unsafe { swap_chain.GetFrameStatistics(&mut statistics) }.is_ok();
+        self.lines.push(format!(
+            "{count},{start},{end},{},{},{},{},{}",
+            known as u8,
+            statistics.PresentCount,
+            statistics.PresentRefreshCount,
+            statistics.SyncRefreshCount,
+            statistics.SyncQPCTime
+        ));
+        if self.lines.len() >= 1024 {
+            self.flush();
+        }
+    }
+
+    fn flush(&mut self) {
+        use std::io::Write;
+        let Ok(mut file) = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&self.path)
+        else {
+            return;
+        };
+        if !self.written {
+            self.written = true;
+            writeln!(
+                file,
+                "present_count,present_start_qpc,present_end_qpc,statistics_known,displayed_present_count,displayed_refresh_count,sync_refresh_count,sync_qpc"
+            )
+            .ok();
+        }
+        for line in self.lines.drain(..) {
+            writeln!(file, "{line}").ok();
+        }
+    }
+}
 const RENDER_TARGET_FORMAT: DXGI_FORMAT = DXGI_FORMAT_B8G8R8A8_UNORM;
 // This configuration is used for MSAA rendering on paths only, and it's guaranteed to be supported by DirectX 11.
 const PATH_MULTISAMPLE_COUNT: u32 = 4;
@@ -54,6 +126,7 @@ pub(crate) struct DirectXRenderer {
     /// In that case we want to discard the first frame that we draw as we got reset in the middle of a frame
     /// meaning we lost all the allocated gpu textures and scene resources.
     skip_draws: bool,
+    present_feedback: Option<PresentFeedback>,
 }
 
 /// Direct3D objects
@@ -194,6 +267,7 @@ impl DirectXRenderer {
             width: 1,
             height: 1,
             skip_draws: false,
+            present_feedback: PresentFeedback::from_env(),
         })
     }
 
@@ -243,13 +317,16 @@ impl DirectXRenderer {
 
     #[inline]
     fn present(&mut self) -> Result<()> {
-        let result = unsafe {
-            self.resources
-                .as_ref()
-                .expect("resources missing")
-                .swap_chain
-                .Present(0, DXGI_PRESENT(0))
-        };
+        let swap_chain = &self
+            .resources
+            .as_ref()
+            .expect("resources missing")
+            .swap_chain;
+        let start = self.present_feedback.as_ref().map(|_| PresentFeedback::qpc());
+        let result = unsafe { swap_chain.Present(0, DXGI_PRESENT(0)) };
+        if let (Some(feedback), Some(start)) = (&mut self.present_feedback, start) {
+            feedback.record(swap_chain, start);
+        }
         result.ok().context("Presenting swap chain failed")
     }
 
@@ -1283,6 +1360,14 @@ struct PathSprite {
 
 impl Drop for DirectXRenderer {
     fn drop(&mut self) {
+        if let Some(feedback) = &mut self.present_feedback {
+            // The last presents reach the display after the last call that
+            // could have read them; one more reading names them.
+            if let Some(resources) = &self.resources {
+                feedback.record(&resources.swap_chain, 0);
+            }
+            feedback.flush();
+        }
         #[cfg(debug_assertions)]
         if let Some(devices) = &self.devices {
             report_live_objects(&devices.device).ok();

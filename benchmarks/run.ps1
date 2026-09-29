@@ -45,6 +45,12 @@ if ($FlutterIsolate -and $Implementation -ne 'flutter') { throw 'FlutterIsolate 
 if ($Rows -ne 100000 -and $Workload -notin @('idle','view')) { throw 'Only the idle and view workloads run with a row count other than 100000' }
 $env:GPUIDART_INPUT_TRACE = $null
 $env:GPUIDART_NATIVE_TRACE = $null
+# The GPUI fixtures record every present and the swap chain's frame
+# statistics themselves when capturing or tracing: external tracing does not
+# follow their composed flips to the display on this system, the swap chain
+# does (present-feedback.csv beside the run).
+$env:GPUI_PRESENT_FEEDBACK = $null
+if (($CapturePresent -or $TraceInput) -and $Implementation -in @('rust','dart')) { $env:GPUI_PRESENT_FEEDBACK = Join-Path $folder 'present-feedback.csv' }
 if ($TraceInput) {
     $env:GPUIDART_INPUT_TRACE = '1'
     $env:GPUIDART_NATIVE_TRACE = Join-Path $folder 'native-input-trace.json'
