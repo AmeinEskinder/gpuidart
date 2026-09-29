@@ -163,6 +163,11 @@ public static class BenchmarkWindow {
         RequireFocus(window);
         Point point = new Point { X = (int)(x * Scale(window)), Y = (int)(y * Scale(window)) };
         ClientToScreen(window, ref point);
+        // A cursor already at the point stays: moving it again costs up to
+        // 17 ms on this machine in one click of twenty, which the input
+        // timestamp taken before it would charge to the fixture.
+        Point now;
+        if (GetCursorPos(out now) && now.X == point.X && now.Y == point.Y) { placed = point; return; }
         if (!SetCursorPos(point.X, point.Y)) throw new InvalidOperationException("SetCursorPos failed");
         placed = point;
     }

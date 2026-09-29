@@ -36,6 +36,7 @@ struct PresentFeedback {
     path: std::path::PathBuf,
     lines: Vec<String>,
     written: bool,
+    last_flush: std::time::Instant,
 }
 
 impl PresentFeedback {
@@ -45,6 +46,7 @@ impl PresentFeedback {
             path: path.into(),
             lines: Vec::new(),
             written: false,
+            last_flush: std::time::Instant::now(),
         })
     }
 
@@ -69,13 +71,20 @@ impl PresentFeedback {
             statistics.SyncRefreshCount,
             statistics.SyncQPCTime
         ));
-        if self.lines.len() >= 1024 {
+        // Written in small batches: a process that exits without dropping
+        // the renderer must still leave its presents behind, and a run is
+        // short.
+        if self.lines.len() >= 32 || self.last_flush.elapsed() >= std::time::Duration::from_millis(500) {
             self.flush();
         }
     }
 
     fn flush(&mut self) {
         use std::io::Write;
+        self.last_flush = std::time::Instant::now();
+        if self.lines.is_empty() {
+            return;
+        }
         let Ok(mut file) = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
