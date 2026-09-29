@@ -310,6 +310,87 @@ void main() {
     );
   });
 
+  test('trees encode their items and decode selection and expansion', () {
+    final tree = UiTree(
+      'files',
+      items: const [
+        UiTreeItem(
+          'src',
+          'src',
+          expanded: true,
+          children: [UiTreeItem('main', 'main.dart', disabled: true)],
+        ),
+        UiTreeItem('license', 'LICENSE'),
+      ],
+      selected: 'main',
+    );
+    expect(tree.toJson(), {
+      'kind': 'tree',
+      'id': 'files',
+      'items': [
+        {
+          'id': 'src',
+          'label': 'src',
+          'expanded': true,
+          'children': [
+            {'id': 'main', 'label': 'main.dart', 'disabled': true},
+          ],
+        },
+        {'id': 'license', 'label': 'LICENSE'},
+      ],
+      'selected': 'main',
+    });
+    expect(
+      UiTree('t', items: const [UiTreeItem('a', 'A')], selected: 'b').toJson,
+      throwsArgumentError,
+      reason: 'selection names an item',
+    );
+    expect(
+      UiTree(
+        't',
+        items: const [UiTreeItem('a', 'A'), UiTreeItem('a', 'B')],
+      ).toJson,
+      throwsArgumentError,
+      reason: 'unique IDs',
+    );
+    expect(const UiTreeItem('', 'A').toJson, throwsArgumentError);
+    expect(const UiTreeItem('a', '').toJson, throwsArgumentError);
+    Map<String, dynamic> decode(Map<String, Object?> event) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(event)));
+    expect(
+      decode({
+        'type': 'tree_select',
+        'revision': 1,
+        'id': 'files',
+        'item': 'main',
+      })['item'],
+      'main',
+    );
+    expect(
+      decode({
+        'type': 'tree_expand',
+        'revision': 1,
+        'id': 'files',
+        'item': 'src',
+        'expanded': false,
+      })['expanded'],
+      false,
+    );
+    expect(
+      () => decode({
+        'type': 'tree_expand',
+        'revision': 1,
+        'id': 'files',
+        'item': 'src',
+      }),
+      throwsFormatException,
+    );
+    expect(
+      () => decode({'type': 'tree_select', 'revision': 1, 'id': 'files'}),
+      throwsFormatException,
+    );
+  });
+
   test('panes encode their specs and decode resize events', () {
     final panes = UiPanes(
       'split',

@@ -84,14 +84,14 @@ infrastructure the adapter uses on the application's behalf without a node.
 | toolbar | not bound | |
 | tooltip | `UiButton.tooltip` | Buttons only. |
 | touch_selection | host | Platform text selection. |
-| tree | planned | A tree of labelled items with expansion and selection. |
+| tree | `UiTree` | Labelled items with stable IDs, expansion and one selection; `tree_select` and `tree_expand` events. |
 | virtual_list | `UiList`, `UiTable` | Through the list and the table. |
 | window_border, window_ext | host | |
 
 Beyond the component crate, gpuidart binds Kit's base animation
 (`UiStyle.animation`), its calendar (through the date picker) and its
 window and lifecycle; `UiCanvas`, `UiStack`, `UiColumn` and `UiRow` are
-gpuidart's own over GPUI's elements. Twenty-five node kinds reach about a
-third of the component catalog; the planned five close the largest gaps an
-application notices (tree, popover, sheet, combobox, rich text), and the
-rest stay reachable only by extending the adapter.
+gpuidart's own over GPUI's elements. Twenty-six node kinds reach about a
+third of the component catalog; the planned four close the largest gaps an
+application notices (popover, sheet, combobox, rich text), and the rest
+stay reachable only by extending the adapter.

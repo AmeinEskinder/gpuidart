@@ -63,6 +63,7 @@ impl Semantics {
                 Node::RadioGroup { .. } => role == RadioGroup,
                 Node::Select { .. } | Node::DatePicker { .. } => role == Combobox,
                 Node::Table { .. } => role == Table,
+                Node::Tree { .. } => role == List,
                 Node::Switch { .. } => role == Switch,
                 Node::Progress { .. } => role == ProgressBar,
                 Node::Separator { .. } => role == Separator,

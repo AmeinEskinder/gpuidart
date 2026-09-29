@@ -339,6 +339,23 @@ pub enum Node {
         #[serde(default)]
         children: Vec<Node>,
     },
+    /// A tree of labelled items with expansion and one selection. Items
+    /// carry stable IDs, unique within the node; `selected` names one of
+    /// them. A click selects an item and toggles a folder, emitting
+    /// `tree_select` and `tree_expand`; a publication whose items or
+    /// selection differ from the last one is authoritative, and one that
+    /// repeats them leaves the user's expansion and selection alone.
+    Tree {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        #[serde(default)]
+        items: Vec<TreeItemSpec>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        selected: Option<String>,
+    },
     /// A calendar picker holding one date as `YYYY-MM-DD`; `date_change`
     /// carries the requested value and the next publication is authoritative.
     DatePicker {
@@ -643,8 +660,11 @@ pub struct PaneSpec {
 
 /// Pane specs parallel the children (or are absent) and every dimension is a
 /// finite logical size within the window bounds, with `min <= size <= max`.
+/// A `set` operation carries a node's own fields without its children, so
+/// the count is checked only where children are present; the description an
+/// operation produces is validated again as a whole.
 fn validate_panes(panes: &[PaneSpec], children: usize) -> Result<(), String> {
-    if !panes.is_empty() && panes.len() != children {
+    if !panes.is_empty() && children != 0 && panes.len() != children {
         return Err("Panes must have one spec per child or none".into());
     }
     let bounded = |value: Option<f32>| value.is_none_or(|v| v.is_finite() && v >= 0. && v <= 8192.);
@@ -659,6 +679,45 @@ fn validate_panes(panes: &[PaneSpec], children: usize) -> Result<(), String> {
         if min > max || pane.size.is_some_and(|size| size < min || size > max) {
             return Err("Pane size must lie within its min and max".into());
         }
+    }
+    Ok(())
+}
+
+/// One tree item: a stable ID, a label and optional children.
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct TreeItemSpec {
+    pub id: String,
+    pub label: String,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub expanded: bool,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub disabled: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub children: Vec<TreeItemSpec>,
+}
+
+/// At most 4,096 items nested at most 32 deep, with nonempty unique IDs and
+/// labels of 1..=1024 UTF-8 bytes; a selection names one of the items.
+fn validate_tree_items(
+    items: &[TreeItemSpec],
+    depth: usize,
+    ids: &mut HashSet<String>,
+) -> Result<(), String> {
+    if depth > 32 {
+        return Err("Tree items nest at most 32 deep".into());
+    }
+    for item in items {
+        if ids.len() >= 4096 {
+            return Err("Tree has at most 4096 items".into());
+        }
+        if item.id.is_empty() || !ids.insert(item.id.clone()) {
+            return Err(format!("Empty or duplicate tree item ID: {}", item.id));
+        }
+        if item.label.is_empty() || item.label.len() > 1024 {
+            return Err("Tree item label must contain 1..1024 UTF-8 bytes".into());
+        }
+        validate_tree_items(&item.children, depth + 1, ids)?;
     }
     Ok(())
 }
@@ -1549,6 +1608,7 @@ impl Node {
             | Self::Stack { id, .. }
             | Self::Scroll { id, .. }
             | Self::Panes { id, .. }
+            | Self::Tree { id, .. }
             | Self::Switch { id, .. }
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
@@ -1579,6 +1639,7 @@ impl Node {
             | Self::Stack { style, .. }
             | Self::Scroll { style, .. }
             | Self::Panes { style, .. }
+            | Self::Tree { style, .. }
             | Self::Switch { style, .. }
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
@@ -1609,6 +1670,7 @@ impl Node {
             | Self::Stack { semantics, .. }
             | Self::Scroll { semantics, .. }
             | Self::Panes { semantics, .. }
+            | Self::Tree { semantics, .. }
             | Self::Switch { semantics, .. }
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
@@ -1754,6 +1816,19 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
     } = node
     {
         validate_panes(panes, children.len())?;
+    }
+    if let Node::Tree {
+        items, selected, ..
+    } = node
+    {
+        let mut item_ids = HashSet::new();
+        validate_tree_items(items, 0, &mut item_ids)?;
+        if selected
+            .as_ref()
+            .is_some_and(|item| !item_ids.contains(item))
+        {
+            return Err("Tree selection must name one of its items".into());
+        }
     }
     if node.style().is_some_and(|style| style.cached) {
         let fixed = matches!(
@@ -2286,6 +2361,19 @@ pub enum Event {
         revision: u64,
         id: String,
         sizes: Vec<f32>,
+    },
+    /// The tree item a click selected.
+    TreeSelect {
+        revision: u64,
+        id: String,
+        item: String,
+    },
+    /// A tree folder the user expanded or collapsed.
+    TreeExpand {
+        revision: u64,
+        id: String,
+        item: String,
+        expanded: bool,
     },
     DialogResult {
         revision: u64,
@@ -3117,6 +3205,38 @@ mod tests {
             );
         }
         println!("VIEW_RECOMPUTE_1M {}", serde_json::Value::Object(report));
+    }
+
+    #[test]
+    fn set_operations_carry_pane_specs_without_children() {
+        let update: Update = serde_json::from_value(serde_json::json!({
+            "revision": 2, "base_revision": 1, "ops": [
+                {"op":"set","id":"split","node":{"kind":"panes","id":"split","panes":[{"size":300,"min":100,"max":500},{}]}}
+            ]
+        }))
+        .unwrap();
+        assert!(
+            update.validate().is_ok(),
+            "a set node has no children to count its specs against"
+        );
+        let mismatched = Snapshot::parse(
+            br#"{"revision":1,"root":{"kind":"panes","id":"split","panes":[{"size":300},{}],"children":[{"kind":"text","id":"only","text":"Only"}]}}"#,
+        );
+        assert!(
+            mismatched.is_err(),
+            "a whole description needs one spec per child"
+        );
+        for bad in [
+            r#"[{"size":0},{}]"#,
+            r#"[{"size":50,"min":100},{}]"#,
+            r#"[{"min":300,"max":100},{}]"#,
+            r#"[{"size":9000},{}]"#,
+        ] {
+            let description = format!(
+                r#"{{"revision":1,"root":{{"kind":"panes","id":"split","panes":{bad},"children":[{{"kind":"text","id":"a","text":"A"}},{{"kind":"text","id":"b","text":"B"}}]}}}}"#
+            );
+            assert!(Snapshot::parse(description.as_bytes()).is_err(), "{bad}");
+        }
     }
 
     #[test]

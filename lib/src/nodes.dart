@@ -217,6 +217,93 @@ final class UiPanes extends UiNode {
   };
 }
 
+/// One tree item: a stable ID unique within its tree, a label and optional
+/// children; [expanded] opens a folder in the publication that carries it.
+final class UiTreeItem {
+  const UiTreeItem(
+    this.id,
+    this.label, {
+    this.expanded = false,
+    this.disabled = false,
+    this.children = const [],
+  });
+  final String id;
+  final String label;
+  final bool expanded;
+  final bool disabled;
+  final List<UiTreeItem> children;
+
+  Map<String, Object> toJson() {
+    if (id.isEmpty) throw ArgumentError('Tree item ID must be nonempty');
+    if (label.isEmpty || utf8.encode(label).length > 1024) {
+      throw ArgumentError('Tree item label must contain 1..1024 UTF-8 bytes');
+    }
+    return {
+      'id': id,
+      'label': label,
+      if (expanded) 'expanded': true,
+      if (disabled) 'disabled': true,
+      if (children.isNotEmpty)
+        'children': children.map((child) => child.toJson()).toList(),
+    };
+  }
+}
+
+/// A tree of labelled items with expansion and one selection. A click
+/// selects an item and toggles a folder: `tree_select` carries the item in
+/// `GpuiEvent.item`, `tree_expand` the item and `GpuiEvent.expanded`. A
+/// publication whose items or [selected] differ from the last one is
+/// authoritative; one that repeats them leaves the user's expansion and
+/// selection alone. At most 4,096 items nested 32 deep. Size the tree
+/// through its style or a flex parent.
+final class UiTree extends UiNode {
+  UiTree(
+    super.id, {
+    required List<UiTreeItem> items,
+    this.selected,
+    super.style,
+    super.semantics,
+  }) : items = List.unmodifiable(items);
+  final List<UiTreeItem> items;
+  final String? selected;
+
+  @override
+  Map<String, Object> props() {
+    final ids = <String>{};
+    var depth = 0;
+    void visit(List<UiTreeItem> items, int level) {
+      if (level > 32) throw ArgumentError('Tree items nest at most 32 deep');
+      for (final item in items) {
+        if (ids.length >= 4096) {
+          throw ArgumentError('Tree has at most 4096 items');
+        }
+        if (!ids.add(item.id)) {
+          throw ArgumentError.value(item.id, 'id', 'Duplicate tree item ID');
+        }
+        depth = level > depth ? level : depth;
+        visit(item.children, level + 1);
+      }
+    }
+
+    visit(items, 0);
+    if (selected != null && !ids.contains(selected)) {
+      throw ArgumentError.value(
+        selected,
+        'selected',
+        'Tree selection must name one of its items',
+      );
+    }
+    return {
+      'kind': 'tree',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('tree'),
+      if (style != null) 'style': style!.toJson(),
+      'items': items.map((item) => item.toJson()).toList(),
+      'selected': ?selected,
+    };
+  }
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;

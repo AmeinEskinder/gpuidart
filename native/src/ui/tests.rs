@@ -2646,3 +2646,137 @@ fn panes_retain_dragged_sizes_follow_publications_and_report_resizes(cx: &mut Te
     })
     .unwrap();
 }
+
+#[gpui::test]
+fn trees_select_expand_and_follow_publications(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, selected: &str, docs_label: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"tree","id":"files","style":{{"width":{{"px":300}},"height":{{"px":400}}}},"selected":{selected},"items":[
+                    {{"id":"src","label":"src","expanded":true,"children":[
+                        {{"id":"main","label":"main.dart"}},
+                        {{"id":"host","label":"host.dart"}}
+                    ]}},
+                    {{"id":"docs","label":"{docs_label}","children":[{{"id":"readme","label":"README.md"}}]}},
+                    {{"id":"license","label":"LICENSE"}}
+                ]}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let received: Arc<Mutex<Vec<Event>>> = Arc::new(Mutex::new(Vec::new()));
+    let sink = received.clone();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(
+            WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(Bounds {
+                    origin: Point::default(),
+                    size: size(px(900.), px(700.)),
+                })),
+                ..Default::default()
+            },
+            cx,
+            |window, cx| {
+                cx.new(|cx| {
+                    DartView::new(
+                        Initial {
+                            window: Default::default(),
+                            snapshot: snapshot(1, "null", "docs"),
+                            datasets: vec![],
+                        },
+                        Events(Arc::new(move |event| sink.lock().unwrap().push(event))),
+                        window,
+                        cx,
+                    )
+                })
+            },
+        )
+        .unwrap()
+    });
+    let tree_events = |received: &Arc<Mutex<Vec<Event>>>| -> Vec<String> {
+        received
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::TreeSelect { item, .. } => Some(format!("select {item}")),
+                Event::TreeExpand { item, expanded, .. } => {
+                    Some(format!("expand {item} {expanded}"))
+                }
+                _ => None,
+            })
+            .collect()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        window.render_frame(cx);
+        assert!(
+            window.find("main").bounds().size.width > px(0.),
+            "an expanded folder shows its children"
+        );
+        assert!(
+            window.try_find("readme").is_none(),
+            "a collapsed folder hides its children"
+        );
+        let trees = view.read(cx).inspect(window, cx)["trees"].clone();
+        assert_eq!(trees["files"]["selected"], serde_json::Value::Null);
+        assert_eq!(trees["files"]["entries"].as_array().map(Vec::len), Some(5));
+        window.click("main", cx);
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        assert_eq!(tree_events(&received), vec!["select main".to_string()]);
+        let trees = view.read(cx).inspect(window, cx)["trees"].clone();
+        assert_eq!(
+            trees["files"]["selected"], "main",
+            "a click selects the item"
+        );
+        window.click("docs", cx);
+        window.render_frame(cx);
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        let events = tree_events(&received);
+        assert!(
+            events.contains(&"expand docs true".to_string()) && events.contains(&"select docs".to_string()),
+            "clicking a folder selects and expands it: {events:?}"
+        );
+        assert!(window.try_find("readme").is_some(), "the expanded folder shows its child");
+
+        // A repeated publication leaves the user's expansion and selection alone.
+        view.update(cx, |view, cx| view.publish(snapshot(2, "null", "docs"), window, cx));
+        window.render_frame(cx);
+        let trees = view.read(cx).inspect(window, cx)["trees"].clone();
+        assert_eq!(trees["files"]["selected"], "docs");
+        assert!(window.try_find("readme").is_some());
+
+        // A publication with a new selection or new items is authoritative.
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(3, "\"license\"", "documents"), window, cx)
+        });
+        window.render_frame(cx);
+        let trees = view.read(cx).inspect(window, cx)["trees"].clone();
+        assert_eq!(trees["files"]["selected"], "license");
+        assert!(window.try_find("readme").is_none(), "republished items start collapsed again");
+
+        view.update(cx, |view, cx| {
+            view.publish(
+                Snapshot::parse(
+                    br#"{"revision":4,"root":{"kind":"column","id":"root","children":[{"kind":"text","id":"only","text":"Only"}]}}"#,
+                )
+                .unwrap(),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        assert!(view.read(cx).trees.is_empty(), "the tree state is released with its node");
+    })
+    .unwrap();
+}

@@ -214,6 +214,12 @@ final class GpuiEvent {
   /// Requested `YYYY-MM-DD` date on `date_change`; null means cleared.
   String? get date => data['date'] as String?;
 
+  /// The tree item a `tree_select` or `tree_expand` event names.
+  String? get item => data['item'] as String?;
+
+  /// Whether a `tree_expand` event opened its folder.
+  bool? get expanded => data['expanded'] as bool?;
+
   /// Every pane's size in logical pixels on `panes_resize`.
   List<double>? get sizes => type == 'panes_resize'
       ? [for (final size in data['sizes'] as List) (size as num).toDouble()]
@@ -1068,6 +1074,8 @@ final class GpuiHost {
           event.type == 'select_change' ||
           event.type == 'date_change' ||
           event.type == 'panes_resize' ||
+          event.type == 'tree_select' ||
+          event.type == 'tree_expand' ||
           event.type == 'switch_change' ||
           event.type == 'radio_change' ||
           event.type == 'tab_change' ||

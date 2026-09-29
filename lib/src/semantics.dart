@@ -61,6 +61,7 @@ final class UiSemantics {
       'input' => {UiRole.textbox},
       'select' || 'date_picker' => {UiRole.combobox},
       'table' => {UiRole.table},
+      'tree' => {UiRole.list},
       'list' => {UiRole.list},
       'switch' => {UiRole.toggle},
       'radio_group' => {UiRole.radioGroup},

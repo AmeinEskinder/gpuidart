@@ -71,6 +71,7 @@ pub(super) fn annotate<T: StatefulInteractiveElement>(element: T, node: &Node) -
                 Role::Group
             }
             Node::Table { .. } => Role::Table,
+            Node::Tree { .. } => Role::Tree,
             Node::List { .. } => Role::List,
             Node::Slider { .. } => Role::Slider,
             Node::Checkbox { .. } => Role::CheckBox,

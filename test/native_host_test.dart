@@ -496,6 +496,36 @@ void main() {
     timeout: const Timeout(Duration(seconds: 120)),
   );
 
+  test('trees show their entries and follow a published selection', () async {
+    String? selected;
+    UiNode build() => UiTree(
+      'files',
+      items: const [
+        UiTreeItem(
+          'src',
+          'src',
+          expanded: true,
+          children: [UiTreeItem('main', 'main.dart')],
+        ),
+        UiTreeItem('license', 'LICENSE'),
+      ],
+      selected: selected,
+      style: const UiStyle(width: UiSize.px(300), height: UiSize.px(300)),
+    );
+    final host = await GpuiHost.openView(build);
+    try {
+      var state = await host.diagnose('inspect');
+      expect(state['trees']['files']['entries'], hasLength(3));
+      expect(state['trees']['files']['selected'], isNull);
+      selected = 'main';
+      await host.rebuild();
+      state = await host.diagnose('inspect');
+      expect(state['trees']['files']['selected'], 'main');
+    } finally {
+      await host.close();
+    }
+  });
+
   test('panes lay out their children and follow published sizes', () async {
     UiNode build(double leftWidth) => UiPanes(
       'split',

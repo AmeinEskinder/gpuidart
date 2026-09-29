@@ -326,6 +326,28 @@ struct RetainedImage {
     image: Arc<gpui::Image>,
 }
 
+/// A tree's Kit state, kept by node ID across publications.
+struct RetainedTree {
+    state: Entity<gpui_kit::component::tree::TreeState>,
+    items: Vec<crate::protocol::TreeItemSpec>,
+    selected: Option<String>,
+    _subscription: gpui_kit::gpui::Subscription,
+}
+
+fn build_tree_items(
+    specs: &[crate::protocol::TreeItemSpec],
+) -> Vec<gpui_kit::component::tree::TreeItem> {
+    specs
+        .iter()
+        .map(|spec| {
+            gpui_kit::component::tree::TreeItem::new(spec.id.clone(), spec.label.clone())
+                .expanded(spec.expanded)
+                .disabled(spec.disabled)
+                .children(build_tree_items(&spec.children))
+        })
+        .collect()
+}
+
 /// A resizable pane group's Kit state, kept by node ID across publications.
 struct RetainedPanes {
     state: Entity<gpui_kit::base::ResizableState>,
@@ -363,6 +385,9 @@ pub(crate) struct DartView {
     /// Resizable pane groups by node ID: the Kit state that holds the
     /// dragged sizes, the axis it was built for and the specs last published.
     panes: HashMap<String, RetainedPanes>,
+    /// Trees by node ID: the Kit state holding the entries, their expansion
+    /// and the selection, with the items and selection last published.
+    trees: HashMap<String, RetainedTree>,
     row_menu: Option<row_menus::Session>,
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
@@ -440,6 +465,23 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<_, _>>();
+        let trees = self
+            .trees
+            .iter()
+            .map(|(id, retained)| {
+                let state = retained.state.read(cx);
+                let entries: Vec<serde_json::Value> = (0..)
+                    .map_while(|ix| state.entry(ix))
+                    .map(|entry| {
+                        json!({"id": entry.item().id.to_string(), "depth": entry.depth(), "expanded": entry.is_expanded(), "folder": entry.is_folder()})
+                    })
+                    .collect();
+                (
+                    id.clone(),
+                    json!({"selected": state.selected_item().map(|item| item.id.to_string()), "entries": entries}),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>();
         let scrolls = self
             .scrolls
             .iter()
@@ -509,7 +551,7 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<String, Value>>();
-        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "panes": panes, "controls": self.inspect_controls(window, cx),
+        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "panes": panes, "trees": trees, "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -607,6 +649,7 @@ impl DartView {
             choice_shown: Default::default(),
             scrolls: HashMap::new(),
             panes: HashMap::new(),
+            trees: HashMap::new(),
             row_menu: None,
             next_row_menu: 0,
             tables: HashMap::new(),
@@ -1201,10 +1244,76 @@ impl DartView {
         let mut list_ids = HashSet::new();
         let mut scroll_ids = HashSet::new();
         let mut pane_ids = HashSet::new();
+        let mut tree_ids = HashSet::new();
         let owner = cx.entity().downgrade();
         let mut changed_views = Vec::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
+            Node::Tree {
+                id,
+                items,
+                selected,
+                ..
+            } => {
+                tree_ids.insert(id.clone());
+                if let Some(retained) = self.trees.get_mut(id) {
+                    if retained.items != *items {
+                        retained
+                            .state
+                            .update(cx, |state, cx| state.set_items(build_tree_items(items), cx));
+                        retained.items = items.clone();
+                    }
+                    if retained.selected != *selected {
+                        let target = selected.as_ref().and_then(|item| {
+                            retained
+                                .state
+                                .read(cx)
+                                .index_of(&SharedString::from(item.clone()))
+                        });
+                        retained
+                            .state
+                            .update(cx, |state, cx| state.set_selected_index(target, cx));
+                        retained.selected = selected.clone();
+                    }
+                } else {
+                    let state = cx.new(|cx| {
+                        gpui_kit::component::tree::TreeState::new(cx).items(build_tree_items(items))
+                    });
+                    if let Some(item) = selected {
+                        let target = state.read(cx).index_of(&SharedString::from(item.clone()));
+                        state.update(cx, |state, cx| state.set_selected_index(target, cx));
+                    }
+                    let event_id = id.clone();
+                    let subscription = cx.subscribe(
+                        &state,
+                        move |this, _, event: &gpui_kit::component::tree::TreeEvent, _| {
+                            let (item, expanded) = match event {
+                                gpui_kit::component::tree::TreeEvent::Expanded(item) => {
+                                    (item, true)
+                                }
+                                gpui_kit::component::tree::TreeEvent::Collapsed(item) => {
+                                    (item, false)
+                                }
+                            };
+                            this.events.emit(Event::TreeExpand {
+                                revision: this.snapshot.revision,
+                                id: event_id.clone(),
+                                item: item.to_string(),
+                                expanded,
+                            });
+                        },
+                    );
+                    self.trees.insert(
+                        id.clone(),
+                        RetainedTree {
+                            state,
+                            items: items.clone(),
+                            selected: selected.clone(),
+                            _subscription: subscription,
+                        },
+                    );
+                }
+            }
             Node::Scroll { id, .. } => {
                 scroll_ids.insert(id.clone());
                 self.scrolls
@@ -1550,6 +1659,7 @@ impl DartView {
         self.lists.retain(|id, _| list_ids.contains(id));
         self.scrolls.retain(|id, _| scroll_ids.contains(id));
         self.panes.retain(|id, _| pane_ids.contains(id));
+        self.trees.retain(|id, _| tree_ids.contains(id));
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
@@ -1812,6 +1922,58 @@ impl DartView {
                 }
                 apply_node_style(
                     annotate(div().id(id), node).test_support().child(group),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
+            Node::Tree { id: tree_id, .. } => {
+                let retained = self
+                    .trees
+                    .get(tree_id)
+                    .ok_or_else(|| format!("Missing retained tree: {tree_id}"))?;
+                let events = self.events.clone();
+                let revision = self.snapshot.revision;
+                let event_id = tree_id.clone();
+                let element = gpui_kit::component::tree::tree(
+                    &retained.state,
+                    move |ix, entry, _selected, _window, _cx| {
+                        let item = entry.item();
+                        let chevron = entry.is_folder().then(|| {
+                            let name = if entry.is_expanded() {
+                                "icons/chevron-down.svg"
+                            } else {
+                                "icons/chevron-right.svg"
+                            };
+                            gpui_kit::component::Icon::new(LucideIcon(name.into()))
+                                .with_size(gpui_kit::component::Size::Size(px(14.)))
+                        });
+                        let events = events.clone();
+                        let event_id = event_id.clone();
+                        let item_id = item.id.to_string();
+                        gpui_kit::component::list::ListItem::new(ix)
+                            .w_full()
+                            .pl(px(16.) * entry.depth() + px(12.))
+                            .child(
+                                div()
+                                    .id(item.id.clone())
+                                    .test_support()
+                                    .h_flex()
+                                    .gap_2()
+                                    .children(chevron)
+                                    .child(item.label.clone()),
+                            )
+                            .on_click(move |_, _, _| {
+                                events.emit(Event::TreeSelect {
+                                    revision,
+                                    id: event_id.clone(),
+                                    item: item_id.clone(),
+                                })
+                            })
+                    },
+                );
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(element),
                     node,
                     colors,
                 )

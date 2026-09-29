@@ -136,6 +136,13 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
         throw const FormatException('Missing select selected value');
       }
       if (value['selected'] != null) string('selected');
+    case 'tree_select' || 'tree_expand':
+      integer('revision', minimum: 1);
+      string('id');
+      string('item');
+      if (value['type'] == 'tree_expand' && value['expanded'] is! bool) {
+        throw const FormatException('Missing tree expansion state');
+      }
     case 'panes_resize':
       integer('revision', minimum: 1);
       string('id');
