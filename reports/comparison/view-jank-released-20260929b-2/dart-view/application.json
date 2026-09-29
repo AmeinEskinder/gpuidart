@@ -1,0 +1,355 @@
+{
+  "implementation": "dart",
+  "rows": 1000000,
+  "retain_records": false,
+  "memory_after_collection": {
+    "dart_rss_bytes": 412008448,
+    "memory_bytes": {
+      "working_set": 412061696,
+      "private_commit": 444850176
+    },
+    "scope": "after the measured phase: eight rounds of 200,000 short-lived lists to force a major collection, then half a second"
+  },
+  "updates": 12,
+  "cells_written": 0,
+  "first_price": "100.00",
+  "first_frame_ms_since_launch": 1927,
+  "native_first_price": {
+    "value": "100.00",
+    "revision": 14
+  },
+  "view": {
+    "stage": 0,
+    "stage_name": "records",
+    "displayed_rows": 1000000,
+    "table": {
+      "entity": 4294967298,
+      "visible_rows": {
+        "start": 0,
+        "end": 9
+      },
+      "row_count": 1000000,
+      "dataset": "quotes",
+      "dataset_revision": 14,
+      "scroll_y": 0.0,
+      "view": {
+        "source_rows": 1000000,
+        "view_rows": 1000000,
+        "groups": 0,
+        "spec_hash": null,
+        "pending": false
+      },
+      "selection": {
+        "row": null,
+        "record": null
+      },
+      "focused": false
+    },
+    "apply_us": {
+      "samples": 12,
+      "p50": 246,
+      "p95": 5994,
+      "p99": 5994,
+      "max": 5994,
+      "values": [
+        148,
+        177,
+        197,
+        209,
+        226,
+        246,
+        297,
+        369,
+        2774,
+        5021,
+        5106,
+        5994
+      ],
+      "sequence": [
+        297,
+        197,
+        246,
+        5106,
+        148,
+        177,
+        226,
+        5021,
+        2774,
+        209,
+        369,
+        5994
+      ]
+    },
+    "settle_us": {
+      "samples": 12,
+      "p50": 140585,
+      "p95": 464241,
+      "p99": 464241,
+      "max": 464241,
+      "values": [
+        5024,
+        5108,
+        6000,
+        135123,
+        138214,
+        140585,
+        142327,
+        169779,
+        174327,
+        387551,
+        403678,
+        464241
+      ],
+      "sequence": [
+        142327,
+        140585,
+        387551,
+        5108,
+        135123,
+        169779,
+        403678,
+        5024,
+        138214,
+        174327,
+        464241,
+        6000
+      ]
+    },
+    "jank": {
+      "longest_gap_us": {
+        "samples": 12,
+        "p50": 17276,
+        "p95": 33954,
+        "p99": 33954,
+        "max": 33954,
+        "values": [
+          0,
+          0,
+          0,
+          17055,
+          17210,
+          17276,
+          17339,
+          17472,
+          17560,
+          17625,
+          32310,
+          33954
+        ],
+        "sequence": [
+          17055,
+          17210,
+          17560,
+          0,
+          17339,
+          32310,
+          33954,
+          0,
+          17625,
+          17276,
+          17472,
+          0
+        ]
+      },
+      "frames_during": [
+        8,
+        8,
+        23,
+        0,
+        8,
+        9,
+        18,
+        0,
+        9,
+        10,
+        28,
+        0
+      ]
+    },
+    "scope": "per click: apply_us runs from the click handler through the rebuild acknowledgement, which native sends before the view index computes off the frame thread; settle_us runs on to the table_view event that reports the index in place; jank counts the frames native rendered from a mark set in the handler to that event and the longest interval between two of them, with the pointer moving over the rows at 60 Hz meanwhile"
+  },
+  "native": {
+    "charts": {},
+    "theme": {
+      "descriptor": {
+        "mode": "light"
+      },
+      "resolved": {
+        "background": "#FFFFFF",
+        "foreground": "#0A0A0A",
+        "primary": "#171717",
+        "primary_foreground": "#FAFAFA",
+        "secondary": "#E5E5E5",
+        "secondary_foreground": "#171717",
+        "muted": "#F5F5F5",
+        "muted_foreground": "#737373",
+        "accent": "#F5F5F5",
+        "accent_foreground": "#171717",
+        "danger": "#EF4444",
+        "danger_foreground": "#FAFAFA",
+        "border": "#E5E5E5",
+        "success": "#22C55E",
+        "warning": "#EAB308",
+        "info": "#06B6D4"
+      }
+    },
+    "revision": 13,
+    "native_process_id": 23728,
+    "inputs": {},
+    "tables": {
+      "table": {
+        "entity": 4294967298,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 1000000,
+        "dataset": "quotes",
+        "dataset_revision": 14,
+        "scroll_y": 0.0,
+        "view": {
+          "source_rows": 1000000,
+          "view_rows": 1000000,
+          "groups": 0,
+          "spec_hash": null,
+          "pending": false
+        },
+        "selection": {
+          "row": null,
+          "record": null
+        },
+        "focused": false
+      }
+    },
+    "lists": {},
+    "subtrees": {},
+    "labels": {
+      "title": "GPUI comparison · 100,000 records"
+    },
+    "scrolls": {},
+    "panes": {},
+    "trees": {},
+    "active_sheet": null,
+    "controls": {},
+    "focus_handle": null,
+    "window": {
+      "width": 860.0,
+      "height": 649.5999755859375,
+      "scale_factor": 1.25,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 736,
+      "rows_constructed": 8063,
+      "cells_constructed": 34451,
+      "data_records_checked": 1000000,
+      "data_cells_written": 4000000,
+      "view_recomputes": 13,
+      "view_jobs": 9,
+      "dataset_copies": 0
+    },
+    "frame_gaps": {
+      "frames": 61,
+      "longest_gap_us": 784131,
+      "since_mark_us": 3008374
+    },
+    "draw": {
+      "samples": 736,
+      "p50_us": 2539.519,
+      "p95_us": 3921.919,
+      "p99_us": 4321.279
+    },
+    "dirty_to_present_submit": {
+      "samples": 735,
+      "p50_us": 14811.135,
+      "p95_us": 18235.391,
+      "p99_us": 19185.663
+    },
+    "present_interval": {
+      "samples": 146,
+      "p50_us": 16629.759,
+      "p95_us": 18022.399,
+      "p99_us": 19103.743
+    },
+    "input_to_frame": {
+      "samples": 730,
+      "p50_us": 14819.327,
+      "p95_us": 18251.775,
+      "p99_us": 19218.431
+    }
+  },
+  "publication": {
+    "description_builds": 13,
+    "encoded_snapshots": 12,
+    "operation_publications": 12,
+    "resubmitted_publications": 0,
+    "patches": 0,
+    "encoded_bytes": 2467,
+    "ffi_callbacks": 79,
+    "ui_callbacks": 13,
+    "diagnostic_callbacks": 26,
+    "description_build": {
+      "samples": 13,
+      "p50_us": 1,
+      "p95_us": 4,
+      "p99_us": 63
+    },
+    "encode": {
+      "samples": 12,
+      "p50_us": 10,
+      "p95_us": 25,
+      "p99_us": 27
+    },
+    "publish_to_applied": {
+      "samples": 12,
+      "p50_us": 277,
+      "p95_us": 5092,
+      "p99_us": 5969
+    },
+    "initial": {
+      "bytes": 546,
+      "encode_us": 121
+    },
+    "data_messages": 13,
+    "data_bytes": 53866033,
+    "data_records_checked": 1000000,
+    "data_cells_written": 4000000,
+    "data_encode": {
+      "samples": 13,
+      "p50_us": 4588,
+      "p95_us": 8346,
+      "p99_us": 9428
+    },
+    "data_pack": {
+      "samples": 13,
+      "p50_us": 14796,
+      "p95_us": 32370,
+      "p99_us": 42534
+    },
+    "data_publish_to_applied": {
+      "samples": 13,
+      "p50_us": 45553,
+      "p95_us": 66025,
+      "p99_us": 72024
+    },
+    "native_data_parse": {
+      "samples": 13,
+      "p50_us": 24548,
+      "p95_us": 26374,
+      "p99_us": 31088
+    },
+    "native_data_apply": {
+      "samples": 13,
+      "p50_us": 1269,
+      "p95_us": 4123,
+      "p99_us": 7390
+    },
+    "native_snapshot_apply": {
+      "samples": 12,
+      "p50_us": 58,
+      "p95_us": 4894,
+      "p99_us": 5834
+    }
+  },
+  "scope": "cumulative since window creation; includes startup and warmup"
+}
