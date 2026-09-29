@@ -45,6 +45,7 @@ public static class BenchmarkWindow {
     [DllImport("user32.dll")] static extern bool ScreenToClient(IntPtr window, ref Point point);
     [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr window, uint flags);
     [DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
+    [DllImport("user32.dll")] static extern bool GetCursorPos(out Point point);
     [DllImport("user32.dll")] static extern int GetSystemMetrics(int index);
     [DllImport("user32.dll", SetLastError = true)] static extern uint SendInput(uint count, Input[] inputs, int size);
     [DllImport("user32.dll")] static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
@@ -157,11 +158,23 @@ public static class BenchmarkWindow {
         var title = new System.Text.StringBuilder(1024); GetWindowText(window, title, title.Capacity);
         return window + " pid=" + owner + " visible=" + IsWindowVisible(window) + " title=" + title;
     }
+    static Point placed;
     public static void Pointer(IntPtr window, double x, double y) {
         RequireFocus(window);
         Point point = new Point { X = (int)(x * Scale(window)), Y = (int)(y * Scale(window)) };
         ClientToScreen(window, ref point);
         if (!SetCursorPos(point.X, point.Y)) throw new InvalidOperationException("SetCursorPos failed");
+        placed = point;
+    }
+    /// Windows routes wheel input to the window under the cursor, so a pointer
+    /// moved by someone at the machine sends the injected events elsewhere or
+    /// off the table while the focus check still passes. A traced run showed
+    /// exactly that: stop the run rather than record the drift as the fixture's.
+    public static void RequirePointer() {
+        Point now;
+        if (!GetCursorPos(out now)) throw new InvalidOperationException("GetCursorPos failed");
+        if (Math.Abs(now.X - placed.X) > 2 || Math.Abs(now.Y - placed.Y) > 2)
+            throw new InvalidOperationException("Benchmark pointer moved; input stopped. Placed at " + placed.X + "," + placed.Y + "; now at " + now.X + "," + now.Y);
     }
     static uint Mouse(params Input[] inputs) {
         uint accepted = SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
@@ -219,6 +232,7 @@ public static class BenchmarkWindow {
     }
     public static uint Wheel(IntPtr window, int delta, uint sequence = 0) {
         RequireFocus(window);
+        RequirePointer();
         return Mouse(Packet(0x800, unchecked((uint)delta), sequence));
     }
     public static void Close(IntPtr window) { PostMessage(window, 0x10, IntPtr.Zero, IntPtr.Zero); }

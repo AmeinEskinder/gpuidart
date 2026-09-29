@@ -91,14 +91,40 @@ scroll-lines setting, 3), and the Kit table's scroll mask consumes the
 vertical delta in the capture phase, converting lines to pixels with the
 line height it captured at its paint (26 px, hence 78 px per event) and
 clamping to the content. For the offset to drift, an event must be lost
-before that handler or a handler must convert with another line height;
-the traced runs show neither. The wheel-event stage itself recorded
-nothing in these nine runs: the listener that records it was registered
-after the content and so ran after the mask had stopped propagation (the
-fix registers it first, `native/src/paint_trace.rs`); the next traced
-series will show, for any run that drifts again, whether the missing or
-extra displacement came with missing or extra events at GPUI's door or
-with an odd per-frame step inside the table. Until such a run occurs the
-drift stays an unreproduced observation from two runs in the earlier
-series, with the displacement exact in the fifteen scroll runs since.
+before that handler or a handler must convert with another line height.
 
+The wheel-event stage recorded nothing in the b, c and d runs because its
+listener was registered after the content, whose scroll mask stops
+propagation in the capture phase; the paint marker now registers it
+first, and a fourth series ran with that build:
+[scroll-trace-20260929e-0](scroll-trace-20260929e-0) to [e-2](scroll-trace-20260929e-2).
+
+Run e-0 is the complete picture of a clean run: 600 wheel events injected,
+600 received by GPUI with their sequence numbers, every one a line delta
+of -3 at a line height of 26, one per painted frame, 600 frames moving
+78 px, the offset -46,800.
+
+Run e-1 is the drift, caught. Of 600 injected events GPUI received 409;
+sequences 165 to 210 and 218 to 362 never arrived. The events that did
+arrive carry the pointer position, and it moved: the first 164 sat at the
+placed point (y = 269.6 in the table), sequences 211 to 217 arrived with
+the pointer sweeping down to y = 656, below the table, and from 363 on it
+came back to y = 401. Someone at the machine moved the mouse 2.7 s into
+the run (the driver's clock puts sequence 165 at 2,734 ms). Windows
+routes wheel input to the window under the cursor, so the 191 events
+injected while the pointer was outside the window went to whatever was
+under it, and the 7 that reached GPUI with the pointer below the table
+found no scroll target: 402 events arrived over the table and the table
+moved 402 times 78 px, to -31,356. The driver's focus check passed
+throughout because no click changed the foreground window. Run e-2 then
+failed activation with nothing under the activation point, the same
+person having switched away.
+
+That resolves the drift: it is foreign pointer input during a run, not
+the table. The earlier "583 of 597 events applied" run is the same
+mechanism, and a fractional excess such as the 276 px run matches a
+notch of a real wheel with a high-resolution delta landing on the
+window. The driver now checks before every wheel event that the cursor is
+still where it placed it and stops the run otherwise, as it does on focus
+loss, so a run with a moved pointer is an interrupted observation rather
+than a drift charged to the fixture.
