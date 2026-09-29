@@ -54,12 +54,15 @@ Future<Map<String, dynamic>> platformQuery(
     } on TimeoutException {
       child.kill();
       await child.exitCode;
+      // The client's stage lines say how far the query got before it hung.
+      final (_, stages) = _splitStages(await errors);
       throw StateError(
-        'Platform accessibility client timed out; restarts=$restarts',
+        'Platform accessibility client timed out; restarts=$restarts; '
+        'stages=$stages',
       );
     }
     final text = await output;
-    final error = await errors;
+    final (error, _) = _splitStages(await errors);
     if (status == 75 &&
         Platform.isLinux &&
         operation == 'query' &&
@@ -78,6 +81,16 @@ Future<Map<String, dynamic>> platformQuery(
     if (error.isNotEmpty) result['client_stderr'] = error;
     return result;
   }
+}
+
+/// The client's progress lines on stderr, kept apart from its errors.
+(String, List<String>) _splitStages(String stderr) {
+  final stages = <String>[];
+  final rest = <String>[];
+  for (final line in const LineSplitter().convert(stderr)) {
+    (line.startsWith('stage ') ? stages : rest).add(line);
+  }
+  return (rest.join('\n'), stages);
 }
 
 /// Platform names asserted against responses, rather than inferred from SDK IDs.

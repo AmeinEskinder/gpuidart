@@ -46,6 +46,14 @@ Future<void> main(List<String> args) async {
     report['error'] = '$error';
     report['stack'] = '$stack';
     exitCode = 1;
+    // Whether the host still answers says if its thread was blocked.
+    try {
+      report['host_after_failure'] = await app?.host
+          .diagnose('inspect')
+          .timeout(const Duration(seconds: 3));
+    } catch (error) {
+      report['host_after_failure'] = 'unavailable: $error';
+    }
   } finally {
     try {
       await app?.close();

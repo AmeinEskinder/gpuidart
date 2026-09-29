@@ -20,7 +20,9 @@ if ($null -eq $window) {
     $owned = Get-Process -Id $AppProcessId -ErrorAction SilentlyContinue
     throw "No UIA window for process $AppProcessId; alive=$($null -ne $owned); native_handle=$($owned.MainWindowHandle); context=$(PointerObservation | ConvertTo-Json -Compress)"
 }
+[Console]::Error.WriteLine("stage window $($window.Current.NativeWindowHandle)")
 $elements = $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [System.Windows.Automation.Condition]::TrueCondition)
+[Console]::Error.WriteLine("stage elements $($elements.Count)")
 if ($elements.Count -gt 4096) { throw "UIA tree exceeds probe bound: $($elements.Count)" }
 if ($Operation -ne 'query') {
     $matches = @($elements | Where-Object { if ($Id) { $_.Current.AutomationId -ceq $Id } else { $_.Current.Name -ceq $Name } })
@@ -55,6 +57,7 @@ if ($Operation -ne 'query') {
 }
 Add-Type -Path (Join-Path $PSScriptRoot 'windows_description.cs')
 $descriptions = [NativeUiaDescriptions]::Read([IntPtr]$window.Current.NativeWindowHandle)
+[Console]::Error.WriteLine("stage descriptions $($descriptions.Count)")
 $nodes = @()
 foreach ($element in $elements) {
     $current = $element.Current
@@ -94,4 +97,5 @@ foreach ($element in $elements) {
     if ($element.TryGetCurrentPattern([System.Windows.Automation.GridItemPattern]::Pattern, [ref]$pattern)) { $node.row = $pattern.Current.Row; $node.column = $pattern.Current.Column }
     $nodes += $node
 }
+[Console]::Error.WriteLine("stage nodes $($nodes.Count)")
 @{ api = 'UIAutomationClient'; process = $AppProcessId; context = (PointerObservation); nodes = $nodes } | ConvertTo-Json -Depth 8 -Compress
