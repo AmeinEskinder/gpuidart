@@ -1,0 +1,1750 @@
+{
+  "implementation": "dart",
+  "rows": 100000,
+  "retain_records": false,
+  "records_mode": "generated",
+  "updates": 50,
+  "cells_written": 50,
+  "first_price": "Tick 000050",
+  "first_frame_ms_since_launch": 440,
+  "native_first_price": {
+    "value": "Tick 000050",
+    "revision": 52
+  },
+  "input_trace": [
+    {
+      "stage": "application_handler",
+      "sequence": 1,
+      "dart_elapsed_us": 3843960,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 1,
+        "target_revision": 3
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 1,
+      "dart_elapsed_us": 3844393,
+      "data": {
+        "updates": 1,
+        "revision": 3
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 1,
+      "dart_elapsed_us": 3844544,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000001",
+          "revision": 3
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 2,
+      "dart_elapsed_us": 4032644,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 2,
+        "target_revision": 4
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 2,
+      "dart_elapsed_us": 4032807,
+      "data": {
+        "updates": 2,
+        "revision": 4
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 2,
+      "dart_elapsed_us": 4032885,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000002",
+          "revision": 4
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 3,
+      "dart_elapsed_us": 4231884,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 3,
+        "target_revision": 5
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 3,
+      "dart_elapsed_us": 4232057,
+      "data": {
+        "updates": 3,
+        "revision": 5
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 3,
+      "dart_elapsed_us": 4232129,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000003",
+          "revision": 5
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 4,
+      "dart_elapsed_us": 4432485,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 4,
+        "target_revision": 6
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 4,
+      "dart_elapsed_us": 4432692,
+      "data": {
+        "updates": 4,
+        "revision": 6
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 4,
+      "dart_elapsed_us": 4432758,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000004",
+          "revision": 6
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 5,
+      "dart_elapsed_us": 4632296,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 5,
+        "target_revision": 7
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 5,
+      "dart_elapsed_us": 4632479,
+      "data": {
+        "updates": 5,
+        "revision": 7
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 5,
+      "dart_elapsed_us": 4632581,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000005",
+          "revision": 7
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 6,
+      "dart_elapsed_us": 4843150,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 6,
+        "target_revision": 8
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 6,
+      "dart_elapsed_us": 4843364,
+      "data": {
+        "updates": 6,
+        "revision": 8
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 6,
+      "dart_elapsed_us": 4843476,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000006",
+          "revision": 8
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 7,
+      "dart_elapsed_us": 5044020,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 7,
+        "target_revision": 9
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 7,
+      "dart_elapsed_us": 5044162,
+      "data": {
+        "updates": 7,
+        "revision": 9
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 7,
+      "dart_elapsed_us": 5044249,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000007",
+          "revision": 9
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 8,
+      "dart_elapsed_us": 5243812,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 8,
+        "target_revision": 10
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 8,
+      "dart_elapsed_us": 5243985,
+      "data": {
+        "updates": 8,
+        "revision": 10
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 8,
+      "dart_elapsed_us": 5244057,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000008",
+          "revision": 10
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 9,
+      "dart_elapsed_us": 5432935,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 9,
+        "target_revision": 11
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 9,
+      "dart_elapsed_us": 5433197,
+      "data": {
+        "updates": 9,
+        "revision": 11
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 9,
+      "dart_elapsed_us": 5433338,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000009",
+          "revision": 11
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 10,
+      "dart_elapsed_us": 5633626,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 10,
+        "target_revision": 12
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 10,
+      "dart_elapsed_us": 5633981,
+      "data": {
+        "updates": 10,
+        "revision": 12
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 10,
+      "dart_elapsed_us": 5634086,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000010",
+          "revision": 12
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 11,
+      "dart_elapsed_us": 5831816,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 11,
+        "target_revision": 13
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 11,
+      "dart_elapsed_us": 5832019,
+      "data": {
+        "updates": 11,
+        "revision": 13
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 11,
+      "dart_elapsed_us": 5832110,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000011",
+          "revision": 13
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 12,
+      "dart_elapsed_us": 6032883,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 12,
+        "target_revision": 14
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 12,
+      "dart_elapsed_us": 6033108,
+      "data": {
+        "updates": 12,
+        "revision": 14
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 12,
+      "dart_elapsed_us": 6033197,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000012",
+          "revision": 14
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 13,
+      "dart_elapsed_us": 6244694,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 13,
+        "target_revision": 15
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 13,
+      "dart_elapsed_us": 6244947,
+      "data": {
+        "updates": 13,
+        "revision": 15
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 13,
+      "dart_elapsed_us": 6245026,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000013",
+          "revision": 15
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 14,
+      "dart_elapsed_us": 6444624,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 14,
+        "target_revision": 16
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 14,
+      "dart_elapsed_us": 6444822,
+      "data": {
+        "updates": 14,
+        "revision": 16
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 14,
+      "dart_elapsed_us": 6444881,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000014",
+          "revision": 16
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 15,
+      "dart_elapsed_us": 6632570,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 15,
+        "target_revision": 17
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 15,
+      "dart_elapsed_us": 6632749,
+      "data": {
+        "updates": 15,
+        "revision": 17
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 15,
+      "dart_elapsed_us": 6632844,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000015",
+          "revision": 17
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 16,
+      "dart_elapsed_us": 6833006,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 16,
+        "target_revision": 18
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 16,
+      "dart_elapsed_us": 6833205,
+      "data": {
+        "updates": 16,
+        "revision": 18
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 16,
+      "dart_elapsed_us": 6833302,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000016",
+          "revision": 18
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 17,
+      "dart_elapsed_us": 7032475,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 17,
+        "target_revision": 19
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 17,
+      "dart_elapsed_us": 7032662,
+      "data": {
+        "updates": 17,
+        "revision": 19
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 17,
+      "dart_elapsed_us": 7032723,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000017",
+          "revision": 19
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 18,
+      "dart_elapsed_us": 7232043,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 18,
+        "target_revision": 20
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 18,
+      "dart_elapsed_us": 7232317,
+      "data": {
+        "updates": 18,
+        "revision": 20
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 18,
+      "dart_elapsed_us": 7232447,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000018",
+          "revision": 20
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 19,
+      "dart_elapsed_us": 7432206,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 19,
+        "target_revision": 21
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 19,
+      "dart_elapsed_us": 7432396,
+      "data": {
+        "updates": 19,
+        "revision": 21
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 19,
+      "dart_elapsed_us": 7432532,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000019",
+          "revision": 21
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 20,
+      "dart_elapsed_us": 7633877,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 20,
+        "target_revision": 22
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 20,
+      "dart_elapsed_us": 7634061,
+      "data": {
+        "updates": 20,
+        "revision": 22
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 20,
+      "dart_elapsed_us": 7634140,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000020",
+          "revision": 22
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 21,
+      "dart_elapsed_us": 7833156,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 21,
+        "target_revision": 23
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 21,
+      "dart_elapsed_us": 7833397,
+      "data": {
+        "updates": 21,
+        "revision": 23
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 21,
+      "dart_elapsed_us": 7833515,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000021",
+          "revision": 23
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 22,
+      "dart_elapsed_us": 8045751,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 22,
+        "target_revision": 24
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 22,
+      "dart_elapsed_us": 8049947,
+      "data": {
+        "updates": 22,
+        "revision": 24
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 22,
+      "dart_elapsed_us": 8050090,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000022",
+          "revision": 24
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 23,
+      "dart_elapsed_us": 8233597,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 23,
+        "target_revision": 25
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 23,
+      "dart_elapsed_us": 8233764,
+      "data": {
+        "updates": 23,
+        "revision": 25
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 23,
+      "dart_elapsed_us": 8233867,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000023",
+          "revision": 25
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 24,
+      "dart_elapsed_us": 8446971,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 24,
+        "target_revision": 26
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 24,
+      "dart_elapsed_us": 8447328,
+      "data": {
+        "updates": 24,
+        "revision": 26
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 24,
+      "dart_elapsed_us": 8447405,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000024",
+          "revision": 26
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 25,
+      "dart_elapsed_us": 8633623,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 25,
+        "target_revision": 27
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 25,
+      "dart_elapsed_us": 8633790,
+      "data": {
+        "updates": 25,
+        "revision": 27
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 25,
+      "dart_elapsed_us": 8633854,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000025",
+          "revision": 27
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 26,
+      "dart_elapsed_us": 8833137,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 26,
+        "target_revision": 28
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 26,
+      "dart_elapsed_us": 8833414,
+      "data": {
+        "updates": 26,
+        "revision": 28
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 26,
+      "dart_elapsed_us": 8833521,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000026",
+          "revision": 28
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 27,
+      "dart_elapsed_us": 9032774,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 27,
+        "target_revision": 29
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 27,
+      "dart_elapsed_us": 9033102,
+      "data": {
+        "updates": 27,
+        "revision": 29
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 27,
+      "dart_elapsed_us": 9033187,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000027",
+          "revision": 29
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 28,
+      "dart_elapsed_us": 9232792,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 28,
+        "target_revision": 30
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 28,
+      "dart_elapsed_us": 9233061,
+      "data": {
+        "updates": 28,
+        "revision": 30
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 28,
+      "dart_elapsed_us": 9233167,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000028",
+          "revision": 30
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 29,
+      "dart_elapsed_us": 9434316,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 29,
+        "target_revision": 31
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 29,
+      "dart_elapsed_us": 9434602,
+      "data": {
+        "updates": 29,
+        "revision": 31
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 29,
+      "dart_elapsed_us": 9434746,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000029",
+          "revision": 31
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 30,
+      "dart_elapsed_us": 9647251,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 30,
+        "target_revision": 32
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 30,
+      "dart_elapsed_us": 9647439,
+      "data": {
+        "updates": 30,
+        "revision": 32
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 30,
+      "dart_elapsed_us": 9647510,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000030",
+          "revision": 32
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 31,
+      "dart_elapsed_us": 9846975,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 31,
+        "target_revision": 33
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 31,
+      "dart_elapsed_us": 9850565,
+      "data": {
+        "updates": 31,
+        "revision": 33
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 31,
+      "dart_elapsed_us": 9850777,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000031",
+          "revision": 33
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 32,
+      "dart_elapsed_us": 10033770,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 32,
+        "target_revision": 34
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 32,
+      "dart_elapsed_us": 10033993,
+      "data": {
+        "updates": 32,
+        "revision": 34
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 32,
+      "dart_elapsed_us": 10034068,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000032",
+          "revision": 34
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 33,
+      "dart_elapsed_us": 10234174,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 33,
+        "target_revision": 35
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 33,
+      "dart_elapsed_us": 10234350,
+      "data": {
+        "updates": 33,
+        "revision": 35
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 33,
+      "dart_elapsed_us": 10234419,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000033",
+          "revision": 35
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 34,
+      "dart_elapsed_us": 10432062,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 34,
+        "target_revision": 36
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 34,
+      "dart_elapsed_us": 10432312,
+      "data": {
+        "updates": 34,
+        "revision": 36
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 34,
+      "dart_elapsed_us": 10432399,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000034",
+          "revision": 36
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 35,
+      "dart_elapsed_us": 10632594,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 35,
+        "target_revision": 37
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 35,
+      "dart_elapsed_us": 10632897,
+      "data": {
+        "updates": 35,
+        "revision": 37
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 35,
+      "dart_elapsed_us": 10633039,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000035",
+          "revision": 37
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 36,
+      "dart_elapsed_us": 10833181,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 36,
+        "target_revision": 38
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 36,
+      "dart_elapsed_us": 10833504,
+      "data": {
+        "updates": 36,
+        "revision": 38
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 36,
+      "dart_elapsed_us": 10833618,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000036",
+          "revision": 38
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 37,
+      "dart_elapsed_us": 11035057,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 37,
+        "target_revision": 39
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 37,
+      "dart_elapsed_us": 11035292,
+      "data": {
+        "updates": 37,
+        "revision": 39
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 37,
+      "dart_elapsed_us": 11035396,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000037",
+          "revision": 39
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 38,
+      "dart_elapsed_us": 11233279,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 38,
+        "target_revision": 40
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 38,
+      "dart_elapsed_us": 11233566,
+      "data": {
+        "updates": 38,
+        "revision": 40
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 38,
+      "dart_elapsed_us": 11233683,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000038",
+          "revision": 40
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 39,
+      "dart_elapsed_us": 11433295,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 39,
+        "target_revision": 41
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 39,
+      "dart_elapsed_us": 11433590,
+      "data": {
+        "updates": 39,
+        "revision": 41
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 39,
+      "dart_elapsed_us": 11433745,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000039",
+          "revision": 41
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 40,
+      "dart_elapsed_us": 11632112,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 40,
+        "target_revision": 42
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 40,
+      "dart_elapsed_us": 11632314,
+      "data": {
+        "updates": 40,
+        "revision": 42
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 40,
+      "dart_elapsed_us": 11632404,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000040",
+          "revision": 42
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 41,
+      "dart_elapsed_us": 11833377,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 41,
+        "target_revision": 43
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 41,
+      "dart_elapsed_us": 11833602,
+      "data": {
+        "updates": 41,
+        "revision": 43
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 41,
+      "dart_elapsed_us": 11833705,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000041",
+          "revision": 43
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 42,
+      "dart_elapsed_us": 12032392,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 42,
+        "target_revision": 44
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 42,
+      "dart_elapsed_us": 12032720,
+      "data": {
+        "updates": 42,
+        "revision": 44
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 42,
+      "dart_elapsed_us": 12032874,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000042",
+          "revision": 44
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 43,
+      "dart_elapsed_us": 12233300,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 43,
+        "target_revision": 45
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 43,
+      "dart_elapsed_us": 12233564,
+      "data": {
+        "updates": 43,
+        "revision": 45
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 43,
+      "dart_elapsed_us": 12233651,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000043",
+          "revision": 45
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 44,
+      "dart_elapsed_us": 12433543,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 44,
+        "target_revision": 46
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 44,
+      "dart_elapsed_us": 12433733,
+      "data": {
+        "updates": 44,
+        "revision": 46
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 44,
+      "dart_elapsed_us": 12433831,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000044",
+          "revision": 46
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 45,
+      "dart_elapsed_us": 12634384,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 45,
+        "target_revision": 47
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 45,
+      "dart_elapsed_us": 12634712,
+      "data": {
+        "updates": 45,
+        "revision": 47
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 45,
+      "dart_elapsed_us": 12634975,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000045",
+          "revision": 47
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 46,
+      "dart_elapsed_us": 12833037,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 46,
+        "target_revision": 48
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 46,
+      "dart_elapsed_us": 12833289,
+      "data": {
+        "updates": 46,
+        "revision": 48
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 46,
+      "dart_elapsed_us": 12833443,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000046",
+          "revision": 48
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 47,
+      "dart_elapsed_us": 13033233,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 47,
+        "target_revision": 49
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 47,
+      "dart_elapsed_us": 13037513,
+      "data": {
+        "updates": 47,
+        "revision": 49
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 47,
+      "dart_elapsed_us": 13037657,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000047",
+          "revision": 49
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 48,
+      "dart_elapsed_us": 13233384,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 48,
+        "target_revision": 50
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 48,
+      "dart_elapsed_us": 13233653,
+      "data": {
+        "updates": 48,
+        "revision": 50
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 48,
+      "dart_elapsed_us": 13233716,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000048",
+          "revision": 50
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 49,
+      "dart_elapsed_us": 13432729,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 49,
+        "target_revision": 51
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 49,
+      "dart_elapsed_us": 13436004,
+      "data": {
+        "updates": 49,
+        "revision": 51
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 49,
+      "dart_elapsed_us": 13436192,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000049",
+          "revision": 51
+        }
+      }
+    },
+    {
+      "stage": "application_handler",
+      "sequence": 50,
+      "dart_elapsed_us": 13633992,
+      "data": {
+        "id": "cell",
+        "update_ordinal": 50,
+        "target_revision": 52
+      }
+    },
+    {
+      "stage": "applied_acknowledged",
+      "sequence": 50,
+      "dart_elapsed_us": 13634205,
+      "data": {
+        "updates": 50,
+        "revision": 52
+      }
+    },
+    {
+      "stage": "state_observed",
+      "sequence": 50,
+      "dart_elapsed_us": 13634309,
+      "data": {
+        "value": null,
+        "native": {
+          "value": "Tick 000050",
+          "revision": 52
+        }
+      }
+    }
+  ],
+  "native": {
+    "charts": {},
+    "theme": {
+      "descriptor": {
+        "mode": "light"
+      },
+      "resolved": {
+        "background": "#FFFFFF",
+        "foreground": "#0A0A0A",
+        "primary": "#171717",
+        "primary_foreground": "#FAFAFA",
+        "secondary": "#E5E5E5",
+        "secondary_foreground": "#171717",
+        "muted": "#F5F5F5",
+        "muted_foreground": "#737373",
+        "accent": "#F5F5F5",
+        "accent_foreground": "#171717",
+        "danger": "#EF4444",
+        "danger_foreground": "#FAFAFA",
+        "border": "#E5E5E5",
+        "success": "#22C55E",
+        "warning": "#EAB308",
+        "info": "#06B6D4"
+      }
+    },
+    "revision": 1,
+    "native_process_id": 38768,
+    "inputs": {},
+    "tables": {
+      "table": {
+        "entity": 4294967298,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 100000,
+        "dataset": "quotes",
+        "dataset_revision": 52,
+        "scroll_y": 0.0,
+        "view": {
+          "source_rows": 100000,
+          "view_rows": 100000,
+          "groups": 0,
+          "spec_hash": null,
+          "pending": false
+        },
+        "selection": {
+          "row": null,
+          "record": null
+        },
+        "focused": false
+      }
+    },
+    "lists": {},
+    "subtrees": {},
+    "labels": {
+      "title": "GPUI comparison · 100,000 records"
+    },
+    "scrolls": {},
+    "panes": {},
+    "trees": {},
+    "active_sheet": null,
+    "controls": {},
+    "focus_handle": null,
+    "window": {
+      "width": 860.0,
+      "height": 649.5999755859375,
+      "scale_factor": 1.25,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 58,
+      "rows_constructed": 616,
+      "cells_constructed": 2128,
+      "data_records_checked": 100050,
+      "data_cells_written": 300050,
+      "view_recomputes": 1,
+      "view_jobs": 0,
+      "dataset_copies": 0
+    },
+    "frame_gaps": {
+      "frames": 58,
+      "longest_gap_us": 3117324,
+      "since_mark_us": 14842504
+    },
+    "draw": {
+      "samples": 58,
+      "p50_us": 2631.679,
+      "p95_us": 4169.727,
+      "p99_us": 7835.647
+    },
+    "dirty_to_present_submit": {
+      "samples": 57,
+      "p50_us": 15638.527,
+      "p95_us": 19300.351,
+      "p99_us": 23379.967
+    },
+    "present_interval": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    },
+    "input_to_frame": {
+      "samples": 52,
+      "p50_us": 15712.255,
+      "p95_us": 19415.039,
+      "p99_us": 22118.399
+    }
+  },
+  "publication": {
+    "description_builds": 1,
+    "encoded_snapshots": 0,
+    "operation_publications": 0,
+    "resubmitted_publications": 0,
+    "patches": 0,
+    "encoded_bytes": 0,
+    "ffi_callbacks": 157,
+    "ui_callbacks": 51,
+    "diagnostic_callbacks": 52,
+    "description_build": {
+      "samples": 1,
+      "p50_us": 3,
+      "p95_us": 3,
+      "p99_us": 3
+    },
+    "encode": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "publish_to_applied": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "initial": {
+      "bytes": 542,
+      "encode_us": 105
+    },
+    "data_messages": 50,
+    "data_bytes": 7785,
+    "data_records_checked": 100050,
+    "data_cells_written": 300050,
+    "data_encode": {
+      "samples": 50,
+      "p50_us": 17,
+      "p95_us": 29,
+      "p99_us": 43
+    },
+    "data_pack": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "data_publish_to_applied": {
+      "samples": 51,
+      "p50_us": 209,
+      "p95_us": 4153,
+      "p99_us": 243022
+    },
+    "native_data_parse": {
+      "samples": 51,
+      "p50_us": 20,
+      "p95_us": 44,
+      "p99_us": 43366
+    },
+    "native_data_apply": {
+      "samples": 51,
+      "p50_us": 32,
+      "p95_us": 60,
+      "p99_us": 1869
+    },
+    "native_snapshot_apply": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    }
+  },
+  "scope": "cumulative since window creation; includes startup and warmup"
+}
