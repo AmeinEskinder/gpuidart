@@ -1,0 +1,629 @@
+{
+  "scope": "input to present start on the QPC clock: driver timestamp before injection to the first Present call of the fixture after the injection completed; input to display adds PresentMon MsUntilDisplayed where it is known",
+  "runs": [
+    {
+      "run": "present-20260929c-0",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 510,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 11,
+      "input_to_present_ms": {
+        "n": 257,
+        "p50": 16.7358,
+        "p95": 30.3482,
+        "p99": 34.8693,
+        "max": 37.3387
+      },
+      "input_to_display_ms": {
+        "n": 7,
+        "p50": 44.828900000000004,
+        "p95": 62.1443,
+        "p99": 62.1443,
+        "max": 62.1443
+      },
+      "inputs_without_a_later_present": 43,
+      "between_presents_ms": {
+        "n": 509,
+        "p50": 17.4422,
+        "p95": 22.3941,
+        "p99": 22.9943,
+        "max": 33.6104
+      }
+    },
+    {
+      "run": "present-20260929c-0",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 13,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 1,
+      "input_to_present_ms": {
+        "n": 13,
+        "p50": 12.0816,
+        "p95": 45.8861,
+        "p99": 45.8861,
+        "max": 45.8861
+      },
+      "input_to_display_ms": {
+        "n": 1,
+        "p50": 69.8809,
+        "p95": 69.8809,
+        "p99": 69.8809,
+        "max": 69.8809
+      },
+      "inputs_without_a_later_present": 37,
+      "between_presents_ms": {
+        "n": 12,
+        "p50": 199.5868,
+        "p95": 220.38920000000002,
+        "p99": 220.38920000000002,
+        "max": 220.38920000000002
+      }
+    },
+    {
+      "run": "present-20260929c-0",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 588,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 75,
+      "input_to_present_ms": {
+        "n": 589,
+        "p50": 9.4677,
+        "p95": 13.9775,
+        "p99": 24.5606,
+        "max": 25.6854
+      },
+      "input_to_display_ms": {
+        "n": 76,
+        "p50": 32.7481,
+        "p95": 37.6278,
+        "p99": 47.7607,
+        "max": 47.7607
+      },
+      "inputs_without_a_later_present": 11,
+      "between_presents_ms": {
+        "n": 587,
+        "p50": 16.6414,
+        "p95": 22.3726,
+        "p99": 24.2173,
+        "max": 515.2561000000001
+      }
+    },
+    {
+      "run": "present-20260929c-0",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 314,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 311,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 15.4509,
+        "p95": 19.2885,
+        "p99": 31.9271,
+        "max": 33.8806
+      },
+      "input_to_display_ms": {
+        "n": 296,
+        "p50": 37.6704,
+        "p95": 51.830799999999996,
+        "p99": 65.2788,
+        "max": 66.3302
+      },
+      "inputs_without_a_later_present": 1,
+      "between_presents_ms": {
+        "n": 313,
+        "p50": 33.2023,
+        "p95": 35.8314,
+        "p99": 49.9405,
+        "max": 51.0604
+      }
+    },
+    {
+      "run": "present-20260929c-0",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 19.7128,
+        "p95": 23.3178,
+        "p99": 24.5503,
+        "max": 24.5503
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 53.8425,
+        "p95": 57.8117,
+        "p99": 58.8686,
+        "max": 58.8686
+      },
+      "inputs_without_a_later_present": 1,
+      "between_presents_ms": {
+        "n": 48,
+        "p50": 200.0916,
+        "p95": 201.8332,
+        "p99": 202.3665,
+        "max": 202.3665
+      }
+    },
+    {
+      "run": "present-20260929c-0",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 600,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 585,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 7.9916,
+        "p95": 11.4959,
+        "p99": 12.5691,
+        "max": 13.079
+      },
+      "input_to_display_ms": {
+        "n": 585,
+        "p50": 28.2941,
+        "p95": 31.646,
+        "p99": 32.353,
+        "max": 43.7853
+      },
+      "inputs_without_a_later_present": 0,
+      "between_presents_ms": {
+        "n": 599,
+        "p50": 16.6372,
+        "p95": 18.269,
+        "p99": 18.9817,
+        "max": 20.6458
+      }
+    },
+    {
+      "run": "present-20260929c-1",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 524,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 29,
+      "input_to_present_ms": {
+        "n": 264,
+        "p50": 20.5394,
+        "p95": 36.8355,
+        "p99": 40.0188,
+        "max": 40.3003
+      },
+      "input_to_display_ms": {
+        "n": 21,
+        "p50": 45.1999,
+        "p95": 60.028400000000005,
+        "p99": 64.1263,
+        "max": 64.1263
+      },
+      "inputs_without_a_later_present": 36,
+      "between_presents_ms": {
+        "n": 523,
+        "p50": 16.664,
+        "p95": 22.9228,
+        "p99": 23.6896,
+        "max": 33.7288
+      }
+    },
+    {
+      "run": "present-20260929c-1",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 38,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 1,
+      "input_to_present_ms": {
+        "n": 37,
+        "p50": 18.7964,
+        "p95": 36.6237,
+        "p99": 39.4859,
+        "max": 39.4859
+      },
+      "input_to_display_ms": {
+        "n": 1,
+        "p50": 43.1188,
+        "p95": 43.1188,
+        "p99": 43.1188,
+        "max": 43.1188
+      },
+      "inputs_without_a_later_present": 13,
+      "between_presents_ms": {
+        "n": 37,
+        "p50": 200.0934,
+        "p95": 220.17360000000002,
+        "p99": 220.8272,
+        "max": 220.8272
+      }
+    },
+    {
+      "run": "present-20260929c-1",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 578,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 26,
+      "input_to_present_ms": {
+        "n": 579,
+        "p50": 3.8332,
+        "p95": 18.5987,
+        "p99": 21.5583,
+        "max": 23.0233
+      },
+      "input_to_display_ms": {
+        "n": 22,
+        "p50": 29.514899999999997,
+        "p95": 43.9422,
+        "p99": 47.6708,
+        "max": 47.6708
+      },
+      "inputs_without_a_later_present": 21,
+      "between_presents_ms": {
+        "n": 577,
+        "p50": 16.6886,
+        "p95": 19.4995,
+        "p99": 21.9609,
+        "max": 47.1343
+      }
+    },
+    {
+      "run": "present-20260929c-1",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 317,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 315,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 19.4205,
+        "p95": 23.1178,
+        "p99": 24.8002,
+        "max": 25.9497
+      },
+      "input_to_display_ms": {
+        "n": 297,
+        "p50": 39.7094,
+        "p95": 56.440200000000004,
+        "p99": 58.7893,
+        "max": 59.1609
+      },
+      "inputs_without_a_later_present": 1,
+      "between_presents_ms": {
+        "n": 316,
+        "p50": 33.233,
+        "p95": 35.2889,
+        "p99": 50.8237,
+        "max": 52.3418
+      }
+    },
+    {
+      "run": "present-20260929c-1",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 16.7843,
+        "p95": 20.5712,
+        "p99": 31.6672,
+        "max": 31.6672
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 37.1727,
+        "p95": 54.4653,
+        "p99": 55.7314,
+        "max": 55.7314
+      },
+      "inputs_without_a_later_present": 1,
+      "between_presents_ms": {
+        "n": 48,
+        "p50": 200.09300000000002,
+        "p95": 202.0163,
+        "p99": 218.5899,
+        "max": 218.5899
+      }
+    },
+    {
+      "run": "present-20260929c-1",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 599,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 557,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 11.9876,
+        "p95": 16.0544,
+        "p99": 17.5755,
+        "max": 21.805
+      },
+      "input_to_display_ms": {
+        "n": 553,
+        "p50": 32.2709,
+        "p95": 35.569199999999995,
+        "p99": 51.9131,
+        "max": 52.9894
+      },
+      "inputs_without_a_later_present": 0,
+      "between_presents_ms": {
+        "n": 598,
+        "p50": 16.6869,
+        "p95": 18.2038,
+        "p99": 19.2077,
+        "max": 23.9419
+      }
+    },
+    {
+      "run": "present-20260929c-2",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 597,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 0,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 7.1617,
+        "p95": 21.4517,
+        "p99": 38.1166,
+        "max": 39.7411
+      },
+      "input_to_display_ms": null,
+      "inputs_without_a_later_present": 0,
+      "between_presents_ms": {
+        "n": 596,
+        "p50": 16.5662,
+        "p95": 20.4786,
+        "p99": 21.3459,
+        "max": 32.1484
+      }
+    },
+    {
+      "run": "present-20260929c-2",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 51,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 2,
+      "input_to_present_ms": {
+        "n": 40,
+        "p50": 6.784,
+        "p95": 37.2103,
+        "p99": 39.4704,
+        "max": 39.4704
+      },
+      "input_to_display_ms": {
+        "n": 2,
+        "p50": 35.095800000000004,
+        "p95": 64.8862,
+        "p99": 64.8862,
+        "max": 64.8862
+      },
+      "inputs_without_a_later_present": 10,
+      "between_presents_ms": {
+        "n": 50,
+        "p50": 184.77550000000002,
+        "p95": 216.9772,
+        "p99": 235.8564,
+        "max": 235.8564
+      }
+    },
+    {
+      "run": "present-20260929c-2",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 261,
+      "present_mode": [
+        "Composed: Flip"
+      ],
+      "displayed_in_window": 14,
+      "input_to_present_ms": {
+        "n": 262,
+        "p50": 3.5989,
+        "p95": 17.9133,
+        "p99": 18.7987,
+        "max": 22.3655
+      },
+      "input_to_display_ms": {
+        "n": 15,
+        "p50": 29.9735,
+        "p95": 45.0972,
+        "p99": 45.0972,
+        "max": 45.0972
+      },
+      "inputs_without_a_later_present": 338,
+      "between_presents_ms": {
+        "n": 260,
+        "p50": 16.6537,
+        "p95": 18.4439,
+        "p99": 19.2736,
+        "max": 21.8958
+      }
+    },
+    {
+      "run": "present-20260929c-2",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 359,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 343,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 8.8239,
+        "p95": 22.3182,
+        "p99": 26.3939,
+        "max": 27.9037
+      },
+      "input_to_display_ms": {
+        "n": 294,
+        "p50": 28.9005,
+        "p95": 43.96,
+        "p99": 47.1648,
+        "max": 61.6558
+      },
+      "inputs_without_a_later_present": 1,
+      "between_presents_ms": {
+        "n": 358,
+        "p50": 32.7433,
+        "p95": 34.7513,
+        "p99": 50.3371,
+        "max": 50.6621
+      }
+    },
+    {
+      "run": "present-20260929c-2",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 11.8283,
+        "p95": 27.2482,
+        "p99": 33.9644,
+        "max": 33.9644
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 32.985699999999994,
+        "p95": 50.9875,
+        "p99": 65.0976,
+        "max": 65.0976
+      },
+      "inputs_without_a_later_present": 1,
+      "between_presents_ms": {
+        "n": 48,
+        "p50": 200.0722,
+        "p95": 217.3828,
+        "p99": 222.37830000000002,
+        "max": 222.37830000000002
+      }
+    },
+    {
+      "run": "present-20260929c-2",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 599,
+      "present_mode": [
+        "Composed: Copy with GPU GDI"
+      ],
+      "displayed_in_window": 580,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 3.5851,
+        "p95": 16.8751,
+        "p99": 17.9952,
+        "max": 19.1613
+      },
+      "input_to_display_ms": {
+        "n": 579,
+        "p50": 23.838900000000002,
+        "p95": 36.719899999999996,
+        "p99": 37.556,
+        "max": 38.784
+      },
+      "inputs_without_a_later_present": 0,
+      "between_presents_ms": {
+        "n": 598,
+        "p50": 16.6179,
+        "p95": 18.1594,
+        "p99": 18.832,
+        "max": 19.5163
+      }
+    }
+  ]
+}

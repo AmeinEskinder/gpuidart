@@ -67,12 +67,13 @@ try {
     if ($CapturePresent) {
         # The session name is unique per run: one runner process starts many
         # runs, and runs that shared a name collided on one ETW session and
-        # recorded nothing. The capture follows the fixture by name, which a
-        # non-elevated PresentMon resolves for a process of this account, and
-        # ends itself shortly after the run; the analyzer keeps the fixture's
-        # records by process ID either way.
+        # recorded nothing. The capture takes every process: followed by name,
+        # a non-elevated PresentMon lost part of the Dart fixture's presents
+        # in five of nine runs (13 of 50 in one), while the unfiltered capture
+        # kept them all. The runner reduces the file to the fixture's process
+        # afterwards and the capture ends itself shortly after the run.
         $trace = Start-Process -FilePath (Join-Path $root '.tools/presentmon/PresentMon.exe') -ArgumentList @(
-            '--process_name', [IO.Path]::GetFileName($exe), '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
+            '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
             '--qpc_time', '--timed', ($Seconds + 25), '--terminate_after_timed', '--no_console_stats', '--session_name', ('gpuidart-' + [guid]::NewGuid().ToString('N').Substring(0, 12))
         ) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $folder 'present.stdout.log') -RedirectStandardError (Join-Path $folder 'present.stderr.log')
         Start-Sleep -Milliseconds 700
@@ -243,6 +244,16 @@ try {
     if ($Implementation -in @('rust','dart','solid','flutter') -and ($null -eq $scrollY -or [math]::Abs($scrollY - $expectedScrollY) -gt 0.01)) { $verificationIssues.Add('Native scroll displacement does not match injected wheel input') }
     if ($Implementation -eq 'shell' -and $verification.cell_builds -le 0) { $verificationIssues.Add('Shell did not materialize any table cells') }
     if ($CapturePresent -and -not $trace.HasExited) { $trace.WaitForExit(40000) | Out-Null }
+    $presentPath = Join-Path $folder 'present.csv'
+    if ($CapturePresent -and (Test-Path -LiteralPath $presentPath)) {
+        # Keep the fixture's records and the count of what was dropped.
+        $captured = @(Import-Csv -LiteralPath $presentPath)
+        $kept = @($captured | Where-Object { [int]$_.ProcessID -eq $app.Id })
+        $dropped = @{}
+        foreach ($group in ($captured | Where-Object { [int]$_.ProcessID -ne $app.Id } | Group-Object Application)) { $dropped[$group.Name] = $group.Count }
+        if ($kept.Count) { $kept | Export-Csv -LiteralPath $presentPath -NoTypeInformation -Encoding UTF8 }
+        @{ kept_process_id = $app.Id; kept_rows = $kept.Count; dropped_rows_by_application = $dropped } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $folder 'present-filter.json') -Encoding UTF8
+    }
     $report = @{
         implementation = $Implementation; workload = $Workload; run_id = $RunId
         process_id = $app.Id; launch_qpc = $launchQpc

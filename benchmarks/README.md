@@ -62,7 +62,7 @@ Then measure all four implementations. Four repetitions rotate each implementati
 ./benchmarks/analyze.ps1 -Directory reports/comparison/comparison-3
 ```
 
-Add `-CapturePresent` when the session has permission to start an ETW trace through administrator access or an appropriately configured Performance Log Users membership. Capturing ETW still requires update-to-frame correlation before reporting response latency.
+Add `-CapturePresent` when the session has permission to start an ETW trace through administrator access or an appropriately configured Performance Log Users membership. Every run starts its own trace session, captures every process and reduces `present.csv` to the fixture's process afterwards (`present-filter.json` counts what was dropped). Without elevation PresentMon 2.6 names the fixtures and records their presents, follows the Flutter fixture's copy-model presents to the display but almost none of the GPUI fixtures' flip-model presents, and leaves its input-association columns empty; input to present is then computed from the driver's input timestamps in `run.json` and the present records, and input to display for the GPUI fixtures needs an elevated session. If a series is interrupted, `logman query -ets` lists trace sessions left behind and `logman stop <name> -ets` ends them. Capturing ETW still requires update-to-frame correlation before reporting response latency.
 
 Each run takes roughly 15–20 seconds including warmup and shutdown. Use `-Repetitions 1` for a capture preflight. The runner stops if its target loses foreground focus. It does not change account privileges. If PresentMon fails, it retains the error log and records presentation as unavailable.
 

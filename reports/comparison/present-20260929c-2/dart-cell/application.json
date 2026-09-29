@@ -1,0 +1,205 @@
+{
+  "implementation": "dart",
+  "rows": 100000,
+  "retain_records": false,
+  "memory_after_collection": {
+    "dart_rss_bytes": 184385536,
+    "memory_bytes": {
+      "working_set": 184463360,
+      "private_commit": 201461760
+    },
+    "scope": "after the measured phase: eight rounds of 200,000 short-lived lists to force a major collection, then half a second"
+  },
+  "updates": 50,
+  "cells_written": 50,
+  "first_price": "Tick 000050",
+  "first_frame_ms_since_launch": 590,
+  "native_first_price": {
+    "value": "Tick 000050",
+    "revision": 52
+  },
+  "native": {
+    "charts": {},
+    "theme": {
+      "descriptor": {
+        "mode": "light"
+      },
+      "resolved": {
+        "background": "#FFFFFF",
+        "foreground": "#0A0A0A",
+        "primary": "#171717",
+        "primary_foreground": "#FAFAFA",
+        "secondary": "#E5E5E5",
+        "secondary_foreground": "#171717",
+        "muted": "#F5F5F5",
+        "muted_foreground": "#737373",
+        "accent": "#F5F5F5",
+        "accent_foreground": "#171717",
+        "danger": "#EF4444",
+        "danger_foreground": "#FAFAFA",
+        "border": "#E5E5E5",
+        "success": "#22C55E",
+        "warning": "#EAB308",
+        "info": "#06B6D4"
+      }
+    },
+    "revision": 1,
+    "native_process_id": 20456,
+    "inputs": {},
+    "tables": {
+      "table": {
+        "entity": 4294967298,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 100000,
+        "dataset": "quotes",
+        "dataset_revision": 52,
+        "scroll_y": 0.0,
+        "view": {
+          "source_rows": 100000,
+          "view_rows": 100000,
+          "groups": 0,
+          "spec_hash": null,
+          "pending": false
+        },
+        "selection": {
+          "row": null,
+          "record": null
+        },
+        "focused": false
+      }
+    },
+    "lists": {},
+    "subtrees": {},
+    "labels": {
+      "title": "GPUI comparison · 100,000 records"
+    },
+    "scrolls": {},
+    "panes": {},
+    "trees": {},
+    "active_sheet": null,
+    "controls": {},
+    "focus_handle": null,
+    "window": {
+      "width": 860.0,
+      "height": 649.5999755859375,
+      "scale_factor": 1.25,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 66,
+      "rows_constructed": 704,
+      "cells_constructed": 2432,
+      "data_records_checked": 100050,
+      "data_cells_written": 300050,
+      "view_recomputes": 1,
+      "view_jobs": 0,
+      "dataset_copies": 0
+    },
+    "frame_gaps": {
+      "frames": 66,
+      "longest_gap_us": 3215852,
+      "since_mark_us": 16145416
+    },
+    "draw": {
+      "samples": 66,
+      "p50_us": 2551.807,
+      "p95_us": 4546.559,
+      "p99_us": 9494.527
+    },
+    "dirty_to_present_submit": {
+      "samples": 65,
+      "p50_us": 8691.711,
+      "p95_us": 20332.543,
+      "p99_us": 20971.519
+    },
+    "present_interval": {
+      "samples": 0,
+      "p50_us": 0.0,
+      "p95_us": 0.0,
+      "p99_us": 0.0
+    },
+    "input_to_frame": {
+      "samples": 53,
+      "p50_us": 6549.503,
+      "p95_us": 20414.463,
+      "p99_us": 21004.287
+    }
+  },
+  "publication": {
+    "description_builds": 1,
+    "encoded_snapshots": 0,
+    "operation_publications": 0,
+    "resubmitted_publications": 0,
+    "patches": 0,
+    "encoded_bytes": 0,
+    "ffi_callbacks": 107,
+    "ui_callbacks": 51,
+    "diagnostic_callbacks": 2,
+    "description_build": {
+      "samples": 1,
+      "p50_us": 37,
+      "p95_us": 37,
+      "p99_us": 37
+    },
+    "encode": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "publish_to_applied": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "initial": {
+      "bytes": 542,
+      "encode_us": 121
+    },
+    "data_messages": 51,
+    "data_bytes": 3795447,
+    "data_records_checked": 100050,
+    "data_cells_written": 300050,
+    "data_encode": {
+      "samples": 51,
+      "p50_us": 16,
+      "p95_us": 34,
+      "p99_us": 87728
+    },
+    "data_pack": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "data_publish_to_applied": {
+      "samples": 51,
+      "p50_us": 228,
+      "p95_us": 4925,
+      "p99_us": 179336
+    },
+    "native_data_parse": {
+      "samples": 51,
+      "p50_us": 20,
+      "p95_us": 44,
+      "p99_us": 89022
+    },
+    "native_data_apply": {
+      "samples": 51,
+      "p50_us": 15,
+      "p95_us": 36,
+      "p99_us": 2084
+    },
+    "native_snapshot_apply": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    }
+  },
+  "scope": "cumulative since window creation; includes startup and warmup"
+}
