@@ -632,6 +632,22 @@ void main() {
       expect(() => decode(value), throwsFormatException);
     }
   });
+  test('a searchable select encodes its combobox flag', () {
+    final select = UiSelect(
+      'city',
+      options: const [UiSelectOption('ams', 'Amsterdam')],
+      searchable: true,
+    );
+    expect(select.toJson()['searchable'], true);
+    expect(
+      UiSelect(
+        'city',
+        options: const [UiSelectOption('ams', 'Amsterdam')],
+      ).toJson().containsKey('searchable'),
+      isFalse,
+    );
+  });
+
   test('select freezes options and encodes separate identities and labels', () {
     final options = [const UiSelectOption('dark', 'Dark')];
     final select = UiSelect(

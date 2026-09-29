@@ -1082,6 +1082,7 @@ final class UiSelect extends UiNode {
     this.selected,
     this.placeholder = '',
     this.disabled = false,
+    this.searchable = false,
     super.style,
     super.semantics,
   }) : options = List.unmodifiable(options);
@@ -1089,6 +1090,10 @@ final class UiSelect extends UiNode {
   final String? selected;
   final String placeholder;
   final bool disabled;
+
+  /// A combobox: the open list carries a search field that filters the
+  /// options as the user types.
+  final bool searchable;
 
   @override
   Map<String, Object> props() {
@@ -1121,6 +1126,7 @@ final class UiSelect extends UiNode {
       'selected': ?selected,
       'placeholder': placeholder,
       'disabled': disabled,
+      if (searchable) 'searchable': true,
     };
   }
 }

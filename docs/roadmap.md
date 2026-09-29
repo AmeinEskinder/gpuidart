@@ -189,7 +189,7 @@ Feasibility verdicts recorded on this machine:
   by manual runs only.
 
 Verification: at the packed-record head the native library suite runs 108 tests (two
-ignored timing probes) and the Dart suite 122, including the live-window,
+ignored timing probes) and the Dart suite 123, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
 library, plus the repository's full check gate. Earlier counts in this

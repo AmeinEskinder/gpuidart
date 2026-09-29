@@ -24,7 +24,7 @@ infrastructure the adapter uses on the application's behalf without a node.
 | clipboard | not bound | Copy buttons. |
 | collapsible | not bound | |
 | color_picker | not bound | |
-| combobox | planned | A select with a typed filter over its options. |
+| combobox | `UiSelect(searchable: true)` | The select's open list with a search field; Kit's multiple-selection combobox is not bound. |
 | command | not bound | Command palette. |
 | component_traits | host | |
 | description_list | not bound | |
@@ -92,6 +92,5 @@ Beyond the component crate, gpuidart binds Kit's base animation
 (`UiStyle.animation`), its calendar (through the date picker) and its
 window and lifecycle; `UiCanvas`, `UiStack`, `UiColumn` and `UiRow` are
 gpuidart's own over GPUI's elements. Twenty-eight node kinds reach about a
-third of the component catalog; the planned two close the largest gaps an
-application notices (combobox, rich text), and the rest stay reachable
-only by extending the adapter.
+third of the component catalog; rich text is the one planned binding left,
+and the rest stay reachable only by extending the adapter.

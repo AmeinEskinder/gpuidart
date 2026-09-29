@@ -28,6 +28,7 @@ pub(super) struct RetainedSelect {
     pub state: Entity<SelectState<Vec<SelectOption>>>,
     options: Vec<SelectOption>,
     disabled: bool,
+    searchable: bool,
     _subscription: Subscription,
 }
 
@@ -255,12 +256,22 @@ impl DartView {
                 options,
                 selected,
                 disabled,
+                searchable,
                 ..
             } = node
             else {
                 return;
             };
             ids.insert(id.clone());
+            // Kit fixes the search field when the state is built, so a
+            // changed flag rebuilds the state.
+            if self
+                .selects
+                .get(id)
+                .is_some_and(|retained| retained.searchable != *searchable)
+            {
+                self.selects.remove(id);
+            }
             let selected_index = selected
                 .as_ref()
                 .and_then(|id| options.iter().position(|o| o.id == *id))
@@ -292,8 +303,10 @@ impl DartView {
                     retained.options = options.clone();
                 }
             } else {
-                let state =
-                    cx.new(|cx| SelectState::new(options.clone(), selected_index, window, cx));
+                let state = cx.new(|cx| {
+                    SelectState::new(options.clone(), selected_index, window, cx)
+                        .searchable(*searchable)
+                });
                 let event_id = id.clone();
                 let subscription = cx.subscribe(
                     &state,
@@ -312,6 +325,7 @@ impl DartView {
                         state,
                         options: options.clone(),
                         disabled: *disabled,
+                        searchable: *searchable,
                         _subscription: subscription,
                     },
                 );

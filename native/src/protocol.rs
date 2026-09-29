@@ -257,6 +257,10 @@ pub enum Node {
         placeholder: String,
         #[serde(default)]
         disabled: bool,
+        /// A combobox: the open list carries a search field that filters the
+        /// options as the user types.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        searchable: bool,
     },
     ConfirmDialog {
         id: String,
