@@ -198,6 +198,32 @@ Feasibility verdicts recorded on this machine:
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
 
+### Order of play after the fourth audit (2026-09-29)
+
+The reviewer's order of play named ten moves and an exit table. Each move
+below carries its state and the commit or report that shows it.
+
+| Move | State | Evidence |
+| --- | --- | --- |
+| A, docs drift gate | Met. The check gate fails when the README, the SDK doc or this document drift from the code. | `4d9a0d6`, `tool/docs_check.dart` |
+| B, scroll runs eligible for equal work | Met for the driver: Flutter 3 of 3 runs eligible, Dart 4 of 6, with one Kit scroll displacement drift retained as a Dart-side finding. | `f413815`, [scroll cadence](../reports/comparison/scroll-cadence-20260929.md) |
+| C, presentation capture on both sides | Blocked on the owner: PresentMon needs Performance Log Users membership or an elevated session. | |
+| D, launch to first painted content | Met by measurement: Dart 240 ms against Flutter 1,510 ms at zero rows by the driver's clock, 194 against 1,504 by the fixtures' own. | `8aef122`, [startup](../reports/comparison/startup-20260929.md) |
+| E, packed record slices with one recompute | Recompute count met (2 against 13); the 1.5 s open met on the quiet runs and missed by up to 0.4 s on loaded ones (1.15 to 1.86 s over six); released-copy memory unchanged, retained-copy 30 to 40 MiB above a single earlier run. | `cab7c41`, [one million records](../reports/performance/datasets-1m-20260929/README.md) |
+| F, sort, filter and group at a million rows | Measured, exit line not met: the Dart fixture completes view changes in about half the Flutter fixture's time, not a tenth. The series exposed the native comparator parsing per comparison (a real sort 5.4 to 7.5 s); columns now parse once (149 to 164 ms in the probe). The series on permuted prices is the next capture. | `f0c8f43`, `47ea24b`, [view workload](../reports/comparison/view-1m-20260929.md) |
+| G, binding table, six kinds, terminal | Met: the binding table, panes, tree, popover, sheet, searchable select as the combobox, rich text (twenty-nine kinds), and the terminal rebuilt on them with the accessibility workflow green. | `62653d1` to `aaa7cff`, `b38dc6b`, [binding table](binding-table.md) |
+| H, memory floor under 85 MB or attribution | Met: 75 to 77 MiB working set and 91.5 MiB private commit for an almost empty host, with every mapped image listed; the resident split per image is not measured. | `7a99693`, [floor](../reports/performance/floor-20260929/README.md) |
+| I, embedding spike | Blocked on a machine for it. | |
+| J, checkmate capture | Blocked on C. | |
+
+Against the exit table: launch to first content is inside 1.5x of Flutter
+(D); working set and private bytes are below Flutter's at 100,000 rows
+(the comparison series) and above them at a million rows only while the
+fixture keeps its Dart copy of the records; the million-row workload
+shows about 2x, not an order of magnitude (F); input-to-present waits on
+C; CI is green with the docs lint through the catalog commits, and the
+sheet kind's live test took three commits to pass on Linux and macOS.
+
 Verification: at the packed-record head the native library suite runs 109 tests (two
 ignored timing probes) and the Dart suite 125, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
