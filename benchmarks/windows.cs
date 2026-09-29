@@ -59,6 +59,7 @@ public static class BenchmarkWindow {
     [DllImport("kernel32.dll")] static extern IntPtr GetCurrentProcess();
     [DllImport("kernel32.dll")] static extern IntPtr GetCurrentThread();
     [DllImport("kernel32.dll")] static extern bool SetPriorityClass(IntPtr process, uint priorityClass);
+    [DllImport("kernel32.dll")] static extern uint SetThreadExecutionState(uint flags);
     [DllImport("kernel32.dll")] static extern bool SetThreadPriority(IntPtr thread, int priority);
     [DllImport("ntdll.dll")] static extern int NtQueryTimerResolution(out uint maximum, out uint minimum, out uint current);
     static IntPtr driverTimer;
@@ -79,8 +80,13 @@ public static class BenchmarkWindow {
         // The driver competes with the fixture for the CPU; a higher class keeps
         // its one-millisecond wakeups from landing behind the fixture's frames.
         ElevatedPriority = SetPriorityClass(GetCurrentProcess(), 0x80) && SetThreadPriority(GetCurrentThread(), 2);
+        // A foreground run needs the display: injected input does not count as
+        // user presence, so an unattended machine would turn its display off
+        // and lock mid-run. Held for the run, released in Finish.
+        SetThreadExecutionState(0x80000003);
     }
     public static void Finish() {
+        SetThreadExecutionState(0x80000000);
         SetThreadPriority(GetCurrentThread(), 0);
         SetPriorityClass(GetCurrentProcess(), 0x20);
         timeEndPeriod(1);
@@ -132,7 +138,8 @@ public static class BenchmarkWindow {
                 try {
                     Point point = new Point { X = (int)(800 * scale), Y = (int)(600 * scale) };
                     ClientToScreen(window, ref point);
-                    if (GetAncestor(WindowFromPoint(point), 2) != window) throw new InvalidOperationException("Benchmark activation point is occluded; no click sent");
+                    IntPtr covering = GetAncestor(WindowFromPoint(point), 2);
+                    if (covering != window) throw new InvalidOperationException("Benchmark activation point is occluded; no click sent. Covering: " + Describe(covering));
                     if (!SetCursorPos(point.X, point.Y)) throw new InvalidOperationException("Cannot position benchmark activation click");
                     Mouse(Packet(2, 0), Packet(4, 0));
                     ActivationClicks++;
