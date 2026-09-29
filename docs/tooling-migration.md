@@ -57,8 +57,8 @@ retain the commands used at their recorded revisions.
 
 ## Verification
 
-The local Windows full gate passed: 111 native tests, three snapshot experiment
-tests, 140 Dart tests, nine benchmark analysis tests, helper-crate formatting and
+The local Windows full gate passed: 111 native tests (two timing probes ignored),
+three snapshot experiment tests, 140 Dart tests, nine benchmark analysis tests, helper-crate formatting and
 tests, compiled CLI doctor, analyzer, and documentation checks. The full log is
 `.cache/migration/integrated-check.log`.
 
@@ -69,6 +69,12 @@ and missing self-test success, replaced stale success reports, hashed ignored
 application entries, and preserved Unicode stdout/stderr. Watchlist interaction,
 resize/scroll/update stability, code reload, startup failures, and child-process
 cleanup passed through the replacement helpers.
+
+The final package from source commit `f1cbb16` passed through the compiled CLI.
+Its metadata records `source_dirty: false` even with an updated audit report in
+the working tree, and its Dart license matches the selected SDK. The compiled
+CLI also passed the file-watching reload and window-close test. See
+[verification.json](../reports/tooling/verification.json) for hashes and artifacts.
 
 Benchmark analysis matched the old scripts across 121 directories, 39 input
 traces, six series summaries, and six Markdown reports. Two floating-point
@@ -83,6 +89,8 @@ live-window tests were running; the serial rerun passed. Both attempts are
 retained under `.cache/migration`. Run desktop accessibility checks serially.
 The legacy/new tree comparison matched the 14 shared nodes; the native UIA
 client also returned six real nonclient title-bar controls.
+That comparison used an existing DLL whose exact source revision was not
+reconstructed; the final control and disabled-state runs used the rebuilt DLL.
 
 Linux helper build/link and GTK query, text, toggle, and absent-process checks
 passed with Rust 1.98.1. Six GTK nodes matched the Python client exactly.

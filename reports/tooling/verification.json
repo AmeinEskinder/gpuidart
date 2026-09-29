@@ -1,0 +1,76 @@
+{
+    "source_commit":  "f1cbb16c1396cd2b7070b35b65da3de858c069e0",
+    "baseline_commit":  "9f825a2cb5f4e90b18a5a9ddd17c1177ae4272bd",
+    "recorded_utc":  "2026-09-29T23:35:04.8103910Z",
+    "platform":  "Windows x64",
+    "removed_maintained_platform_files":  38,
+    "full_gate":  {
+                      "passed":  true,
+                      "native_passed":  111,
+                      "native_timing_probes_ignored":  2,
+                      "snapshot_experiment_passed":  3,
+                      "dart_passed":  140,
+                      "benchmark_analysis_passed":  9,
+                      "helper_crates":  "format and tests passed",
+                      "compiled_cli_doctor":  "passed",
+                      "analyzer":  "passed",
+                      "documentation":  "passed",
+                      "log":  ".cache/migration/integrated-check.log"
+                  },
+    "package":  {
+                    "passed":  true,
+                    "archive":  {
+                                    "path":  "D:\\Dev\\worktrees\\gpuidart\\dusky-cobble\\gpuidart\\build/MigrationFinal-windows-x64.zip",
+                                    "sha256":  "539badabbd1018d7430a4193d81d99b60cd7249065587000d9150c151dd21eaf",
+                                    "bytes":  15814030
+                                },
+                    "source_dirty":  false,
+                    "source_sha256":  "879093f97509525f2f69b5af5df2dd309497a7584453346a9442d167edefb630",
+                    "source_files":  411,
+                    "changed_report_during_build":  "reports/tooling-migration.tsv",
+                    "selected_dart_sdk_license_sha256":  "2cfa3ee8e7512e6d44c854b986510810fadc815f93f890373b3a81c1b6ccd256",
+                    "verification":  ".cache/migration/final-verification.json",
+                    "build_result":  ".cache/migration/final-package/result.json",
+                    "failure_cases":  ".cache/migration/package-failures.json"
+                },
+    "compiled_cli":  {
+                         "path":  "build/bin/gpuidart.exe",
+                         "sha256":  "3100997a11eba86a9dba53aea0f80d2ebc4609d5f3a6c08f85aee3b038eff319",
+                         "file_watcher_reload_and_window_close":  true,
+                         "launcher_report":  ".cache/migration/compiled-cli-launcher.json",
+                         "harness_adaptation":  ".cache/cli-launcher-check.dart is tool/verify_dev_launcher.dart with the subprocess changed to the compiled CLI and the report path changed"
+                     },
+    "accessibility":  {
+                          "windows_control_steps":  9,
+                          "controls_passed":  true,
+                          "disabled_passed":  true,
+                          "controls_report":  ".cache/migration/accessibility-controls-serial.json",
+                          "disabled_report":  ".cache/migration/accessibility-disabled.json",
+                          "earlier_timeout":  ".cache/migration/accessibility-controls.json",
+                          "timeout_context":  "Ran concurrently with live-window Dart tests; serial retry passed. UIA desktop discovery can inspect unrelated providers.",
+                          "old_new_comparison":  "reports/tooling/accessibility/windows-comparison.json",
+                          "old_new_comparison_runtime":  "Comparison used an existing primary-checkout DLL; its exact source revision was not reconstructed. Serial controls and disabled checks used the newly built runtime.",
+                          "linux_client":  "GTK query/action and private-bus protocol passed; reports/tooling/accessibility",
+                          "macos":  "cross-check only; runtime and linking not verified"
+                      },
+    "benchmarks":  {
+                       "analysis_equivalence":  "reports/tooling/benchmark_migration.json",
+                       "fresh_workloads":  ".cache/migration/benchmark-runs",
+                       "background_clicks":  10,
+                       "foreground_clicks":  10,
+                       "foreground_wheel_events":  120,
+                       "missed_input_deadlines":  0
+                   },
+    "limits":  [
+                   "Hosted workflows have not run for this migration.",
+                   "macOS AX/Metal runtime and linking are unverified.",
+                   "Linux GPUI cache-event delivery is unverified; the GTK fixture emitted no cache events to either client.",
+                   "A new Windows Sandbox launch and feature installation were not performed.",
+                   "Full comparison-fixture rebuilds and Unix analyzer execution were not repeated."
+               ],
+    "independent_review":  {
+                               "model":  "GPT-6 Astra",
+                               "result":  "No remaining code blockers or material audit inaccuracies",
+                               "attention":  "Retain platform limits and report two ignored native timing probes."
+                           }
+}
