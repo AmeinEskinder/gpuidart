@@ -859,7 +859,8 @@ impl ViewIndex {
                 self.source_rows += 1;
             }
             IndexPatch::Delete(row) => {
-                self.entries.retain(|entry| *entry != ViewEntry::Record(row));
+                self.entries
+                    .retain(|entry| *entry != ViewEntry::Record(row));
                 for entry in &mut self.entries {
                     if let ViewEntry::Record(source) = entry {
                         if *source > row {
@@ -4023,13 +4024,24 @@ mod tests {
         index.extend_identity(5);
         assert_eq!(
             index.entries,
-            [Group(0), Record(2), Record(1), Record(0), Record(3), Record(4)],
+            [
+                Group(0),
+                Record(2),
+                Record(1),
+                Record(0),
+                Record(3),
+                Record(4)
+            ],
             "appended records show behind the index in dataset order"
         );
         assert_eq!(index.source_rows, 5);
         index.extend_identity(4);
         assert_eq!(index.source_rows, 5, "a smaller count extends nothing");
-        assert_eq!(index.groups.len(), 1, "summaries stay until the next computed index");
+        assert_eq!(
+            index.groups.len(),
+            1,
+            "summaries stay until the next computed index"
+        );
         let data = super::TableData {
             columns: vec!["v".into()],
             rows: (0..3).map(|i| vec![i.to_string()]).collect(),

@@ -6,8 +6,8 @@ use crate::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
         FontWeight as StyleFontWeight, ImageEncoding, ImageFit, IndexPatch,
         Justify as StyleJustify, KeystrokeSpec, MenuEntry, Node, ScrollAxis, Size as StyleSize,
-        Snapshot, Style, TableData, TableView, ThemeToken, Touched, TreeIndex, ViewEntry, ViewIndex,
-        apply_in_place, rollback,
+        Snapshot, Style, TableData, TableView, ThemeToken, Touched, TreeIndex, ViewEntry,
+        ViewIndex, apply_in_place, rollback,
     },
 };
 use async_channel::Receiver;
@@ -306,9 +306,7 @@ impl ViewInputs {
                 .and_then(|source| index.row_of(ViewEntry::Record(source))),
             _ => None,
         };
-        let anchor_view = self
-            .anchor_source
-            .and_then(|entry| index.row_of(entry));
+        let anchor_view = self.anchor_source.and_then(|entry| index.row_of(entry));
         ViewResult {
             index,
             selection_row,
@@ -1377,14 +1375,20 @@ impl DartView {
         });
         self.view_jobs += 1;
         let job = self.view_jobs;
-        self.counters.view_jobs.set(self.counters.view_jobs.get() + 1);
+        self.counters
+            .view_jobs
+            .set(self.counters.view_jobs.get() + 1);
         let selected_record = inputs.selected_record.clone();
-        let compute = cx.background_executor().spawn(async move { inputs.compute() });
+        let compute = cx
+            .background_executor()
+            .spawn(async move { inputs.compute() });
         let table_id = id.to_owned();
         let task = cx.spawn(async move |this, cx| {
             let result = compute.await;
-            this.update(cx, |this, cx| this.finish_view_job(&table_id, job, result, cx))
-                .ok();
+            this.update(cx, |this, cx| {
+                this.finish_view_job(&table_id, job, result, cx)
+            })
+            .ok();
         });
         if let Some(retained) = self.tables.get_mut(id) {
             retained.pending = Some(PendingView {
@@ -1401,7 +1405,12 @@ impl DartView {
     /// job superseded it, then applies the updates that waited on it.
     fn finish_view_job(&mut self, id: &str, job: u64, result: ViewResult, cx: &mut Context<Self>) {
         let pending = match self.tables.get_mut(id) {
-            Some(retained) if retained.pending.as_ref().is_some_and(|pending| pending.job == job) => {
+            Some(retained)
+                if retained
+                    .pending
+                    .as_ref()
+                    .is_some_and(|pending| pending.job == job) =>
+            {
                 retained.pending.take()
             }
             _ => None,
@@ -1445,7 +1454,10 @@ impl DartView {
         let table = retained.state.clone();
         let (index, data) = {
             let state = table.read(cx);
-            (state.delegate().index.clone(), state.delegate().data.clone())
+            (
+                state.delegate().index.clone(),
+                state.delegate().data.clone(),
+            )
         };
         let selection = match &retained.selected_record {
             Some(record) if data.borrow().data.ids.is_some() => {
@@ -1847,7 +1859,8 @@ impl DartView {
                         changed_views.push((id.clone(), false));
                     }
                 } else {
-                    let index = Rc::new(RefCell::new(ViewIndex::compute(None, &data.borrow().data)));
+                    let index =
+                        Rc::new(RefCell::new(ViewIndex::compute(None, &data.borrow().data)));
                     let table = cx.new(|cx| {
                         TableState::new(
                             Rows {

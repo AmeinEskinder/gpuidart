@@ -3139,7 +3139,14 @@ fn large_views_compute_off_the_frame_thread_and_queue_edits(cx: &mut TestAppCont
     // The index landed ascending; the queued edit then applied, listed the
     // table pending again, and its own index landed with R000000 (price 0)
     // first.
-    assert_eq!(tags(), [format!("view:{rows}"), "dataset:table".into(), format!("view:{rows}")]);
+    assert_eq!(
+        tags(),
+        [
+            format!("view:{rows}"),
+            "dataset:table".into(),
+            format!("view:{rows}")
+        ]
+    );
     cx.update_window(handle, |_, window, cx| {
         window.render_frame(cx);
         let inspect = view.read(cx).inspect(window, cx);
@@ -3180,9 +3187,20 @@ fn large_views_compute_off_the_frame_thread_and_queue_edits(cx: &mut TestAppCont
         "every publication is acknowledged at once"
     );
     cx.run_until_parked();
-    assert_eq!(tags(), ["applied:table", "applied:table", "applied:table", &format!("view:{rows}")]);
+    assert_eq!(
+        tags(),
+        [
+            "applied:table",
+            "applied:table",
+            "applied:table",
+            &format!("view:{rows}")
+        ]
+    );
     cx.update_window(handle, |_, window, cx| {
-        assert_eq!(view.read(cx).inspect(window, cx)["native"]["view_recomputes"], 3);
+        assert_eq!(
+            view.read(cx).inspect(window, cx)["native"]["view_recomputes"],
+            3
+        );
         assert_eq!(
             first_entries(cx, 2),
             [ViewEntry::Record(1), ViewEntry::Record(2)],
@@ -3267,7 +3285,10 @@ fn large_views_compute_off_the_frame_thread_and_queue_edits(cx: &mut TestAppCont
             [ViewEntry::Record(rows + 4)],
             "descending price over the replacement"
         );
-        assert_eq!(view.read(cx).inspect(window, cx)["tables"]["table"]["scroll_y"], 0.0);
+        assert_eq!(
+            view.read(cx).inspect(window, cx)["tables"]["table"]["scroll_y"],
+            0.0
+        );
     })
     .unwrap();
 }

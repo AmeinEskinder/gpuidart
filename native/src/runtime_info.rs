@@ -436,9 +436,14 @@ mod tests {
         {
             assert!(value.get("working_set_pages_error").is_none());
             let pages = &value["working_set_pages"];
-            assert!(pages["resident_bytes"].as_u64().is_some_and(|bytes| bytes > 0));
             assert!(
-                pages["in_images_bytes"].as_u64().unwrap() <= pages["resident_bytes"].as_u64().unwrap()
+                pages["resident_bytes"]
+                    .as_u64()
+                    .is_some_and(|bytes| bytes > 0)
+            );
+            assert!(
+                pages["in_images_bytes"].as_u64().unwrap()
+                    <= pages["resident_bytes"].as_u64().unwrap()
             );
             let resident: u64 = value["loaded_images"]
                 .as_array()

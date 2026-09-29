@@ -62,7 +62,11 @@ pub fn observe<E: InteractiveElement>(root: E) -> E {
 /// A table's vertical offset at a paint, so the offset trajectory can be
 /// read against the wheel deltas that produced it.
 pub fn record_table_scroll(id: &str, frame: u64, y: f32) {
-    record_sequence("table_scroll_painted", None, json!({"id": id, "frame": frame, "y": y}));
+    record_sequence(
+        "table_scroll_painted",
+        None,
+        json!({"id": id, "frame": frame, "y": y}),
+    );
 }
 
 pub fn save() {
