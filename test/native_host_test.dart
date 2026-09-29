@@ -496,6 +496,30 @@ void main() {
     timeout: const Timeout(Duration(seconds: 120)),
   );
 
+  test('popovers follow a published open state', () async {
+    var open = true;
+    UiNode build() => UiPopover('filters', 'Filters', const [
+      UiText('inside', 'Inside'),
+    ], open: open);
+    final host = await GpuiHost.openView(build);
+    try {
+      // The popup's content is part of the description either way; the
+      // native test covers its visibility. Here both states must apply.
+      var state = await host.diagnose('inspect');
+      expect(state['revision'], 1);
+      open = false;
+      await host.rebuild();
+      state = await host.diagnose('inspect');
+      expect(state['revision'], 2);
+      open = true;
+      await host.rebuild();
+      state = await host.diagnose('inspect');
+      expect(state['revision'], 3);
+    } finally {
+      await host.close();
+    }
+  });
+
   test('trees show their entries and follow a published selection', () async {
     String? selected;
     UiNode build() => UiTree(

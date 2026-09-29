@@ -1979,6 +1979,47 @@ impl DartView {
                 )
                 .into_any_element()
             }
+            Node::Popover {
+                id: popover_id,
+                label,
+                open,
+                children,
+                ..
+            } => {
+                let events = self.events.clone();
+                let revision = self.snapshot.revision;
+                let event_id = popover_id.clone();
+                let content = div().v_flex().gap_2().children(
+                    children
+                        .iter()
+                        .map(|child| self.materialize(child, colors, cx))
+                        .collect::<Result<Vec<_>, _>>()?,
+                );
+                let mut popover = gpui_kit::component::popover::Popover::new(SharedString::from(
+                    popover_id.clone(),
+                ))
+                .trigger(
+                    Button::new(SharedString::from(format!("{popover_id}-trigger")))
+                        .label(label.clone()),
+                )
+                .on_open_change(move |open, _, _| {
+                    events.emit(Event::PopoverChange {
+                        revision,
+                        id: event_id.clone(),
+                        open: *open,
+                    })
+                })
+                .child(content);
+                if let Some(open) = open {
+                    popover = popover.open(*open);
+                }
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(popover),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
             Node::Scroll {
                 id: scroll_id,
                 axis,

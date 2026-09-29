@@ -310,6 +310,42 @@ void main() {
     );
   });
 
+  test('popovers encode their trigger and decode open changes', () {
+    final popover = UiPopover('filters', 'Filters', const [
+      UiText('inside', 'Inside'),
+    ], open: true);
+    expect(popover.toJson(), {
+      'kind': 'popover',
+      'id': 'filters',
+      'label': 'Filters',
+      'open': true,
+      'children': [
+        {'kind': 'text', 'id': 'inside', 'text': 'Inside'},
+      ],
+    });
+    expect(
+      UiPopover('f', 'F', const []).toJson().containsKey('open'),
+      isFalse,
+      reason: 'native owns the state when open is not given',
+    );
+    expect(UiPopover('f', '', const []).toJson, throwsArgumentError);
+    Map<String, dynamic> decode(Map<String, Object?> event) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(event)));
+    expect(
+      decode({
+        'type': 'popover_change',
+        'revision': 1,
+        'id': 'filters',
+        'open': false,
+      })['open'],
+      false,
+    );
+    expect(
+      () => decode({'type': 'popover_change', 'revision': 1, 'id': 'filters'}),
+      throwsFormatException,
+    );
+  });
+
   test('trees encode their items and decode selection and expansion', () {
     final tree = UiTree(
       'files',

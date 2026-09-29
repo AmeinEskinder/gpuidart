@@ -2780,3 +2780,83 @@ fn trees_select_expand_and_follow_publications(cx: &mut TestAppContext) {
     })
     .unwrap();
 }
+
+#[gpui::test]
+fn popovers_open_on_their_trigger_and_follow_a_published_state(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, open: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"popover","id":"filters","label":"Filters","open":{open},"children":[
+                    {{"kind":"text","id":"inside","text":"Inside the popover"}}
+                ]}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let received: Arc<Mutex<Vec<Event>>> = Arc::new(Mutex::new(Vec::new()));
+    let sink = received.clone();
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, "null"),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(move |event| sink.lock().unwrap().push(event))),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    let changes = |received: &Arc<Mutex<Vec<Event>>>| -> Vec<bool> {
+        received
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::PopoverChange { id, open, .. } if id == "filters" => Some(*open),
+                _ => None,
+            })
+            .collect()
+    };
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        assert!(
+            window.try_find("inside").is_none(),
+            "closed until triggered"
+        );
+        window.click("filters-trigger", cx);
+        window.render_frame(cx);
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle, |_, window, cx| {
+        assert!(
+            window.try_find("inside").is_some(),
+            "the trigger opens the popover"
+        );
+        assert_eq!(changes(&received), vec![true]);
+        view.update(cx, |view, cx| {
+            view.publish(snapshot(2, "false"), window, cx)
+        });
+        window.render_frame(cx);
+        window.render_frame(cx);
+        assert!(
+            window.try_find("inside").is_none(),
+            "a published state closes it"
+        );
+        view.update(cx, |view, cx| view.publish(snapshot(3, "true"), window, cx));
+        window.render_frame(cx);
+        window.render_frame(cx);
+        assert!(window.try_find("inside").is_some(), "and opens it");
+    })
+    .unwrap();
+}

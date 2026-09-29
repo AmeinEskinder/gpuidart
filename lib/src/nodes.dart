@@ -304,6 +304,47 @@ final class UiTree extends UiNode {
   }
 }
 
+/// A button labelled [label] that opens an anchored popup holding
+/// [children]. Native owns the open state unless [open] is given, in which
+/// case each publication controls it; `popover_change` reports every change
+/// in `GpuiEvent.open`.
+final class UiPopover extends UiNode {
+  UiPopover(
+    super.id,
+    this.label,
+    List<UiNode> children, {
+    this.open,
+    super.style,
+    super.semantics,
+  }) : children = List.unmodifiable(children);
+  final String label;
+  final bool? open;
+  @override
+  final List<UiNode> children;
+  @override
+  bool get isContainer => true;
+  @override
+  Map<String, Object> props() {
+    if (label.isEmpty || utf8.encode(label).length > 1024) {
+      throw ArgumentError('Popover label must contain 1..1024 UTF-8 bytes');
+    }
+    return {
+      'kind': 'popover',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('popover'),
+      if (style != null) 'style': style!.toJson(),
+      'label': label,
+      'open': ?open,
+    };
+  }
+
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
+    'children': children.map((child) => child.toJson()).toList(),
+  };
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;

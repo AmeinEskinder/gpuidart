@@ -53,7 +53,7 @@ infrastructure the adapter uses on the application's behalf without a node.
 | notification | not bound | Toasts. |
 | pagination | not bound | |
 | plot | `UiChart` | Through the chart. |
-| popover | planned | An anchored popup holding a bounded subtree. |
+| popover | `UiPopover` | A labelled trigger button and an anchored popup holding a subtree; `popover_change` event. |
 | progress | `UiProgress` | Determinate or indeterminate. |
 | questionnaire | not bound | |
 | radio | `UiRadioGroup` | |
@@ -91,7 +91,7 @@ infrastructure the adapter uses on the application's behalf without a node.
 Beyond the component crate, gpuidart binds Kit's base animation
 (`UiStyle.animation`), its calendar (through the date picker) and its
 window and lifecycle; `UiCanvas`, `UiStack`, `UiColumn` and `UiRow` are
-gpuidart's own over GPUI's elements. Twenty-six node kinds reach about a
-third of the component catalog; the planned four close the largest gaps an
-application notices (popover, sheet, combobox, rich text), and the rest
-stay reachable only by extending the adapter.
+gpuidart's own over GPUI's elements. Twenty-seven node kinds reach about a
+third of the component catalog; the planned three close the largest gaps an
+application notices (sheet, combobox, rich text), and the rest stay
+reachable only by extending the adapter.

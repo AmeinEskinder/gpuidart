@@ -356,6 +356,22 @@ pub enum Node {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         selected: Option<String>,
     },
+    /// A button that opens an anchored popup holding the children. Native
+    /// owns the open state unless `open` is published, in which case the
+    /// publication controls it; either way `popover_change` reports each
+    /// change with the new state.
+    Popover {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        open: Option<bool>,
+        #[serde(default)]
+        children: Vec<Node>,
+    },
     /// A calendar picker holding one date as `YYYY-MM-DD`; `date_change`
     /// carries the requested value and the next publication is authoritative.
     DatePicker {
@@ -1609,6 +1625,7 @@ impl Node {
             | Self::Scroll { id, .. }
             | Self::Panes { id, .. }
             | Self::Tree { id, .. }
+            | Self::Popover { id, .. }
             | Self::Switch { id, .. }
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
@@ -1640,6 +1657,7 @@ impl Node {
             | Self::Scroll { style, .. }
             | Self::Panes { style, .. }
             | Self::Tree { style, .. }
+            | Self::Popover { style, .. }
             | Self::Switch { style, .. }
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
@@ -1671,6 +1689,7 @@ impl Node {
             | Self::Scroll { semantics, .. }
             | Self::Panes { semantics, .. }
             | Self::Tree { semantics, .. }
+            | Self::Popover { semantics, .. }
             | Self::Switch { semantics, .. }
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
@@ -1696,7 +1715,8 @@ impl Node {
             | Self::Row { children, .. }
             | Self::Stack { children, .. }
             | Self::Scroll { children, .. }
-            | Self::Panes { children, .. } => Some(children),
+            | Self::Panes { children, .. }
+            | Self::Popover { children, .. } => Some(children),
             _ => None,
         }
     }
@@ -1829,6 +1849,11 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
         {
             return Err("Tree selection must name one of its items".into());
         }
+    }
+    if let Node::Popover { label, .. } = node
+        && (label.is_empty() || label.len() > 1024)
+    {
+        return Err("Popover label must contain 1..1024 UTF-8 bytes".into());
     }
     if node.style().is_some_and(|style| style.cached) {
         let fixed = matches!(
@@ -2225,7 +2250,8 @@ pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
         | Node::Row { children, .. }
         | Node::Stack { children, .. }
         | Node::Scroll { children, .. }
-        | Node::Panes { children, .. } => Some(children),
+        | Node::Panes { children, .. }
+        | Node::Popover { children, .. } => Some(children),
         _ => None,
     }
 }
@@ -2374,6 +2400,12 @@ pub enum Event {
         id: String,
         item: String,
         expanded: bool,
+    },
+    /// A popover opened or closed.
+    PopoverChange {
+        revision: u64,
+        id: String,
+        open: bool,
     },
     DialogResult {
         revision: u64,

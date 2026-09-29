@@ -51,7 +51,8 @@ impl Semantics {
                 | Node::Row { .. }
                 | Node::Stack { .. }
                 | Node::Scroll { .. }
-                | Node::Panes { .. } => {
+                | Node::Panes { .. }
+                | Node::Popover { .. } => {
                     matches!(role, Group | List | ListItem)
                 }
                 Node::Text { .. } => matches!(role, Label | Heading),
