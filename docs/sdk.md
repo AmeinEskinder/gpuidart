@@ -112,6 +112,7 @@ Serialise asynchronous UI handlers that touch the same dataset. The watchlist's 
 | GpuiWindowOptions | Initial title and logical width/height. Width 320..8192, height 240..8192. Window sizing is independent of display scale. |
 | GpuiEvent.tableSelection | Typed row-selection data with table ID, dataset ID and dataset revision. Ignore an index from a revision that the application no longer holds. |
 | GpuiEvent.tableView / viewsSettled | A table's view index landed: over 10,000 records the index computes off the frame thread after the acknowledgement, and `viewsSettled` completes when no table is waiting for one. See [table views](datasets.md#table-views). |
+| Repaint on update (Windows) | After a publication, an operation update or a dataset update has been applied, the host asks Windows to repaint the window at once instead of at the next vsync tick; see [frame scheduling on Windows](#frame-scheduling-on-windows). |
 | publish / rebuild | Completes after native applies the description, sent as operations against the previous publication when possible. Subtrees handed back as the same `UiNode` instances (const nodes, `UiMemo`) are neither re-described nor re-diffed. This is not a presentation fence. |
 | UiMemo | Keeps a built subtree while its inputs compare equal, so a rebuild reuses it by identity. See [retained tree](retained-tree.md). |
 | patch | Writes one published node's own fields as a single `set` operation, with no build, describe or diff; the node keeps its ID and kind and carries no children. The write stands until the next publication, which carries the application's value. |
@@ -131,6 +132,29 @@ Node IDs are nonempty and unique across the whole description, including nested 
 Snapshots have at most 4,096 nodes, depth 32 and 16 MiB encoded size; an operation update carries at most 4,096 operations and its result meets the same bounds. Datasets have at most 1,000,000 rows and 64 columns; records beyond one message upload in appended slices. The native command queue has 64 slots. Invalid descriptions, stale revisions, a full/closed queue and overlapping transactions are errors. Await or handle the returned Future.
 
 Native acknowledgements have a 30-second deadline; shutdown reporting has a 10-second deadline. Configure these with `requestTimeout` and `shutdownTimeout` when opening the host. Missing acknowledgements, malformed events and caught native panics close the host and settle pending requests. See [failure handling and its limits](failures.md).
+
+## Frame scheduling on Windows
+
+GPUI draws a window that has changed at the next vsync tick. For an update
+the application sends in answer to an input, that tick is up to a frame
+away from the moment the change is applied: the traced click chain of the
+comparison benchmark measured 8 ms at the median and 15 ms at the 95th
+percentile between an edit applied natively and its frame, against a
+0.3 ms round trip through Dart. On Windows the host therefore asks the
+window to repaint as soon as a publication, an operation update or a
+dataset update has been applied (`RedrawWindow` with an invalidation, the
+same request the vsync tick makes). GPUI still draws only what is dirty and
+draws nothing at the following tick if the change is already on screen, so
+a burst of updates paints no more than before; the request is made at most
+once every 4 ms. Measured on the cell workload, the frame carrying the
+change reached the display about 17 ms sooner at the median and 20 ms
+sooner at the 95th percentile. Publications that are not answers to input
+get the same treatment; an application that publishes continuously is
+bounded by the 4 ms interval and by its own publication rate.
+
+Set `GPUIDART_DRAW_ON_UPDATE=0` in the process environment to leave drawing
+to the vsync tick, which is the behavior on macOS and Linux and the one to
+compare against. The setting is read once at startup.
 
 ## Package an AOT application
 
