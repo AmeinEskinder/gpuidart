@@ -179,11 +179,83 @@ mod windows {
             info: *mut ModuleInfo,
             size: u32,
         ) -> i32;
+        fn QueryWorkingSet(process: *mut c_void, buffer: *mut c_void, size: u32) -> i32;
     }
 
-    /// Every image mapped into the process with its size, largest first, so
-    /// a memory floor can be attributed to the libraries behind it.
-    fn loaded_images(process: *mut c_void) -> Result<Vec<Value>, String> {
+    struct Image {
+        path: String,
+        base: usize,
+        size_of_image: Option<u32>,
+        resident_bytes: usize,
+        resident_shared_bytes: usize,
+    }
+
+    /// The resident pages of the process, attributed to the image whose
+    /// mapping holds each page: a working-set walk (`QueryWorkingSet`) lists
+    /// every page in memory with its shared flag, and a page inside an
+    /// image's range counts toward that image. Pages outside every image
+    /// are heap, stacks and other mappings.
+    fn working_set(process: *mut c_void, images: &mut [Image]) -> Result<Value, String> {
+        const ERROR_BAD_LENGTH: i32 = 24;
+        const PAGE: usize = 4096;
+        let mut buffer: Vec<usize> = vec![0; 1 << 16];
+        loop {
+            let bytes = (buffer.len() * std::mem::size_of::<usize>()) as u32;
+            if unsafe { QueryWorkingSet(process, buffer.as_mut_ptr().cast(), bytes) } != 0 {
+                break;
+            }
+            let error = std::io::Error::last_os_error();
+            // On a short buffer the first entry holds the count required.
+            if error.raw_os_error() == Some(ERROR_BAD_LENGTH) && buffer.len() < 1 << 24 {
+                let needed = buffer[0].saturating_add(1 << 12).max(buffer.len() * 2);
+                buffer = vec![0; needed];
+                continue;
+            }
+            return Err(error.to_string());
+        }
+        let count = buffer[0].min(buffer.len() - 1);
+        let mut ranges: Vec<(usize, usize, usize)> = images
+            .iter()
+            .enumerate()
+            .filter_map(|(index, image)| {
+                image
+                    .size_of_image
+                    .map(|size| (image.base, image.base + size as usize, index))
+            })
+            .collect();
+        ranges.sort_unstable();
+        let (mut total, mut shared, mut in_images) = (0usize, 0usize, 0usize);
+        for &block in &buffer[1..=count] {
+            let address = (block >> 12) << 12;
+            let is_shared = block & (1 << 8) != 0;
+            total += PAGE;
+            if is_shared {
+                shared += PAGE;
+            }
+            let candidate = ranges.partition_point(|(base, _, _)| *base <= address);
+            if let Some(&(_, end, index)) = candidate.checked_sub(1).map(|at| &ranges[at]) {
+                if address < end {
+                    in_images += PAGE;
+                    images[index].resident_bytes += PAGE;
+                    if is_shared {
+                        images[index].resident_shared_bytes += PAGE;
+                    }
+                }
+            }
+        }
+        Ok(json!({
+            "resident_bytes": total,
+            "shared_bytes": shared,
+            "private_bytes": total - shared,
+            "in_images_bytes": in_images,
+            "outside_images_bytes": total - in_images,
+            "pages": count,
+        }))
+    }
+
+    /// Every image mapped into the process with its size and base, so a
+    /// memory floor can be attributed to the libraries behind it.
+    fn loaded_images(process: *mut c_void) -> Result<Vec<Image>, String> {
         const LIST_MODULES_ALL: u32 = 0x03;
         let mut handles: Vec<*mut c_void> = vec![std::ptr::null_mut(); 2048];
         let mut needed = 0u32;
@@ -226,25 +298,56 @@ mod windows {
             } else {
                 None
             };
-            images.push(json!({"path": path, "size_of_image": size}));
+            images.push(Image {
+                path,
+                base: info.base as usize,
+                size_of_image: size,
+                resident_bytes: 0,
+                resident_shared_bytes: 0,
+            });
         }
-        images.sort_by_key(|image| std::cmp::Reverse(image["size_of_image"].as_u64().unwrap_or(0)));
         Ok(images)
     }
 
     pub(super) fn append(value: &mut Value) {
         let process = unsafe { GetCurrentProcess() };
         match loaded_images(process) {
-            Ok(images) => {
+            Ok(mut images) => {
+                match working_set(process, &mut images) {
+                    Ok(pages) => {
+                        value["working_set_pages"] = pages;
+                        value["working_set_pages_source"] = json!(
+                            "QueryWorkingSet; each resident page attributed to the image whose mapping holds it, shared by the OS flag"
+                        );
+                    }
+                    Err(error) => value["working_set_pages_error"] = json!(error),
+                }
+                // Largest resident share first, mapped size second.
+                images.sort_by_key(|image| {
+                    std::cmp::Reverse((image.resident_bytes, image.size_of_image.unwrap_or(0)))
+                });
                 value["loaded_images_total_bytes"] = json!(
                     images
                         .iter()
-                        .map(|image| image["size_of_image"].as_u64().unwrap_or(0))
+                        .map(|image| u64::from(image.size_of_image.unwrap_or(0)))
                         .sum::<u64>()
                 );
-                value["loaded_images"] = json!(images);
-                value["loaded_images_source"] =
-                    json!("EnumProcessModulesEx with GetModuleInformation SizeOfImage");
+                value["loaded_images"] = json!(
+                    images
+                        .iter()
+                        .map(|image| {
+                            json!({
+                                "path": image.path,
+                                "size_of_image": image.size_of_image,
+                                "resident_bytes": image.resident_bytes,
+                                "resident_shared_bytes": image.resident_shared_bytes,
+                            })
+                        })
+                        .collect::<Vec<_>>()
+                );
+                value["loaded_images_source"] = json!(
+                    "EnumProcessModulesEx with GetModuleInformation SizeOfImage and the working-set walk's resident pages"
+                );
             }
             Err(error) => value["loaded_images_error"] = json!(error),
         }
@@ -329,6 +432,23 @@ mod tests {
         assert!(value["cpu_user_us"].as_i64().is_some_and(|time| time >= 0));
         assert!(value.get("loaded_images_error").is_none());
         assert!(value.get("memory_error").is_none());
+        #[cfg(windows)]
+        {
+            assert!(value.get("working_set_pages_error").is_none());
+            let pages = &value["working_set_pages"];
+            assert!(pages["resident_bytes"].as_u64().is_some_and(|bytes| bytes > 0));
+            assert!(
+                pages["in_images_bytes"].as_u64().unwrap() <= pages["resident_bytes"].as_u64().unwrap()
+            );
+            let resident: u64 = value["loaded_images"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|image| image["resident_bytes"].as_u64().unwrap())
+                .sum();
+            assert_eq!(resident, pages["in_images_bytes"].as_u64().unwrap());
+            assert!(resident > 0, "the test binary itself has resident pages");
+        }
         assert!(
             value["memory_peak_bytes"]
                 .as_object()

@@ -63,15 +63,24 @@ Future<void> main(List<String> args) async {
         },
         'loaded_images_total_bytes': settled['loaded_images_total_bytes'],
         'loaded_images_count': images.length,
+        'working_set_pages': settled['working_set_pages'],
         'largest_images': [
           for (final image in images.take(20))
-            {'path': image['path'], 'size_of_image': image['size_of_image']},
+            {
+              'path': image['path'],
+              'size_of_image': image['size_of_image'],
+              'resident_bytes': image['resident_bytes'],
+              'resident_shared_bytes': image['resident_shared_bytes'],
+            },
         ],
         'scope':
             'one process on one machine; working set and private commit are '
             'the OS counters after a settle step; image sizes are SizeOfImage '
             '(mapped, not resident) and bound the code and data the libraries '
-            'can contribute to the floor',
+            'can contribute to the floor; resident bytes come from a '
+            'working-set walk that attributes each page in memory to the '
+            'image whose mapping holds it, and working_set_pages splits the '
+            'walk into shared and private pages and pages outside every image',
       }),
     );
   } finally {
