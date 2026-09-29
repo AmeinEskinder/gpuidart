@@ -133,8 +133,7 @@ do not compare them directly with historical uninstrumented benchmark timings.
 ## Reproduce the smoke workload
 
 ```powershell
-. ./tool/env.ps1
-cargo build --locked -p gpuidart
+dart run tool/env.dart cargo build --locked -p gpuidart
 dart run tool/capture_publication_trace.dart build/publication-jit.trace.json
 dart compile exe tool/capture_publication_trace.dart -o build/publication-trace.exe
 ./build/publication-trace.exe build/publication-aot.trace.json target/debug/gpuidart.dll

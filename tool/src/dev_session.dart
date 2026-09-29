@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'toolchain.dart';
+
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
@@ -28,7 +30,7 @@ class DevSession {
     final serviceInfo = File.fromUri(directory.uri.resolve('service.json'));
     late final OwnedProcess owned;
     try {
-      owned = await OwnedProcess.start(Platform.resolvedExecutable, [
+      owned = await OwnedProcess.start(dartExecutable, [
         '--enable-vm-service=0',
         '--write-service-info=${serviceInfo.path}',
         '--packages=${File('.dart_tool/package_config.json').absolute.path}',

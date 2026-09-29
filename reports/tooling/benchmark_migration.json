@@ -1,0 +1,58 @@
+{
+    "reference_revision":  "9f825a2",
+    "platform":  "Windows x64",
+    "method":  "Copied recorded JSON/CSV inputs into an isolated directory, regenerated outputs with the PowerShell scripts at reference_revision, then compared the Dart outputs recursively. Object key order is ignored; arrays retain order. Markdown compares after BOM removal, newline normalization and trimming surrounding whitespace.",
+    "analysis_directories":  121,
+    "input_traces":  39,
+    "series_summaries":  6,
+    "markdown_reports":  6,
+    "series":  [
+                   "dart-deferred-20260929",
+                   "dart-flutter-20260928",
+                   "dart-flutter-nosplash-20260928",
+                   "dart-js-20260925",
+                   "paired-final-20260925",
+                   "paired-traced-20260925"
+               ],
+    "unmatched_outputs":  0,
+    "numeric_comparison":  "Exact numeric equality, with absolute tolerance 1e-12 only for unequal floating-point values. Integers have no tolerance.",
+    "tolerated_floating_roundtrips":  [
+                                          {
+                                              "path":  "root.groups[1].window_available_ms.median",
+                                              "powershell":  423.45885000000004,
+                                              "dart":  423.45885,
+                                              "absolute_difference":  5.6843418860808015E-14
+                                          },
+                                          {
+                                              "path":  "root.groups[7].window_available_ms.median",
+                                              "powershell":  506.98155,
+                                              "dart":  506.9815500000001,
+                                              "absolute_difference":  5.6843418860808015E-14
+                                          }
+                                      ],
+    "exclusions":  [
+                       "calibration-flutter has no run.json or failure.json and produces no analysis output in the old script.",
+                       "Existing summary JSONs were regenerated with the current reference scripts; two legacy summaries omitted implementations, so their Rust/Dart selection was passed explicitly."
+                   ],
+    "validation":  {
+                       "dart_analysis":  "passed",
+                       "dart_behavior_tests":  9,
+                       "rust_scheduler_test":  "passed",
+                       "native_release_self_test":  "passed: QPC, INPUT ABI, bitmap ABI, process CPU/memory APIs and invalid-window focus guard; no injected input",
+                       "missing_fixture":  "passed: exit 1 and partial driver-result.json preserved",
+                       "presentmon_pin":  "passed: installed PresentMon 2.6.0 SHA-256 matched",
+                       "crt_extraction":  "passed: extracted vcruntime140.dll SHA-256 d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066 matches recorded package inventory",
+                       "fresh_dart_fixture_runs":  "passed: background 10 clicks; foreground 10 clicks and 120 wheel events; no missed deadlines; application state matched injected input"
+                   },
+    "not_run":  [
+                    "Full Rust/Dart/Solid/Shell/Flutter fixture rebuild and packaging.",
+                    "Unix execution of the analyzer and driver scheduler; driver Windows API calls are cfg-gated.",
+                    "Clippy: component is not installed in the available Rust toolchain."
+                ],
+    "local_evidence":  {
+                           "comparison_script":  ".cache/check_benchmark_parity.dart",
+                           "reference_inputs_and_outputs":  ".cache/benchmark-parity",
+                           "reference_scripts":  ".cache/migration-reference",
+                           "fresh_fixture_runs":  ".cache/migration/benchmark-runs"
+                       }
+}

@@ -1,0 +1,27 @@
+{
+  "scope": "Synthetic signal fixture on a real private AT-SPI bus; does not establish GPUI cache delivery.",
+  "matching": {
+    "add": 1,
+    "api": "Gio.DBusConnection",
+    "invalid": [],
+    "passed": true,
+    "process": 3071,
+    "remove": 1
+  },
+  "invalid": {
+    "add": 1,
+    "api": "Gio.DBusConnection",
+    "invalid": [
+      {
+        "arguments": 2,
+        "signal": "AddAccessible",
+        "signature": "(so)"
+      }
+    ],
+    "passed": false,
+    "process": 3071,
+    "remove": 0
+  },
+  "legacy_equal": true,
+  "passed": true
+}

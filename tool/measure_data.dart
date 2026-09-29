@@ -74,7 +74,7 @@ Native allocation verification is in [data-allocations.json](data-allocations.js
 
 The previous full-data snapshot measurements are preserved in [baseline-snapshots/summary.md](baseline-snapshots/summary.md). They are a historical local sample, not a matched input-latency comparison. Percentiles for different intervals have not been added.
 
-Reproduce with `./tool/package.ps1` followed by `dart run tool/measure_data.dart`. See [../docs/datasets.md](../docs/datasets.md) for the API and transaction contract.
+Reproduce with `dart run tool/package.dart` followed by `dart run tool/measure_data.dart`. See [../docs/datasets.md](../docs/datasets.md) for the API and transaction contract.
 ''');
   await File('reports/data-publication.md').writeAsString(markdown.toString());
   stdout.writeln(

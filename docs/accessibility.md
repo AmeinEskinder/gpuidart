@@ -12,8 +12,8 @@ it uses `gpui-pre` 0.3.7. The source contains actual AccessKit adapters:
 
 | Backend | Adapter | External client for this milestone |
 | --- | --- | --- |
-| Windows | `accesskit_windows::Adapter`, UIA events | `System.Windows.Automation` |
-| Linux X11 | `accesskit_unix::Adapter`, AT-SPI bus | GI `Atspi` over session D-Bus |
+| Windows | `accesskit_windows::Adapter`, UIA events | Native `IUIAutomation` |
+| Linux X11 | `accesskit_unix::Adapter`, AT-SPI bus | `libatspi` over session D-Bus |
 | macOS | `accesskit_macos::SubclassingAdapter` on NSWindow | `AXUIElement` targeting companion PID |
 
 Windows local spike queried the real settings window and invoked its Appearance
@@ -162,6 +162,13 @@ persistent OS object handles or offscreen table navigation.
 
 Use `dart run tool/verify_settings.dart REPORT.json --semantics` for the settings
 track and `dart run tool/accessibility/watchlist.dart REPORT.json` for Watchlist.
+The Rust client in `tool/native_probe` uses native UIA, AX and libatspi APIs.
+The Dart drivers build it with its own pinned Cargo manifest before querying.
+Run `dart run tool/native_probe/build.dart` to build it separately. Linux builds
+require `libatspi2.0-dev` and `libglib2.0-dev`; Windows uses the Windows SDK and
+macOS uses system frameworks. The helper also observes Linux cache signals
+through GIO and enumerates Windows WMI and macOS Metal devices.
+
 The clients require native platform accessibility access; Linux CI uses a private
 D-Bus accessibility session, and the macOS external client must be authorized.
 The scripts refuse to replace a prior report and fail on missing platform access.
@@ -195,8 +202,8 @@ menus use Kit or native menu semantics. Accepted snapshot values provide selecte
 and checked states; focus follows retained handles. Button tooltip text is also
 an accessibility description. Windows AccessKit maps that description to
 [UIA FullDescription](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-automation-element-propids),
-not HelpText. The external probe uses native IUIAutomation for this newer property
-because PowerShell's .NET Framework property registry does not expose it.
+not HelpText. The Rust external probe reads FullDescription directly through
+native IUIAutomation, alongside the other properties and action patterns.
 
 Charts expose Group roles with a summary and bounded point Labels. The pinned
 AccessKit version has no Chart role. Point alternatives use the same projection

@@ -9,11 +9,11 @@ The Dart host checks native ABI/protocol version 1 before creating a host. Libra
 From the repository root:
 
 ```powershell
-./tool/build.ps1
+dart run tool/build.dart
 dart run tool/dev.dart
 ```
 
-On macOS/Linux, use `dart run tool/build.dart` in place of the PowerShell build command. Linux currently requires X11; see [Unix prerequisites and packaging](unix-release-checks.md). The application API and development entry point are the same on all three targets.
+The Dart build command works on all three targets. Linux currently requires X11; see [Unix prerequisites and packaging](unix-release-checks.md).
 
 The default entry point is [Market watch](../example/watchlist/main.dart). It contains 1,000 fictitious instruments, search, row selection, a shortlist, price sorting and sample price updates. Search and the shortlist toggle are a native view over the dataset; updating a price or shortlist entry sends one cell edit. There is no live feed or trading connection. Application data is in memory and resets when the process exits.
 
@@ -161,41 +161,41 @@ compare against. The setting is read once at startup.
 The following commands describe the Windows package. For macOS/Linux use `dart run tool/package.dart --name=MyApp --entry=path/to/main.dart`, then `dart run tool/verify_package.dart ARCHIVE REPORT.json`. Their [release guide](unix-release-checks.md) describes the bundle, standalone verifier, runtime prerequisites and signing limits.
 
 ```powershell
-./tool/package.ps1
-./tool/verify_package.ps1
+dart run tool/package.dart
+dart run tool/verify_package.dart build/gpuidart-windows-x64.zip
 ```
 
-The default output is build/gpuidart-windows-x64.zip. The directory beside it contains the executable, GPUI DLL, release CRT, license, manifest of file hashes and a standalone verification script. The executable embeds a PerMonitorV2 application manifest. The shared host also selects or verifies that awareness before opening GPUI, which covers dart run and launchers with the same setting already applied. Conflicting earlier DPI configuration fails with an actionable error.
+The default output is build/gpuidart-windows-x64.zip. A fresh staging directory contains the executable, GPUI DLL, release CRT, licenses, manifest of file hashes, `verify.exe` and its Rust OS helper. The executable embeds a PerMonitorV2 application manifest. The shared host also selects or verifies that awareness before opening GPUI, which covers dart run and launchers with the same setting already applied. Conflicting earlier DPI configuration fails with an actionable error.
 
 The package verifier extracts outside the repository, uses an unrelated working directory and Windows-only PATH, runs the application's self-test, checks package hashes/loaded DLL paths and queries the actual window's DPI-awareness context. These local checks do not establish clean-machine dependency closure.
 
 Custom entry point and filename:
 
 ```powershell
-./tool/package.ps1 -EntryPoint path/to/main.dart -Name MyApp
-./tool/verify_package.ps1 -Zip build/MyApp-windows-x64.zip
+dart run tool/package.dart --entry=path/to/main.dart --name=MyApp
+dart run tool/verify_package.dart build/MyApp-windows-x64.zip
 ```
 
-The package verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot and passed set to the boolean true. The counter and watchlist examples implement that contract. Preferences has a separate `tool/verify_settings.dart` JIT/AOT verifier. A custom application supplies its own meaningful self-test. Failed package verification writes passed false and the error to its report, replacing any earlier success. Supply -CrtDirectory when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
+The package verifier expects a --self-test mode that exits successfully and prints one JSON object with mode set to aot and passed set to the boolean true. The counter and watchlist examples implement that contract. Preferences has a separate `tool/verify_settings.dart` JIT/AOT verifier. A custom application supplies its own meaningful self-test. Failed package verification writes passed false and the error to its report, replacing any earlier success. Supply --crt-directory=DIR when the project-local Microsoft x64 CRT archive is unavailable. Packages are evaluation ZIPs, not signed installers.
 
-The manifest records the native ABI, Git commit, whether source files were modified, tool versions and hashes of source files and shipped files. It includes the application entry file even if that file is ignored by Git or outside the SDK repository. Such an entry is marked as uncommitted source. The included release instructions use the chosen executable filename. Keep the manifest with a result. Use verify_package.ps1 -ReportPath to retain separate verification reports for different packages.
+The manifest records the native ABI, Git commit, whether source files were modified, tool versions and hashes of source files and shipped files. It includes the application entry file even if that file is ignored by Git or outside the SDK repository. Such an entry is marked as uncommitted source. The included release instructions use the chosen executable filename. Keep the manifest with a result. Use dart run tool/verify_package.dart ARCHIVE REPORT.json to retain separate verification reports for different packages.
 
 ## Verification status
 
-The [MVP release-candidate record](../reports/mvp/README.md) contains the latest committed-source package and acceptance result. Run `./tool/verify_mvp.ps1` for the full local release gate. Its source hash covers repository source files and the application entry; when packaging an application outside this repository, retain that application's own revision and dependency sources separately.
+The [MVP release-candidate record](../reports/mvp/README.md) contains the latest committed-source package and acceptance result. Run `dart run tool/verify_mvp.dart` for the full local release gate. Its source hash covers repository source files and the application entry; when packaging an application outside this repository, retain that application's own revision and dependency sources separately.
 
 Run the SDK checks after building the native library:
 
 ```powershell
-./tool/check.ps1
+dart run tool/check.dart
 dart run tool/verify_watchlist_ui.dart
 dart run tool/verify_watchlist_stability.dart
 dart run tool/verify_watchlist_reload.dart
 dart run tool/verify_dev_launcher.dart
 dart run tool/verify_dev_failures.dart
 dart run tool/verify_settings.dart build/settings-check.json
-./tool/package.ps1
-./tool/verify_package.ps1
+dart run tool/package.dart
+dart run tool/verify_package.dart build/gpuidart-windows-x64.zip
 ```
 
 See [the SDK milestone record](../reports/sdk/README.md). Automated checks cover native input/navigation, dataset transactions, the live watchlist's posted mouse/character messages, state-preserving code reload, AOT launch and 125% DPI. Posted messages are not IME composition or physical input-to-present measurements.

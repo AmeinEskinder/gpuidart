@@ -8,7 +8,6 @@ must be retained in a separate command log; a path named `release` is not proof
 of its compilation settings.
 
 ```powershell
-. ./tool/env.ps1
 dart run tool/performance/run_logged.dart build/performance-build cargo build --locked --release -p gpuidart
 dart run tool/record_platform_environment.dart build/performance-environment.json
 dart run tool/performance/run_baselines.dart build/performance-windows target/release 3
@@ -17,6 +16,17 @@ dart run tool/performance/run_baselines.dart build/performance-windows target/re
 Unix also requires `-p gpuidart-launcher`. `.github/workflows/performance.yml`
 runs the same tools on hosted macOS and Linux/X11. These are machine-specific
 baselines; hosted Linux uses Mesa software rendering.
+
+To capture a snapshot gate for a baseline checkout and the current checkout,
+using each checkout's SDK and release library:
+
+```sh
+dart run tool/performance/run_update_gate.dart --baseline ../baseline --output build/update-gate
+```
+
+`--target-dir` selects a Cargo build directory. Each side's binaries are copied
+before building the next side. `--sides trunk,head` selects the sides to run;
+existing series are retained and cannot be overwritten.
 
 ## Cases
 

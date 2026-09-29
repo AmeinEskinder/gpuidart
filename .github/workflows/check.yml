@@ -38,4 +38,4 @@ jobs:
       - name: Restore locked Dart dependencies
         run: dart pub get --enforce-lockfile
       - name: Native headless and Dart protocol checks
-        run: ./tool/check.ps1 -Headless
+        run: dart run tool/check.dart --headless

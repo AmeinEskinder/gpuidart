@@ -1,6 +1,24 @@
 import 'dart:io';
 
-import 'windows_powershell.dart';
+import 'toolchain.dart';
+
+Future<Process> startCommand(
+  String executable,
+  List<String> args, {
+  Map<String, String>? environment,
+  String? workingDirectory,
+  ProcessStartMode mode = ProcessStartMode.normal,
+}) {
+  final childEnvironment = toolchainEnvironment(environment: environment);
+  return Process.start(
+    toolExecutable(executable, childEnvironment),
+    args,
+    environment: childEnvironment,
+    includeParentEnvironment: false,
+    workingDirectory: workingDirectory,
+    mode: mode,
+  );
+}
 
 Future<String> command(
   String executable,
@@ -9,19 +27,14 @@ Future<String> command(
   String? workingDirectory,
 }) async {
   stdout.writeln('> $executable ${args.join(' ')}');
-  final result =
-      Platform.isWindows && executable.toLowerCase() == 'powershell.exe'
-      ? await runWindowsPowerShell(
-          args,
-          environment: environment,
-          workingDirectory: workingDirectory,
-        )
-      : await Process.run(
-          executable,
-          args,
-          environment: environment,
-          workingDirectory: workingDirectory,
-        );
+  final childEnvironment = toolchainEnvironment(environment: environment);
+  final result = await Process.run(
+    toolExecutable(executable, childEnvironment),
+    args,
+    environment: childEnvironment,
+    includeParentEnvironment: false,
+    workingDirectory: workingDirectory,
+  );
   if (result.exitCode != 0) {
     throw StateError(
       '$executable failed (${result.exitCode}): ${result.stdout}\n${result.stderr}',
@@ -31,31 +44,24 @@ Future<String> command(
 }
 
 Future<void> buildNative({required bool release}) async {
-  if (Platform.isWindows) {
-    await command('powershell.exe', [
-      '-NoProfile',
-      '-File',
-      'tool/build.ps1',
-      if (release) '-Release',
-    ]);
-  } else {
-    await command(
-      'cargo',
-      [
-        'build',
-        '--locked',
-        '-p',
-        'gpuidart',
-        '-p',
-        'gpuidart-launcher',
-        if (release) '--release',
-      ],
-      environment: {if (Platform.isMacOS) 'MACOSX_DEPLOYMENT_TARGET': '15.0'},
-    );
-    await command(Platform.resolvedExecutable, [
-      'pub',
-      'get',
-      '--enforce-lockfile',
-    ]);
-  }
+  final arguments = [
+    'build',
+    '--locked',
+    '-p',
+    'gpuidart',
+    '-p',
+    'gpuidart-launcher',
+    if (release) '--release',
+  ];
+  stdout.writeln('> cargo ${arguments.join(' ')}');
+  final process = await startCommand(
+    'cargo',
+    arguments,
+    mode: ProcessStartMode.inheritStdio,
+  );
+  final status = await process.exitCode;
+  if (status != 0) throw StateError('Native build failed ($status)');
+  stdout.writeln(
+    await command(dartExecutable, ['pub', 'get', '--enforce-lockfile']),
+  );
 }

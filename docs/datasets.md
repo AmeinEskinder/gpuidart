@@ -206,8 +206,8 @@ Data acknowledgements report native parsing time, application time, records chec
 ## Verification
 
 ```powershell
-./tool/check.ps1
-./tool/package.ps1
+dart run tool/check.dart
+dart run tool/package.dart
 dart run tool/measure_data.dart
 $env:GPUIDART_LIBRARY = "$PWD/target/release/gpuidart.dll"
 dart run tool/verify_reload.dart

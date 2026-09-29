@@ -7,11 +7,12 @@ same pinned GPUI Kit dependency. The initial UI follows the toolkit's
 Build and run from the repository root:
 
 ```sh
-cargo build --locked -p gpuidart-platform-probe
+dart run tool/env.dart cargo build --locked -p gpuidart-platform-probe
 dart run tool/platform_probe/run.dart
 ```
 
-On Windows first load `tool/env.ps1`. On Linux provide an X11 display and Vulkan
+The environment wrapper discovers the local Rust and Windows C++ toolchains.
+On Linux provide an X11 display and Vulkan
 driver. The hosted job uses Xvfb and Mesa software rendering. The output directory
 defaults to `build/platform-probe`; pass another path to retain separate attempts.
 
@@ -19,6 +20,9 @@ Each command has a deadline and separate stdout/stderr. `results.json` records
 exit codes, timeout, tool versions and environment observations. The runner
 returns failure if any launcher fails. In particular, macOS worker rejection
 is an unsupported launch strategy, never a successful window check.
+
+Metal device enumeration uses the Rust helper in `tool/native_probe`. The Dart
+driver builds it from its pinned standalone Cargo manifest before running it.
 
 The companion candidate now runs in JIT and AOT, plus actual method reload,
 invalid-source rejection and recovery through the existing development launcher.

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import '../src/commands.dart';
+
 /// Retains a command's output and status, including failed benchmark attempts.
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
@@ -22,7 +24,7 @@ Future<void> main(List<String> args) async {
   final out = File('${output.path}/stdout.log').openWrite();
   final err = File('${output.path}/stderr.log').openWrite();
   try {
-    final process = await Process.start(args[1], args.sublist(2));
+    final process = await startCommand(args[1], args.sublist(2));
     record['pid'] = process.pid;
     final copies = [
       out.addStream(process.stdout),

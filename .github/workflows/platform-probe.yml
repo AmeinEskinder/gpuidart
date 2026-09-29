@@ -5,6 +5,9 @@ on:
     paths:
       - '.github/workflows/platform-probe.yml'
       - 'tool/platform_probe/**'
+      - 'tool/native_probe/**'
+      - 'tool/src/commands.dart'
+      - 'tool/src/toolchain.dart'
       - 'Cargo.toml'
       - 'Cargo.lock'
   workflow_dispatch:

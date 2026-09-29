@@ -2,6 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import '../native_probe/client.dart';
+import '../src/commands.dart';
+import '../src/toolchain.dart';
+
 Future<void> main(List<String> args) async {
   final output = Directory(args.isEmpty ? 'build/platform-probe' : args.single)
       .absolute;
@@ -23,7 +27,7 @@ Future<void> main(List<String> args) async {
     Object? error;
     String? inputError;
     try {
-      final process = await Process.start(
+      final process = await startCommand(
         executable,
         arguments,
         environment: companion
@@ -145,7 +149,7 @@ Future<void> main(List<String> args) async {
       'SPDisplaysDataType',
     ]);
     await run('os', 'sw_vers', []);
-    await run('metal', 'swift', ['tool/platform_probe/metal.swift']);
+    await run('metal', await nativeProbe(), ['metal']);
   } else if (Platform.isLinux) {
     await run('os', 'uname', ['-a']);
     await run('vulkan', 'vulkaninfo', ['--summary']);
@@ -169,13 +173,13 @@ Future<void> main(List<String> args) async {
   final nativeWorker = await run('rust-worker', native, [
     '--worker',
   ], driveInput: driveInput);
-  final jit = await run('dart-jit', Platform.resolvedExecutable, [
+  final jit = await run('dart-jit', dartExecutable, [
     '--enable-vm-service=0',
     'tool/platform_probe/probe.dart',
     library,
   ], driveInput: driveInput);
   final aotPath = '${output.path}/probe$suffix';
-  final compile = await run('aot-compile', Platform.resolvedExecutable, [
+  final compile = await run('aot-compile', dartExecutable, [
     'compile',
     'exe',
     'tool/platform_probe/probe.dart',
@@ -186,29 +190,24 @@ Future<void> main(List<String> args) async {
       ? await run('dart-aot', aotPath, [library], driveInput: driveInput)
       : null;
 
-  final companionJit = await run('companion-jit', Platform.resolvedExecutable, [
+  final companionJit = await run('companion-jit', dartExecutable, [
     'tool/platform_probe/companion.dart',
     native,
   ], companion: true);
   final companionAotPath = '${output.path}/companion$suffix';
-  final companionCompile = await run(
-    'companion-compile',
-    Platform.resolvedExecutable,
-    [
-      'compile',
-      'exe',
-      'tool/platform_probe/companion.dart',
-      '-o',
-      companionAotPath,
-    ],
-    timeout: const Duration(minutes: 2),
-  );
+  final companionCompile = await run('companion-compile', dartExecutable, [
+    'compile',
+    'exe',
+    'tool/platform_probe/companion.dart',
+    '-o',
+    companionAotPath,
+  ], timeout: const Duration(minutes: 2));
   final companionAot = companionCompile['exit_code'] == 0
       ? await run('companion-aot', companionAotPath, [native], companion: true)
       : null;
   final reload = await run(
     'companion-reload',
-    Platform.resolvedExecutable,
+    dartExecutable,
     ['tool/platform_probe/reload.dart', native, '${output.path}/reload.json'],
     companion: true,
     timeout: const Duration(seconds: 45),
@@ -217,7 +216,7 @@ Future<void> main(List<String> args) async {
   final ffiReload = !Platform.isMacOS
       ? await run(
           'ffi-reload',
-          Platform.resolvedExecutable,
+          dartExecutable,
           [
             'tool/platform_probe/reload_ffi.dart',
             library,
@@ -262,7 +261,7 @@ Future<void> main(List<String> args) async {
 
 Future<void> injectInput() async {
   Future<String> xdotool(List<String> arguments) async {
-    final process = await Process.start('xdotool', arguments);
+    final process = await startCommand('xdotool', arguments);
     final output = utf8.decodeStream(process.stdout);
     final errors = utf8.decodeStream(process.stderr);
     final status = await process.exitCode.timeout(

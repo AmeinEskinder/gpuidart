@@ -6,35 +6,34 @@ import 'package:crypto/crypto.dart';
 import 'package:gpuidart/src/platform.dart';
 
 import 'src/commands.dart';
+import 'src/package_manifest.dart';
+import 'src/toolchain.dart';
+import 'src/windows_package.dart';
 
 Future<void> main(List<String> args) async {
   var name = 'gpuidart';
   var entry = 'example/watchlist/main.dart';
+  String? crtDirectory;
   for (final arg in args) {
     if (arg.startsWith('--name=')) {
       name = arg.substring(7);
     } else if (arg.startsWith('--entry=')) {
       entry = arg.substring(8);
+    } else if (arg.startsWith('--crt-directory=')) {
+      crtDirectory = arg.substring(16);
     } else {
-      throw ArgumentError('Usage: package.dart [--name=NAME] [--entry=FILE]');
+      throw ArgumentError(
+        'Usage: package.dart [--name=NAME] [--entry=FILE] [--crt-directory=DIR]',
+      );
     }
   }
-  if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(name)) {
-    throw ArgumentError('Invalid package name');
-  }
+  validatePackageName(name);
   if (Platform.isWindows) {
-    stdout.writeln(
-      await command('powershell.exe', [
-        '-NoProfile',
-        '-File',
-        'tool/package.ps1',
-        '-Name',
-        name,
-        '-EntryPoint',
-        entry,
-      ]),
-    );
+    await packageWindows(name: name, entry: entry, crtDirectory: crtDirectory);
     return;
+  }
+  if (crtDirectory != null) {
+    throw ArgumentError('--crt-directory is a Windows option');
   }
   final target = switch (Abi.current()) {
     Abi.linuxX64 => 'linux-x64',
@@ -53,7 +52,7 @@ Future<void> main(List<String> args) async {
       : stage;
   payload.createSync(recursive: true);
   final binary = '${payload.path}/$name';
-  await command(Platform.resolvedExecutable, [
+  await command(dartExecutable, [
     'compile',
     'exe',
     '--define=gpuidart.packaged=true',
@@ -66,7 +65,7 @@ Future<void> main(List<String> args) async {
   await File('target/release/gpuidart-launcher')
       .copy('${payload.path}/gpuidart-launcher');
   await command('chmod', ['755', binary, '${payload.path}/gpuidart-launcher']);
-  await command(Platform.resolvedExecutable, [
+  await command(dartExecutable, [
     'compile',
     'exe',
     'tool/unix/verify.dart',
@@ -138,9 +137,11 @@ Future<void> main(List<String> args) async {
       .copy('${stage.path}/AccessKit-LICENSE-MIT.txt');
   await File('native/vendor/LICENSE-APACHE')
       .copy('${stage.path}/AccessKit-LICENSE-APACHE.txt');
-  await File.fromUri(
-    File(Platform.resolvedExecutable).parent.parent.uri.resolve('LICENSE'),
-  ).copy('${stage.path}/Dart-LICENSE.txt');
+  final dartSdk = await command(dartExecutable, [
+    'run',
+    'tool/src/dart_sdk.dart',
+  ]);
+  await File('$dartSdk/LICENSE').copy('${stage.path}/Dart-LICENSE.txt');
   await File('${stage.path}/THIRD-PARTY.json').writeAsString(
     jsonEncode(
       packages
@@ -192,25 +193,6 @@ Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, Ac
       .toList();
   files.sort((a, b) => a.path.compareTo(b.path));
   final prefix = '${stage.absolute.path}/';
-  final sources = (await command('git', [
-    'ls-files',
-    '--cached',
-    '--others',
-    '--exclude-standard',
-    '--',
-    'LICENSE',
-    'lib',
-    'native',
-    'launcher',
-    'example',
-    'tool',
-    'pubspec.yaml',
-    'pubspec.lock',
-    'Cargo.toml',
-    'Cargo.lock',
-    'rust-toolchain.toml',
-  ])).split('\n').where((p) => p.isNotEmpty).toSet().toList()..sort();
-  if (!sources.contains(entry)) sources.add(entry);
   final manifest = {
     'target': target,
     'project_license': 'MIT',
@@ -226,25 +208,7 @@ Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, Ac
     'signing': Platform.isMacOS
         ? 'ad-hoc evaluation; not notarized'
         : 'unsigned evaluation archive',
-    'build': {
-      'git_commit': await command('git', ['rev-parse', 'HEAD']),
-      'source_dirty': (await command('git', [
-        'status',
-        '--porcelain',
-      ])).isNotEmpty,
-      'source_files': [
-        for (final source in sources)
-          {
-            'path': source,
-            'sha256': sha256
-                .convert(await File(source).readAsBytes())
-                .toString(),
-          },
-      ],
-      'dart': Platform.version,
-      'rustc': await command('rustc', ['--version']),
-      'built_at_utc': DateTime.now().toUtc().toIso8601String(),
-    },
+    'build': await sourceManifest(entry),
     'files': [
       for (final file in files)
         {

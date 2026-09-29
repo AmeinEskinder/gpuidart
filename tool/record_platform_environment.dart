@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'native_probe/client.dart';
+import 'src/toolchain.dart';
+
 Future<void> main(List<String> args) async {
   if (args.length != 1) {
     throw ArgumentError('Usage: record_platform_environment.dart OUTPUT');
@@ -11,30 +14,13 @@ Future<void> main(List<String> args) async {
     ['cargo', '--version'],
     if (!Platform.isWindows) ['uname', '-a'],
     if (Platform.isWindows) ...[
-      [
-        'powershell.exe',
-        '-NoProfile',
-        '-Command',
-        'Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,TotalVisibleMemorySize | ConvertTo-Json',
-      ],
-      [
-        'powershell.exe',
-        '-NoProfile',
-        '-Command',
-        'Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors | ConvertTo-Json',
-      ],
-      [
-        'powershell.exe',
-        '-NoProfile',
-        '-Command',
-        'Get-CimInstance Win32_VideoController | Select-Object Name,DriverVersion,CurrentHorizontalResolution,CurrentVerticalResolution | ConvertTo-Json',
-      ],
+      ['gpuidart-native-probe', 'environment'],
     ] else if (Platform.isMacOS) ...[
       ['sw_vers'],
       ['xcodebuild', '-version'],
       ['xcrun', '--find', 'metal'],
       ['sysctl', 'hw.model', 'hw.machine', 'hw.physicalcpu', 'hw.memsize'],
-      ['swift', 'tool/platform_probe/metal.swift'],
+      ['gpuidart-native-probe', 'metal'],
     ] else ...[
       ['cat', '/etc/os-release'],
       ['ldd', '--version'],
@@ -44,11 +30,16 @@ Future<void> main(List<String> args) async {
     ],
   ];
   final results = <Map<String, Object>>[];
+  final environment = toolchainEnvironment();
   for (final command in commands) {
     try {
       final result = await Process.run(
-        command.first,
+        command.first == 'gpuidart-native-probe'
+            ? await nativeProbe()
+            : toolExecutable(command.first, environment),
         command.skip(1).toList(),
+        environment: environment,
+        includeParentEnvironment: false,
       ).timeout(const Duration(seconds: 30));
       results.add({
         'command': command,

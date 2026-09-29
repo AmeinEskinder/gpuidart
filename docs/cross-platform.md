@@ -21,9 +21,9 @@ Run the existing Dart API and snapshot/dataset protocol on macOS and Linux. Exte
 | DPI | Embedded manifest, PerMonitorV2 checks | package verifier, `lib/src/windows.dart` |
 | Dev-session teardown | Windows uses `taskkill /T /F`; the existing Unix fallback kills only the tracked process | `tool/src/dev_session.dart` |
 | Benchmark input tracing | `#[link(name = "user32")]` | `benchmarks/native/src/input_trace.rs` |
-| Toolchain | MSVC, Windows SDK, PowerShell scripts | `tool/*.ps1`, `benchmarks/*.ps1` |
-| Packaging | CRT redistributable, ZIP layout | `tool/package.ps1`, `tool/windows/` |
-| Test eligibility and fixtures | Four Dart test files use `@TestOn('windows')`; DLL names, fixture compilation and the incompatible-library probe are platform-specific | `test/*_test.dart`, `tool/build_test_fixtures.ps1` |
+| Toolchain | MSVC and Windows SDK discovery | `tool/src/toolchain.dart` |
+| Packaging | CRT redistributable, ZIP layout | `tool/package.dart`, `tool/windows/` |
+| Test eligibility and fixtures | Four Dart test files use `@TestOn('windows')`; DLL names, fixture compilation and the incompatible-library probe are platform-specific | `test/*_test.dart`, `tool/build_test_fixtures.dart` |
 
 ## Phase 0: feasibility spike
 
@@ -57,7 +57,7 @@ Acceptance: equivalent lifecycle and live-window contracts pass on each targeted
 
 ## Phase 3: tooling and CI
 
-- Port build/check/package flows so they run on each host OS. Prefer extending the existing Dart tooling (`tool/*.dart`) over triplicating PowerShell/bash; keep `tool/check.ps1` working on Windows.
+- Keep build/check/package flows in the shared Dart tooling (`tool/*.dart`), with Rust helpers for OS APIs.
 - Extend hosted CI to the declared Windows/macOS/Linux targets with explicit runner OS images and architectures. Record the latest verified Windows source in [CI evidence](../reports/ci/README.md). Keep headless and real-window jobs distinct. If a runner excludes `live-window` suites, record them as untested and require a separate real-window result before claiming support. Preserve suite serialization for tests sharing process-global native state.
 - Per-OS packaging verification: use the correct bundle/launcher and native loader search paths; extract outside the repository, use an unrelated working directory and restrict the environment. Use `otool -L` / `ldd` for dependency inspection, and separately record libraries actually loaded by the self-test process, such as dyld image paths or Linux process mappings. Define macOS signing/notarization requirements and Linux runtime-library prerequisites for the intended distribution channel.
 - Exercise an extracted package without development SDKs on a clean environment per target. Hosted build images and restricted PATH tests alone do not establish this gate.

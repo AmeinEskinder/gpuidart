@@ -41,7 +41,7 @@ The latest local acceptance run and Windows Japanese IME observation passed. The
 Commit source and test changes, then run:
 
 ```powershell
-./tool/verify_mvp.ps1
+dart run tool/verify_mvp.dart
 ```
 
 This runs nine checks in sequence, records each exit code and log, builds WatchlistMvp-windows-x64.zip, and verifies its source identity. Results are written to reports/mvp/acceptance.json. Any failed check leaves local_acceptance_passed false. The report keeps external release checks pending rather than inferring them from local results.

@@ -5,7 +5,8 @@ import 'dart:io';
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
-import 'src/windows_powershell.dart';
+import 'src/windows_tool.dart';
+import 'src/toolchain.dart';
 
 Future<void> main() async {
   final fixture = await Directory('.cache').createTemp('watchlist-launcher-');
@@ -13,7 +14,7 @@ Future<void> main() async {
       .copy('${fixture.path}/app.dart');
   final entry = await File('example/watchlist/main.dart')
       .copy('${fixture.path}/main.dart');
-  final process = await Process.start(Platform.resolvedExecutable, [
+  final process = await Process.start(dartExecutable, [
     'run',
     'tool/dev.dart',
     entry.absolute.path,
@@ -70,18 +71,7 @@ Future<void> main() async {
     if (state['state']['labels']['title'] != 'Market watch from file watcher') {
       throw StateError('File watcher did not apply changed code');
     }
-    final close = await runWindowsPowerShell([
-      '-NoProfile',
-      '-File',
-      'tool/windows/watchlist_probe.ps1',
-      '-AppProcessId',
-      '${vm.pid!}',
-      '-Step',
-      'close',
-    ]);
-    if (close.exitCode != 0) {
-      throw StateError('Window close failed: ${close.stderr}');
-    }
+    await watchlistStep(vm.pid!, 'close');
     final status = await process.exitCode.timeout(const Duration(seconds: 15));
     if (status != 0) throw StateError('Launcher exited with $status: $errors');
     await Directory('reports/sdk').create(recursive: true);

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'src/dev_session.dart';
-import 'src/windows_powershell.dart';
+import 'src/windows_tool.dart';
 
 Future<void> main() async {
   final fixture = await Directory('.cache').createTemp('launcher-failures-');
@@ -60,16 +60,12 @@ Future<void> main(List<String> args) async {
       'elapsed_ms': timer.elapsedMilliseconds,
     };
   }
-  final needle = fixture.absolute.path.replaceAll("'", "''");
-  final processes = await runWindowsPowerShell([
-    '-NoProfile',
-    '-Command',
-    "@(Get-CimInstance Win32_Process | Where-Object { \$_.Name -match '^dart(vm)?\\.exe\$' -and \$_.CommandLine -like '*$needle*' }).Count",
+  final processes = await windowsQuery([
+    'processes-containing',
+    fixture.absolute.path,
   ]);
-  if (processes.exitCode != 0 || '${processes.stdout}'.trim() != '0') {
-    throw StateError(
-      'Launcher left test processes behind: ${processes.stdout} ${processes.stderr}',
-    );
+  if ((processes as List).isNotEmpty) {
+    throw StateError('Launcher left test processes behind: $processes');
   }
   results['remaining_application_processes'] = 0;
   results['passed'] = true;

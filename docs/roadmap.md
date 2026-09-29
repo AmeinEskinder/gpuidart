@@ -234,8 +234,8 @@ elevated session for the Dart fixture (C); CI is green with the docs lint
 through the catalog commits, and the
 sheet kind's live test took three commits to pass on Linux and macOS.
 
-Verification: at the async-view head the native library suite runs 111 tests (two
-ignored timing probes) and the Dart suite 127, including the live-window,
+Verification: after the tooling migration the native library suite runs 111 tests (two
+ignored timing probes) and the Dart suite 140, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
 library, plus the repository's full check gate. Earlier counts in this
@@ -245,6 +245,8 @@ differ from the Windows full gate it just ran, when the README's node-kind
 count or the Dart node classes differ from the native `Node` enum, when a
 node class is missing from the SDK reference, or when the README overview
 calls a publication a whole description.
-The branch is pushed; the Windows, Linux and macOS SDK checks and the
-accessibility probes pass on it, and the Linux and macOS window jobs run the
-live-window suite that holds the secondary-window and patch tests.
+Earlier revisions passed the hosted Windows, Linux and macOS SDK and
+accessibility jobs. The tooling migration passed the local Windows gate;
+its hosted jobs have not run yet. The Linux and macOS window jobs retain the
+live-window suite that holds the secondary-window and patch tests. See the
+[migration verification](tooling-migration.md) for the platform limits.

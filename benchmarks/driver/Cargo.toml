@@ -1,0 +1,16 @@
+[package]
+name = "gpuidart-benchmark-driver"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[target.'cfg(windows)'.dependencies]
+png = "0.18"
+zip = { version = "2", default-features = false, features = ["deflate"] }

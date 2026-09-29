@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import '../native_probe/client.dart';
+
 /// Linux-only external bus observer. Neither values nor names enter its report.
 class CacheEvents {
   CacheEvents._(this.process, this.output, this.errors);
@@ -12,8 +14,8 @@ class CacheEvents {
   static Future<CacheEvents> start(int pid, String path) async {
     final output = File(path);
     if (output.existsSync()) throw StateError('Refusing to replace $path');
-    final process = await Process.start('/usr/bin/python3', [
-      'tool/accessibility/cache_events.py',
+    final process = await Process.start(await nativeProbe(), [
+      'cache-events',
       '$pid',
       path,
     ]);

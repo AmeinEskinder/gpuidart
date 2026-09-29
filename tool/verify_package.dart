@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 
 import 'src/commands.dart';
+import 'src/archives.dart';
 
 Future<void> main(List<String> args) async {
   final runtimeOnly = args.contains('--runtime-only');
@@ -21,35 +22,33 @@ Future<void> main(List<String> args) async {
     if (runtimeOnly) {
       throw UnsupportedError('--runtime-only is a Unix verifier option');
     }
-    stdout.writeln(
-      await command('powershell.exe', [
-        '-NoProfile',
-        '-File',
-        'tool/verify_package.ps1',
-        '-Zip',
-        archive.path,
-        '-ReportPath',
-        report.path,
-      ]),
-    );
-    return;
   }
   final directory = await Directory.systemTemp.createTemp(
     'gpuidart-extracted-',
   );
   // Extract our generated archive outside the repository. Keep evidence in place.
-  final names = await command('tar', ['-tzf', archive.path]);
-  if (names
-      .split('\n')
-      .any((name) => name.startsWith('/') || name.split('/').contains('..'))) {
-    throw StateError('Unsafe archive path');
+  if (Platform.isWindows) {
+    await extractZip(archive, directory);
+  } else {
+    final names = await command('tar', ['-tzf', archive.path]);
+    if (names
+        .split('\n')
+        .any(
+          (name) => name.startsWith('/') || name.split('/').contains('..'),
+        )) {
+      throw StateError('Unsafe archive path');
+    }
+    await command('tar', ['-xzf', archive.path, '-C', directory.path]);
   }
-  await command('tar', ['-xzf', archive.path, '-C', directory.path]);
-  final result = await Process.run('${directory.path}/verify', [
-    if (runtimeOnly) '--runtime-only',
-    '--report=${report.path}',
-    '--environment=${args.length > 2 ? args[2] : 'development_machine'}',
-  ]);
+  await report.parent.create(recursive: true);
+  final result = await Process.run(
+    '${directory.path}/verify${Platform.isWindows ? '.exe' : ''}',
+    [
+      if (runtimeOnly) '--runtime-only',
+      '--report=${report.path}',
+      '--environment=${args.length > 2 ? args[2] : 'development_machine'}',
+    ],
+  );
   final value = jsonDecode(await report.readAsString()) as Map<String, dynamic>;
   value['archive'] = {
     'path': archive.path,

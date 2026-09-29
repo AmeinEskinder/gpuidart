@@ -5,9 +5,13 @@ publish_to: none
 environment:
   sdk: '>=3.13.0 <4.0.0'
 dependencies:
-  ffi: ^2.1.4
-dev_dependencies:
+  archive: ^4.3.0
   crypto: ^3.0.7
+  ffi: ^2.1.4
+  path: ^1.9.1
+  vm_service: ^15.3.0
+dev_dependencies:
   test: ^1.26.0
   lints: ^6.0.0
-  vm_service: ^15.3.0
+executables:
+  gpuidart:

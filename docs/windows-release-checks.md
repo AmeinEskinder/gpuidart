@@ -7,17 +7,24 @@ with `mode: "aot"` and boolean `passed: true`. Write diagnostics to UTF-8 stderr
 The standalone verifier preserves non-ASCII text in both streams and rejects
 malformed UTF-8.
 
+The report records the complete NT version from `RtlGetVersion` and native
+architecture from `IsWow64Process2`. Its OS query does not require firmware,
+network or installed-language inspection. Windows 11 can retain a Windows 10
+registry product name; the report keeps that raw value and labels the caption
+inference separately. If that registry value cannot be read, the caption uses
+the NT version.
+
 ## Fresh Windows machine or VM
 
 1. Use a newly provisioned Windows x64 machine/VM without Dart, Flutter, Rust or Visual Studio. Record its image/version and installed prerequisites. Do not copy SDKs from the development machine.
 2. Extract the complete ZIP. Keep the DLLs beside the executable.
-3. Open PowerShell in the extracted directory and run:
+3. Open a terminal in the extracted directory and run:
 
    ```powershell
-   ./verify.ps1 -Environment clean_vm
+   ./verify.exe --environment=clean_vm
    ```
 
-   Use clean_machine for a separate clean physical machine. This option records the operator's declaration; the script does not provision or independently certify a clean environment.
+   Use `--environment=clean_machine` for a separate clean physical machine. This option records the operator's declaration; the verifier does not provision or independently certify a clean environment. The package includes the verifier and its native Windows helper; no Dart or Rust SDK is required.
 4. Retain verification.json, including the exact package hashes and loaded modules. If it fails, retain the console error and do not install missing prerequisites until recording the original failure.
 5. Launch gpuidart.exe normally. Search for ALP0000, select it, add it to the shortlist, simulate a price update, then toggle the shortlist view. Confirm the price reads 100.07 and the row remains saved.
 6. Repeat at 125% or 150% scaling. If two differently scaled monitors are available, move the window between them and check text, input caret/candidate placement, hit targets and clipping.

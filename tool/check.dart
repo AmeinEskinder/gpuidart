@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:gpuidart/src/platform.dart';
 
+import 'src/commands.dart';
+import 'src/toolchain.dart';
+
 Future<void> main(List<String> args) async {
   if (args.any((arg) => arg != '--headless')) {
     throw ArgumentError('Usage: dart run tool/check.dart [--headless]');
@@ -10,7 +13,7 @@ Future<void> main(List<String> args) async {
   final headless = args.contains('--headless');
   Future<void> run(String executable, List<String> arguments) async {
     stdout.writeln('> $executable ${arguments.join(' ')}');
-    final process = await Process.start(
+    final process = await startCommand(
       executable,
       arguments,
       mode: ProcessStartMode.inheritStdio,
@@ -23,7 +26,7 @@ Future<void> main(List<String> args) async {
   /// counts it just produced.
   Future<String> runCapturing(String executable, List<String> arguments) async {
     stdout.writeln('> $executable ${arguments.join(' ')}');
-    final process = await Process.start(executable, arguments);
+    final process = await startCommand(executable, arguments);
     final captured = StringBuffer();
     final streams = Future.wait([
       process.stdout.transform(utf8.decoder).forEach((chunk) {
@@ -41,11 +44,20 @@ Future<void> main(List<String> args) async {
     return captured.toString();
   }
 
-  await run(Platform.resolvedExecutable, [
-    'run',
-    'tool/accessibility/verify_vendor.dart',
-  ]);
+  await run(dartExecutable, ['run', 'tool/accessibility/verify_vendor.dart']);
   await run('cargo', ['fmt', '--all', '--check']);
+  for (final manifest in [
+    'tool/native_probe/Cargo.toml',
+    'benchmarks/driver/Cargo.toml',
+    if (Platform.isWindows) 'tool/windows/native/Cargo.toml',
+  ]) {
+    await run('cargo', ['fmt', '--manifest-path', manifest, '--', '--check']);
+    await run('cargo', ['test', '--locked', '--manifest-path', manifest]);
+  }
+  await run(dartExecutable, ['run', 'tool/build_cli.dart']);
+  await run('build/bin/gpuidart${Platform.isWindows ? '.exe' : ''}', [
+    'doctor',
+  ]);
   await run('rustfmt', [
     '--edition',
     '2024',
@@ -73,14 +85,15 @@ Future<void> main(List<String> args) async {
   ]);
   await run('cargo', ['build', '--locked', '-p', 'gpuidart-launcher']);
   if (!headless) await run('cargo', ['build', '--locked', '-p', 'gpuidart']);
-  await run(Platform.resolvedExecutable, [
+  await run(dartExecutable, [
     'format',
     '--output=none',
     '--set-exit-if-changed',
     'lib',
     'test',
   ]);
-  await run(Platform.resolvedExecutable, ['analyze', '--fatal-infos']);
+  await run(dartExecutable, ['analyze', '--fatal-infos']);
+  await run(dartExecutable, ['test', 'benchmarks/analysis_test.dart']);
   Directory('.cache').createSync(recursive: true);
   await run('rustc', [
     '--edition=2024',
@@ -92,7 +105,7 @@ Future<void> main(List<String> args) async {
     '-o',
     '.cache/${nativeLibraryName('fault_host')}',
   ]);
-  final dartOutput = await runCapturing(Platform.resolvedExecutable, [
+  final dartOutput = await runCapturing(dartExecutable, [
     'test',
     if (headless) ...['--exclude-tags', 'live-window'],
   ]);
@@ -101,7 +114,7 @@ Future<void> main(List<String> args) async {
       ?.group(1);
   // The roadmap records the Windows full gate's counts; other platforms and
   // the headless gate run different subsets, so they check the prose only.
-  await run(Platform.resolvedExecutable, [
+  await run(dartExecutable, [
     'run',
     'tool/docs_check.dart',
     if (Platform.isWindows && nativeCount != null) '--native=$nativeCount',

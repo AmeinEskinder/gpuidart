@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import '../native_probe/client.dart';
+
 /// External OS accessibility client. It never substitutes the host's inspect
 /// payload for a platform response. Failed clients retain stdout/stderr.
 Future<Map<String, dynamic>> platformQuery(
@@ -11,33 +13,8 @@ Future<Map<String, dynamic>> platformQuery(
   String value = '',
   String id = '',
 }) async {
-  final (command, args) = switch (Platform.operatingSystem) {
-    'windows' => (
-      'powershell.exe',
-      [
-        '-NoProfile',
-        '-NonInteractive',
-        '-File',
-        'tool/accessibility/windows.ps1',
-        '-AppProcessId',
-        '$process',
-        '-Operation',
-        operation,
-        if (name.isNotEmpty) ...['-Name', name],
-        if (value.isNotEmpty) ...['-Value', value],
-        if (id.isNotEmpty) ...['-Id', id],
-      ],
-    ),
-    'linux' => (
-      '/usr/bin/python3',
-      ['tool/accessibility/linux.py', '$process', operation, name, value, id],
-    ),
-    'macos' => (
-      'build/accessibility/ax-probe',
-      ['$process', operation, name, value, id],
-    ),
-    _ => throw UnsupportedError('No platform accessibility probe'),
-  };
+  final command = await nativeProbe();
+  final args = ['accessibility', '$process', operation, name, value, id];
   final timer = Stopwatch()..start();
   final restarts = <String>[];
   while (true) {

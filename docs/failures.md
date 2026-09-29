@@ -42,6 +42,6 @@ do not establish recovery from every native platform crash.
 
 ## Dart regression evidence
 
-`./tool/check.ps1` builds the test-only `test/fixtures/fault_host.rs` DLL under `.cache` before running Dart tests. The fixture uses the public ABI to send malformed events, omit acknowledgements, mismatch dataset identity, report a native failure, omit closed and delay native exit. It counts allocated/freed event buffers and early destruction attempts. The test checks that failed transactions preserve Dart data and shutdown never destroys a running host.
+`dart run tool/check.dart` builds the test-only `test/fixtures/fault_host.rs` DLL under `.cache` before running Dart tests. The fixture uses the public ABI to send malformed events, omit acknowledgements, mismatch dataset identity, report a native failure, omit closed and delay native exit. It counts allocated/freed event buffers and early destruction attempts. The test checks that failed transactions preserve Dart data and shutdown never destroys a running host.
 
 The 23 Dart tests also cover pure Dart schema validation, immutable data, Unicode JSON encoding, native event decoding, launcher readiness and the real GPUI window. All passed locally. The fixture is not included in application packages.

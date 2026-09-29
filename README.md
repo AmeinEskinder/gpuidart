@@ -10,7 +10,7 @@ An experimental desktop SDK using Dart application code and GPUI Kit's Rust cont
 
 See [cross-platform acceptance](reports/cross-platform/status.md) for source revisions, package results and remaining gates. Native Wayland, Intel Macs, other Linux distributions and older macOS versions are unverified.
 
-The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include clean Windows Sandbox and Linux desktop VM launches. Owner-authorized agent visual observation verified Japanese composition and reload on [Windows](reports/ime/windows-japanese-20260926/README.md) and [configured Linux Fcitx5/Mozc](reports/ime/linux-japanese-20260926/README.md). Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `./tool/verify_mvp.ps1`.
+The current [MVP release candidate](reports/mvp/README.md) passed all nine local acceptance checks. [Release evidence and packages](reports/release/README.md) include clean Windows Sandbox and Linux desktop VM launches. Owner-authorized agent visual observation verified Japanese composition and reload on [Windows](reports/ime/windows-japanese-20260926/README.md) and [configured Linux Fcitx5/Mozc](reports/ime/linux-japanese-20260926/README.md). Other desktop/input checks and an [unlocalized reload observation](reports/mvp/attempt-023eef4/README.md) remain open before calling the release stable. Reproduce local acceptance with `dart run tool/verify_mvp.dart`.
 
 The SDK supports row/column layouts, stacks, scroll containers, text, buttons, menu buttons, native text inputs, virtualized tables and lists, checkboxes, switches, radio groups, sliders, selects, tabs, date pickers, progress bars, separators, icons, images, canvases, native animation, confirmation dialogs and dataset charts. Application menus, record-bound row menus, button tooltips and snapshot themes compose with those controls. Typed styles, scoped keyboard actions and guarded controlled-input writes share the existing host. Dart submits a UI description through FFI, whole on the first publication and as operations against the applied tree afterwards. Rust owns the description and retained control state. Native events return asynchronously, leaving Dart timers and Futures free to run.
 
@@ -20,14 +20,27 @@ This implements a small direct adapter over GPUI Kit. It does not replace Shell'
 
 ## Run
 
-Requirements: Windows x64, Dart 3.13+, Rust 1.98.1, MSVC x64 build tools and a Windows SDK. A project-local Rust/MSVC installation is already present in this workspace under `.tools`; the scripts discover it. On another machine, install the standard Rust and Visual Studio C++ toolchains first.
+Requirements: Windows x64, Dart 3.13+, Rust 1.98.1, MSVC x64 build tools and a Windows SDK. The Dart tools discover a project-local installation under `.tools` or an installed Visual Studio C++ toolchain. On another machine, install the standard Rust and Visual Studio C++ toolchains first.
 
-From this directory in PowerShell:
+From this directory:
 
 ```powershell
-./tool/build.ps1
+dart run tool/build.dart
 dart run tool/dev.dart
 ```
+
+The same commands are available through `dart run bin/gpuidart.dart`. Run
+`dart run bin/gpuidart.dart doctor` to check the toolchain, or compile the CLI:
+
+```sh
+dart run tool/build_cli.dart
+```
+
+This creates `build/bin/gpuidart.exe` on Windows or `build/bin/gpuidart` on
+macOS/Linux. It supports `doctor`, `build`, `run`, `check`, `package`, `verify`,
+and `exec`. The CLI is a native executable. Build and development commands still
+require the Dart/Rust toolchains and an SDK checkout. Set `GPUIDART_SDK` or pass
+`--sdk=PATH` when the checkout is elsewhere. Use `gpuidart --help` for options.
 
 Market watch opens a native GPUI window with 1,000 fictitious instruments. Search by symbol, select a row, add it to your shortlist, sort by price and simulate a price update. Search and the shortlist toggle are a native view over the dataset: filtering and sorting never move or republish records, selection survives them by stable record ID, and prices/changes render through declarative number formats with color and icon rules. Ctrl+F focuses search and Ctrl+Enter saves the selected record as scoped key actions. Input text, focus, selection and scroll state survive ordinary description replacement. State is in memory. The earlier counter and 10,000-row measurement example remains in example/main.dart.
 
@@ -47,7 +60,7 @@ and [implementation and verification status](reports/market-terminal/README.md).
 For a release build:
 
 ```powershell
-./tool/build.ps1 -Release
+dart run tool/build.dart --release
 $env:GPUIDART_LIBRARY = "$PWD/target/release/gpuidart.dll"
 dart run example/watchlist/main.dart
 ```
@@ -55,11 +68,11 @@ dart run example/watchlist/main.dart
 ## Portable Windows package
 
 ```powershell
-./tool/package.ps1
-./tool/verify_package.ps1
+dart run tool/package.dart
+dart run tool/verify_package.dart build/gpuidart-windows-x64.zip
 ```
 
-The output is [build/gpuidart-windows-x64.zip](build/gpuidart-windows-x64.zip). Extract it and run `gpuidart.exe`; keep its DLLs beside it. The executable includes Dart's AOT runtime. The ZIP includes the native GPUI library and release Visual C++ runtime. On a machine without the project-local CRT archive, supply `-CrtDirectory` pointing to the Microsoft x64 redistributable folder.
+The output is [build/gpuidart-windows-x64.zip](build/gpuidart-windows-x64.zip). Extract it and run `gpuidart.exe`; keep its DLLs beside it. The executable includes Dart's AOT runtime. The ZIP includes the native GPUI library and release Visual C++ runtime. On a machine without the project-local CRT archive, supply `--crt-directory=DIR` pointing to the Microsoft x64 redistributable folder.
 
 Verification extracts the ZIP outside the repository, changes to an unrelated working directory, restricts PATH to Windows directories and runs the watchlist's self-test. It checks loaded module paths, including Common Controls v6 and the sibling CRT, and the actual window's PerMonitorV2 awareness. The executable embeds a DPI manifest. The MIT package also passed in a [fresh Windows Sandbox without development SDKs](reports/release/README.md). The ZIP includes a standalone verifier and [manual release checks](docs/windows-release-checks.md).
 
@@ -79,7 +92,7 @@ The package command emits `build/Watchlist-macos-arm64.tar.gz` or `build/Watchli
 ## Development code reload
 
 ```powershell
-./tool/build.ps1
+dart run tool/build.dart
 dart run tool/dev.dart
 ```
 
@@ -102,10 +115,9 @@ dart run tool/verify_dev_launcher.dart
 See [the recorded results and limitations](reports/summary.md). The host separately counts registered Dart description builds, encodes, all FFI callbacks, UI callbacks, native view materializations, and row/cell construction calls. Native profiling records draw and presentation-submission timings. Application acknowledgement is not a display fence.
 
 ```powershell
-./tool/verify_package.ps1
-. ./tool/env.ps1
+dart run tool/verify_package.dart build/gpuidart-windows-x64.zip
 $env:GPUIDART_VIRTUALIZATION_REPORT = "$PWD/reports/virtualization.json"
-cargo test --locked -p gpuidart construction_and_allocations_scale_with_viewport
+dart run tool/env.dart cargo test --locked -p gpuidart construction_and_allocations_scale_with_viewport
 dart run tool/verify_reload.dart
 dart run tool/summarize.dart
 ```
@@ -115,7 +127,7 @@ dart run tool/summarize.dart
 ## Verify
 
 ```powershell
-./tool/check.ps1
+dart run tool/check.dart
 ```
 
 The native tests render GPUI controls and exercise pointer/keyboard input, Unicode selection, table navigation, wheel scrolling, resizing, retained state, callback-free repaints, invalid descriptions, stale revisions and removal of retained state. A separate allocator probe measures redraw work for 100, 10,000 and 100,000 records. The Dart integration test briefly opens a real native window, publishes from a timer, checks rejection/recovery and closes the application. Headless interaction tests do not replace human visual inspection.
