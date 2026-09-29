@@ -147,6 +147,12 @@ mod windows {
             user: *mut FileTime,
         ) -> i32;
     }
+    #[repr(C)]
+    struct ModuleInfo {
+        base: *mut c_void,
+        size_of_image: u32,
+        entry: *mut c_void,
+    }
     #[link(name = "psapi")]
     unsafe extern "system" {
         fn GetProcessMemoryInfo(
@@ -154,9 +160,94 @@ mod windows {
             counters: *mut MemoryCounters,
             size: u32,
         ) -> i32;
+        fn EnumProcessModulesEx(
+            process: *mut c_void,
+            modules: *mut *mut c_void,
+            size: u32,
+            needed: *mut u32,
+            filter: u32,
+        ) -> i32;
+        fn GetModuleFileNameExW(
+            process: *mut c_void,
+            module: *mut c_void,
+            name: *mut u16,
+            size: u32,
+        ) -> u32;
+        fn GetModuleInformation(
+            process: *mut c_void,
+            module: *mut c_void,
+            info: *mut ModuleInfo,
+            size: u32,
+        ) -> i32;
     }
+
+    /// Every image mapped into the process with its size, largest first, so
+    /// a memory floor can be attributed to the libraries behind it.
+    fn loaded_images(process: *mut c_void) -> Result<Vec<Value>, String> {
+        const LIST_MODULES_ALL: u32 = 0x03;
+        let mut handles: Vec<*mut c_void> = vec![std::ptr::null_mut(); 2048];
+        let mut needed = 0u32;
+        let capacity = (handles.len() * std::mem::size_of::<*mut c_void>()) as u32;
+        if unsafe {
+            EnumProcessModulesEx(
+                process,
+                handles.as_mut_ptr(),
+                capacity,
+                &mut needed,
+                LIST_MODULES_ALL,
+            )
+        } == 0
+        {
+            return Err("EnumProcessModulesEx failed".into());
+        }
+        let count = (needed as usize / std::mem::size_of::<*mut c_void>()).min(handles.len());
+        let mut images = Vec::with_capacity(count);
+        for &module in &handles[..count] {
+            let mut name = [0u16; 1024];
+            let length = unsafe {
+                GetModuleFileNameExW(process, module, name.as_mut_ptr(), name.len() as u32)
+            };
+            let path = String::from_utf16_lossy(&name[..length as usize]);
+            let mut info = ModuleInfo {
+                base: std::ptr::null_mut(),
+                size_of_image: 0,
+                entry: std::ptr::null_mut(),
+            };
+            let size = if unsafe {
+                GetModuleInformation(
+                    process,
+                    module,
+                    &mut info,
+                    std::mem::size_of::<ModuleInfo>() as u32,
+                )
+            } != 0
+            {
+                Some(info.size_of_image)
+            } else {
+                None
+            };
+            images.push(json!({"path": path, "size_of_image": size}));
+        }
+        images.sort_by_key(|image| std::cmp::Reverse(image["size_of_image"].as_u64().unwrap_or(0)));
+        Ok(images)
+    }
+
     pub(super) fn append(value: &mut Value) {
         let process = unsafe { GetCurrentProcess() };
+        match loaded_images(process) {
+            Ok(images) => {
+                value["loaded_images_total_bytes"] = json!(
+                    images
+                        .iter()
+                        .map(|image| image["size_of_image"].as_u64().unwrap_or(0))
+                        .sum::<u64>()
+                );
+                value["loaded_images"] = json!(images);
+                value["loaded_images_source"] =
+                    json!("EnumProcessModulesEx with GetModuleInformation SizeOfImage");
+            }
+            Err(error) => value["loaded_images_error"] = json!(error),
+        }
         let mut memory = MemoryCounters {
             size: std::mem::size_of::<MemoryCounters>() as u32,
             ..Default::default()
@@ -225,7 +316,6 @@ mod tests {
     fn runtime_probe_reports_current_process_loaded_images_and_memory() {
         let value = super::read();
         assert_eq!(value["pid"], std::process::id());
-        #[cfg(unix)]
         assert!(
             value["loaded_images"]
                 .as_array()

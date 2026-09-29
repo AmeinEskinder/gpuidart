@@ -391,9 +391,12 @@ pub(crate) struct DartView {
     trees: HashMap<String, RetainedTree>,
     /// The sheet node whose sheet the window shows, if any.
     active_sheet: Option<String>,
-    /// Set by a publication that carries or drops a sheet; the next frame
-    /// reconciles the window's sheet after it has rendered.
+    /// Set by a publication that carries or drops a sheet. Once the window
+    /// has rendered (so Kit's window root exists) a publication reconciles
+    /// the sheet at once, and its acknowledgement covers it; before that the
+    /// first frame reconciles after it has rendered.
     sheets_dirty: bool,
+    root_ready: bool,
     row_menu: Option<row_menus::Session>,
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
@@ -658,6 +661,7 @@ impl DartView {
             trees: HashMap::new(),
             active_sheet: None,
             sheets_dirty: false,
+            root_ready: false,
             row_menu: None,
             next_row_menu: 0,
             tables: HashMap::new(),
@@ -1673,6 +1677,10 @@ impl DartView {
         self.trees.retain(|id, _| tree_ids.contains(id));
         if self.active_sheet.is_some() {
             self.sheets_dirty = true;
+        }
+        if self.sheets_dirty && self.root_ready {
+            self.sheets_dirty = false;
+            self.reconcile_sheets(window, cx);
         }
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
@@ -2964,6 +2972,7 @@ impl DartView {
 impl Render for DartView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         self.reconcile_row_menu(window, cx);
+        self.root_ready = true;
         if self.sheets_dirty {
             self.sheets_dirty = false;
             cx.defer_in(window, |this, window, cx| this.reconcile_sheets(window, cx));
@@ -3055,11 +3064,24 @@ impl Windows {
         self.by_id.get(&window).cloned()
     }
 
+    fn handles(&self) -> Vec<gpui::WindowHandle<gpui_kit::component::Root>> {
+        self.by_id.values().map(|(handle, _)| *handle).collect()
+    }
+
     fn remove_by_window_id(&mut self, id: gpui::WindowId) -> Option<u32> {
         let window = self.ids.remove(&id)?;
         self.by_id.remove(&window);
         Some(window)
     }
+}
+
+/// Closes the window's sheet, if one is open, without leasing Kit's root.
+fn dismiss_sheet(cx: &mut gpui::AsyncApp, handle: gpui::WindowHandle<gpui_kit::component::Root>) {
+    let _ = cx.update_window(handle.into(), |_, window, cx| {
+        if window.has_active_sheet(cx) {
+            window.close_sheet(cx);
+        }
+    });
 }
 
 /// Opens a secondary window with its own view and reports the outcome to
@@ -3295,12 +3317,22 @@ pub(crate) fn run(
                             break;
                         }
                     }
-                    Command::Close | Command::CloseWindow(0) => break,
+                    Command::Close | Command::CloseWindow(0) => {
+                        // An open sheet holds Kit's focus trap; dismiss it
+                        // before the application quits so teardown does not
+                        // wait on it.
+                        let handles = windows.borrow().handles();
+                        for handle in handles {
+                            dismiss_sheet(cx, handle);
+                        }
+                        break;
+                    }
                     Command::CloseWindow(window) => {
                         // Removing the window runs the close observer,
                         // which borrows the registry: hold no borrow here.
                         let target = windows.borrow().get(window);
                         if let Some((handle, _)) = target {
+                            dismiss_sheet(cx, handle);
                             let _ = handle.update(cx, |_, w, _| w.remove_window());
                         }
                     }
