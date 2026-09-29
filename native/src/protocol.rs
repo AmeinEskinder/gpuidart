@@ -3979,4 +3979,63 @@ mod tests {
             serde_json::to_value(&applied().root).unwrap()
         );
     }
+
+    /// A table keeps showing its last index while the next one computes
+    /// off the frame thread; the patches keep that index pointing at the
+    /// records it showed through the edits applied meanwhile.
+    #[test]
+    fn view_index_patches_follow_structural_edits() {
+        use super::{IndexPatch, ViewEntry::*};
+        let sorted = |entries: Vec<super::ViewEntry>, source_rows: usize| super::ViewIndex {
+            entries,
+            groups: vec![super::GroupSummary {
+                column: 0,
+                key: "k".into(),
+                count: 3,
+                aggregates: Vec::new(),
+            }],
+            source_rows,
+        };
+        // Sorted view over three records: 2, 0, 1.
+        let mut index = sorted(vec![Group(0), Record(2), Record(0), Record(1)], 3);
+        index.patch(IndexPatch::Insert(1));
+        assert_eq!(
+            index.entries,
+            [Group(0), Record(3), Record(0), Record(2), Record(1)],
+            "records at or after the insertion shift up; the new one joins at the end"
+        );
+        assert_eq!(index.source_rows, 4);
+        index.patch(IndexPatch::Delete(0));
+        assert_eq!(
+            index.entries,
+            [Group(0), Record(2), Record(1), Record(0)],
+            "the deleted record leaves; later ones shift down"
+        );
+        assert_eq!(index.source_rows, 3);
+        index.patch(IndexPatch::Move(0, 2));
+        assert_eq!(
+            index.entries,
+            [Group(0), Record(1), Record(0), Record(2)],
+            "the moved record is followed to its new index; the ones it passed shift down"
+        );
+        index.patch(IndexPatch::Move(2, 0));
+        assert_eq!(index.entries, [Group(0), Record(2), Record(1), Record(0)]);
+        index.extend_identity(5);
+        assert_eq!(
+            index.entries,
+            [Group(0), Record(2), Record(1), Record(0), Record(3), Record(4)],
+            "appended records show behind the index in dataset order"
+        );
+        assert_eq!(index.source_rows, 5);
+        index.extend_identity(4);
+        assert_eq!(index.source_rows, 5, "a smaller count extends nothing");
+        assert_eq!(index.groups.len(), 1, "summaries stay until the next computed index");
+        let data = super::TableData {
+            columns: vec!["v".into()],
+            rows: (0..3).map(|i| vec![i.to_string()]).collect(),
+            ids: None,
+            format: None,
+        };
+        assert_eq!(super::ViewIndex::compute(None, &data).source_rows, 3);
+    }
 }
