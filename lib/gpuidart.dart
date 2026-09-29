@@ -8,6 +8,7 @@ export 'src/host.dart'
         GpuiEvent,
         ActionEvent,
         TableSelection,
+        TableViewSettled,
         TableDataset,
         maxDatasetRows,
         TableEdit,

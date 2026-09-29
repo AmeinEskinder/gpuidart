@@ -22,6 +22,14 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
     }
   }
 
+  void pendingViews() {
+    if (!value.containsKey('pending_views')) return;
+    final listed = value['pending_views'];
+    if (listed is! List || listed.any((table) => table is! String)) {
+      throw const FormatException('Invalid pending views');
+    }
+  }
+
   string('type');
   if (value.containsKey('id')) string('id');
   if (value.containsKey('revision')) integer('revision', minimum: 1);
@@ -33,6 +41,7 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
     case 'applied':
       integer('revision', minimum: 1);
       integer('native_apply_us');
+      pendingViews();
     case 'rejected':
       integer('revision', minimum: 1);
       string('message');
@@ -50,6 +59,15 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
           (work['cells_written'] as int) < 0) {
         throw const FormatException('Invalid dataset work counters');
       }
+      pendingViews();
+    case 'table_view':
+      integer('revision', minimum: 1);
+      string('id');
+      string('dataset');
+      integer('dataset_revision', minimum: 1);
+      integer('view_rows');
+      integer('groups');
+      integer('compute_us');
     case 'dataset_rejected':
       integer('request', minimum: 1);
       string('message');

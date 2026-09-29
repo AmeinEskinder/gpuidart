@@ -793,6 +793,14 @@ pub enum ViewEntry {
     Group(usize),
 }
 
+/// What a structural edit does to the record indices a view index holds.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IndexPatch {
+    Insert(usize),
+    Delete(usize),
+    Move(usize, usize),
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct GroupSummary {
     pub column: usize,
@@ -807,6 +815,9 @@ pub struct GroupSummary {
 pub struct ViewIndex {
     pub entries: Vec<ViewEntry>,
     pub groups: Vec<GroupSummary>,
+    /// The record count the entries were computed over, so records appended
+    /// since can be shown behind them while the next index computes.
+    pub source_rows: usize,
 }
 
 impl ViewIndex {
@@ -817,7 +828,61 @@ impl ViewIndex {
             None => Self {
                 entries: (0..data.rows.len()).map(ViewEntry::Record).collect(),
                 groups: Vec::new(),
+                source_rows: data.rows.len(),
             },
+        }
+    }
+
+    /// Shows records appended since this index was computed, in dataset
+    /// order behind the entries it has.
+    pub fn extend_identity(&mut self, rows: usize) {
+        self.entries
+            .extend((self.source_rows..rows).map(ViewEntry::Record));
+        self.source_rows = self.source_rows.max(rows);
+    }
+
+    /// Keeps the entries pointing at the records they showed after one
+    /// structural edit: a deleted record leaves, a moved one is followed,
+    /// an inserted one joins at the end. The group summaries stay as they
+    /// were; the next computed index replaces them.
+    pub fn patch(&mut self, patch: IndexPatch) {
+        match patch {
+            IndexPatch::Insert(at) => {
+                for entry in &mut self.entries {
+                    if let ViewEntry::Record(source) = entry {
+                        if *source >= at {
+                            *source += 1;
+                        }
+                    }
+                }
+                self.entries.push(ViewEntry::Record(at));
+                self.source_rows += 1;
+            }
+            IndexPatch::Delete(row) => {
+                self.entries.retain(|entry| *entry != ViewEntry::Record(row));
+                for entry in &mut self.entries {
+                    if let ViewEntry::Record(source) = entry {
+                        if *source > row {
+                            *source -= 1;
+                        }
+                    }
+                }
+                self.source_rows = self.source_rows.saturating_sub(1);
+            }
+            IndexPatch::Move(row, to) => {
+                for entry in &mut self.entries {
+                    let ViewEntry::Record(source) = entry else {
+                        continue;
+                    };
+                    if *source == row {
+                        *source = to;
+                    } else if row < to && *source > row && *source <= to {
+                        *source -= 1;
+                    } else if to < row && *source >= to && *source < row {
+                        *source += 1;
+                    }
+                }
+            }
         }
     }
 
@@ -971,6 +1036,7 @@ impl TableView {
             return ViewIndex {
                 entries: records.into_iter().map(ViewEntry::Record).collect(),
                 groups: Vec::new(),
+                source_rows: data.rows.len(),
             };
         };
         // The aggregated columns, parsed once and shared with the sort and
@@ -1008,7 +1074,10 @@ impl TableView {
                 }
             }
         }
-        let mut index = ViewIndex::default();
+        let mut index = ViewIndex {
+            source_rows: data.rows.len(),
+            ..ViewIndex::default()
+        };
         for (group, (key, sources, accumulators)) in members.into_iter().enumerate() {
             index.entries.push(ViewEntry::Group(group));
             index
@@ -1527,7 +1596,10 @@ impl Style {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+/// Cloned only by the store's `Arc::make_mut`, and only when a superseded
+/// view job still reads the records an edit changes; every other path
+/// shares the records through the `Arc`.
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TableData {
     pub columns: Vec<String>,
@@ -2353,6 +2425,10 @@ pub enum Event {
     Applied {
         revision: u64,
         native_apply_us: u64,
+        /// Tables whose view is still computing off the frame thread after
+        /// this publication; each reports `table_view` when its index lands.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        pending_views: Vec<String>,
     },
     Rejected {
         revision: u64,
@@ -2365,6 +2441,8 @@ pub enum Event {
         parse_us: u64,
         apply_us: u64,
         work: crate::datasets::Work,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        pending_views: Vec<String>,
     },
     DatasetRejected {
         request: u64,
@@ -2498,6 +2576,18 @@ pub enum Event {
         dataset_revision: u64,
         record: String,
         action: String,
+    },
+    /// A table's view index landed: computed off the frame thread over a
+    /// snapshot of the records and swapped in with the selection and scroll
+    /// anchor resolved, or computed in place for a small dataset.
+    TableView {
+        revision: u64,
+        id: String,
+        dataset: String,
+        dataset_revision: u64,
+        view_rows: usize,
+        groups: usize,
+        compute_us: u64,
     },
     TableSelection {
         revision: u64,

@@ -3024,3 +3024,250 @@ fn rich_text_renders_markdown_and_follows_publications(cx: &mut TestAppContext) 
     })
     .unwrap();
 }
+
+fn large_initial(rows: usize, direction: SortDirection) -> Initial {
+    Initial {
+        window: Default::default(),
+        snapshot: Snapshot {
+            revision: 1,
+            theme: None,
+            menus: Vec::new(),
+            actions: Vec::new(),
+            root: Node::Table {
+                id: "table".into(),
+                context_menu: Vec::new(),
+                semantics: None,
+                style: None,
+                dataset: "records".into(),
+                view: Some(TableView {
+                    sort: vec![SortKey {
+                        column: 1,
+                        direction,
+                    }],
+                    group: None,
+                    filter: vec![],
+                }),
+            },
+        },
+        datasets: vec![Upload {
+            id: "records".into(),
+            revision: 1,
+            // Prices fall with the row index: ascending price reverses the
+            // dataset order, descending keeps it.
+            data: TableData {
+                columns: vec!["sym".into(), "price".into()],
+                rows: (0..rows)
+                    .map(|i| vec![format!("R{i:06}"), format!("{}", rows - i)])
+                    .collect(),
+                ids: Some((0..rows).map(|i| format!("R{i:06}")).collect()),
+                format: None,
+            },
+        }],
+    }
+}
+
+/// A view over at least `VIEW_JOB_ROWS` records computes off the frame
+/// thread: the table shows dataset order until the index lands, edits sent
+/// meanwhile wait for it, a later spec change supersedes it, and the rows a
+/// replacement or a structural edit changes stay consistent throughout.
+#[gpui::test]
+fn large_views_compute_off_the_frame_thread_and_queue_edits(cx: &mut TestAppContext) {
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let collected = events.clone();
+    let sink = Events(Arc::new(move |event| collected.lock().unwrap().push(event)));
+    cx.update(gpui_kit::init);
+    // Above the threshold with room for the deletion below to stay above it.
+    let rows = super::VIEW_JOB_ROWS + 10;
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| DartView::new(large_initial(rows, SortDirection::Asc), sink, window, cx))
+        })
+        .unwrap()
+    });
+    let tags = || {
+        events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|event| match event {
+                Event::TableView { view_rows, .. } => Some(format!("view:{view_rows}")),
+                Event::DatasetApplied { pending_views, .. } => {
+                    Some(format!("dataset:{}", pending_views.join(",")))
+                }
+                Event::Applied { pending_views, .. } => {
+                    Some(format!("applied:{}", pending_views.join(",")))
+                }
+                Event::TableSelection { .. } => Some("selection".into()),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    let first_entries = |cx: &mut gpui_kit::App, count: usize| {
+        let index = view.read(cx).tables["table"]
+            .state
+            .read(cx)
+            .delegate()
+            .index
+            .borrow()
+            .clone();
+        index.entries[..count].to_vec()
+    };
+
+    // The first frame shows dataset order with the job reported pending; an
+    // edit to the sort column sent meanwhile is not applied yet.
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["pending"], true);
+        assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], rows);
+        assert_eq!(inspect["native"]["view_jobs"], 1);
+        assert_eq!(inspect["native"]["view_recomputes"], 0);
+        assert_eq!(
+            first_entries(cx, 2),
+            [ViewEntry::Record(0), ViewEntry::Record(1)],
+            "dataset order until the index lands"
+        );
+        edit_cell(&view, 1, 0, 1, "0", cx);
+        assert_eq!(
+            inspect["tables"]["table"]["dataset_revision"], 1,
+            "the edit waits for the job"
+        );
+    })
+    .unwrap();
+    assert_eq!(tags(), Vec::<String>::new());
+    cx.run_until_parked();
+    // The index landed ascending; the queued edit then applied, listed the
+    // table pending again, and its own index landed with R000000 (price 0)
+    // first.
+    assert_eq!(tags(), [format!("view:{rows}"), "dataset:table".into(), format!("view:{rows}")]);
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["pending"], false);
+        assert_eq!(inspect["tables"]["table"]["dataset_revision"], 2);
+        assert_eq!(inspect["native"]["view_jobs"], 2);
+        assert_eq!(inspect["native"]["view_recomputes"], 2);
+        assert_eq!(
+            first_entries(cx, 2),
+            [ViewEntry::Record(0), ViewEntry::Record(rows - 1)],
+            "ascending price with the edited record first"
+        );
+    })
+    .unwrap();
+
+    // Two spec changes in one turn: the first job is superseded and only the
+    // second lands, descending.
+    events.lock().unwrap().clear();
+    cx.update_window(handle, |_, window, cx| {
+        let spec = |direction| TableView {
+            sort: vec![SortKey {
+                column: 1,
+                direction,
+            }],
+            group: None,
+            filter: vec![],
+        };
+        publish_table_view(&view, 2, spec(SortDirection::Desc), window, cx);
+        publish_table_view(&view, 3, spec(SortDirection::Asc), window, cx);
+        publish_table_view(&view, 4, spec(SortDirection::Desc), window, cx);
+        window.render_frame(cx);
+        assert_eq!(view.read(cx).inspect(window, cx)["native"]["view_jobs"], 5);
+    })
+    .unwrap();
+    assert_eq!(
+        tags(),
+        ["applied:table", "applied:table", "applied:table"],
+        "every publication is acknowledged at once"
+    );
+    cx.run_until_parked();
+    assert_eq!(tags(), ["applied:table", "applied:table", "applied:table", &format!("view:{rows}")]);
+    cx.update_window(handle, |_, window, cx| {
+        assert_eq!(view.read(cx).inspect(window, cx)["native"]["view_recomputes"], 3);
+        assert_eq!(
+            first_entries(cx, 2),
+            [ViewEntry::Record(1), ViewEntry::Record(2)],
+            "descending price: R000001 (price rows-1) first, R000000 (price 0) last"
+        );
+    })
+    .unwrap();
+
+    // A structural edit with no job in flight: the shown rows follow the
+    // deleted record at once and the sorted index follows.
+    events.lock().unwrap().clear();
+    cx.update_window(handle, |_, window, cx| {
+        view.update(cx, |view, cx| {
+            view.update_dataset(
+                Update {
+                    request: 7,
+                    id: "records".into(),
+                    base_revision: 2,
+                    revision: 3,
+                    change: Change::Edit {
+                        edits: vec![crate::datasets::Edit::Delete { row: 1 }],
+                    },
+                },
+                0,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["pending"], true);
+        assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], rows - 1);
+        assert_eq!(inspect["tables"]["table"]["row_count"], rows - 1);
+        assert_eq!(
+            first_entries(cx, 2),
+            [ViewEntry::Record(1), ViewEntry::Record(2)],
+            "the deleted record left and the later ones shifted down"
+        );
+    })
+    .unwrap();
+    assert_eq!(tags(), ["dataset:table"]);
+    cx.run_until_parked();
+    assert_eq!(tags(), ["dataset:table", &format!("view:{}", rows - 1)]);
+
+    // A replacement shows the new records in dataset order until its index
+    // lands, and emits no selection event when nothing was selected.
+    events.lock().unwrap().clear();
+    cx.update_window(handle, |_, window, cx| {
+        view.update(cx, |view, cx| {
+            view.update_dataset(
+                Update {
+                    request: 8,
+                    id: "records".into(),
+                    base_revision: 3,
+                    revision: 4,
+                    change: Change::Replace {
+                        data: TableData {
+                            columns: vec!["sym".into(), "price".into()],
+                            rows: (0..rows + 5)
+                                .map(|i| vec![format!("S{i:06}"), format!("{i}")])
+                                .collect(),
+                            ids: Some((0..rows + 5).map(|i| format!("S{i:06}")).collect()),
+                            format: None,
+                        },
+                    },
+                },
+                0,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        let inspect = view.read(cx).inspect(window, cx);
+        assert_eq!(inspect["tables"]["table"]["view"]["pending"], true);
+        assert_eq!(inspect["tables"]["table"]["view"]["view_rows"], rows + 5);
+        assert_eq!(first_entries(cx, 1), [ViewEntry::Record(0)]);
+    })
+    .unwrap();
+    cx.run_until_parked();
+    assert_eq!(tags(), ["dataset:table", &format!("view:{}", rows + 5)]);
+    cx.update_window(handle, |_, window, cx| {
+        assert_eq!(
+            first_entries(cx, 1),
+            [ViewEntry::Record(rows + 4)],
+            "descending price over the replacement"
+        );
+        assert_eq!(view.read(cx).inspect(window, cx)["tables"]["table"]["scroll_y"], 0.0);
+    })
+    .unwrap();
+}

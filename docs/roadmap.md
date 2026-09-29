@@ -224,8 +224,8 @@ shows about 2x, not an order of magnitude (F); input-to-present waits on
 C; CI is green with the docs lint through the catalog commits, and the
 sheet kind's live test took three commits to pass on Linux and macOS.
 
-Verification: at the packed-record head the native library suite runs 109 tests (two
-ignored timing probes) and the Dart suite 125, including the live-window,
+Verification: at the async-view head the native library suite runs 110 tests (two
+ignored timing probes) and the Dart suite 126, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
 library, plus the repository's full check gate. Earlier counts in this

@@ -247,6 +247,18 @@ final class GpuiEvent {
         )
       : null;
 
+  /// The table whose view index landed, on a `table_view` event.
+  TableViewSettled? get tableView => type == 'table_view'
+      ? TableViewSettled._(
+          data['id'] as String,
+          data['dataset'] as String,
+          data['dataset_revision'] as int,
+          data['view_rows'] as int,
+          data['groups'] as int,
+          data['compute_us'] as int,
+        )
+      : null;
+
   /// The record a `list_select` event chose, with its dataset revision.
   TableSelection? get listSelection => type == 'list_select'
       ? TableSelection._(
@@ -742,6 +754,16 @@ final class GpuiHost {
   /// publication, which carries the application's value for that node.
   Future<void> patch(UiNode node) => _main.patch(node);
 
+  /// Completes once every table view in the main window has its index.
+  ///
+  /// A view over 10,000 records or more computes off the frame thread: the
+  /// publication or edit that changes it is acknowledged at once, the table
+  /// shows its last rows meanwhile, and a `table_view` event follows when
+  /// the index lands. Edits to that dataset sent in between apply, and are
+  /// acknowledged, after it. Smaller views compute in place and this
+  /// completes immediately.
+  Future<void> get viewsSettled => _main.viewsSettled;
+
   /// Opens a secondary window with its own description and datasets. See
   /// docs/windows.md. Completes once native has opened the window; a
   /// rejected request throws a [StateError].
@@ -1105,7 +1127,10 @@ final class GpuiHost {
               .completeError(StateError(event.data['message'] as String));
         case 'window_closed':
           _windows.remove(event.window)?._closed();
+        case 'table_view':
+          _viewFor(event)?.viewSettled(event.id!);
         case 'dataset_applied':
+          _viewFor(event)?.syncPendingViews(event);
           final pending = _dataPending[event.data['request']];
           if (pending != null &&
               (pending.id != event.id || pending.revision != event.revision)) {
@@ -1287,6 +1312,35 @@ final class _View {
   final inFlight = <int, _Publication>{};
   final pending = <int, Completer<void>>{};
   final publishTimers = <int, Stopwatch>{};
+
+  /// Tables whose view index is computing off the frame thread, as the last
+  /// acknowledgement listed them; each `table_view` event retires one.
+  final pendingViews = <String>{};
+  Completer<void>? _viewsSettled;
+
+  Future<void> get viewsSettled {
+    if (pendingViews.isEmpty) return Future.value();
+    return (_viewsSettled ??= Completer<void>()).future;
+  }
+
+  void syncPendingViews(GpuiEvent event) {
+    final listed = event.data['pending_views'];
+    pendingViews
+      ..clear()
+      ..addAll(listed is List ? listed.cast<String>() : const []);
+    _settleViews();
+  }
+
+  void viewSettled(String table) {
+    pendingViews.remove(table);
+    _settleViews();
+  }
+
+  void _settleViews() {
+    if (pendingViews.isNotEmpty) return;
+    _viewsSettled?.complete();
+    _viewsSettled = null;
+  }
 
   /// Snapshot-level fields of the last submission; an operation update
   /// restates them, and omitting them would clear them.
@@ -1535,6 +1589,7 @@ final class _View {
   }
 
   void applied(GpuiEvent event) {
+    syncPendingViews(event);
     final timer = publishTimers.remove(event.revision);
     if (timer != null) {
       HostMetrics.sample(
@@ -1572,7 +1627,30 @@ final class _View {
     publishTimers.clear();
     inFlight.clear();
     baseline = null;
+    pendingViews.clear();
+    _viewsSettled?.completeError(error, stack);
+    _viewsSettled = null;
   }
+}
+
+/// A table's view index landed, from a `table_view` event: the rows and
+/// group headers it now shows, over the dataset at [datasetRevision], and
+/// how long the index took to compute.
+final class TableViewSettled {
+  const TableViewSettled._(
+    this.table,
+    this.dataset,
+    this.datasetRevision,
+    this.rows,
+    this.groups,
+    this.computeMicroseconds,
+  );
+  final String table;
+  final String dataset;
+  final int datasetRevision;
+  final int rows;
+  final int groups;
+  final int computeMicroseconds;
 }
 
 /// A secondary native window opened by [GpuiHost.openWindow]. It publishes
@@ -1631,6 +1709,10 @@ final class GpuiWindow {
     _checkOpen();
     return _host._diagnose(id, op, arguments);
   }
+
+  /// Completes once every table view in this window has its index; see
+  /// [GpuiHost.viewsSettled].
+  Future<void> get viewsSettled => _view.viewsSettled;
 
   /// Samples a controlled input in this window; see [InputCommands.readInput].
   Future<UiInputState> readInput(String id) {

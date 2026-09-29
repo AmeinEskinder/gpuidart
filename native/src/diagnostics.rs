@@ -14,11 +14,13 @@ pub(crate) struct Counters {
     pub data_records_checked: Cell<u64>,
     pub data_cells_written: Cell<u64>,
     pub view_recomputes: Cell<u64>,
+    /// View indices computed off the frame thread, a subset of the recomputes.
+    pub view_jobs: Cell<u64>,
 }
 
 impl Counters {
     pub fn read(&self) -> Value {
-        json!({"materializations": self.materializations.get(), "rows_constructed": self.rows.get(), "cells_constructed": self.cells.get(), "data_records_checked": self.data_records_checked.get(), "data_cells_written": self.data_cells_written.get(), "view_recomputes": self.view_recomputes.get()})
+        json!({"materializations": self.materializations.get(), "rows_constructed": self.rows.get(), "cells_constructed": self.cells.get(), "data_records_checked": self.data_records_checked.get(), "data_cells_written": self.data_cells_written.get(), "view_recomputes": self.view_recomputes.get(), "view_jobs": self.view_jobs.get()})
     }
 }
 
@@ -62,6 +64,13 @@ pub(crate) enum Request {
     Repaint {
         request: u64,
         frames: u32,
+    },
+    /// The frames the view rendered since the last mark and the longest
+    /// interval between two of them; `mark` starts the next interval set.
+    FrameGaps {
+        request: u64,
+        #[serde(default)]
+        mark: bool,
     },
     Prepare {
         request: u64,
@@ -116,6 +125,7 @@ impl Request {
             | Self::Semantics { request }
             | Self::Key { request, .. }
             | Self::Repaint { request, .. }
+            | Self::FrameGaps { request, .. }
             | Self::Prepare { request, .. }
             | Self::PromptPaths { request, .. }
             | Self::PromptSavePath { request, .. }
@@ -281,6 +291,10 @@ pub(crate) fn handle(
             });
         }
         Request::Inspect { request } => reply(request, view, events, window, cx),
+        Request::FrameGaps { request, mark } => events.emit(Event::Diagnostic {
+            request,
+            data: view.update(cx, |view, _| view.frame_gaps(mark)),
+        }),
         Request::Repaint { request, frames } if frames <= 600 => {
             let target = view.read(cx).materialization_count() + u64::from(frames);
             repaint(request, target, view.clone(), events.clone(), window, cx);

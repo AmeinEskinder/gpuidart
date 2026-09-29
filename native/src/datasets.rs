@@ -1,9 +1,10 @@
-use crate::protocol::{MAX_MESSAGE_BYTES, Node, Snapshot, TableData};
+use crate::protocol::{IndexPatch, MAX_MESSAGE_BYTES, Node, Snapshot, TableData};
 use serde::{Deserialize, Serialize};
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
     rc::Rc,
+    sync::Arc,
 };
 
 #[derive(Deserialize, Serialize)]
@@ -347,6 +348,17 @@ impl Edit {
             Self::Insert { .. } | Self::Delete { .. } | Self::Move { .. }
         )
     }
+
+    /// What this edit does to the record indices a view index holds, for
+    /// edits that change which records exist or where.
+    pub fn index_patch(&self) -> Option<IndexPatch> {
+        match self {
+            Edit::Insert { at, .. } => Some(IndexPatch::Insert(*at)),
+            Edit::Delete { row } => Some(IndexPatch::Delete(*row)),
+            Edit::Move { row, to } => Some(IndexPatch::Move(*row, *to)),
+            Edit::Cell { .. } | Edit::Row { .. } => None,
+        }
+    }
 }
 
 /// Prefix of a framed dataset message: `GDP1`, a little-endian u32 header
@@ -461,7 +473,11 @@ pub struct Dataset {
     pub generation: u64,
     pub id: String,
     pub revision: u64,
-    pub data: TableData,
+    /// The records, shared with any view job computing over them off the
+    /// frame thread: a job clones the `Arc` and the store mutates through
+    /// `Arc::make_mut`, which copies only if a job still holds the snapshot.
+    /// The view queue keeps that from happening while a job is in flight.
+    pub data: Arc<TableData>,
     /// Sorted 64-bit hashes of every record ID, eight bytes per record, so
     /// appends and inserts check uniqueness by binary search. A hit is
     /// confirmed against the records themselves, so a collision costs a scan
@@ -575,7 +591,7 @@ impl Store {
                     id: upload.id,
                     revision: upload.revision,
                     generation: upload.revision,
-                    data: upload.data,
+                    data: Arc::new(upload.data),
                     ids_index,
                     stale_ids: 0,
                 })),
@@ -607,7 +623,7 @@ impl Store {
                 if let Some(current) = current {
                     let mut current = current.borrow_mut();
                     current.generation = update.revision;
-                    current.data = data;
+                    current.data = Arc::new(data);
                     current.ids_index = ids_index;
                     current.stale_ids = 0;
                     current.revision = update.revision;
@@ -619,7 +635,7 @@ impl Store {
                             id: update.id,
                             revision: update.revision,
                             generation: update.revision,
-                            data,
+                            data: Arc::new(data),
                             ids_index,
                             stale_ids: 0,
                         })),
@@ -675,12 +691,13 @@ impl Store {
                     cells_written: rows.len() * width,
                 };
                 let dataset = &mut *current;
-                dataset.data.rows.extend(rows);
+                let data = Arc::make_mut(&mut dataset.data);
+                data.rows.extend(rows);
                 if let Some(new) = ids {
-                    dataset.index_hashes(hashes);
-                    if let Some(existing) = &mut dataset.data.ids {
+                    if let Some(existing) = &mut data.ids {
                         existing.extend(new);
                     }
+                    dataset.index_hashes(hashes);
                 }
                 dataset.revision = update.revision;
                 Ok(work)
@@ -742,36 +759,37 @@ impl Store {
                 };
                 let dataset = &mut *current;
                 for edit in edits {
+                    let data = Arc::make_mut(&mut dataset.data);
                     match edit {
                         Edit::Cell { row, column, value } => {
-                            dataset.data.rows[row][column] = value;
+                            data.rows[row][column] = value;
                             work.cells_written += 1;
                         }
                         Edit::Row { row, values } => {
                             work.cells_written += values.len();
-                            dataset.data.rows[row] = values;
+                            data.rows[row] = values;
                         }
                         Edit::Insert { at, values, id } => {
                             work.cells_written += values.len();
-                            dataset.data.rows.insert(at, values);
+                            data.rows.insert(at, values);
                             if let Some(id) = id {
-                                dataset.index_ids(std::iter::once(&id));
-                                if let Some(ids) = &mut dataset.data.ids {
-                                    ids.insert(at, id);
+                                if let Some(ids) = &mut data.ids {
+                                    ids.insert(at, id.clone());
                                 }
+                                dataset.index_ids(std::iter::once(&id));
                             }
                         }
                         Edit::Delete { row } => {
-                            dataset.data.rows.remove(row);
-                            if let Some(ids) = &mut dataset.data.ids {
+                            data.rows.remove(row);
+                            if let Some(ids) = &mut data.ids {
                                 ids.remove(row);
                                 dataset.unindex_id();
                             }
                         }
                         Edit::Move { row, to } => {
-                            let record = dataset.data.rows.remove(row);
-                            dataset.data.rows.insert(to, record);
-                            if let Some(ids) = &mut dataset.data.ids {
+                            let record = data.rows.remove(row);
+                            data.rows.insert(to, record);
+                            if let Some(ids) = &mut data.ids {
                                 let id = ids.remove(row);
                                 ids.insert(to, id);
                             }

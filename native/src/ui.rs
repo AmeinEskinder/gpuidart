@@ -4,9 +4,10 @@ use crate::{
     Command, Events,
     protocol::{
         Align as StyleAlign, CellIcon, Color as StyleColor, Draw, Easing, Event,
-        FontWeight as StyleFontWeight, ImageEncoding, ImageFit, Justify as StyleJustify,
-        KeystrokeSpec, MenuEntry, Node, ScrollAxis, Size as StyleSize, Snapshot, Style, TableView,
-        ThemeToken, Touched, TreeIndex, ViewEntry, ViewIndex, apply_in_place, rollback,
+        FontWeight as StyleFontWeight, ImageEncoding, ImageFit, IndexPatch,
+        Justify as StyleJustify, KeystrokeSpec, MenuEntry, Node, ScrollAxis, Size as StyleSize,
+        Snapshot, Style, TableData, TableView, ThemeToken, Touched, TreeIndex, ViewEntry, ViewIndex,
+        apply_in_place, rollback,
     },
 };
 use async_channel::Receiver;
@@ -36,7 +37,7 @@ use gpui_kit::*;
 use serde_json::{Value, json};
 use std::{
     cell::{Cell, RefCell},
-    collections::{HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
     rc::Rc,
     sync::Arc,
     time::{Duration, Instant},
@@ -258,6 +259,125 @@ struct RetainedTable {
     /// redundant clears do not emit duplicate selection events. Events are
     /// delivered deferred, after the table state has settled.
     selection_notified: Option<(Option<usize>, Option<String>)>,
+    /// The view job in flight, if any.
+    pending: Option<PendingView>,
+}
+
+/// Records at or above this count compute their view index off the frame
+/// thread; below it the compute costs less than a frame and runs in place.
+const VIEW_JOB_ROWS: usize = 10_000;
+
+/// A view job in flight: the table keeps showing its last index, adjusted
+/// for the records edited under it, until the job's result swaps in.
+struct PendingView {
+    job: u64,
+    reset_scroll: bool,
+    /// The selection the job resolves; one made while it ran is resolved
+    /// again at the swap.
+    selected_record: Option<String>,
+    started: Instant,
+    _task: gpui::Task<()>,
+}
+
+/// What a view job reads: the spec, a snapshot of the records, and the
+/// selection and first visible entry to carry across the swap.
+struct ViewInputs {
+    spec: Option<TableView>,
+    records: Arc<TableData>,
+    selected_record: Option<String>,
+    anchor_source: Option<ViewEntry>,
+}
+
+struct ViewResult {
+    index: ViewIndex,
+    /// The selected record's row in the new index, when it is still shown.
+    selection_row: Option<usize>,
+    /// The first visible entry's row in the new index, when it is still shown.
+    anchor_view: Option<usize>,
+}
+
+impl ViewInputs {
+    fn compute(&self) -> ViewResult {
+        let index = ViewIndex::compute(self.spec.as_ref(), &self.records);
+        let selection_row = match (&self.selected_record, &self.records.ids) {
+            (Some(record), Some(ids)) => ids
+                .iter()
+                .position(|id| id == record)
+                .and_then(|source| index.row_of(ViewEntry::Record(source))),
+            _ => None,
+        };
+        let anchor_view = self
+            .anchor_source
+            .and_then(|entry| index.row_of(entry));
+        ViewResult {
+            index,
+            selection_row,
+            anchor_view,
+        }
+    }
+}
+
+/// What a dataset change does to the index a table shows while the next
+/// one computes.
+enum IndexChange {
+    /// The spec changed under the same records: the last index stays.
+    None,
+    /// New records: dataset order.
+    Replace,
+    /// Records appended: shown behind the last index in dataset order.
+    Append,
+    /// Records inserted, deleted or moved: the last index follows them.
+    Edits(Vec<IndexPatch>),
+}
+
+/// A dataset update that arrived while a view job read the dataset.
+struct QueuedUpdate {
+    update: Update,
+    parse_us: u64,
+}
+
+/// Frames this view rendered since the `frame_gaps` diagnostic last marked
+/// it: how many, and the longest interval between two of them. The frame
+/// before the mark starts the first interval, so a stall that begins at
+/// the mark is measured in full.
+struct FrameGaps {
+    marked: Instant,
+    last_frame: Option<Instant>,
+    frames: u64,
+    longest: Duration,
+}
+
+impl FrameGaps {
+    fn new() -> Self {
+        Self {
+            marked: Instant::now(),
+            last_frame: None,
+            frames: 0,
+            longest: Duration::ZERO,
+        }
+    }
+
+    fn frame(&mut self, now: Instant) {
+        if let Some(last) = self.last_frame {
+            self.longest = self.longest.max(now - last);
+        }
+        self.last_frame = Some(now);
+        self.frames += 1;
+    }
+
+    fn read(&self) -> Value {
+        json!({
+            "frames": self.frames,
+            "longest_gap_us": self.longest.as_micros() as u64,
+            "since_mark_us": self.marked.elapsed().as_micros() as u64,
+        })
+    }
+
+    fn mark(&mut self) {
+        self.marked = Instant::now();
+        self.frames = 0;
+        self.longest = Duration::ZERO;
+    }
 }
 
 /// A list over one dataset column: the shared records, the view index its
@@ -401,6 +521,13 @@ pub(crate) struct DartView {
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
     lists: HashMap<String, RetainedList>,
+    /// View jobs started, numbering them so a superseded job's result is
+    /// told from the current one's.
+    view_jobs: u64,
+    frame_gaps: FrameGaps,
+    /// Dataset updates by dataset ID, in arrival order, waiting for a view
+    /// job over that dataset to land.
+    queued_updates: HashMap<String, VecDeque<QueuedUpdate>>,
     /// Cached containers by node ID.
     subtrees: HashMap<String, RetainedSubtree>,
     /// Decoded inline images by node ID, so a frame reuses the decode and
@@ -424,6 +551,15 @@ pub(crate) struct DartView {
 impl DartView {
     pub(crate) fn materialization_count(&self) -> u64 {
         self.counters.materializations.get()
+    }
+
+    /// The frames rendered since the last mark, marking again if asked.
+    pub(crate) fn frame_gaps(&mut self, mark: bool) -> Value {
+        let gaps = self.frame_gaps.read();
+        if mark {
+            self.frame_gaps.mark();
+        }
+        gaps
     }
 
     pub(crate) fn inspect(&self, window: &Window, cx: &App) -> Value {
@@ -467,7 +603,7 @@ impl DartView {
                         "dataset": table.delegate().data.borrow().id,
                         "dataset_revision": table.delegate().data.borrow().revision,
                         "scroll_y": f32::from(offset.y),
-                        "view": {"source_rows": source_rows, "view_rows": view_rows, "groups": groups, "spec_hash": spec_hash},
+                        "view": {"source_rows": source_rows, "view_rows": view_rows, "groups": groups, "spec_hash": spec_hash, "pending": retained.pending.is_some()},
                         "selection": {"row": table.selected_row(), "record": retained.selected_record},
                         "focused": table.focus_handle(cx).is_focused(window),
                     }),
@@ -564,6 +700,7 @@ impl DartView {
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
+            "frame_gaps": self.frame_gaps.read(),
             "draw": histogram!(frames.draw_duration_histogram),
             "dirty_to_present_submit": histogram!(frames.dirty_to_present_histogram),
             "present_interval": histogram!(frames.present_interval_histogram),
@@ -666,6 +803,9 @@ impl DartView {
             next_row_menu: 0,
             tables: HashMap::new(),
             lists: HashMap::new(),
+            view_jobs: 0,
+            frame_gaps: FrameGaps::new(),
+            queued_updates: HashMap::new(),
             subtrees: HashMap::new(),
             images: RefCell::new(HashMap::new()),
             table_subscriptions: HashMap::new(),
@@ -816,8 +956,12 @@ impl DartView {
         self.events.emit(Event::Applied {
             revision: self.snapshot.revision,
             native_apply_us: timer.elapsed().as_micros() as u64,
+            pending_views: self.pending_views(),
         });
         cx.notify();
+        // A table that left the tree takes its view job with it; the
+        // updates waiting on that job apply now.
+        self.drain_queued_updates(cx);
     }
 
     /// Re-renders every cached container that holds one of `ids`, or is one.
@@ -964,11 +1108,31 @@ impl DartView {
     }
 
     fn update_dataset(&mut self, update: Update, parse_us: u64, cx: &mut Context<Self>) {
+        // An update to records a view job is reading waits until the job's
+        // index has landed, so no index ever refers to records it did not
+        // see; the acknowledgement follows the apply.
+        if self.view_pending_for(&update.id, cx) {
+            self.queued_updates
+                .entry(update.id.clone())
+                .or_default()
+                .push_back(QueuedUpdate { update, parse_us });
+            return;
+        }
         let timer = Instant::now();
         let request = update.request;
         let id = update.id.clone();
         let revision = update.revision;
         let replace = matches!(&update.change, Change::Replace { .. });
+        // What the change does to the indices the tables hold, applied to
+        // them while the next index computes.
+        let index_change = match &update.change {
+            Change::Replace { .. } => IndexChange::Replace,
+            Change::Append { more: false, .. } => IndexChange::Append,
+            Change::Edit { edits } => {
+                IndexChange::Edits(edits.iter().filter_map(Edit::index_patch).collect())
+            }
+            _ => IndexChange::None,
+        };
         // A structural edit changes which records exist, so every view index
         // over the dataset is stale afterwards, spec or not.
         let structural = matches!(&update.change, Change::Edit { edits } if edits.iter().any(Edit::is_structural))
@@ -1058,6 +1222,7 @@ impl DartView {
                     parse_us,
                     apply_us: timer.elapsed().as_micros() as u64,
                     work,
+                    pending_views: self.pending_views(),
                 });
             }
             Ok(work) => {
@@ -1082,7 +1247,7 @@ impl DartView {
                             _ => false,
                         };
                     if recompute {
-                        self.recompute_table_view(&table_id, replace, cx);
+                        self.recompute_table_view(&table_id, replace, &index_change, cx);
                     } else {
                         let state = self.tables[&table_id].state.clone();
                         state.update(cx, |_, cx| cx.notify());
@@ -1144,6 +1309,7 @@ impl DartView {
                     parse_us,
                     apply_us: timer.elapsed().as_micros() as u64,
                     work,
+                    pending_views: self.pending_views(),
                 });
             }
             Err(message) => self
@@ -1154,46 +1320,154 @@ impl DartView {
 
     /// Recomputes a table's view index after its spec or dataset changed.
     ///
+    /// A small dataset computes in place. A large one computes off the
+    /// frame thread over a snapshot of its records while the table shows
+    /// its last index adjusted for `change`; updates to that dataset wait
+    /// in the queue meanwhile, and a later recompute supersedes the job.
+    /// Either way the result lands through `apply_view_result`.
+    fn recompute_table_view(
+        &mut self,
+        id: &str,
+        reset_scroll: bool,
+        change: &IndexChange,
+        cx: &mut Context<Self>,
+    ) {
+        let Some(retained) = self.tables.get(id) else {
+            return;
+        };
+        let started = Instant::now();
+        let state = retained.state.clone();
+        let inputs = {
+            let table = state.read(cx);
+            let anchor = table.visible_range().rows().start;
+            let anchor_source = table.delegate().index.borrow().entries.get(anchor).copied();
+            ViewInputs {
+                spec: retained.view.clone(),
+                records: table.delegate().data.borrow().data.clone(),
+                selected_record: retained.selected_record.clone(),
+                anchor_source,
+            }
+        };
+        if inputs.spec.is_none() || inputs.records.rows.len() < VIEW_JOB_ROWS {
+            if let Some(retained) = self.tables.get_mut(id) {
+                retained.pending = None;
+            }
+            let selected_record = inputs.selected_record.clone();
+            let result = inputs.compute();
+            self.apply_view_result(id, reset_scroll, selected_record, result, started, cx);
+            return;
+        }
+        {
+            let index = state.read(cx).delegate().index.clone();
+            let mut index = index.borrow_mut();
+            match change {
+                IndexChange::None => {}
+                IndexChange::Replace => *index = ViewIndex::compute(None, &inputs.records),
+                IndexChange::Append => index.extend_identity(inputs.records.rows.len()),
+                IndexChange::Edits(patches) => {
+                    for patch in patches {
+                        index.patch(*patch);
+                    }
+                }
+            }
+        }
+        state.update(cx, |table, cx| {
+            table.refresh(cx);
+            cx.notify();
+        });
+        self.view_jobs += 1;
+        let job = self.view_jobs;
+        self.counters.view_jobs.set(self.counters.view_jobs.get() + 1);
+        let selected_record = inputs.selected_record.clone();
+        let compute = cx.background_executor().spawn(async move { inputs.compute() });
+        let table_id = id.to_owned();
+        let task = cx.spawn(async move |this, cx| {
+            let result = compute.await;
+            this.update(cx, |this, cx| this.finish_view_job(&table_id, job, result, cx))
+                .ok();
+        });
+        if let Some(retained) = self.tables.get_mut(id) {
+            retained.pending = Some(PendingView {
+                job,
+                reset_scroll,
+                selected_record,
+                started,
+                _task: task,
+            });
+        }
+    }
+
+    /// Lands a view job's result unless the table left the tree or a later
+    /// job superseded it, then applies the updates that waited on it.
+    fn finish_view_job(&mut self, id: &str, job: u64, result: ViewResult, cx: &mut Context<Self>) {
+        let pending = match self.tables.get_mut(id) {
+            Some(retained) if retained.pending.as_ref().is_some_and(|pending| pending.job == job) => {
+                retained.pending.take()
+            }
+            _ => None,
+        };
+        let Some(pending) = pending else {
+            return;
+        };
+        self.apply_view_result(
+            id,
+            pending.reset_scroll,
+            pending.selected_record,
+            result,
+            pending.started,
+            cx,
+        );
+        self.drain_queued_updates(cx);
+    }
+
+    /// Swaps a computed index into a table in one step.
+    ///
     /// Selection: in identity mode the selected record ID is re-resolved to
     /// its new view row; if it left the view the selection clears and the
-    /// subscription emits the null `TableSelection`. `reset_scroll` (Replace)
-    /// keeps the historic unconditional scroll reset; otherwise the first
-    /// visible record stays anchored if it remains in the view, else the
-    /// scroll resets to the top.
-    fn recompute_table_view(&mut self, id: &str, reset_scroll: bool, cx: &mut Context<Self>) {
+    /// subscription emits the null `TableSelection`. A record selected while
+    /// a job ran is resolved here rather than from the job. `reset_scroll`
+    /// (Replace) keeps the historic unconditional scroll reset; otherwise
+    /// the first visible record stays anchored if it remains in the view,
+    /// else the scroll resets to the top. Emits `TableView` once the index
+    /// is in place.
+    fn apply_view_result(
+        &mut self,
+        id: &str,
+        reset_scroll: bool,
+        job_record: Option<String>,
+        result: ViewResult,
+        started: Instant,
+        cx: &mut Context<Self>,
+    ) {
         let Some(retained) = self.tables.get(id) else {
             return;
         };
         let table = retained.state.clone();
-        let spec = retained.view.clone();
-        let selected_record = retained.selected_record.clone();
-        let (index, data, anchor_source) = {
+        let (index, data) = {
             let state = table.read(cx);
-            let anchor = state.visible_range().rows().start;
-            let anchor_source = state.delegate().index.borrow().entries.get(anchor).copied();
-            (
-                state.delegate().index.clone(),
-                state.delegate().data.clone(),
-                anchor_source,
-            )
+            (state.delegate().index.clone(), state.delegate().data.clone())
         };
-        let (new_index, selection, anchor_view) = {
-            let data = data.borrow();
-            let new_index = ViewIndex::compute(spec.as_ref(), &data.data);
-            let selection = match (&selected_record, &data.data.ids) {
-                (Some(record), Some(ids)) => ids
-                    .iter()
-                    .position(|id| id == record)
-                    .and_then(|source| new_index.row_of(ViewEntry::Record(source)))
-                    .map_or(ViewSelection::Gone, ViewSelection::Keep),
-                _ if reset_scroll => ViewSelection::Clear,
-                _ => ViewSelection::Clamp,
-            };
-            let anchor_view = anchor_source.and_then(|entry| new_index.row_of(entry));
-            (new_index, selection, anchor_view)
+        let selection = match &retained.selected_record {
+            Some(record) if data.borrow().data.ids.is_some() => {
+                let row = if job_record.as_ref() == Some(record) {
+                    result.selection_row
+                } else {
+                    let data = data.borrow();
+                    data.data
+                        .ids
+                        .as_ref()
+                        .and_then(|ids| ids.iter().position(|id| id == record))
+                        .and_then(|source| result.index.row_of(ViewEntry::Record(source)))
+                };
+                row.map_or(ViewSelection::Gone, ViewSelection::Keep)
+            }
+            _ if reset_scroll => ViewSelection::Clear,
+            _ => ViewSelection::Clamp,
         };
-        let view_len = new_index.entries.len();
-        *index.borrow_mut() = new_index;
+        let view_len = result.index.entries.len();
+        let groups = result.index.groups.len();
+        let anchor_view = result.anchor_view;
+        *index.borrow_mut() = result.index;
         self.counters
             .view_recomputes
             .set(self.counters.view_recomputes.get() + 1);
@@ -1205,7 +1479,11 @@ impl DartView {
                     }
                 }
                 ViewSelection::Gone | ViewSelection::Clear => {
-                    table.clear_selection(cx);
+                    // Nothing selected clears nothing: a new table or a
+                    // replacement without a selection emits no null event.
+                    if table.selected_row().is_some() {
+                        table.clear_selection(cx);
+                    }
                 }
                 ViewSelection::Clamp => {
                     if table.selected_row().is_some_and(|row| row >= view_len) {
@@ -1242,6 +1520,58 @@ impl DartView {
                 retained.selected_record = None;
             }
         }
+        let (dataset, dataset_revision) = {
+            let data = data.borrow();
+            (data.id.clone(), data.revision)
+        };
+        self.events.emit(Event::TableView {
+            revision: self.snapshot.revision,
+            id: id.to_owned(),
+            dataset,
+            dataset_revision,
+            view_rows: view_len,
+            groups,
+            compute_us: started.elapsed().as_micros() as u64,
+        });
+    }
+
+    /// Whether a view job is reading this dataset's records.
+    fn view_pending_for(&self, dataset: &str, cx: &App) -> bool {
+        self.tables.values().any(|retained| {
+            retained.pending.is_some()
+                && retained.state.read(cx).delegate().data.borrow().id == dataset
+        })
+    }
+
+    /// Tables whose view job is in flight, for the acknowledgements.
+    fn pending_views(&self) -> Vec<String> {
+        let mut pending: Vec<String> = self
+            .tables
+            .iter()
+            .filter(|(_, retained)| retained.pending.is_some())
+            .map(|(id, _)| id.clone())
+            .collect();
+        pending.sort();
+        pending
+    }
+
+    /// Applies the updates that waited for a view job, in arrival order per
+    /// dataset, until one of them starts another job.
+    fn drain_queued_updates(&mut self, cx: &mut Context<Self>) {
+        let datasets: Vec<String> = self.queued_updates.keys().cloned().collect();
+        for dataset in datasets {
+            while !self.view_pending_for(&dataset, cx) {
+                let next = self
+                    .queued_updates
+                    .get_mut(&dataset)
+                    .and_then(|queue| queue.pop_front());
+                let Some(next) = next else {
+                    self.queued_updates.remove(&dataset);
+                    break;
+                };
+                self.update_dataset(next.update, next.parse_us, cx);
+            }
+        }
     }
 
     fn reconcile(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Result<(), String> {
@@ -1258,7 +1588,7 @@ impl DartView {
         let mut pane_ids = HashSet::new();
         let mut tree_ids = HashSet::new();
         let owner = cx.entity().downgrade();
-        let mut changed_views = Vec::new();
+        let mut changed_views: Vec<(String, bool)> = Vec::new();
         let mut failure = None;
         self.snapshot.root.visit(&mut |node| match node {
             Node::Tree {
@@ -1490,9 +1820,11 @@ impl DartView {
                     }
                     let swapped = !Rc::ptr_eq(&retained.state.read(cx).delegate().data, &data);
                     if swapped {
+                        // New records: dataset order until the view lands,
+                        // selection and scroll reset now.
                         let index = retained.state.read(cx).delegate().index.clone();
-                        *index.borrow_mut() =
-                            ViewIndex::compute(view.as_ref(), &data.borrow().data);
+                        *index.borrow_mut() = ViewIndex::compute(None, &data.borrow().data);
+                        retained.pending = None;
                         retained.state.update(cx, |table, cx| {
                             table.delegate_mut().data = data.clone();
                             table.clear_selection(cx);
@@ -1507,15 +1839,15 @@ impl DartView {
                         });
                         retained.selected_record = None;
                         retained.view = view.clone();
+                        if view.is_some() {
+                            changed_views.push((id.clone(), true));
+                        }
                     } else if retained.view != *view {
                         retained.view = view.clone();
-                        changed_views.push(id.clone());
+                        changed_views.push((id.clone(), false));
                     }
                 } else {
-                    let index = Rc::new(RefCell::new(ViewIndex::compute(
-                        view.as_ref(),
-                        &data.borrow().data,
-                    )));
+                    let index = Rc::new(RefCell::new(ViewIndex::compute(None, &data.borrow().data)));
                     let table = cx.new(|cx| {
                         TableState::new(
                             Rows {
@@ -1586,8 +1918,12 @@ impl DartView {
                             view: view.clone(),
                             selected_record: None,
                             selection_notified: None,
+                            pending: None,
                         },
                     );
+                    if view.is_some() {
+                        changed_views.push((id.clone(), true));
+                    }
                 }
             }
             Node::List {
@@ -1685,8 +2021,8 @@ impl DartView {
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
-        for id in changed_views {
-            self.recompute_table_view(&id, false, cx);
+        for (id, reset_scroll) in changed_views {
+            self.recompute_table_view(&id, reset_scroll, &IndexChange::None, cx);
         }
         self.reconcile_row_menu(window, cx);
         Ok(())
@@ -2980,6 +3316,7 @@ impl Render for DartView {
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);
+        self.frame_gaps.frame(Instant::now());
         let colors = cx.theme().colors.clone();
         let content = match self.materialize(&self.snapshot.root, &colors, cx) {
             Ok(content) => content,
@@ -3272,6 +3609,7 @@ pub(crate) fn run(
         events.emit(Event::Applied {
             revision: view.read(cx).snapshot.revision,
             native_apply_us: 0,
+            pending_views: view.read(cx).pending_views(),
         });
         cx.spawn(async move |cx| {
             while let Ok(command) = receiver.recv().await {

@@ -689,6 +689,89 @@ void main() {
     );
   });
 
+  test(
+    'large views compute off the frame thread and settle in order',
+    () async {
+      const rows = 60000;
+      final dataset = TableDataset(
+        'big',
+        columns: ['ID', 'Value'],
+        rows: [
+          for (var i = 0; i < rows; i++) ['R$i', '${rows - i}'],
+        ],
+        rowIds: [for (var i = 0; i < rows; i++) 'R$i'],
+      );
+      final host = await GpuiHost.open(
+        const UiTable(
+          'table',
+          dataset: 'big',
+          view: UiTableView(sort: [UiSort(1, direction: UiSortDirection.asc)]),
+        ),
+        datasets: [dataset],
+      );
+      try {
+        final settled = <TableViewSettled>[];
+        final subscription = host.events.listen((event) {
+          if (event.tableView case final view?) settled.add(view);
+        });
+        Future<String> shown(int row) async =>
+            (await host.diagnose('formatted_cell', {
+                  'table': 'table',
+                  'row': row,
+                  'column': 0,
+                }))['text']
+                as String;
+        // The publication was acknowledged before the index landed; the
+        // settled future and the event report it.
+        await host.viewsSettled;
+        var state = await host.diagnose('inspect');
+        expect(state['tables']['table']['view']['pending'], false);
+        expect(state['tables']['table']['view']['view_rows'], rows);
+        expect(state['native']['view_jobs'], 1);
+        expect(await shown(0), 'R${rows - 1}', reason: 'ascending value');
+        expect(settled, hasLength(1));
+        expect(settled.single.table, 'table');
+        expect(settled.single.rows, rows);
+        expect(settled.single.datasetRevision, 1);
+        // Two edits to the sort column: the first starts a job, the second is
+        // sent while it runs and applies after it, in order.
+        await host.editDataset(dataset, [const CellEdit(0, 1, '0')]);
+        await host.editDataset(dataset, [const CellEdit(1, 1, '${rows + 5}')]);
+        expect(dataset.revision, 3);
+        await host.viewsSettled;
+        state = await host.diagnose('inspect');
+        expect(state['tables']['table']['view']['pending'], false);
+        expect(state['tables']['table']['dataset_revision'], 3);
+        expect(state['native']['view_jobs'], 3);
+        expect(await shown(0), 'R0', reason: 'value 0 sorts first');
+        expect(
+          await shown(rows - 1),
+          'R1',
+          reason: 'the largest value sorts last',
+        );
+        expect(settled, hasLength(3));
+        expect(settled.last.datasetRevision, 3);
+        // A view over fewer records computes in place and still reports.
+        await host.replaceDataset(
+          dataset,
+          columns: ['ID', 'Value'],
+          rows: [
+            ['a', '2'],
+            ['b', '1'],
+          ],
+          rowIds: ['a', 'b'],
+        );
+        await host.viewsSettled;
+        expect(await shown(0), 'b');
+        expect(settled, hasLength(4));
+        expect(settled.last.rows, 2);
+        await subscription.cancel();
+      } finally {
+        await host.close();
+      }
+    },
+  );
+
   test('structural edits keep record identity, views and selection', () async {
     final dataset = TableDataset(
       'records',
