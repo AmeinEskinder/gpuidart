@@ -496,6 +496,27 @@ void main() {
     timeout: const Timeout(Duration(seconds: 120)),
   );
 
+  test('sheets open and close by publication', () async {
+    var open = true;
+    UiNode build() => UiColumn('main', [
+      const UiText('page', 'Page'),
+      UiSheet('side', 'Details', const [
+        UiText('inside', 'Inside'),
+      ], open: open),
+    ]);
+    final host = await GpuiHost.openView(build);
+    try {
+      var state = await host.diagnose('inspect');
+      expect(state['active_sheet'], 'side');
+      open = false;
+      await host.rebuild();
+      state = await host.diagnose('inspect');
+      expect(state['active_sheet'], isNull);
+    } finally {
+      await host.close();
+    }
+  });
+
   test('popovers follow a published open state', () async {
     var open = true;
     UiNode build() => UiPopover('filters', 'Filters', const [

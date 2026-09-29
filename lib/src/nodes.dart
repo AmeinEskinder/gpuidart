@@ -345,6 +345,72 @@ final class UiPopover extends UiNode {
   };
 }
 
+enum UiSheetPlacement {
+  right('right'),
+  left('left'),
+  top('top'),
+  bottom('bottom');
+
+  const UiSheetPlacement(this.wire);
+  final String wire;
+}
+
+/// A sheet sliding in from one window edge with a [title] and [children] as
+/// content, shown while [open] is true. The window shows one sheet at a
+/// time. Closing it from its button or overlay emits `sheet_close`; the
+/// application then publishes it closed. [size] is the sheet's width or
+/// height in logical pixels.
+final class UiSheet extends UiNode {
+  UiSheet(
+    super.id,
+    this.title,
+    List<UiNode> children, {
+    this.open = false,
+    this.placement = UiSheetPlacement.right,
+    this.size,
+    super.style,
+    super.semantics,
+  }) : children = List.unmodifiable(children);
+  final String title;
+  final bool open;
+  final UiSheetPlacement placement;
+  final double? size;
+  @override
+  final List<UiNode> children;
+  @override
+  bool get isContainer => true;
+  @override
+  Map<String, Object> props() {
+    if (title.isEmpty || utf8.encode(title).length > 1024) {
+      throw ArgumentError('Sheet title must contain 1..1024 UTF-8 bytes');
+    }
+    final size = this.size;
+    if (size != null && (!size.isFinite || size <= 0 || size > 8192)) {
+      throw ArgumentError.value(
+        size,
+        'size',
+        'Positive logical pixels within 8192',
+      );
+    }
+    return {
+      'kind': 'sheet',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('sheet'),
+      if (style != null) 'style': style!.toJson(),
+      'title': title,
+      if (placement != UiSheetPlacement.right) 'placement': placement.wire,
+      'size': ?size,
+      if (open) 'open': true,
+    };
+  }
+
+  @override
+  Map<String, Object> toJson() => {
+    ...props(),
+    'children': children.map((child) => child.toJson()).toList(),
+  };
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;

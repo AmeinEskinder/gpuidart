@@ -143,6 +143,9 @@ Map<String, dynamic> decodeNativeEvent(List<int> bytes) {
       if (value['type'] == 'tree_expand' && value['expanded'] is! bool) {
         throw const FormatException('Missing tree expansion state');
       }
+    case 'sheet_close':
+      integer('revision', minimum: 1);
+      string('id');
     case 'popover_change':
       integer('revision', minimum: 1);
       string('id');

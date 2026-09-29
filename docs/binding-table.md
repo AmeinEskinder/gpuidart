@@ -65,7 +65,7 @@ infrastructure the adapter uses on the application's behalf without a node.
 | select | `UiSelect` | |
 | separator | `UiSeparator` | |
 | setting | not bound | Settings page scaffolding. |
-| sheet | planned | A side or bottom sheet holding a bounded subtree. |
+| sheet | `UiSheet` | A sheet from any window edge holding a subtree, open by publication; `sheet_close` event. |
 | shimmer, skeleton, spinner | not bound | Loading placeholders; an indeterminate `UiProgress` is the one bound loading indicator. |
 | sidebar | not bound | |
 | sizing | host | |
@@ -91,7 +91,7 @@ infrastructure the adapter uses on the application's behalf without a node.
 Beyond the component crate, gpuidart binds Kit's base animation
 (`UiStyle.animation`), its calendar (through the date picker) and its
 window and lifecycle; `UiCanvas`, `UiStack`, `UiColumn` and `UiRow` are
-gpuidart's own over GPUI's elements. Twenty-seven node kinds reach about a
-third of the component catalog; the planned three close the largest gaps an
-application notices (sheet, combobox, rich text), and the rest stay
-reachable only by extending the adapter.
+gpuidart's own over GPUI's elements. Twenty-eight node kinds reach about a
+third of the component catalog; the planned two close the largest gaps an
+application notices (combobox, rich text), and the rest stay reachable
+only by extending the adapter.

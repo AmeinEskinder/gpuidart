@@ -310,6 +310,43 @@ void main() {
     );
   });
 
+  test('sheets encode their placement and decode close events', () {
+    final sheet = UiSheet(
+      'side',
+      'Details',
+      const [UiText('inside', 'Inside')],
+      open: true,
+      placement: UiSheetPlacement.left,
+      size: 320,
+    );
+    expect(sheet.toJson(), {
+      'kind': 'sheet',
+      'id': 'side',
+      'title': 'Details',
+      'placement': 'left',
+      'size': 320.0,
+      'open': true,
+      'children': [
+        {'kind': 'text', 'id': 'inside', 'text': 'Inside'},
+      ],
+    });
+    final closed = UiSheet('side', 'Details', const []).toJson();
+    expect(closed.containsKey('open'), isFalse);
+    expect(closed.containsKey('placement'), isFalse);
+    expect(UiSheet('s', '', const []).toJson, throwsArgumentError);
+    expect(UiSheet('s', 'S', const [], size: 0).toJson, throwsArgumentError);
+    Map<String, dynamic> decode(Map<String, Object?> event) =>
+        decodeNativeEvent(utf8.encode(jsonEncode(event)));
+    expect(
+      decode({'type': 'sheet_close', 'revision': 2, 'id': 'side'})['id'],
+      'side',
+    );
+    expect(
+      () => decode({'type': 'sheet_close', 'revision': 2}),
+      throwsFormatException,
+    );
+  });
+
   test('popovers encode their trigger and decode open changes', () {
     final popover = UiPopover('filters', 'Filters', const [
       UiText('inside', 'Inside'),

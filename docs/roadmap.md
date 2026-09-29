@@ -188,8 +188,8 @@ Feasibility verdicts recorded on this machine:
   platform leaves the prompts and reveal unimplemented, so they are verified
   by manual runs only.
 
-Verification: at the packed-record head the native library suite runs 107 tests (two
-ignored timing probes) and the Dart suite 120, including the live-window,
+Verification: at the packed-record head the native library suite runs 108 tests (two
+ignored timing probes) and the Dart suite 122, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug
 library, plus the repository's full check gate. Earlier counts in this

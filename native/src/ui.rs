@@ -13,6 +13,7 @@ use async_channel::Receiver;
 use gpui::{ScrollStrategy, UniformListScrollHandle, uniform_list};
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{ScrollbarHandle, TestSupportExt};
+use gpui_kit::component::WindowExt as _;
 use gpui_kit::component::theme::ThemeColor;
 use gpui_kit::component::{
     ActiveTheme, Disableable, Icon, IconNamed, Sizable, StyledExt,
@@ -388,6 +389,11 @@ pub(crate) struct DartView {
     /// Trees by node ID: the Kit state holding the entries, their expansion
     /// and the selection, with the items and selection last published.
     trees: HashMap<String, RetainedTree>,
+    /// The sheet node whose sheet the window shows, if any.
+    active_sheet: Option<String>,
+    /// Set by a publication that carries or drops a sheet; the next frame
+    /// reconciles the window's sheet after it has rendered.
+    sheets_dirty: bool,
     row_menu: Option<row_menus::Session>,
     next_row_menu: u64,
     tables: HashMap<String, RetainedTable>,
@@ -551,7 +557,7 @@ impl DartView {
                 )
             })
             .collect::<serde_json::Map<String, Value>>();
-        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "panes": panes, "trees": trees, "controls": self.inspect_controls(window, cx),
+        json!({"charts": self.inspect_charts(), "theme": self.inspect_theme(cx), "revision": self.snapshot.revision, "native_process_id": std::process::id(), "inputs": inputs, "tables": tables, "lists": lists, "subtrees": subtrees, "labels": labels, "scrolls": scrolls, "panes": panes, "trees": trees, "active_sheet": self.active_sheet.clone(), "controls": self.inspect_controls(window, cx),
             "focus_handle": window.focused(cx).map(|focus| format!("{focus:?}")),
             "window": {"width": f32::from(window.viewport_size().width), "height": f32::from(window.viewport_size().height), "scale_factor": window.scale_factor(), "scroll_y": f32::from(self.scroll.offset().y)},
             "native": self.counters.read(),
@@ -650,6 +656,8 @@ impl DartView {
             scrolls: HashMap::new(),
             panes: HashMap::new(),
             trees: HashMap::new(),
+            active_sheet: None,
+            sheets_dirty: false,
             row_menu: None,
             next_row_menu: 0,
             tables: HashMap::new(),
@@ -1314,6 +1322,9 @@ impl DartView {
                     );
                 }
             }
+            Node::Sheet { .. } => {
+                self.sheets_dirty = true;
+            }
             Node::Scroll { id, .. } => {
                 scroll_ids.insert(id.clone());
                 self.scrolls
@@ -1660,6 +1671,9 @@ impl DartView {
         self.scrolls.retain(|id, _| scroll_ids.contains(id));
         self.panes.retain(|id, _| pane_ids.contains(id));
         self.trees.retain(|id, _| tree_ids.contains(id));
+        if self.active_sheet.is_some() {
+            self.sheets_dirty = true;
+        }
         self.tables.retain(|id, _| table_ids.contains(id));
         self.table_subscriptions
             .retain(|id, _| table_ids.contains(id));
@@ -2020,6 +2034,11 @@ impl DartView {
                 )
                 .into_any_element()
             }
+            // The sheet's content lives in the window's sheet; the node itself
+            // holds only its place in the tree.
+            Node::Sheet { .. } => annotate(div().id(id), node)
+                .test_support()
+                .into_any_element(),
             Node::Scroll {
                 id: scroll_id,
                 axis,
@@ -2845,9 +2864,92 @@ mod inputs;
 #[cfg(test)]
 mod tests;
 
+impl DartView {
+    /// Opens or closes the window's sheet to match the description: the last
+    /// open sheet node wins, and a closed or removed node closes it. Runs
+    /// after a frame, once Kit's window root exists and is not mid-render.
+    fn reconcile_sheets(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let mut wanted = None;
+        self.snapshot.root.visit(&mut |node| {
+            if let Node::Sheet {
+                id,
+                open: true,
+                placement,
+                title,
+                size,
+                ..
+            } = node
+            {
+                wanted = Some((id.clone(), *placement, title.clone(), *size));
+            }
+        });
+        let Some((id, placement, title, size)) = wanted else {
+            if self.active_sheet.take().is_some() && window.has_active_sheet(cx) {
+                window.close_sheet(cx);
+            }
+            return;
+        };
+        if self.active_sheet.as_deref() == Some(id.as_str()) && window.has_active_sheet(cx) {
+            return;
+        }
+        let owner = cx.entity().downgrade();
+        let events = self.events.clone();
+        let title = SharedString::from(title);
+        let placement = match placement {
+            crate::protocol::SheetPlacement::Right => gpui_kit::component::Placement::Right,
+            crate::protocol::SheetPlacement::Left => gpui_kit::component::Placement::Left,
+            crate::protocol::SheetPlacement::Top => gpui_kit::component::Placement::Top,
+            crate::protocol::SheetPlacement::Bottom => gpui_kit::component::Placement::Bottom,
+        };
+        let sheet_id = id.clone();
+        // The builder runs on every frame the sheet is shown, so it
+        // materializes the node's current children each time.
+        window.open_sheet_at(placement, cx, move |sheet, _, cx| {
+            let content: Vec<AnyElement> = owner
+                .upgrade()
+                .map(|view| {
+                    let view = view.read(cx);
+                    let colors = cx.theme().colors.clone();
+                    match view.snapshot.root.find(&sheet_id) {
+                        Some(Node::Sheet { children, .. }) => children
+                            .iter()
+                            .filter_map(|child| view.materialize(child, &colors, cx).ok())
+                            .collect(),
+                        _ => Vec::new(),
+                    }
+                })
+                .unwrap_or_default();
+            let events = events.clone();
+            let owner = owner.clone();
+            let event_id = sheet_id.clone();
+            let mut sheet = sheet
+                .title(title.clone())
+                .child(div().v_flex().gap_3().size_full().children(content))
+                .on_close(move |_, _, cx| {
+                    let revision = owner
+                        .upgrade()
+                        .map_or(0, |view| view.read(cx).snapshot.revision);
+                    events.emit(Event::SheetClose {
+                        revision,
+                        id: event_id.clone(),
+                    });
+                });
+            if let Some(size) = size {
+                sheet = sheet.size(px(size));
+            }
+            sheet
+        });
+        self.active_sheet = Some(id);
+    }
+}
+
 impl Render for DartView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         self.reconcile_row_menu(window, cx);
+        if self.sheets_dirty {
+            self.sheets_dirty = false;
+            cx.defer_in(window, |this, window, cx| this.reconcile_sheets(window, cx));
+        }
         self.counters
             .materializations
             .set(self.counters.materializations.get() + 1);

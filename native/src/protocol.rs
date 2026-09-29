@@ -372,6 +372,27 @@ pub enum Node {
         #[serde(default)]
         children: Vec<Node>,
     },
+    /// A sheet sliding in from one edge of the window with a title and the
+    /// children as content, open while `open` is published true. The window
+    /// shows one sheet at a time; the last open one in the description wins.
+    /// Closing it from its button or overlay emits `sheet_close`, and the
+    /// application republishes it closed.
+    Sheet {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        title: String,
+        #[serde(default)]
+        placement: SheetPlacement,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        size: Option<f32>,
+        #[serde(default)]
+        open: bool,
+        #[serde(default)]
+        children: Vec<Node>,
+    },
     /// A calendar picker holding one date as `YYYY-MM-DD`; `date_change`
     /// carries the requested value and the next publication is authoritative.
     DatePicker {
@@ -697,6 +718,16 @@ fn validate_panes(panes: &[PaneSpec], children: usize) -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SheetPlacement {
+    #[default]
+    Right,
+    Left,
+    Top,
+    Bottom,
 }
 
 /// One tree item: a stable ID, a label and optional children.
@@ -1626,6 +1657,7 @@ impl Node {
             | Self::Panes { id, .. }
             | Self::Tree { id, .. }
             | Self::Popover { id, .. }
+            | Self::Sheet { id, .. }
             | Self::Switch { id, .. }
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
@@ -1658,6 +1690,7 @@ impl Node {
             | Self::Panes { style, .. }
             | Self::Tree { style, .. }
             | Self::Popover { style, .. }
+            | Self::Sheet { style, .. }
             | Self::Switch { style, .. }
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
@@ -1690,6 +1723,7 @@ impl Node {
             | Self::Panes { semantics, .. }
             | Self::Tree { semantics, .. }
             | Self::Popover { semantics, .. }
+            | Self::Sheet { semantics, .. }
             | Self::Switch { semantics, .. }
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
@@ -1716,7 +1750,8 @@ impl Node {
             | Self::Stack { children, .. }
             | Self::Scroll { children, .. }
             | Self::Panes { children, .. }
-            | Self::Popover { children, .. } => Some(children),
+            | Self::Popover { children, .. }
+            | Self::Sheet { children, .. } => Some(children),
             _ => None,
         }
     }
@@ -1854,6 +1889,14 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
         && (label.is_empty() || label.len() > 1024)
     {
         return Err("Popover label must contain 1..1024 UTF-8 bytes".into());
+    }
+    if let Node::Sheet { title, size, .. } = node {
+        if title.is_empty() || title.len() > 1024 {
+            return Err("Sheet title must contain 1..1024 UTF-8 bytes".into());
+        }
+        if size.is_some_and(|size| !size.is_finite() || size <= 0. || size > 8192.) {
+            return Err("Sheet size must be a positive logical size within 8192".into());
+        }
     }
     if node.style().is_some_and(|style| style.cached) {
         let fixed = matches!(
@@ -2251,7 +2294,8 @@ pub(crate) fn children_mut(node: &mut Node) -> Option<&mut Vec<Node>> {
         | Node::Stack { children, .. }
         | Node::Scroll { children, .. }
         | Node::Panes { children, .. }
-        | Node::Popover { children, .. } => Some(children),
+        | Node::Popover { children, .. }
+        | Node::Sheet { children, .. } => Some(children),
         _ => None,
     }
 }
@@ -2406,6 +2450,11 @@ pub enum Event {
         revision: u64,
         id: String,
         open: bool,
+    },
+    /// The user closed a sheet from its button or overlay.
+    SheetClose {
+        revision: u64,
+        id: String,
     },
     DialogResult {
         revision: u64,

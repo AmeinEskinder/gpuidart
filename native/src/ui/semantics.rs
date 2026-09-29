@@ -65,7 +65,8 @@ pub(super) fn annotate<T: StatefulInteractiveElement>(element: T, node: &Node) -
             | Node::Stack { .. }
             | Node::Scroll { .. }
             | Node::Panes { .. }
-            | Node::Popover { .. } => {
+            | Node::Popover { .. }
+            | Node::Sheet { .. } => {
                 if node.semantics().is_none() {
                     return element;
                 }

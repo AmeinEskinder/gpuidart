@@ -54,7 +54,8 @@ final class UiSemantics {
       'stack' ||
       'scroll' ||
       'panes' ||
-      'popover' => {UiRole.group, UiRole.list, UiRole.listItem},
+      'popover' ||
+      'sheet' => {UiRole.group, UiRole.list, UiRole.listItem},
       'text' => {UiRole.label, UiRole.heading},
       'button' || 'confirm_dialog' || 'menu_button' => {UiRole.button},
       'checkbox' => {UiRole.checkbox},

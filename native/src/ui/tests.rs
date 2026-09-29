@@ -2860,3 +2860,110 @@ fn popovers_open_on_their_trigger_and_follow_a_published_state(cx: &mut TestAppC
     })
     .unwrap();
 }
+
+#[gpui::test]
+fn sheets_open_by_publication_and_close_with_their_node(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, open: bool| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"text","id":"page","text":"Page"}},
+                {{"kind":"sheet","id":"side","title":"Details","placement":"left","size":320,"open":{open},"children":[
+                    {{"kind":"text","id":"in-sheet","text":"Inside the sheet"}}
+                ]}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    // Sheets live in Kit's component window root, which the host wraps the
+    // view in; the plain test window has none.
+    let mut content = None;
+    let handle = cx.update(|cx| {
+        cx.open_window(
+            WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(Bounds {
+                    origin: Point::default(),
+                    size: size(px(900.), px(700.)),
+                })),
+                ..Default::default()
+            },
+            |window, cx| {
+                let view = cx.new(|cx| {
+                    DartView::new(
+                        Initial {
+                            window: Default::default(),
+                            snapshot: snapshot(1, true),
+                            datasets: vec![],
+                        },
+                        Events(Arc::new(|_| {})),
+                        window,
+                        cx,
+                    )
+                });
+                content = Some(view.clone());
+                cx.new(|cx| gpui_kit::component::Root::new(view, window, cx))
+            },
+        )
+        .unwrap()
+    });
+    let view = content.expect("view content");
+    // The sheet is reconciled after the frame that carried its description.
+    cx.update_window(handle.into(), |_, window, cx| window.render_frame(cx))
+        .unwrap();
+    cx.update_window(handle.into(), |_, window, cx| {
+        window.render_frame(cx);
+        assert!(
+            window.try_find("in-sheet").is_some(),
+            "an open sheet shows its content"
+        );
+        assert_eq!(view.read(cx).inspect(window, cx)["active_sheet"], "side");
+        view.update(cx, |view, cx| view.publish(snapshot(2, false), window, cx));
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle.into(), |_, window, cx| {
+        window.render_frame(cx);
+        assert!(
+            window.try_find("in-sheet").is_none(),
+            "a closed sheet hides it"
+        );
+        assert_eq!(
+            view.read(cx).inspect(window, cx)["active_sheet"],
+            serde_json::Value::Null
+        );
+        view.update(cx, |view, cx| view.publish(snapshot(3, true), window, cx));
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle.into(), |_, window, cx| {
+        window.render_frame(cx);
+        assert!(window.try_find("in-sheet").is_some(), "and reopens it");
+        view.update(cx, |view, cx| {
+            view.publish(
+                Snapshot::parse(
+                    br#"{"revision":4,"root":{"kind":"column","id":"root","children":[{"kind":"text","id":"page","text":"Page"}]}}"#,
+                )
+                .unwrap(),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+    })
+    .unwrap();
+    cx.update_window(handle.into(), |_, window, cx| {
+        window.render_frame(cx);
+        assert!(
+            window.try_find("in-sheet").is_none(),
+            "removing the node closes the sheet"
+        );
+        assert_eq!(
+            view.read(cx).inspect(window, cx)["active_sheet"],
+            serde_json::Value::Null
+        );
+    })
+    .unwrap();
+}

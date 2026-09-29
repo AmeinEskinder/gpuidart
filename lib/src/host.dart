@@ -1080,6 +1080,7 @@ final class GpuiHost {
           event.type == 'tree_select' ||
           event.type == 'tree_expand' ||
           event.type == 'popover_change' ||
+          event.type == 'sheet_close' ||
           event.type == 'switch_change' ||
           event.type == 'radio_change' ||
           event.type == 'tab_change' ||
