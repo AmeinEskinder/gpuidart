@@ -3433,6 +3433,65 @@ impl Windows {
 }
 
 /// Closes the window's sheet, if one is open, without leasing Kit's root.
+/// Asks Windows to repaint the window now that an update from the
+/// application has landed. GPUI draws a dirty window at the next vsync tick,
+/// which is up to a frame away from a change that is already applied; the
+/// repaint request draws it at once (GPUI still draws only what is dirty,
+/// and the tick then finds nothing left), at most once per 4 ms. Off with
+/// `GPUIDART_DRAW_ON_UPDATE=0`, for measuring the difference.
+#[cfg(windows)]
+fn draw_now(
+    cx: &mut gpui::AsyncApp,
+    handle: gpui::WindowHandle<gpui_kit::component::Root>,
+    last: &Cell<Option<Instant>>,
+) {
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    if !*ENABLED.get_or_init(|| std::env::var("GPUIDART_DRAW_ON_UPDATE").map_or(true, |v| v != "0"))
+    {
+        return;
+    }
+    if last
+        .get()
+        .is_some_and(|at| at.elapsed() < Duration::from_millis(4))
+    {
+        return;
+    }
+    #[link(name = "user32")]
+    unsafe extern "system" {
+        fn RedrawWindow(
+            hwnd: *mut std::ffi::c_void,
+            rect: *const std::ffi::c_void,
+            region: *mut std::ffi::c_void,
+            flags: u32,
+        ) -> i32;
+    }
+    const RDW_INVALIDATE: u32 = 0x0001;
+    let _ = cx.update_window(handle.into(), |_, window, _| {
+        if let Ok(raw) = window.window_handle() {
+            if let RawWindowHandle::Win32(win32) = raw.as_raw() {
+                unsafe {
+                    RedrawWindow(
+                        win32.hwnd.get() as *mut std::ffi::c_void,
+                        std::ptr::null(),
+                        std::ptr::null_mut(),
+                        RDW_INVALIDATE,
+                    );
+                }
+            }
+        }
+    });
+    last.set(Some(Instant::now()));
+}
+
+#[cfg(not(windows))]
+fn draw_now(
+    _: &mut gpui::AsyncApp,
+    _: gpui::WindowHandle<gpui_kit::component::Root>,
+    _: &Cell<Option<Instant>>,
+) {
+}
+
 fn dismiss_sheet(cx: &mut gpui::AsyncApp, handle: gpui::WindowHandle<gpui_kit::component::Root>) {
     let _ = cx.update_window(handle.into(), |_, window, cx| {
         if window.has_active_sheet(cx) {
@@ -3631,6 +3690,7 @@ pub(crate) fn run(
             native_apply_us: 0,
             pending_views: view.read(cx).pending_views(),
         });
+        let last_draw = Cell::new(None::<Instant>);
         cx.spawn(async move |cx| {
             while let Ok(command) = receiver.recv().await {
                 trace.point("native.dequeue", command.trace_key(), None, None);
@@ -3647,9 +3707,6 @@ pub(crate) fn run(
                             });
                             continue;
                         };
-                        // A publication may open or close the window's
-                        // sheet, which updates Kit's root: reach the window
-                        // without leasing the root.
                         if cx
                             .update_window(handle.into(), |_, w, cx| {
                                 view.update(cx, |view, cx| view.publish(snapshot, w, cx))
@@ -3659,6 +3716,7 @@ pub(crate) fn run(
                         {
                             break;
                         }
+                        draw_now(cx, handle, &last_draw);
                     }
                     Command::Update(window, update) => {
                         let Some((handle, view)) = windows.borrow().get(window) else {
@@ -3677,6 +3735,7 @@ pub(crate) fn run(
                         {
                             break;
                         }
+                        draw_now(cx, handle, &last_draw);
                     }
                     Command::Close | Command::CloseWindow(0) => {
                         // An open sheet holds Kit's focus trap; dismiss it
@@ -3717,6 +3776,7 @@ pub(crate) fn run(
                         {
                             break;
                         }
+                        draw_now(cx, handle, &last_draw);
                     }
                     Command::Diagnostic(window, request) => {
                         let Some((handle, view)) = windows.borrow().get(window) else {

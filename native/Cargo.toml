@@ -27,6 +27,11 @@ serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 libc = "0.2"
 
+# The window handle behind a GPUI window, to ask Windows for a repaint the
+# moment an update from the application has landed.
+[target.'cfg(windows)'.dependencies]
+raw-window-handle = "0.6"
+
 [dev-dependencies]
 gpui-kit = { git = "https://github.com/longbridge/gpui-kit", rev = "0c830f4d257e69fdd17200650533ab4ca9a40cc0", features = ["test-support"] }
 

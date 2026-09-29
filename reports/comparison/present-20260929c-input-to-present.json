@@ -1,5 +1,5 @@
 {
-  "scope": "input to present start on the QPC clock: driver timestamp before injection to the first Present call of the fixture after the injection completed; input to display adds PresentMon MsUntilDisplayed where it is known",
+  "scope": "input to present start on the QPC clock: from the injection completed to the first Present call of the fixture after it, with the driver time before the injection reported separately; input to display adds PresentMon MsUntilDisplayed where it is known",
   "runs": [
     {
       "run": "present-20260929c-0",
@@ -15,19 +15,26 @@
       "displayed_in_window": 11,
       "input_to_present_ms": {
         "n": 257,
-        "p50": 16.7358,
-        "p95": 30.3482,
-        "p99": 34.8693,
-        "max": 37.3387
+        "p50": 14.5869,
+        "p95": 19.5294,
+        "p99": 20.379,
+        "max": 21.9228
       },
       "input_to_display_ms": {
         "n": 7,
-        "p50": 44.828900000000004,
-        "p95": 62.1443,
-        "p99": 62.1443,
-        "max": 62.1443
+        "p50": 42.8446,
+        "p95": 44.334999999999994,
+        "p99": 44.334999999999994,
+        "max": 44.334999999999994
       },
       "inputs_without_a_later_present": 43,
+      "driver_before_injection_ms": {
+        "n": 257,
+        "p50": 1.9254,
+        "p95": 10.2456,
+        "p99": 17.8093,
+        "max": 19.5124
+      },
       "between_presents_ms": {
         "n": 509,
         "p50": 17.4422,
@@ -50,19 +57,26 @@
       "displayed_in_window": 1,
       "input_to_present_ms": {
         "n": 13,
-        "p50": 12.0816,
-        "p95": 45.8861,
-        "p99": 45.8861,
-        "max": 45.8861
+        "p50": 10.5352,
+        "p95": 22.4987,
+        "p99": 22.4987,
+        "max": 22.4987
       },
       "input_to_display_ms": {
         "n": 1,
-        "p50": 69.8809,
-        "p95": 69.8809,
-        "p99": 69.8809,
-        "max": 69.8809
+        "p50": 46.4935,
+        "p95": 46.4935,
+        "p99": 46.4935,
+        "max": 46.4935
       },
       "inputs_without_a_later_present": 37,
+      "driver_before_injection_ms": {
+        "n": 13,
+        "p50": 1.4515,
+        "p95": 23.3874,
+        "p99": 23.3874,
+        "max": 23.3874
+      },
       "between_presents_ms": {
         "n": 12,
         "p50": 199.5868,
@@ -85,19 +99,26 @@
       "displayed_in_window": 75,
       "input_to_present_ms": {
         "n": 589,
-        "p50": 9.4677,
-        "p95": 13.9775,
-        "p99": 24.5606,
-        "max": 25.6854
+        "p50": 8.3606,
+        "p95": 13.3835,
+        "p99": 23.479,
+        "max": 23.9915
       },
       "input_to_display_ms": {
         "n": 76,
-        "p50": 32.7481,
-        "p95": 37.6278,
-        "p99": 47.7607,
-        "max": 47.7607
+        "p50": 32.0696,
+        "p95": 36.921,
+        "p99": 46.8935,
+        "max": 46.8935
       },
       "inputs_without_a_later_present": 11,
+      "driver_before_injection_ms": {
+        "n": 589,
+        "p50": 0.6682,
+        "p95": 1.4123,
+        "p99": 1.8275,
+        "max": 8.2501
+      },
       "between_presents_ms": {
         "n": 587,
         "p50": 16.6414,
@@ -120,19 +141,26 @@
       "displayed_in_window": 311,
       "input_to_present_ms": {
         "n": 299,
-        "p50": 15.4509,
-        "p95": 19.2885,
-        "p99": 31.9271,
-        "max": 33.8806
+        "p50": 12.9237,
+        "p95": 16.5038,
+        "p99": 21.8871,
+        "max": 23.6457
       },
       "input_to_display_ms": {
         "n": 296,
-        "p50": 37.6704,
-        "p95": 51.830799999999996,
-        "p99": 65.2788,
-        "max": 66.3302
+        "p50": 36.232,
+        "p95": 49.413,
+        "p99": 50.5735,
+        "max": 53.6537
       },
       "inputs_without_a_later_present": 1,
+      "driver_before_injection_ms": {
+        "n": 299,
+        "p50": 1.7948,
+        "p95": 5.4479,
+        "p99": 21.2533,
+        "max": 22.7671
+      },
       "between_presents_ms": {
         "n": 313,
         "p50": 33.2023,
@@ -155,19 +183,26 @@
       "displayed_in_window": 49,
       "input_to_present_ms": {
         "n": 49,
-        "p50": 19.7128,
-        "p95": 23.3178,
-        "p99": 24.5503,
-        "max": 24.5503
+        "p50": 17.4637,
+        "p95": 21.6087,
+        "p99": 22.638,
+        "max": 22.638
       },
       "input_to_display_ms": {
         "n": 49,
-        "p50": 53.8425,
-        "p95": 57.8117,
-        "p99": 58.8686,
-        "max": 58.8686
+        "p50": 49.9703,
+        "p95": 55.552400000000006,
+        "p99": 56.9563,
+        "max": 56.9563
       },
       "inputs_without_a_later_present": 1,
+      "driver_before_injection_ms": {
+        "n": 49,
+        "p50": 1.7665,
+        "p95": 10.1968,
+        "p99": 11.5839,
+        "max": 11.5839
+      },
       "between_presents_ms": {
         "n": 48,
         "p50": 200.0916,
@@ -190,19 +225,26 @@
       "displayed_in_window": 585,
       "input_to_present_ms": {
         "n": 600,
-        "p50": 7.9916,
-        "p95": 11.4959,
-        "p99": 12.5691,
-        "max": 13.079
+        "p50": 7.3474,
+        "p95": 10.9371,
+        "p99": 12.0056,
+        "max": 12.5167
       },
       "input_to_display_ms": {
         "n": 585,
-        "p50": 28.2941,
-        "p95": 31.646,
-        "p99": 32.353,
-        "max": 43.7853
+        "p50": 27.6107,
+        "p95": 30.9964,
+        "p99": 31.8485,
+        "max": 42.6897
       },
       "inputs_without_a_later_present": 0,
+      "driver_before_injection_ms": {
+        "n": 600,
+        "p50": 0.5931,
+        "p95": 0.9563,
+        "p99": 1.1213,
+        "max": 3.0249
+      },
       "between_presents_ms": {
         "n": 599,
         "p50": 16.6372,
@@ -225,19 +267,26 @@
       "displayed_in_window": 29,
       "input_to_present_ms": {
         "n": 264,
-        "p50": 20.5394,
-        "p95": 36.8355,
-        "p99": 40.0188,
-        "max": 40.3003
+        "p50": 18.2692,
+        "p95": 20.844,
+        "p99": 21.7496,
+        "max": 22.0871
       },
       "input_to_display_ms": {
         "n": 21,
-        "p50": 45.1999,
-        "p95": 60.028400000000005,
-        "p99": 64.1263,
-        "max": 64.1263
+        "p50": 43.0171,
+        "p95": 44.7059,
+        "p99": 46.0911,
+        "max": 46.0911
       },
       "inputs_without_a_later_present": 36,
+      "driver_before_injection_ms": {
+        "n": 264,
+        "p50": 2.26,
+        "p95": 16.4263,
+        "p99": 20.6615,
+        "max": 21.3183
+      },
       "between_presents_ms": {
         "n": 523,
         "p50": 16.664,
@@ -260,19 +309,26 @@
       "displayed_in_window": 1,
       "input_to_present_ms": {
         "n": 37,
-        "p50": 18.7964,
-        "p95": 36.6237,
-        "p99": 39.4859,
-        "max": 39.4859
+        "p50": 15.836,
+        "p95": 22.2035,
+        "p99": 23.1491,
+        "max": 23.1491
       },
       "input_to_display_ms": {
         "n": 1,
-        "p50": 43.1188,
-        "p95": 43.1188,
-        "p99": 43.1188,
-        "max": 43.1188
+        "p50": 40.848299999999995,
+        "p95": 40.848299999999995,
+        "p99": 40.848299999999995,
+        "max": 40.848299999999995
       },
       "inputs_without_a_later_present": 13,
+      "driver_before_injection_ms": {
+        "n": 37,
+        "p50": 2.5605,
+        "p95": 16.3368,
+        "p99": 17.2073,
+        "max": 17.2073
+      },
       "between_presents_ms": {
         "n": 37,
         "p50": 200.0934,
@@ -295,19 +351,26 @@
       "displayed_in_window": 26,
       "input_to_present_ms": {
         "n": 579,
-        "p50": 3.8332,
-        "p95": 18.5987,
-        "p99": 21.5583,
-        "max": 23.0233
+        "p50": 3.1991,
+        "p95": 18.0589,
+        "p99": 20.8091,
+        "max": 22.387
       },
       "input_to_display_ms": {
         "n": 22,
-        "p50": 29.514899999999997,
-        "p95": 43.9422,
-        "p99": 47.6708,
-        "max": 47.6708
+        "p50": 28.8798,
+        "p95": 42.922700000000006,
+        "p99": 46.8058,
+        "max": 46.8058
       },
       "inputs_without_a_later_present": 21,
+      "driver_before_injection_ms": {
+        "n": 579,
+        "p50": 0.6348,
+        "p95": 1.0267,
+        "p99": 1.2761,
+        "max": 1.8598
+      },
       "between_presents_ms": {
         "n": 577,
         "p50": 16.6886,
@@ -330,19 +393,26 @@
       "displayed_in_window": 315,
       "input_to_present_ms": {
         "n": 299,
-        "p50": 19.4205,
-        "p95": 23.1178,
-        "p99": 24.8002,
-        "max": 25.9497
+        "p50": 17.5646,
+        "p95": 20.9808,
+        "p99": 22.7973,
+        "max": 24.6061
       },
       "input_to_display_ms": {
         "n": 297,
-        "p50": 39.7094,
-        "p95": 56.440200000000004,
-        "p99": 58.7893,
-        "max": 59.1609
+        "p50": 37.6155,
+        "p95": 54.8188,
+        "p99": 56.6449,
+        "max": 57.693599999999996
       },
       "inputs_without_a_later_present": 1,
+      "driver_before_injection_ms": {
+        "n": 299,
+        "p50": 1.391,
+        "p95": 9.2107,
+        "p99": 12.7795,
+        "max": 14.0462
+      },
       "between_presents_ms": {
         "n": 316,
         "p50": 33.233,
@@ -365,19 +435,26 @@
       "displayed_in_window": 49,
       "input_to_present_ms": {
         "n": 49,
-        "p50": 16.7843,
-        "p95": 20.5712,
-        "p99": 31.6672,
-        "max": 31.6672
+        "p50": 14.3127,
+        "p95": 18.6107,
+        "p99": 19.1086,
+        "max": 19.1086
       },
       "input_to_display_ms": {
         "n": 49,
-        "p50": 37.1727,
-        "p95": 54.4653,
-        "p99": 55.7314,
-        "max": 55.7314
+        "p50": 34.9162,
+        "p95": 49.9314,
+        "p99": 52.658300000000004,
+        "max": 52.658300000000004
       },
       "inputs_without_a_later_present": 1,
+      "driver_before_injection_ms": {
+        "n": 49,
+        "p50": 1.6936,
+        "p95": 11.4162,
+        "p99": 21.0766,
+        "max": 21.0766
+      },
       "between_presents_ms": {
         "n": 48,
         "p50": 200.09300000000002,
@@ -400,19 +477,26 @@
       "displayed_in_window": 557,
       "input_to_present_ms": {
         "n": 600,
-        "p50": 11.9876,
-        "p95": 16.0544,
-        "p99": 17.5755,
-        "max": 21.805
+        "p50": 11.4112,
+        "p95": 15.2899,
+        "p99": 16.9104,
+        "max": 21.351
       },
       "input_to_display_ms": {
         "n": 553,
-        "p50": 32.2709,
-        "p95": 35.569199999999995,
-        "p99": 51.9131,
-        "max": 52.9894
+        "p50": 31.8024,
+        "p95": 34.9358,
+        "p99": 51.0651,
+        "max": 52.3668
       },
       "inputs_without_a_later_present": 0,
+      "driver_before_injection_ms": {
+        "n": 600,
+        "p50": 0.5398,
+        "p95": 0.9982,
+        "p99": 1.181,
+        "max": 1.8495
+      },
       "between_presents_ms": {
         "n": 598,
         "p50": 16.6869,
@@ -435,13 +519,20 @@
       "displayed_in_window": 0,
       "input_to_present_ms": {
         "n": 300,
-        "p50": 7.1617,
-        "p95": 21.4517,
-        "p99": 38.1166,
-        "max": 39.7411
+        "p50": 5.8165,
+        "p95": 19.0187,
+        "p99": 19.7198,
+        "max": 20.0177
       },
       "input_to_display_ms": null,
       "inputs_without_a_later_present": 0,
+      "driver_before_injection_ms": {
+        "n": 300,
+        "p50": 1.5126,
+        "p95": 3.2932,
+        "p99": 19.0631,
+        "max": 20.7699
+      },
       "between_presents_ms": {
         "n": 596,
         "p50": 16.5662,
@@ -464,19 +555,26 @@
       "displayed_in_window": 2,
       "input_to_present_ms": {
         "n": 40,
-        "p50": 6.784,
-        "p95": 37.2103,
-        "p99": 39.4704,
-        "max": 39.4704
+        "p50": 5.3874,
+        "p95": 19.8798,
+        "p99": 20.2695,
+        "max": 20.2695
       },
       "input_to_display_ms": {
         "n": 2,
-        "p50": 35.095800000000004,
-        "p95": 64.8862,
-        "p99": 64.8862,
-        "max": 64.8862
+        "p50": 33.934400000000004,
+        "p95": 45.3752,
+        "p99": 45.3752,
+        "max": 45.3752
       },
       "inputs_without_a_later_present": 10,
+      "driver_before_injection_ms": {
+        "n": 40,
+        "p50": 1.8305,
+        "p95": 18.8609,
+        "p99": 19.5906,
+        "max": 19.5906
+      },
       "between_presents_ms": {
         "n": 50,
         "p50": 184.77550000000002,
@@ -499,19 +597,26 @@
       "displayed_in_window": 14,
       "input_to_present_ms": {
         "n": 262,
-        "p50": 3.5989,
-        "p95": 17.9133,
-        "p99": 18.7987,
-        "max": 22.3655
+        "p50": 2.8324,
+        "p95": 17.3891,
+        "p99": 18.1951,
+        "max": 21.8542
       },
       "input_to_display_ms": {
         "n": 15,
-        "p50": 29.9735,
-        "p95": 45.0972,
-        "p99": 45.0972,
-        "max": 45.0972
+        "p50": 29.528000000000002,
+        "p95": 44.5965,
+        "p99": 44.5965,
+        "max": 44.5965
       },
       "inputs_without_a_later_present": 338,
+      "driver_before_injection_ms": {
+        "n": 262,
+        "p50": 0.5212,
+        "p95": 0.9261,
+        "p99": 1.1619,
+        "max": 1.4005
+      },
       "between_presents_ms": {
         "n": 260,
         "p50": 16.6537,
@@ -534,19 +639,26 @@
       "displayed_in_window": 343,
       "input_to_present_ms": {
         "n": 299,
-        "p50": 8.8239,
-        "p95": 22.3182,
-        "p99": 26.3939,
-        "max": 27.9037
+        "p50": 7.2002,
+        "p95": 20.2101,
+        "p99": 20.9931,
+        "max": 21.6841
       },
       "input_to_display_ms": {
         "n": 294,
-        "p50": 28.9005,
-        "p95": 43.96,
-        "p99": 47.1648,
-        "max": 61.6558
+        "p50": 27.192,
+        "p95": 42.3554,
+        "p99": 45.734,
+        "max": 46.127300000000005
       },
       "inputs_without_a_later_present": 1,
+      "driver_before_injection_ms": {
+        "n": 299,
+        "p50": 1.397,
+        "p95": 10.022,
+        "p99": 15.6434,
+        "max": 17.4126
+      },
       "between_presents_ms": {
         "n": 358,
         "p50": 32.7433,
@@ -569,19 +681,26 @@
       "displayed_in_window": 49,
       "input_to_present_ms": {
         "n": 49,
-        "p50": 11.8283,
-        "p95": 27.2482,
-        "p99": 33.9644,
-        "max": 33.9644
+        "p50": 10.3434,
+        "p95": 15.3351,
+        "p99": 16.5962,
+        "max": 16.5962
       },
       "input_to_display_ms": {
         "n": 49,
-        "p50": 32.985699999999994,
-        "p95": 50.9875,
-        "p99": 65.0976,
-        "max": 65.0976
+        "p50": 30.9529,
+        "p95": 47.90090000000001,
+        "p99": 49.617399999999996,
+        "max": 49.617399999999996
       },
       "inputs_without_a_later_present": 1,
+      "driver_before_injection_ms": {
+        "n": 49,
+        "p50": 1.5824,
+        "p95": 16.4379,
+        "p99": 17.5801,
+        "max": 17.5801
+      },
       "between_presents_ms": {
         "n": 48,
         "p50": 200.0722,
@@ -604,19 +723,26 @@
       "displayed_in_window": 580,
       "input_to_present_ms": {
         "n": 600,
-        "p50": 3.5851,
-        "p95": 16.8751,
-        "p99": 17.9952,
-        "max": 19.1613
+        "p50": 3.0875,
+        "p95": 16.3949,
+        "p99": 17.379,
+        "max": 18.7069
       },
       "input_to_display_ms": {
         "n": 579,
-        "p50": 23.838900000000002,
-        "p95": 36.719899999999996,
-        "p99": 37.556,
-        "max": 38.784
+        "p50": 23.344,
+        "p95": 36.237899999999996,
+        "p99": 37.141999999999996,
+        "max": 38.3296
       },
       "inputs_without_a_later_present": 0,
+      "driver_before_injection_ms": {
+        "n": 600,
+        "p50": 0.4594,
+        "p95": 0.7533,
+        "p99": 1.1981,
+        "max": 1.7949
+      },
       "between_presents_ms": {
         "n": 598,
         "p50": 16.6179,
