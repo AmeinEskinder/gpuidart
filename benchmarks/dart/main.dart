@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:gpuidart/gpuidart.dart';
+import 'package:gpuidart/src/runtime_info.dart';
 
 /// The view workload cycles the table through these stages, one per click:
 /// a descending sort on the price, the sort with a filter that keeps about
@@ -116,6 +117,30 @@ Future<void> main(List<String> args) async {
     if (event.type == 'error') throw StateError('$event');
     if (event.type != 'click') return;
     if (event.id == 'report') {
+      // With the Dart copy released, the VM keeps the freed heap pages until
+      // a major collection, which a short run never provokes; churn enough
+      // short-lived allocation to force one, after the measured phase, and
+      // read the process figures once more so the report shows what a
+      // released copy leaves once collected.
+      Map<String, Object?>? afterCollection;
+      if (!retainRecords) {
+        for (var round = 0; round < 8; round++) {
+          final churn = List<List<int>>.generate(
+            200000,
+            (i) => List.filled(16, i),
+          );
+          if (churn.length == 1) stdout.writeln(churn);
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        afterCollection = {
+          'dart_rss_bytes': ProcessInfo.currentRss,
+          'memory_bytes': readRuntimeInfo()['memory_bytes'],
+          'scope':
+              'after the measured phase: eight rounds of 200,000 short-lived '
+              'lists to force a major collection, then half a second',
+        };
+      }
       final state = await host.diagnose('inspect');
       final nativeCell = data.rowCount == 0
           ? null
@@ -129,6 +154,7 @@ Future<void> main(List<String> args) async {
           'implementation': 'dart',
           'rows': data.rowCount,
           'retain_records': retainRecords,
+          'memory_after_collection': ?afterCollection,
           'updates': updates,
           'cells_written': cellsWritten,
           'first_price': data.rowCount == 0
