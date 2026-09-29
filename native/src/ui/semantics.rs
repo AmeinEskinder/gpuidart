@@ -59,7 +59,7 @@ pub(super) fn annotate<T: StatefulInteractiveElement>(element: T, node: &Node) -
         Some(SemanticRole::ListItem) => Role::ListItem,
         Some(SemanticRole::Heading) => Role::Heading,
         _ => match node {
-            Node::Text { .. } => Role::Label,
+            Node::Text { .. } | Node::RichText { .. } => Role::Label,
             Node::Row { .. }
             | Node::Column { .. }
             | Node::Stack { .. }

@@ -2039,6 +2039,24 @@ impl DartView {
             Node::Sheet { .. } => annotate(div().id(id), node)
                 .test_support()
                 .into_any_element(),
+            Node::RichText {
+                id: text_id,
+                markdown,
+                selectable,
+                ..
+            } => {
+                let view = gpui_kit::base::TextView::markdown(
+                    SharedString::from(format!("{text_id}-markdown")),
+                    markdown.clone(),
+                )
+                .selectable(*selectable);
+                apply_node_style(
+                    annotate(div().id(id), node).test_support().child(view),
+                    node,
+                    colors,
+                )
+                .into_any_element()
+            }
             Node::Scroll {
                 id: scroll_id,
                 axis,

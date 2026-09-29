@@ -496,6 +496,20 @@ void main() {
     timeout: const Timeout(Duration(seconds: 120)),
   );
 
+  test('rich text publishes and republishes markdown', () async {
+    var markdown = '# Title\n\nBody';
+    UiNode build() => UiRichText('notes', markdown, selectable: true);
+    final host = await GpuiHost.openView(build);
+    try {
+      expect((await host.diagnose('inspect'))['revision'], 1);
+      markdown = '# Title\n\n- one\n- two';
+      await host.rebuild();
+      expect((await host.diagnose('inspect'))['revision'], 2);
+    } finally {
+      await host.close();
+    }
+  });
+
   test('sheets open and close by publication', () async {
     var open = true;
     UiNode build() => UiColumn('main', [

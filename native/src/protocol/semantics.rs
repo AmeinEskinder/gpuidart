@@ -56,7 +56,7 @@ impl Semantics {
                 | Node::Sheet { .. } => {
                     matches!(role, Group | List | ListItem)
                 }
-                Node::Text { .. } => matches!(role, Label | Heading),
+                Node::Text { .. } | Node::RichText { .. } => matches!(role, Label | Heading),
                 Node::Button { .. } | Node::ConfirmDialog { .. } => role == Button,
                 Node::Checkbox { .. } => role == Checkbox,
                 Node::Slider { .. } => role == Slider,

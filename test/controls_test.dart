@@ -310,6 +310,21 @@ void main() {
     );
   });
 
+  test('rich text encodes its markdown and bounds it', () {
+    expect(const UiRichText('notes', '# Title', selectable: true).toJson(), {
+      'kind': 'rich_text',
+      'id': 'notes',
+      'markdown': '# Title',
+      'selectable': true,
+    });
+    expect(
+      const UiRichText('notes', 'plain').toJson().containsKey('selectable'),
+      isFalse,
+    );
+    expect(const UiRichText('notes', '').toJson, throwsArgumentError);
+    expect(UiRichText('notes', 'x' * 65537).toJson, throwsArgumentError);
+  });
+
   test('sheets encode their placement and decode close events', () {
     final sheet = UiSheet(
       'side',

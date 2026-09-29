@@ -2967,3 +2967,60 @@ fn sheets_open_by_publication_and_close_with_their_node(cx: &mut TestAppContext)
     })
     .unwrap();
 }
+
+#[gpui::test]
+fn rich_text_renders_markdown_and_follows_publications(cx: &mut TestAppContext) {
+    cx.update(gpui_kit::init);
+    let snapshot = |revision: u64, markdown: &str| {
+        Snapshot::parse(
+            format!(
+                r#"{{"revision":{revision},"root":{{"kind":"column","id":"root","children":[
+                {{"kind":"rich_text","id":"notes","markdown":{markdown},"selectable":true,"style":{{"width":{{"px":400}}}}}}
+            ]}}}}"#
+            )
+            .as_bytes(),
+        )
+        .unwrap()
+    };
+    let (handle, view) = cx.update(|cx| {
+        gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+            cx.new(|cx| {
+                DartView::new(
+                    Initial {
+                        window: Default::default(),
+                        snapshot: snapshot(1, r#""One line""#),
+                        datasets: vec![],
+                    },
+                    Events(Arc::new(|_| {})),
+                    window,
+                    cx,
+                )
+            })
+        })
+        .unwrap()
+    });
+    cx.update_window(handle, |_, window, cx| {
+        window.render_frame(cx);
+        window.render_frame(cx);
+        let short = window.find("notes").bounds();
+        assert!(short.size.height > px(0.), "markdown renders: {short:?}");
+        view.update(cx, |view, cx| {
+            view.publish(
+                snapshot(
+                    2,
+                    r##""# Title\n\nA paragraph with **bold** text.\n\n- one\n- two\n- three""##,
+                ),
+                window,
+                cx,
+            )
+        });
+        window.render_frame(cx);
+        window.render_frame(cx);
+        let long = window.find("notes").bounds();
+        assert!(
+            long.size.height > short.size.height + px(20.),
+            "more markdown takes more height: {short:?} then {long:?}"
+        );
+    })
+    .unwrap();
+}

@@ -397,6 +397,19 @@ pub enum Node {
         #[serde(default)]
         children: Vec<Node>,
     },
+    /// Markdown rendered by Kit's text view: headings, emphasis, lists,
+    /// links, code and tables, at most 64 KiB of source. Display only;
+    /// `selectable` lets the user select and copy the text.
+    RichText {
+        id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        style: Option<Style>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        semantics: Option<Semantics>,
+        markdown: String,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        selectable: bool,
+    },
     /// A calendar picker holding one date as `YYYY-MM-DD`; `date_change`
     /// carries the requested value and the next publication is authoritative.
     DatePicker {
@@ -1662,6 +1675,7 @@ impl Node {
             | Self::Tree { id, .. }
             | Self::Popover { id, .. }
             | Self::Sheet { id, .. }
+            | Self::RichText { id, .. }
             | Self::Switch { id, .. }
             | Self::Progress { id, .. }
             | Self::Separator { id, .. }
@@ -1695,6 +1709,7 @@ impl Node {
             | Self::Tree { style, .. }
             | Self::Popover { style, .. }
             | Self::Sheet { style, .. }
+            | Self::RichText { style, .. }
             | Self::Switch { style, .. }
             | Self::Progress { style, .. }
             | Self::Separator { style, .. }
@@ -1728,6 +1743,7 @@ impl Node {
             | Self::Tree { semantics, .. }
             | Self::Popover { semantics, .. }
             | Self::Sheet { semantics, .. }
+            | Self::RichText { semantics, .. }
             | Self::Switch { semantics, .. }
             | Self::Progress { semantics, .. }
             | Self::Separator { semantics, .. }
@@ -1901,6 +1917,11 @@ fn validate_tree(node: &Node, depth: usize, ids: &mut HashSet<String>) -> Result
         if size.is_some_and(|size| !size.is_finite() || size <= 0. || size > 8192.) {
             return Err("Sheet size must be a positive logical size within 8192".into());
         }
+    }
+    if let Node::RichText { markdown, .. } = node
+        && (markdown.is_empty() || markdown.len() > 65536)
+    {
+        return Err("Rich text must contain 1..65536 UTF-8 bytes of markdown".into());
     }
     if node.style().is_some_and(|style| style.cached) {
         let fixed = matches!(

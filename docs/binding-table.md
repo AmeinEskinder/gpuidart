@@ -77,7 +77,7 @@ infrastructure the adapter uses on the application's behalf without a node.
 | tab | `UiTabs` | |
 | table | `UiTable` | Dataset-backed with views, formats, selection and row commands. |
 | tag | not bound | |
-| text | planned | Rich text (markdown) through Kit's text view. |
+| text | `UiRichText` | Markdown through Kit's text view, optionally selectable; HTML is not bound. |
 | theme | `UiTheme` | Light and dark palettes with bounded token overrides. |
 | time | `UiDatePicker` | The calendar date picker; the time field is not bound. |
 | title_bar | not bound | Custom title bars. |
@@ -91,6 +91,6 @@ infrastructure the adapter uses on the application's behalf without a node.
 Beyond the component crate, gpuidart binds Kit's base animation
 (`UiStyle.animation`), its calendar (through the date picker) and its
 window and lifecycle; `UiCanvas`, `UiStack`, `UiColumn` and `UiRow` are
-gpuidart's own over GPUI's elements. Twenty-eight node kinds reach about a
-third of the component catalog; rich text is the one planned binding left,
-and the rest stay reachable only by extending the adapter.
+gpuidart's own over GPUI's elements. Twenty-nine node kinds reach about a
+third of the component catalog; the six kinds the catalog plan named are
+bound, and the rest stay reachable only by extending the adapter.

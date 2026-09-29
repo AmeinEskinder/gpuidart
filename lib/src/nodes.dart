@@ -411,6 +411,36 @@ final class UiSheet extends UiNode {
   };
 }
 
+/// Markdown rendered natively: headings, emphasis, lists, links, code and
+/// tables from at most 64 KiB of source. Display only; [selectable] lets the
+/// user select and copy the text.
+final class UiRichText extends UiNode {
+  const UiRichText(
+    super.id,
+    this.markdown, {
+    this.selectable = false,
+    super.style,
+    super.semantics,
+  });
+  final String markdown;
+  final bool selectable;
+
+  @override
+  Map<String, Object> props() {
+    if (markdown.isEmpty || utf8.encode(markdown).length > 65536) {
+      throw ArgumentError('Rich text must contain 1..65536 UTF-8 bytes');
+    }
+    return {
+      'kind': 'rich_text',
+      'id': id,
+      if (semantics != null) 'semantics': semantics!.toJson('rich_text'),
+      if (style != null) 'style': style!.toJson(),
+      'markdown': markdown,
+      if (selectable) 'selectable': true,
+    };
+  }
+}
+
 final class UiText extends UiNode {
   const UiText(super.id, this.text, {super.style, super.semantics});
   final String text;
