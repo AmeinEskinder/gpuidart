@@ -10,6 +10,7 @@ param(
     [switch]$NoPointerWarmup,
     [switch]$ReleaseRecords,
     [switch]$FlutterIsolate,
+    [ValidateSet(30, 60)][int]$ScrollRate = 60,
     [ValidateRange(0,1000000)][int]$Rows = 100000
 )
 $ErrorActionPreference = 'Stop'
@@ -131,8 +132,8 @@ try {
     $frequency = [Diagnostics.Stopwatch]::Frequency
     $startQpc = [Diagnostics.Stopwatch]::GetTimestamp()
     $timer = [Diagnostics.Stopwatch]::StartNew()
-    $period = switch ($Workload) { idle { [double]::PositiveInfinity } scroll { 1000.0 / 60 } cell { 200.0 } burst { 1000.0 / 30 } view { 1000.0 } }
-    $plannedInputs = $Seconds * $(switch ($Workload) { idle { 0 } scroll { 60 } cell { 5 } burst { 30 } view { 1 } })
+    $period = switch ($Workload) { idle { [double]::PositiveInfinity } scroll { 1000.0 / $ScrollRate } cell { 200.0 } burst { 1000.0 / 30 } view { 1000.0 } }
+    $plannedInputs = $Seconds * $(switch ($Workload) { idle { 0 } scroll { $ScrollRate } cell { 5 } burst { 30 } view { 1 } })
     $wheelDelta = switch ($Implementation) { solid { -156 } flutter { -117 } default { -120 } }
     $nextInput = 0.0
     $nextSlot = 0
@@ -277,7 +278,7 @@ try {
         driver_warmup = -not [bool]$BackgroundSmoke
         input_count = $inputTimes.Count; input_deadlines_missed = $missedInputDeadlines
         hover_moves = $hoverMoves
-        planned_inputs = $plannedInputs
+        planned_inputs = $plannedInputs; scroll_rate = $(if ($Workload -eq 'scroll') { $ScrollRate } else { $null })
         correctness = @{
             passed = $verificationIssues.Count -eq 0; issues = @($verificationIssues.ToArray())
             expected_updates = $expectedUpdates; observed_updates = $verification.updates
