@@ -1,0 +1,201 @@
+{
+  "implementation": "flutter",
+  "rows": 1000000,
+  "isolate_sort": false,
+  "updates": 12,
+  "cells_written": 0,
+  "first_price": "100.00",
+  "first_frame_ms_since_launch": 4200,
+  "visible_rows": {
+    "start": 0,
+    "end": 10
+  },
+  "scroll_y": -0.0,
+  "scroll_y_convention": "negative ScrollController offset, the content displacement the Kit fixtures report",
+  "row_builds": 234,
+  "view": {
+    "stage": 0,
+    "stage_name": "records",
+    "displayed_rows": 1000000,
+    "compute_us": {
+      "samples": 12,
+      "p50": 631262,
+      "p95": 1284422,
+      "p99": 1284422,
+      "max": 1284422,
+      "values": [
+        0,
+        1,
+        1,
+        459433,
+        498337,
+        631262,
+        639814,
+        656603,
+        658628,
+        787042,
+        858435,
+        1284422
+      ],
+      "sequence": [
+        656603,
+        631262,
+        1284422,
+        0,
+        498337,
+        639814,
+        787042,
+        1,
+        459433,
+        658628,
+        858435,
+        1
+      ]
+    },
+    "frame_us": {
+      "samples": 12,
+      "p50": 632316,
+      "p95": 1288948,
+      "p99": 1288948,
+      "max": 1288948,
+      "values": [
+        13868,
+        18328,
+        19576,
+        462642,
+        503081,
+        632316,
+        641146,
+        659991,
+        660852,
+        790330,
+        861789,
+        1288948
+      ],
+      "sequence": [
+        660852,
+        632316,
+        1288948,
+        19576,
+        503081,
+        641146,
+        790330,
+        18328,
+        462642,
+        659991,
+        861789,
+        13868
+      ]
+    },
+    "frame_total_us": {
+      "samples": 11,
+      "p50": 494387,
+      "p95": 1283930,
+      "p99": 1283930,
+      "max": 1283930,
+      "values": [
+        1837,
+        2255,
+        2493,
+        3632,
+        4656,
+        494387,
+        632341,
+        653641,
+        791376,
+        853207,
+        1283930
+      ],
+      "sequence": [
+        3632,
+        653641,
+        4656,
+        1283930,
+        494387,
+        632341,
+        791376,
+        1837,
+        2255,
+        2493,
+        853207
+      ]
+    },
+    "jank": {
+      "longest_gap_us": {
+        "samples": 12,
+        "p50": 649628,
+        "p95": 1297512,
+        "p99": 1297512,
+        "max": 1297512,
+        "values": [
+          19016,
+          19917,
+          21510,
+          469065,
+          517705,
+          649628,
+          663642,
+          666257,
+          675539,
+          804189,
+          884231,
+          1297512
+        ],
+        "sequence": [
+          666257,
+          649628,
+          1297512,
+          21510,
+          517705,
+          663642,
+          804189,
+          19917,
+          469065,
+          675539,
+          884231,
+          19016
+        ]
+      },
+      "frames_during": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "changes_with_missing_timings": 0
+    },
+    "scope": "per click: compute_us is the handler computing the stage on the UI isolate; frame_us runs from the handler to the post-frame callback of the frame that shows it (build, layout and paint done, raster pending); frame_total_us is that frame's FrameTiming total span; jank counts the frames rasterized between the frame current at the click and the one showing the change, and the longest interval between consecutive raster finishes from the click's frame on, with the pointer moving over the rows at 60 Hz meanwhile"
+  },
+  "frames": {
+    "scope": "every frame since the first, from FrameTiming; includes startup and warmup",
+    "build_us": {
+      "samples": 374,
+      "p50": 335,
+      "p95": 633,
+      "p99": 3615,
+      "max": 4498
+    },
+    "raster_us": {
+      "samples": 374,
+      "p50": 1452,
+      "p95": 2535,
+      "p99": 3758,
+      "max": 53967
+    },
+    "total_us": {
+      "samples": 374,
+      "p50": 2864,
+      "p95": 4986,
+      "p99": 791376,
+      "max": 1408857
+    }
+  }
+}

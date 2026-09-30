@@ -1,0 +1,348 @@
+{
+  "implementation": "dart",
+  "rows": 1000000,
+  "retain_records": false,
+  "records_mode": "generated",
+  "updates": 12,
+  "cells_written": 0,
+  "first_price": "100.00",
+  "first_frame_ms_since_launch": 1962,
+  "native_first_price": {
+    "value": "100.00",
+    "revision": 14
+  },
+  "view": {
+    "stage": 0,
+    "stage_name": "records",
+    "displayed_rows": 1000000,
+    "table": {
+      "entity": 4294967298,
+      "visible_rows": {
+        "start": 0,
+        "end": 9
+      },
+      "row_count": 1000000,
+      "dataset": "quotes",
+      "dataset_revision": 14,
+      "scroll_y": 0.0,
+      "view": {
+        "source_rows": 1000000,
+        "view_rows": 1000000,
+        "groups": 0,
+        "spec_hash": null,
+        "pending": false
+      },
+      "selection": {
+        "row": null,
+        "record": null
+      },
+      "focused": false
+    },
+    "apply_us": {
+      "samples": 12,
+      "p50": 203,
+      "p95": 7330,
+      "p99": 7330,
+      "max": 7330,
+      "values": [
+        133,
+        138,
+        176,
+        186,
+        192,
+        203,
+        216,
+        247,
+        283,
+        4634,
+        6151,
+        7330
+      ],
+      "sequence": [
+        247,
+        176,
+        186,
+        7330,
+        192,
+        133,
+        138,
+        6151,
+        283,
+        203,
+        216,
+        4634
+      ]
+    },
+    "settle_us": {
+      "samples": 12,
+      "p50": 133614,
+      "p95": 416614,
+      "p99": 416614,
+      "max": 416614,
+      "values": [
+        4637,
+        6155,
+        7333,
+        133197,
+        133408,
+        133614,
+        133945,
+        154543,
+        179392,
+        332784,
+        350757,
+        416614
+      ],
+      "sequence": [
+        154543,
+        133197,
+        332784,
+        7333,
+        133408,
+        179392,
+        416614,
+        6155,
+        133945,
+        133614,
+        350757,
+        4637
+      ]
+    },
+    "jank": {
+      "longest_gap_us": {
+        "samples": 12,
+        "p50": 17096,
+        "p95": 18150,
+        "p99": 18150,
+        "max": 18150,
+        "values": [
+          0,
+          0,
+          0,
+          16999,
+          17025,
+          17096,
+          17407,
+          17449,
+          17513,
+          17520,
+          17701,
+          18150
+        ],
+        "sequence": [
+          17520,
+          17701,
+          17025,
+          0,
+          17513,
+          18150,
+          17407,
+          0,
+          17096,
+          16999,
+          17449,
+          0
+        ]
+      },
+      "frames_during": [
+        9,
+        8,
+        20,
+        0,
+        8,
+        11,
+        25,
+        0,
+        8,
+        8,
+        21,
+        0
+      ]
+    },
+    "scope": "per click: apply_us runs from the click handler through the rebuild acknowledgement, which native sends before the view index computes off the frame thread; settle_us runs on to the table_view event that reports the index in place; jank counts the frames native rendered from a mark set in the handler to that event and the longest interval between two of them, with the pointer moving over the rows at 60 Hz meanwhile"
+  },
+  "native": {
+    "charts": {},
+    "theme": {
+      "descriptor": {
+        "mode": "light"
+      },
+      "resolved": {
+        "background": "#FFFFFF",
+        "foreground": "#0A0A0A",
+        "primary": "#171717",
+        "primary_foreground": "#FAFAFA",
+        "secondary": "#E5E5E5",
+        "secondary_foreground": "#171717",
+        "muted": "#F5F5F5",
+        "muted_foreground": "#737373",
+        "accent": "#F5F5F5",
+        "accent_foreground": "#171717",
+        "danger": "#EF4444",
+        "danger_foreground": "#FAFAFA",
+        "border": "#E5E5E5",
+        "success": "#22C55E",
+        "warning": "#EAB308",
+        "info": "#06B6D4"
+      }
+    },
+    "revision": 13,
+    "native_process_id": 2328,
+    "inputs": {},
+    "tables": {
+      "table": {
+        "entity": 4294967298,
+        "visible_rows": {
+          "start": 0,
+          "end": 9
+        },
+        "row_count": 1000000,
+        "dataset": "quotes",
+        "dataset_revision": 14,
+        "scroll_y": 0.0,
+        "view": {
+          "source_rows": 1000000,
+          "view_rows": 1000000,
+          "groups": 0,
+          "spec_hash": null,
+          "pending": false
+        },
+        "selection": {
+          "row": null,
+          "record": null
+        },
+        "focused": false
+      }
+    },
+    "lists": {},
+    "subtrees": {},
+    "labels": {
+      "title": "GPUI comparison · 100,000 records"
+    },
+    "scrolls": {},
+    "panes": {},
+    "trees": {},
+    "active_sheet": null,
+    "controls": {},
+    "focus_handle": null,
+    "window": {
+      "width": 860.0,
+      "height": 649.5999755859375,
+      "scale_factor": 1.25,
+      "scroll_y": 0.0
+    },
+    "native": {
+      "materializations": 762,
+      "rows_constructed": 8349,
+      "cells_constructed": 35673,
+      "data_records_checked": 1000000,
+      "data_cells_written": 4000000,
+      "view_recomputes": 13,
+      "view_jobs": 9,
+      "dataset_copies": 0
+    },
+    "frame_gaps": {
+      "frames": 61,
+      "longest_gap_us": 750469,
+      "since_mark_us": 1748045
+    },
+    "draw": {
+      "samples": 762,
+      "p50_us": 2486.271,
+      "p95_us": 3657.727,
+      "p99_us": 4399.103
+    },
+    "dirty_to_present_submit": {
+      "samples": 761,
+      "p50_us": 9543.679,
+      "p95_us": 13787.135,
+      "p99_us": 15777.791
+    },
+    "present_interval": {
+      "samples": 148,
+      "p50_us": 16752.639,
+      "p95_us": 18169.855,
+      "p99_us": 19005.439
+    },
+    "input_to_frame": {
+      "samples": 759,
+      "p50_us": 9560.063,
+      "p95_us": 13737.983,
+      "p99_us": 15441.919
+    }
+  },
+  "publication": {
+    "description_builds": 13,
+    "encoded_snapshots": 12,
+    "operation_publications": 12,
+    "resubmitted_publications": 0,
+    "patches": 0,
+    "encoded_bytes": 2467,
+    "ffi_callbacks": 79,
+    "ui_callbacks": 13,
+    "diagnostic_callbacks": 26,
+    "description_build": {
+      "samples": 13,
+      "p50_us": 1,
+      "p95_us": 2,
+      "p99_us": 2
+    },
+    "encode": {
+      "samples": 12,
+      "p50_us": 8,
+      "p95_us": 9,
+      "p99_us": 16
+    },
+    "publish_to_applied": {
+      "samples": 12,
+      "p50_us": 206,
+      "p95_us": 6113,
+      "p99_us": 7259
+    },
+    "initial": {
+      "bytes": 546,
+      "encode_us": 55
+    },
+    "data_messages": 0,
+    "data_bytes": 0,
+    "data_records_checked": 1000000,
+    "data_cells_written": 4000000,
+    "data_encode": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "data_pack": {
+      "samples": 0,
+      "p50_us": 0,
+      "p95_us": 0,
+      "p99_us": 0
+    },
+    "data_publish_to_applied": {
+      "samples": 1,
+      "p50_us": 1835753,
+      "p95_us": 1835753,
+      "p99_us": 1835753
+    },
+    "native_data_parse": {
+      "samples": 13,
+      "p50_us": 23659,
+      "p95_us": 34084,
+      "p99_us": 36343
+    },
+    "native_data_apply": {
+      "samples": 13,
+      "p50_us": 907,
+      "p95_us": 4965,
+      "p99_us": 5359
+    },
+    "native_snapshot_apply": {
+      "samples": 12,
+      "p50_us": 53,
+      "p95_us": 5914,
+      "p99_us": 6979
+    }
+  },
+  "scope": "cumulative since window creation; includes startup and warmup"
+}

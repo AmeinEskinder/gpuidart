@@ -1,0 +1,197 @@
+{
+  "implementation": "flutter",
+  "rows": 1000000,
+  "isolate_sort": true,
+  "updates": 12,
+  "cells_written": 0,
+  "first_price": "100.00",
+  "first_frame_ms_since_launch": 2283,
+  "visible_rows": {
+    "start": 0,
+    "end": 10
+  },
+  "scroll_y": -0.0,
+  "scroll_y_convention": "negative ScrollController offset, the content displacement the Kit fixtures report",
+  "row_builds": 234,
+  "view": {
+    "stage": 0,
+    "stage_name": "records",
+    "displayed_rows": 1000000,
+    "compute_us": {
+      "samples": 12,
+      "p50": 18,
+      "p95": 33,
+      "p99": 33,
+      "max": 33,
+      "values": [
+        12,
+        13,
+        13,
+        16,
+        17,
+        18,
+        21,
+        23,
+        23,
+        24,
+        32,
+        33
+      ],
+      "sequence": [
+        33,
+        13,
+        32,
+        23,
+        18,
+        17,
+        21,
+        12,
+        13,
+        23,
+        24,
+        16
+      ]
+    },
+    "frame_us": {
+      "samples": 12,
+      "p50": 556026,
+      "p95": 631789,
+      "p99": 631789,
+      "max": 631789,
+      "values": [
+        11545,
+        12493,
+        14996,
+        516885,
+        527407,
+        556026,
+        557041,
+        564222,
+        578762,
+        589334,
+        591555,
+        631789
+      ],
+      "sequence": [
+        556026,
+        589334,
+        591555,
+        11545,
+        527407,
+        516885,
+        564222,
+        14996,
+        557041,
+        578762,
+        631789,
+        12493
+      ]
+    },
+    "frame_total_us": {
+      "samples": 9,
+      "p50": 2807,
+      "p95": 3412,
+      "p99": 3412,
+      "max": 3412,
+      "values": [
+        1972,
+        1972,
+        2072,
+        2628,
+        2807,
+        2814,
+        3102,
+        3403,
+        3412
+      ],
+      "sequence": [
+        3412,
+        1972,
+        2628,
+        1972,
+        2072,
+        3102,
+        3403,
+        2814,
+        2807
+      ]
+    },
+    "jank": {
+      "longest_gap_us": {
+        "samples": 12,
+        "p50": 33121,
+        "p95": 36820,
+        "p99": 36820,
+        "max": 36820,
+        "values": [
+          17906,
+          20378,
+          20521,
+          25121,
+          25274,
+          33121,
+          33743,
+          34275,
+          35226,
+          35537,
+          36460,
+          36820
+        ],
+        "sequence": [
+          36460,
+          34275,
+          35537,
+          20521,
+          20378,
+          33743,
+          35226,
+          36820,
+          25274,
+          33121,
+          25121,
+          17906
+        ]
+      },
+      "frames_during": [
+        30,
+        35,
+        35,
+        1,
+        32,
+        28,
+        34,
+        1,
+        34,
+        35,
+        38,
+        1
+      ],
+      "changes_with_missing_timings": 0
+    },
+    "scope": "per click: compute_us is the handler computing the stage on the UI isolate; frame_us runs from the handler to the post-frame callback of the frame that shows it (build, layout and paint done, raster pending); frame_total_us is that frame's FrameTiming total span; jank counts the frames rasterized between the frame current at the click and the one showing the change, and the longest interval between consecutive raster finishes from the click's frame on, with the pointer moving over the rows at 60 Hz meanwhile"
+  },
+  "frames": {
+    "scope": "every frame since the first, from FrameTiming; includes startup and warmup",
+    "build_us": {
+      "samples": 761,
+      "p50": 272,
+      "p95": 525,
+      "p99": 2840,
+      "max": 4753
+    },
+    "raster_us": {
+      "samples": 761,
+      "p50": 1362,
+      "p95": 2067,
+      "p99": 2532,
+      "max": 29690
+    },
+    "total_us": {
+      "samples": 761,
+      "p50": 2776,
+      "p95": 4063,
+      "p99": 6340,
+      "max": 700933
+    }
+  }
+}

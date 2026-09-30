@@ -1,0 +1,926 @@
+﻿[
+    {
+        "private_bytes":  {
+                              "p50":  191516672,
+                              "p99":  192573440,
+                              "samples":  40,
+                              "max":  192573440,
+                              "p95":  192573440
+                          },
+        "input_count":  298,
+        "input_delivery":  {
+                               "planned":  300,
+                               "uninjected":  2,
+                               "injected":  298,
+                               "excess":  0
+                           },
+        "duration_ms":  10000.1069,
+        "flutter_frame_timing":  null,
+        "presentation":  {
+                             "between_presents_ms":  {
+                                                         "p50":  16.6078,
+                                                         "p99":  22.188,
+                                                         "samples":  597,
+                                                         "max":  31.1354,
+                                                         "p95":  20.5961
+                                                     },
+                             "estimated_missed_workload_slots":  5,
+                             "input_to_response_display_ms":  null,
+                             "frames_not_displayed":  244,
+                             "input_associated_display_ms":  null,
+                             "target_period_ms":  33.333333333333336,
+                             "frames":  598,
+                             "input_to_response_present_ms":  null,
+                             "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                             "between_display_changes_ms":  {
+                                                                "p50":  33.3387,
+                                                                "p99":  50.0743,
+                                                                "samples":  353,
+                                                                "max":  50.104,
+                                                                "p95":  33.4553
+                                                            }
+                         },
+        "solid_draw_overlay":  null,
+        "scheduled_inputs_missed":  2,
+        "delivery_quality":  "driver missed deadlines; exclude from matched-cadence ranking",
+        "correctness":  {
+                            "issues":  [
+
+                                       ],
+                            "observed_updates":  298,
+                            "passed":  true,
+                            "expected_view_stage":  null,
+                            "expected_updates":  298,
+                            "expected_scroll_y":  0,
+                            "expected_cells":  2384,
+                            "observed_cells":  2384,
+                            "application_price":  "Tick 000298",
+                            "observed_scroll_y":  0.0,
+                            "native_price":  "Tick 000298",
+                            "expected_price":  "Tick 000298",
+                            "observed_view_stage":  null
+                        },
+        "equal_work_timing_eligible":  false,
+        "dart_publication":  {
+                                 "scope":  "Dataset edits from delivered workload clicks, through the applied acknowledgement; initial upload reported separately",
+                                 "limit":  "Application-defined percentile estimator; do not add stage percentiles or treat acknowledgement as presentation",
+                                 "statistics":  {
+                                                    "description_builds":  1,
+                                                    "encoded_snapshots":  0,
+                                                    "operation_publications":  0,
+                                                    "resubmitted_publications":  0,
+                                                    "patches":  0,
+                                                    "encoded_bytes":  0,
+                                                    "ffi_callbacks":  603,
+                                                    "ui_callbacks":  299,
+                                                    "diagnostic_callbacks":  2,
+                                                    "description_build":  {
+                                                                              "samples":  1,
+                                                                              "p50_us":  3,
+                                                                              "p95_us":  3,
+                                                                              "p99_us":  3
+                                                                          },
+                                                    "encode":  {
+                                                                   "samples":  0,
+                                                                   "p50_us":  0,
+                                                                   "p95_us":  0,
+                                                                   "p99_us":  0
+                                                               },
+                                                    "publish_to_applied":  {
+                                                                               "samples":  0,
+                                                                               "p50_us":  0,
+                                                                               "p95_us":  0,
+                                                                               "p99_us":  0
+                                                                           },
+                                                    "initial":  {
+                                                                    "bytes":  542,
+                                                                    "encode_us":  84
+                                                                },
+                                                    "data_messages":  298,
+                                                    "data_bytes":  165776,
+                                                    "data_records_checked":  102384,
+                                                    "data_cells_written":  302384,
+                                                    "data_encode":  {
+                                                                        "samples":  298,
+                                                                        "p50_us":  21,
+                                                                        "p95_us":  46,
+                                                                        "p99_us":  61
+                                                                    },
+                                                    "data_pack":  {
+                                                                      "samples":  0,
+                                                                      "p50_us":  0,
+                                                                      "p95_us":  0,
+                                                                      "p99_us":  0
+                                                                  },
+                                                    "data_publish_to_applied":  {
+                                                                                    "samples":  299,
+                                                                                    "p50_us":  197,
+                                                                                    "p95_us":  3293,
+                                                                                    "p99_us":  4240
+                                                                                },
+                                                    "native_data_parse":  {
+                                                                              "samples":  299,
+                                                                              "p50_us":  27,
+                                                                              "p95_us":  62,
+                                                                              "p99_us":  101
+                                                                          },
+                                                    "native_data_apply":  {
+                                                                              "samples":  299,
+                                                                              "p50_us":  15,
+                                                                              "p95_us":  39,
+                                                                              "p99_us":  52
+                                                                          },
+                                                    "native_snapshot_apply":  {
+                                                                                  "samples":  0,
+                                                                                  "p50_us":  0,
+                                                                                  "p95_us":  0,
+                                                                                  "p99_us":  0
+                                                                              }
+                                                }
+                             },
+        "status":  "ETW captured; response-frame correlation and parity review still required",
+        "native_diagnostics":  {
+                                   "scope":  "cumulative since window creation; includes startup and warmup",
+                                   "limit":  "Cumulative native histories include startup and warmup; no changed-cell presentation correlation",
+                                   "input_to_frame":  {
+                                                          "samples":  301,
+                                                          "p50_us":  6033.407,
+                                                          "p95_us":  18366.463,
+                                                          "p99_us":  20496.383
+                                                      },
+                                   "draw":  {
+                                                "samples":  355,
+                                                "p50_us":  2605.055,
+                                                "p95_us":  4399.103,
+                                                "p99_us":  5517.311
+                                            },
+                                   "dirty_to_present_submit":  {
+                                                                   "samples":  354,
+                                                                   "p50_us":  6787.071,
+                                                                   "p95_us":  18268.159,
+                                                                   "p99_us":  20430.847
+                                                               }
+                               },
+        "window_available_ms":  334.4409,
+        "cpu_percent_one_core":  17.812309586410521,
+        "working_set_bytes":  {
+                                  "p50":  173219840,
+                                  "p99":  173252608,
+                                  "samples":  40,
+                                  "max":  173252608,
+                                  "p95":  173252608
+                              },
+        "application_work":  {
+                                 "flutter_visible_rows":  null,
+                                 "view":  null,
+                                 "updates":  298,
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "shell_cell_builds":  null,
+                                 "solid_mounted_window":  null,
+                                 "shell_view_builds":  null,
+                                 "flutter_scroll_y":  null,
+                                 "shell_visible_range":  null,
+                                 "flutter_row_builds":  null,
+                                 "cells_written":  2384
+                             },
+        "workload":  "burst",
+        "implementation":  "dart",
+        "run_id":  "present-20260930g-3"
+    },
+    {
+        "private_bytes":  {
+                              "p50":  185012224,
+                              "p99":  188186624,
+                              "samples":  40,
+                              "max":  188186624,
+                              "p95":  188178432
+                          },
+        "input_count":  50,
+        "input_delivery":  {
+                               "planned":  50,
+                               "uninjected":  0,
+                               "injected":  50,
+                               "excess":  0
+                           },
+        "duration_ms":  10000.8111,
+        "flutter_frame_timing":  null,
+        "presentation":  {
+                             "between_presents_ms":  {
+                                                         "p50":  199.61780000000002,
+                                                         "p99":  398.85490000000004,
+                                                         "samples":  53,
+                                                         "max":  398.85490000000004,
+                                                         "p95":  217.6209
+                                                     },
+                             "estimated_missed_workload_slots":  30,
+                             "input_to_response_display_ms":  null,
+                             "frames_not_displayed":  37,
+                             "input_associated_display_ms":  null,
+                             "target_period_ms":  200,
+                             "frames":  54,
+                             "input_to_response_present_ms":  null,
+                             "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                             "between_display_changes_ms":  {
+                                                                "p50":  200.3358,
+                                                                "p99":  3002.0015000000003,
+                                                                "samples":  16,
+                                                                "max":  3002.0015000000003,
+                                                                "p95":  3002.0015000000003
+                                                            }
+                         },
+        "solid_draw_overlay":  null,
+        "scheduled_inputs_missed":  0,
+        "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+        "correctness":  {
+                            "issues":  [
+
+                                       ],
+                            "observed_updates":  50,
+                            "passed":  true,
+                            "expected_view_stage":  null,
+                            "expected_updates":  50,
+                            "expected_scroll_y":  0,
+                            "expected_cells":  50,
+                            "observed_cells":  50,
+                            "application_price":  "Tick 000050",
+                            "observed_scroll_y":  0.0,
+                            "native_price":  "Tick 000050",
+                            "expected_price":  "Tick 000050",
+                            "observed_view_stage":  null
+                        },
+        "equal_work_timing_eligible":  true,
+        "dart_publication":  {
+                                 "scope":  "Dataset edits from delivered workload clicks, through the applied acknowledgement; initial upload reported separately",
+                                 "limit":  "Application-defined percentile estimator; do not add stage percentiles or treat acknowledgement as presentation",
+                                 "statistics":  {
+                                                    "description_builds":  1,
+                                                    "encoded_snapshots":  0,
+                                                    "operation_publications":  0,
+                                                    "resubmitted_publications":  0,
+                                                    "patches":  0,
+                                                    "encoded_bytes":  0,
+                                                    "ffi_callbacks":  107,
+                                                    "ui_callbacks":  51,
+                                                    "diagnostic_callbacks":  2,
+                                                    "description_build":  {
+                                                                              "samples":  1,
+                                                                              "p50_us":  9,
+                                                                              "p95_us":  9,
+                                                                              "p99_us":  9
+                                                                          },
+                                                    "encode":  {
+                                                                   "samples":  0,
+                                                                   "p50_us":  0,
+                                                                   "p95_us":  0,
+                                                                   "p99_us":  0
+                                                               },
+                                                    "publish_to_applied":  {
+                                                                               "samples":  0,
+                                                                               "p50_us":  0,
+                                                                               "p95_us":  0,
+                                                                               "p99_us":  0
+                                                                           },
+                                                    "initial":  {
+                                                                    "bytes":  542,
+                                                                    "encode_us":  128
+                                                                },
+                                                    "data_messages":  50,
+                                                    "data_bytes":  7785,
+                                                    "data_records_checked":  100050,
+                                                    "data_cells_written":  300050,
+                                                    "data_encode":  {
+                                                                        "samples":  50,
+                                                                        "p50_us":  17,
+                                                                        "p95_us":  42,
+                                                                        "p99_us":  73
+                                                                    },
+                                                    "data_pack":  {
+                                                                      "samples":  0,
+                                                                      "p50_us":  0,
+                                                                      "p95_us":  0,
+                                                                      "p99_us":  0
+                                                                  },
+                                                    "data_publish_to_applied":  {
+                                                                                    "samples":  51,
+                                                                                    "p50_us":  225,
+                                                                                    "p95_us":  5680,
+                                                                                    "p99_us":  224569
+                                                                                },
+                                                    "native_data_parse":  {
+                                                                              "samples":  51,
+                                                                              "p50_us":  20,
+                                                                              "p95_us":  74,
+                                                                              "p99_us":  38091
+                                                                          },
+                                                    "native_data_apply":  {
+                                                                              "samples":  51,
+                                                                              "p50_us":  15,
+                                                                              "p95_us":  54,
+                                                                              "p99_us":  1703
+                                                                          },
+                                                    "native_snapshot_apply":  {
+                                                                                  "samples":  0,
+                                                                                  "p50_us":  0,
+                                                                                  "p95_us":  0,
+                                                                                  "p99_us":  0
+                                                                              }
+                                                }
+                             },
+        "status":  "ETW captured; response-frame correlation and parity review still required",
+        "native_diagnostics":  {
+                                   "scope":  "cumulative since window creation; includes startup and warmup",
+                                   "limit":  "Cumulative native histories include startup and warmup; no changed-cell presentation correlation",
+                                   "input_to_frame":  {
+                                                          "samples":  53,
+                                                          "p50_us":  3549.183,
+                                                          "p95_us":  6647.807,
+                                                          "p99_us":  51380.223
+                                                      },
+                                   "draw":  {
+                                                "samples":  60,
+                                                "p50_us":  2312.191,
+                                                "p95_us":  4673.535,
+                                                "p99_us":  9256.959
+                                            },
+                                   "dirty_to_present_submit":  {
+                                                                   "samples":  59,
+                                                                   "p50_us":  3510.271,
+                                                                   "p95_us":  6619.135,
+                                                                   "p99_us":  53477.375
+                                                               }
+                               },
+        "window_available_ms":  455.1555,
+        "cpu_percent_one_core":  4.2184078449396969,
+        "working_set_bytes":  {
+                                  "p50":  166522880,
+                                  "p99":  166555648,
+                                  "samples":  40,
+                                  "max":  166555648,
+                                  "p95":  166531072
+                              },
+        "application_work":  {
+                                 "flutter_visible_rows":  null,
+                                 "view":  null,
+                                 "updates":  50,
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "shell_cell_builds":  null,
+                                 "solid_mounted_window":  null,
+                                 "shell_view_builds":  null,
+                                 "flutter_scroll_y":  null,
+                                 "shell_visible_range":  null,
+                                 "flutter_row_builds":  null,
+                                 "cells_written":  50
+                             },
+        "workload":  "cell",
+        "implementation":  "dart",
+        "run_id":  "present-20260930g-3"
+    },
+    {
+        "private_bytes":  {
+                              "p50":  187031552,
+                              "p99":  191262720,
+                              "samples":  40,
+                              "max":  191262720,
+                              "p95":  191086592
+                          },
+        "input_count":  600,
+        "input_delivery":  {
+                               "planned":  600,
+                               "uninjected":  0,
+                               "injected":  600,
+                               "excess":  0
+                           },
+        "duration_ms":  10000.6321,
+        "flutter_frame_timing":  null,
+        "presentation":  {
+                             "between_presents_ms":  {
+                                                         "p50":  17.5133,
+                                                         "p99":  47.125600000000013,
+                                                         "samples":  597,
+                                                         "max":  53.5226,
+                                                         "p95":  34.7248
+                                                     },
+                             "estimated_missed_workload_slots":  328,
+                             "input_to_response_display_ms":  null,
+                             "frames_not_displayed":  333,
+                             "input_associated_display_ms":  null,
+                             "target_period_ms":  16.666666666666668,
+                             "frames":  598,
+                             "input_to_response_present_ms":  null,
+                             "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                             "between_display_changes_ms":  {
+                                                                "p50":  33.3412,
+                                                                "p99":  150.00740000000002,
+                                                                "samples":  264,
+                                                                "max":  233.4726,
+                                                                "p95":  100.06660000000001
+                                                            }
+                         },
+        "solid_draw_overlay":  null,
+        "scheduled_inputs_missed":  0,
+        "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+        "correctness":  {
+                            "issues":  [
+
+                                       ],
+                            "observed_updates":  0,
+                            "passed":  true,
+                            "expected_view_stage":  null,
+                            "expected_updates":  0,
+                            "expected_scroll_y":  -46800,
+                            "expected_cells":  0,
+                            "observed_cells":  0,
+                            "application_price":  "100.00",
+                            "observed_scroll_y":  -46800.0,
+                            "native_price":  "100.00",
+                            "expected_price":  "100.00",
+                            "observed_view_stage":  null
+                        },
+        "equal_work_timing_eligible":  true,
+        "dart_publication":  {
+                                 "scope":  "Dataset edits from delivered workload clicks, through the applied acknowledgement; initial upload reported separately",
+                                 "limit":  "Application-defined percentile estimator; do not add stage percentiles or treat acknowledgement as presentation",
+                                 "statistics":  {
+                                                    "description_builds":  1,
+                                                    "encoded_snapshots":  0,
+                                                    "operation_publications":  0,
+                                                    "resubmitted_publications":  0,
+                                                    "patches":  0,
+                                                    "encoded_bytes":  0,
+                                                    "ffi_callbacks":  7,
+                                                    "ui_callbacks":  1,
+                                                    "diagnostic_callbacks":  2,
+                                                    "description_build":  {
+                                                                              "samples":  1,
+                                                                              "p50_us":  12,
+                                                                              "p95_us":  12,
+                                                                              "p99_us":  12
+                                                                          },
+                                                    "encode":  {
+                                                                   "samples":  0,
+                                                                   "p50_us":  0,
+                                                                   "p95_us":  0,
+                                                                   "p99_us":  0
+                                                               },
+                                                    "publish_to_applied":  {
+                                                                               "samples":  0,
+                                                                               "p50_us":  0,
+                                                                               "p95_us":  0,
+                                                                               "p99_us":  0
+                                                                           },
+                                                    "initial":  {
+                                                                    "bytes":  542,
+                                                                    "encode_us":  194
+                                                                },
+                                                    "data_messages":  0,
+                                                    "data_bytes":  0,
+                                                    "data_records_checked":  100000,
+                                                    "data_cells_written":  300000,
+                                                    "data_encode":  {
+                                                                        "samples":  0,
+                                                                        "p50_us":  0,
+                                                                        "p95_us":  0,
+                                                                        "p99_us":  0
+                                                                    },
+                                                    "data_pack":  {
+                                                                      "samples":  0,
+                                                                      "p50_us":  0,
+                                                                      "p95_us":  0,
+                                                                      "p99_us":  0
+                                                                  },
+                                                    "data_publish_to_applied":  {
+                                                                                    "samples":  1,
+                                                                                    "p50_us":  626187,
+                                                                                    "p95_us":  626187,
+                                                                                    "p99_us":  626187
+                                                                                },
+                                                    "native_data_parse":  {
+                                                                              "samples":  1,
+                                                                              "p50_us":  110499,
+                                                                              "p95_us":  110499,
+                                                                              "p99_us":  110499
+                                                                          },
+                                                    "native_data_apply":  {
+                                                                              "samples":  1,
+                                                                              "p50_us":  4364,
+                                                                              "p95_us":  4364,
+                                                                              "p99_us":  4364
+                                                                          },
+                                                    "native_snapshot_apply":  {
+                                                                                  "samples":  0,
+                                                                                  "p50_us":  0,
+                                                                                  "p95_us":  0,
+                                                                                  "p99_us":  0
+                                                                              }
+                                                }
+                             },
+        "status":  "ETW captured; response-frame correlation and parity review still required",
+        "native_diagnostics":  {
+                                   "scope":  "cumulative since window creation; includes startup and warmup",
+                                   "limit":  "Cumulative native histories include startup and warmup; no changed-cell presentation correlation",
+                                   "input_to_frame":  {
+                                                          "samples":  602,
+                                                          "p50_us":  16138.239,
+                                                          "p95_us":  20430.847,
+                                                          "p99_us":  22478.847
+                                                      },
+                                   "draw":  {
+                                                "samples":  606,
+                                                "p50_us":  9019.391,
+                                                "p95_us":  10665.983,
+                                                "p99_us":  12623.871
+                                            },
+                                   "dirty_to_present_submit":  {
+                                                                   "samples":  605,
+                                                                   "p50_us":  16121.855,
+                                                                   "p95_us":  20430.847,
+                                                                   "p99_us":  22953.983
+                                                               }
+                               },
+        "window_available_ms":  524.22570000000007,
+        "cpu_percent_one_core":  64.214690989382561,
+        "working_set_bytes":  {
+                                  "p50":  169074688,
+                                  "p99":  169086976,
+                                  "samples":  40,
+                                  "max":  169086976,
+                                  "p95":  169086976
+                              },
+        "application_work":  {
+                                 "flutter_visible_rows":  null,
+                                 "view":  null,
+                                 "updates":  0,
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "shell_cell_builds":  null,
+                                 "solid_mounted_window":  null,
+                                 "shell_view_builds":  null,
+                                 "flutter_scroll_y":  null,
+                                 "shell_visible_range":  null,
+                                 "flutter_row_builds":  null,
+                                 "cells_written":  0
+                             },
+        "workload":  "scroll",
+        "implementation":  "dart",
+        "run_id":  "present-20260930g-3"
+    },
+    {
+        "private_bytes":  {
+                              "p50":  205447168,
+                              "p99":  214376448,
+                              "samples":  40,
+                              "max":  214376448,
+                              "p95":  211562496
+                          },
+        "input_count":  300,
+        "input_delivery":  {
+                               "planned":  300,
+                               "uninjected":  0,
+                               "injected":  300,
+                               "excess":  0
+                           },
+        "duration_ms":  10001.5478,
+        "flutter_frame_timing":  {
+                                     "scope":  "every frame since the first, from FrameTiming; includes startup and warmup",
+                                     "raster_us":  {
+                                                       "samples":  362,
+                                                       "p50":  3095,
+                                                       "p95":  5308,
+                                                       "p99":  5895,
+                                                       "max":  43757
+                                                   },
+                                     "total_us":  {
+                                                      "samples":  362,
+                                                      "p50":  6503,
+                                                      "p95":  11165,
+                                                      "p99":  12332,
+                                                      "max":  88667
+                                                  },
+                                     "limit":  "Flutter FrameTiming build and raster phases for every frame since startup; the estimator matches the process percentiles but the history is cumulative",
+                                     "build_us":  {
+                                                      "samples":  362,
+                                                      "p50":  2506,
+                                                      "p95":  4618,
+                                                      "p99":  5471,
+                                                      "max":  6282
+                                                  }
+                                 },
+        "presentation":  {
+                             "between_presents_ms":  {
+                                                         "p50":  32.9033,
+                                                         "p99":  51.1954,
+                                                         "samples":  332,
+                                                         "max":  52.4191,
+                                                         "p95":  36.6109
+                                                     },
+                             "estimated_missed_workload_slots":  35,
+                             "input_to_response_display_ms":  null,
+                             "frames_not_displayed":  4,
+                             "input_associated_display_ms":  null,
+                             "target_period_ms":  33.333333333333336,
+                             "frames":  333,
+                             "input_to_response_present_ms":  null,
+                             "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                             "between_display_changes_ms":  {
+                                                                "p50":  33.3429,
+                                                                "p99":  66.6361,
+                                                                "samples":  328,
+                                                                "max":  66.7176,
+                                                                "p95":  50.041700000000013
+                                                            }
+                         },
+        "solid_draw_overlay":  null,
+        "scheduled_inputs_missed":  0,
+        "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+        "correctness":  {
+                            "issues":  [
+
+                                       ],
+                            "observed_updates":  300,
+                            "passed":  true,
+                            "expected_view_stage":  null,
+                            "expected_updates":  300,
+                            "expected_scroll_y":  0,
+                            "expected_cells":  2400,
+                            "observed_cells":  2400,
+                            "application_price":  "Tick 000300",
+                            "observed_scroll_y":  0.0,
+                            "native_price":  null,
+                            "expected_price":  "Tick 000300",
+                            "observed_view_stage":  null
+                        },
+        "equal_work_timing_eligible":  true,
+        "dart_publication":  null,
+        "status":  "ETW captured; response-frame correlation and parity review still required",
+        "native_diagnostics":  null,
+        "window_available_ms":  63.4089,
+        "cpu_percent_one_core":  34.369680260889218,
+        "working_set_bytes":  {
+                                  "p50":  197505024,
+                                  "p99":  206012416,
+                                  "samples":  40,
+                                  "max":  206012416,
+                                  "p95":  203599872
+                              },
+        "application_work":  {
+                                 "flutter_visible_rows":  {
+                                                              "start":  0,
+                                                              "end":  10
+                                                          },
+                                 "view":  null,
+                                 "updates":  300,
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "shell_cell_builds":  null,
+                                 "solid_mounted_window":  null,
+                                 "shell_view_builds":  null,
+                                 "flutter_scroll_y":  0.0,
+                                 "shell_visible_range":  null,
+                                 "flutter_row_builds":  5418,
+                                 "cells_written":  2400
+                             },
+        "workload":  "burst",
+        "implementation":  "flutter",
+        "run_id":  "present-20260930g-3"
+    },
+    {
+        "private_bytes":  {
+                              "p50":  192823296,
+                              "p99":  196538368,
+                              "samples":  40,
+                              "max":  196538368,
+                              "p95":  195993600
+                          },
+        "input_count":  50,
+        "input_delivery":  {
+                               "planned":  50,
+                               "uninjected":  0,
+                               "injected":  50,
+                               "excess":  0
+                           },
+        "duration_ms":  10000.2732,
+        "flutter_frame_timing":  {
+                                     "scope":  "every frame since the first, from FrameTiming; includes startup and warmup",
+                                     "raster_us":  {
+                                                       "samples":  78,
+                                                       "p50":  3361,
+                                                       "p95":  5550,
+                                                       "p99":  78103,
+                                                       "max":  78103
+                                                   },
+                                     "total_us":  {
+                                                      "samples":  78,
+                                                      "p50":  6129,
+                                                      "p95":  10662,
+                                                      "p99":  212300,
+                                                      "max":  212300
+                                                  },
+                                     "limit":  "Flutter FrameTiming build and raster phases for every frame since startup; the estimator matches the process percentiles but the history is cumulative",
+                                     "build_us":  {
+                                                      "samples":  78,
+                                                      "p50":  1738,
+                                                      "p95":  3390,
+                                                      "p99":  3636,
+                                                      "max":  3636
+                                                  }
+                                 },
+        "presentation":  {
+                             "between_presents_ms":  {
+                                                         "p50":  199.8017,
+                                                         "p99":  218.9302,
+                                                         "samples":  48,
+                                                         "max":  218.9302,
+                                                         "p95":  217.7812
+                                                     },
+                             "estimated_missed_workload_slots":  0,
+                             "input_to_response_display_ms":  null,
+                             "frames_not_displayed":  0,
+                             "input_associated_display_ms":  null,
+                             "target_period_ms":  200,
+                             "frames":  49,
+                             "input_to_response_present_ms":  null,
+                             "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                             "between_display_changes_ms":  {
+                                                                "p50":  200.1363,
+                                                                "p99":  233.5103,
+                                                                "samples":  48,
+                                                                "max":  233.5103,
+                                                                "p95":  216.913
+                                                            }
+                         },
+        "solid_draw_overlay":  null,
+        "scheduled_inputs_missed":  0,
+        "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+        "correctness":  {
+                            "issues":  [
+
+                                       ],
+                            "observed_updates":  50,
+                            "passed":  true,
+                            "expected_view_stage":  null,
+                            "expected_updates":  50,
+                            "expected_scroll_y":  0,
+                            "expected_cells":  50,
+                            "observed_cells":  50,
+                            "application_price":  "Tick 000050",
+                            "observed_scroll_y":  0.0,
+                            "native_price":  null,
+                            "expected_price":  "Tick 000050",
+                            "observed_view_stage":  null
+                        },
+        "equal_work_timing_eligible":  true,
+        "dart_publication":  null,
+        "status":  "ETW captured; response-frame correlation and parity review still required",
+        "native_diagnostics":  null,
+        "window_available_ms":  79.7124,
+        "cpu_percent_one_core":  4.6873719409985721,
+        "working_set_bytes":  {
+                                  "p50":  186093568,
+                                  "p99":  189603840,
+                                  "samples":  40,
+                                  "max":  189603840,
+                                  "p95":  189071360
+                              },
+        "application_work":  {
+                                 "flutter_visible_rows":  {
+                                                              "start":  0,
+                                                              "end":  10
+                                                          },
+                                 "view":  null,
+                                 "updates":  50,
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "shell_cell_builds":  null,
+                                 "solid_mounted_window":  null,
+                                 "shell_view_builds":  null,
+                                 "flutter_scroll_y":  0.0,
+                                 "shell_visible_range":  null,
+                                 "flutter_row_builds":  918,
+                                 "cells_written":  50
+                             },
+        "workload":  "cell",
+        "implementation":  "flutter",
+        "run_id":  "present-20260930g-3"
+    },
+    {
+        "private_bytes":  {
+                              "p50":  200290304,
+                              "p99":  206860288,
+                              "samples":  40,
+                              "max":  206860288,
+                              "p95":  206061568
+                          },
+        "input_count":  597,
+        "input_delivery":  {
+                               "planned":  600,
+                               "uninjected":  3,
+                               "injected":  597,
+                               "excess":  0
+                           },
+        "duration_ms":  10000.2418,
+        "flutter_frame_timing":  {
+                                     "scope":  "every frame since the first, from FrameTiming; includes startup and warmup",
+                                     "raster_us":  {
+                                                       "samples":  601,
+                                                       "p50":  2036,
+                                                       "p95":  3110,
+                                                       "p99":  4057,
+                                                       "max":  82605
+                                                   },
+                                     "total_us":  {
+                                                      "samples":  601,
+                                                      "p50":  4610,
+                                                      "p95":  6516,
+                                                      "p99":  8636,
+                                                      "max":  160096
+                                                  },
+                                     "limit":  "Flutter FrameTiming build and raster phases for every frame since startup; the estimator matches the process percentiles but the history is cumulative",
+                                     "build_us":  {
+                                                      "samples":  601,
+                                                      "p50":  1405,
+                                                      "p95":  2407,
+                                                      "p99":  2728,
+                                                      "max":  8716
+                                                  }
+                                 },
+        "presentation":  {
+                             "between_presents_ms":  {
+                                                         "p50":  16.6384,
+                                                         "p99":  19.3364,
+                                                         "samples":  596,
+                                                         "max":  51.1645,
+                                                         "p95":  18.4354
+                                                     },
+                             "estimated_missed_workload_slots":  7,
+                             "input_to_response_display_ms":  null,
+                             "frames_not_displayed":  5,
+                             "input_associated_display_ms":  null,
+                             "target_period_ms":  16.666666666666668,
+                             "frames":  597,
+                             "input_to_response_present_ms":  null,
+                             "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                             "between_display_changes_ms":  {
+                                                                "p50":  16.6783,
+                                                                "p99":  33.1804,
+                                                                "samples":  591,
+                                                                "max":  50.025000000000013,
+                                                                "p95":  16.776
+                                                            }
+                         },
+        "solid_draw_overlay":  null,
+        "scheduled_inputs_missed":  3,
+        "delivery_quality":  "driver missed deadlines; exclude from matched-cadence ranking",
+        "correctness":  {
+                            "issues":  [
+
+                                       ],
+                            "observed_updates":  0,
+                            "passed":  true,
+                            "expected_view_stage":  null,
+                            "expected_updates":  0,
+                            "expected_scroll_y":  -46566,
+                            "expected_cells":  0,
+                            "observed_cells":  0,
+                            "application_price":  "100.00",
+                            "observed_scroll_y":  -46566.0,
+                            "native_price":  null,
+                            "expected_price":  "100.00",
+                            "observed_view_stage":  null
+                        },
+        "equal_work_timing_eligible":  false,
+        "dart_publication":  null,
+        "status":  "ETW captured; response-frame correlation and parity review still required",
+        "native_diagnostics":  null,
+        "window_available_ms":  62.8136,
+        "cpu_percent_one_core":  35.780384830294807,
+        "working_set_bytes":  {
+                                  "p50":  190713856,
+                                  "p99":  197316608,
+                                  "samples":  40,
+                                  "max":  197316608,
+                                  "p95":  196685824
+                              },
+        "application_work":  {
+                                 "flutter_visible_rows":  {
+                                                              "start":  1455,
+                                                              "end":  1466
+                                                          },
+                                 "view":  null,
+                                 "updates":  0,
+                                 "solid_row_components_created":  null,
+                                 "solid_scroll_offset":  null,
+                                 "shell_cell_builds":  null,
+                                 "solid_mounted_window":  null,
+                                 "shell_view_builds":  null,
+                                 "flutter_scroll_y":  -46566.0,
+                                 "shell_visible_range":  null,
+                                 "flutter_row_builds":  1473,
+                                 "cells_written":  0
+                             },
+        "workload":  "scroll",
+        "implementation":  "flutter",
+        "run_id":  "present-20260930g-3"
+    }
+]
