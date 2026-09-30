@@ -1,7 +1,20 @@
 
 # Preserve byte hashes in vendored dependency provenance.
-native/vendor/** -text
+native/vendor/** -text linguist-vendored
 # Retained capture hashes describe exact bytes, including PowerShell log encodings.
 reports/accessibility/windows-final/** -text
 reports/accessibility/hosted/** -text
 reports/market-terminal/acceptance/** -text
+
+# Comparison applications are separate workloads; benchmark tooling stays counted.
+benchmarks/native/** linguist-detectable=false
+benchmarks/dart/** linguist-detectable=false
+benchmarks/flutter/** linguist-detectable=false
+benchmarks/solid/** linguist-detectable=false
+benchmarks/shell/** linguist-detectable=false
+
+# Reports retain observations and historical source captures.
+reports/** linguist-documentation
+
+# These project-owned test implementations are not vendored fixtures.
+test/fixtures/** linguist-vendored=false

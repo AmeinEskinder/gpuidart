@@ -140,6 +140,13 @@ excluded scopes are explicit in the inventory. CI YAML, manifests, documentation
 and evidence are not implementation source. Historical reports retain old
 commands as evidence of what ran at their recorded revisions.
 
+The [GitHub Linguist audit](../reports/tooling/linguist/README.md) reconciles
+the old language bar to every counted Git blob on the old default branch.
+It records the complete legacy-file census and the semantic classification
+rules for vendor code, comparison workloads, reports and owned test fixtures.
+Actual Linguist with those rules reports 47.74% Dart, 52.07% Rust and 0.18% C
+for the maintained public ABI header.
+
 ## Earlier parity evidence
 
 Benchmark analysis matched the old scripts across 121 directories, 39 input
