@@ -1,4 +1,8 @@
-# Current release acceptance
+# Release acceptance history
+
+This page records acceptance at `bb6a894` and `4fca314` in September 2026.
+Current Dart and Rust tooling verification is in the
+[migration record](../../docs/tooling-migration.md).
 
 This continues the stable-MVP goal after the feature stack at `bb6a894`.
 The public architecture remains snapshots plus retained datasets. No new
@@ -39,7 +43,7 @@ Raw evidence is kept in revision-specific directories. The decision log is
 - [Current clean-Windows verification](4fca314/clean-windows/verification.json) passed for the MIT package in a fresh guest without developer SDK commands, at DPI 120 with PerMonitorV2. The corrected `<vGPU>` setting was confirmed by adapter inventory and WARP modules. [The investigation](sandbox-investigation/README.md) retains the compositor crashes and corrects the earlier assumption that `<VGpu>` disabled GPU sharing.
 - [Current Unix package workflow](https://github.com/AmeinEskinder/gpuidart/actions/runs/36214976228): extracted macOS/Linux packages, macOS runtime-only verification, X11 geometry at scales 1 and 1.25, and a fresh Ubuntu runtime container passed. [Raw records](4fca314/unix/) retain their individual scope; [earlier evidence](bb6a894/unix/) remains available.
 - [Current Windows identity](4fca314/windows-artifact.json): ZIP SHA-256 `e5b66c8b3dfafc5af04bd85f56f572acc5bf69a41e2c50b6f823def67476d87b`. [Current Unix identities](4fca314/unix-artifacts.json) and [previous Windows identity](53ea4c7/artifact.json) are retained separately.
-- [PowerShell environment follow-up](powershell-environment/README.md): the new preparation test exposed a hosted Windows module-loading failure. The shared Dart launcher now lets Windows PowerShell rebuild its module path; all 37 local headless tests pass. The hosted failure and unsuccessful local reproduction probes are retained.
+- [PowerShell environment follow-up](powershell-environment/README.md): the preparation test at that revision exposed a hosted Windows module-loading failure. The former Dart launcher let Windows PowerShell rebuild its module path; all 37 local headless tests passed. The hosted failure and unsuccessful local reproduction probes are retained as history of the removed implementation.
 - [Post-restart inspection](bb6a894/prerequisites.json) and [Japanese readiness](bb6a894/japanese-readiness.json): no pending restart, Basic Typing installed, Japanese added after English. These are preparation records, not IME observations.
 - [Sandbox attempt](bb6a894/sandbox-attempt.json): folder mappings worked; the guest had no logged-in desktop session. The environment later disappeared for an unknown reason. No package result was produced. The desktop inspection helper could not connect after retries and a reset.
 - [Language metadata check](language-metadata-check.json): the old PowerShell pipeline produced null fields; explicit iteration reports installed languages correctly. The setup instructions also accept Windows' normalized `ja` tag. [A fresh configuration](bb6a894/sandbox-next-attempt.json) contains the corrected guest script and the same candidate ZIP; it has not been executed.

@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+warning: using `chunks_exact` with a constant chunk size
+   --> src\windows.rs:613:14
+    |
+613 |             .chunks_exact(4)
+    |              ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#chunks_exact_to_as_chunks
+    = note: `#[warn(clippy::chunks_exact_to_as_chunks)]` on by default
+
+warning: `gpuidart-benchmark-driver` (bin "gpuidart-benchmark-driver") generated 1 warning (run `cargo clippy --fix --bin "gpuidart-benchmark-driver" -p gpuidart-benchmark-driver -- --no-deps` to apply 1 suggestion)
+warning: `gpuidart-benchmark-driver` (bin "gpuidart-benchmark-driver" test) generated 1 warning (1 duplicate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.95s

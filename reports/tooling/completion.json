@@ -495,6 +495,48 @@
                                           "warnings":  3,
                                           "report":  "completion/platform-clippy.json",
                                           "log":  "completion/platform-clippy.log"
+                                      },
+                                      {
+                                          "scope":  "windows-helper",
+                                          "passed":  true,
+                                          "command":  [
+                                                          "dart",
+                                                          "run",
+                                                          "tool/env.dart",
+                                                          "cargo",
+                                                          "clippy",
+                                                          "--locked",
+                                                          "--manifest-path",
+                                                          "tool/windows/native/Cargo.toml",
+                                                          "--all-targets",
+                                                          "--no-deps"
+                                                      ],
+                                          "exit_code":  0,
+                                          "source_commit":  "a2600907a8013a5e890ce9c23c248f02f5f6887c",
+                                          "warnings":  1,
+                                          "report":  "completion/clippy-windows-helper.json",
+                                          "log":  "completion/clippy-windows-helper.log"
+                                      },
+                                      {
+                                          "scope":  "benchmark-driver",
+                                          "passed":  true,
+                                          "command":  [
+                                                          "dart",
+                                                          "run",
+                                                          "tool/env.dart",
+                                                          "cargo",
+                                                          "clippy",
+                                                          "--locked",
+                                                          "--manifest-path",
+                                                          "benchmarks/driver/Cargo.toml",
+                                                          "--all-targets",
+                                                          "--no-deps"
+                                                      ],
+                                          "exit_code":  0,
+                                          "source_commit":  "a2600907a8013a5e890ce9c23c248f02f5f6887c",
+                                          "warnings":  1,
+                                          "report":  "completion/clippy-benchmark-driver.json",
+                                          "log":  "completion/clippy-benchmark-driver.log"
                                       }
                                   ],
                   "clippy_warnings":  "Existing native warnings and helper suggestions remain; Clippy exits 0. Native lib: 54 warnings; native tests: 56 including duplicates; Windows probe: 2; Windows helper and benchmark driver: 1 each. Platform probe: 3 existing let-unit-value warnings (duplicated in lib tests), checked at d02a4ce."
@@ -810,7 +852,8 @@
                                   "Grok 4.6"
                               ],
                    "result":  "Final source and evidence audits clean at d02a4ce. Seven passing workflows, six artifact hashes, three clean package provenance records, 24 accessibility results, all platform checkpoints, exact source composition, and retained Clippy receipts independently verified. No remaining migration review blockers.",
-                   "dropouts":  "One Grok inventory worker returned malformed output; not counted as completed review. Parent completed inventory with a behavioral test."
+                   "dropouts":  "One Grok inventory worker returned malformed output; not counted as completed review. Parent completed inventory with a behavioral test.",
+                   "revalidation":  "revalidation/README.md"
                },
     "decision_trail":  "../tooling-migration.tsv",
     "previous_verified_source":  "8491da1f77e91cc6764aa5749000db0438f39387",
