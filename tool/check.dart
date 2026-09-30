@@ -116,6 +116,7 @@ Future<void> main(List<String> args) async {
   ]);
   final dartOutput = await runCapturing(dartExecutable, [
     'test',
+    '--reporter=expanded',
     if (headless) ...['--exclude-tags', 'live-window'],
   ]);
   final dartCount = RegExp(r'\+(\d+): All tests passed')

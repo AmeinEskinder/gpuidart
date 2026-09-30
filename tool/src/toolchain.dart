@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 String get dartExecutable {
@@ -24,27 +25,20 @@ Map<String, String> toolchainEnvironment({
   String? root,
   Map<String, String>? environment,
 }) {
-  final result = <String, String>{};
+  final result = Platform.isWindows
+      ? SplayTreeMap<String, String>(
+          (left, right) => left.toUpperCase().compareTo(right.toUpperCase()),
+        )
+      : <String, String>{};
   void put(String key, String value) {
-    if (Platform.isWindows) {
-      result.removeWhere((name, _) => name.toUpperCase() == key.toUpperCase());
-    }
+    result.remove(key);
     result[key] = value;
   }
 
   for (final entry in {...Platform.environment, ...?environment}.entries) {
     put(entry.key, entry.value);
   }
-  String? get(String key) {
-    for (final entry in result.entries) {
-      if (Platform.isWindows
-          ? entry.key.toUpperCase() == key.toUpperCase()
-          : entry.key == key) {
-        return entry.value;
-      }
-    }
-    return null;
-  }
+  String? get(String key) => result[key];
 
   final paths = <String>[];
   final toolsDirectory = Directory('${root ?? Directory.current.path}/.tools');

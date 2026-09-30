@@ -97,6 +97,9 @@ void main() {
         environment: {
           'GPUIDART_TEST_OVERRIDE': 'preserved',
           if (Platform.isWindows) 'Path': 'custom-environment-path',
+          if (Platform.isWindows) 'VCTOOLSINSTALLDIR': temporary.path,
+          if (Platform.isWindows)
+            'VCTOOLSREDISTDIR': '${temporary.path}/redist',
         },
       );
       expect(environment['GPUIDART_TEST_OVERRIDE'], 'preserved');
@@ -105,6 +108,7 @@ void main() {
           'PATH',
         ]);
         expect(environment['PATH'], endsWith('custom-environment-path'));
+        expect(environment['VCToolsRedistDir'], '${temporary.path}/redist');
       }
     },
   );
