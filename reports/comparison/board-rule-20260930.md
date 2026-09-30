@@ -42,3 +42,35 @@ The evidence this rule was written against is the board on the switch-off
 build, [board-switch-off-20260930.md](board-switch-off-20260930.md), where
 every latency cell was already within this rule's 3 ms except the cell
 display median, 3.4 ms behind.
+
+## Changes made after the board of 2026-09-30, stated before the next one
+
+The board of the evening of 2026-09-30 missed this rule on the burst and
+scroll display medians and, by half a millisecond, on the cell display
+lead. Its own records locate the two display misses in where the Dart
+fixture presents within the refresh interval, 3.8 to 5.1 ms after the
+vertical blank against the Flutter fixture's 7.2 to 7.6, with present to
+display two intervals less that phase on both. Three changes follow, and
+then one more board under this rule, unchanged:
+
+1. **The driver jitters every injected input** by a seeded uniform draw
+   over one refresh interval (16.67 ms, capped just under the input period
+   so the order and the count hold), with the same seed for both fixtures'
+   n-th attempt of a workload in a series, so that each run samples every
+   phase of the refresh rather than the fraction a cadence locked to it
+   samples. This changes the workload, not the rule. Figures from boards
+   before it are not comparable to the millisecond.
+2. **The instrument reads the swap chain's statistics once more** 60 ms
+   after a present that nothing followed, so that a run's last click is
+   confirmed shown and equal-work runs count. This changes which runs count,
+   not a figure.
+3. **The Dart fixture's library gains frame pacing in its vsync tick**: the
+   invalidation waits until the next vertical blank less a margin for the
+   compositor less the recent 99th percentile of the draw time, so the
+   present lands late in the interval; the wait is zero when draws are
+   long. The margin is found by sweeping it and keeping the largest wait at
+   which at least 99 percent of frames are still shown at the second blank.
+   The pacing's own acceptance, before the board: on burst and scroll, six
+   runs a side, present to display at or below the Flutter fixture's 26 ms,
+   no rise in frames shown a refresh late, scroll displacement exact; the
+   immediate repaint on a lone click unchanged.
