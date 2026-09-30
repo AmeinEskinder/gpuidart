@@ -26,6 +26,7 @@ codegen-units = 1
 # resolved, so dependency versions are unchanged; GPUI Kit itself stays a git
 # pin in native/Cargo.toml.
 [patch.crates-io]
+block = { path = "native/vendor/block-0.1.6" }
 accesskit_atspi_common = { path = "native/vendor/accesskit_atspi_common-0.19.1" }
 accesskit_consumer = { path = "native/vendor/accesskit_consumer-0.38.0" }
 accesskit_windows = { path = "native/vendor/accesskit_windows-0.34.0" }

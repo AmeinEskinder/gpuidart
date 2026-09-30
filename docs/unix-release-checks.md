@@ -64,23 +64,86 @@ native Wayland support.
 
 ## macOS distribution
 
-The evaluation bundle declares macOS 15 and high-resolution capability. Its
-code has ad-hoc signatures, checked by the verifier. It is not a Developer ID
-release and has not been notarized. Do not disable Gatekeeper to turn this
-into a claimed distribution pass.
+The bundle declares macOS 15 and high-resolution capability. Default packaging
+uses ad-hoc signatures for evaluation. Developer ID packaging signs every
+executable and library, enables the hardened runtime, submits a temporary ZIP
+to Apple, requires an accepted result, and staples the app before producing
+the final archive and file hashes. Evaluation packages never satisfy
+`verify --require-notarized`.
 
 GPUI-Dart uses the MIT License; the archive includes `LICENSE`. Dependencies
 retain their own terms in the accompanying license files and inventory.
 
-Before public distribution, sign every shipped
-executable/library and the app with the owner's Developer ID, enable and test
-the hardened runtime with the required entitlements, submit with `notarytool`,
-and staple/validate the ticket. Repeat the extracted-package tests on the exact
-signed artifact and on a clean Mac with quarantine intact. See
+### Build with an existing macOS keychain
+
+Use a Developer ID Application certificate and a `notarytool` keychain profile
+owned by the distributing developer:
+
+```sh
+gpuidart package --name=Watchlist \
+  --signing-identity='Developer ID Application: YOUR NAME (TEAMID)' \
+  --notary-profile=YOUR_PROFILE
+gpuidart verify build/Watchlist-macos-arm64.tar.gz \
+  build/notarized-verification.json --require-notarized
+```
+
+`--signing-keychain=PATH` directs both tools to the specified keychain. A
+certificate's SHA-1 fingerprint also works as the signing identity. Supply
+both the identity and profile; the command rejects incomplete configuration.
+The signing tools verify the Developer ID certificate rather than trusting its
+display name. No password or private key belongs in these arguments.
+
+The distribution path requests no hardened-runtime exception entitlements.
+Dart 3.13.4 AOT uses signed executable-page remapping for its FFI callbacks.
+All shipped native code must carry the same Developer ID team signature so
+library validation can stay enabled. The extracted AOT self-test is required
+to prove this policy for the built package.
+
+### Build through GitHub Actions
+
+Configure these repository Actions secrets:
+
+| Secret | Value |
+| --- | --- |
+| `MACOS_CERTIFICATE_P12_BASE64` | Base64 of the exported Developer ID Application certificate, private key and certificate chain |
+| `MACOS_CERTIFICATE_PASSWORD` | Password protecting that PKCS#12 export |
+| `MACOS_SIGNING_IDENTITY` | Full Developer ID Application certificate name or SHA-1 fingerprint |
+| `APPLE_NOTARY_KEY_ID` | App Store Connect team API key ID authorized for notarization |
+| `APPLE_NOTARY_ISSUER_ID` | Issuer ID for that team API key |
+| `APPLE_NOTARY_KEY_P8` | Contents of the matching private `.p8` key |
+
+Run **Notarized macOS package** from the Actions page on `main`. This manual
+workflow runs only on `main`. It builds the native CLI, creates an isolated
+temporary keychain, imports and checks the certificate, stores the notarization
+profile, then runs packaging and extracted verification. The wrapper removes
+credential variables from child environments, suppresses credential-command
+output, and redacts package console output. The keychain and private
+files are removed on ordinary completion or failure. A canceled hosted job
+also relies on destruction of its ephemeral runner.
+
+The workflow uploads `notarized-macos-arm64` only after all checks pass. The
+separate evidence artifact retains the Apple submission ID and log, signing
+checks, final source/file hashes and extracted verification. Missing secrets
+fail the workflow; there is no automatic fallback to an evaluation package.
+
+### Verify distribution
+
+Verification requires a Developer ID signature on every shipped binary,
+`syspolicy_check distribution`, Gatekeeper assessment and a valid stapled app
+ticket. The standalone `verify` executable is signed and submitted in the same
+ZIP, but macOS cannot staple a ticket to a standalone binary. Its notarization
+check uses online Apple ticket lookup. `--runtime-only` skips the developer-tool
+`stapler` command and retains system signature, policy and online-ticket checks.
+The separately uploaded developer CLI in the evaluation workflow is not part
+of this notarized application archive.
+
+Repeat the extracted-package tests on a clean Mac with quarantine intact before
+claiming clean-machine distribution. A hosted build pass does not establish
+that environment. Do not disable Gatekeeper to turn a failure into a pass. See
 [Apple's distribution guidance](https://developer.apple.com/developer-id/) and
 [notarization workflow](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).
-The current work does not establish which hardened-runtime entitlements the
-Dart FFI callbacks require.
+Apple's [testing guidance](https://developer.apple.com/forums/thread/130560)
+distinguishes app assessment from standalone-code notarization checks.
 
 ## Clean environment
 

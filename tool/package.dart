@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:gpuidart/src/platform.dart';
 
 import 'src/commands.dart';
+import 'src/macos_signing.dart';
 import 'src/package_manifest.dart';
 import 'src/toolchain.dart';
 import 'src/windows_package.dart';
@@ -14,6 +15,9 @@ Future<void> main(List<String> args) async {
   var name = 'gpuidart';
   var entry = 'example/watchlist/main.dart';
   String? crtDirectory;
+  String? signingIdentity;
+  String? notaryProfile;
+  String? signingKeychain;
   for (final arg in args) {
     if (arg.startsWith('--name=')) {
       name = arg.substring(7);
@@ -21,13 +25,28 @@ Future<void> main(List<String> args) async {
       entry = arg.substring(8);
     } else if (arg.startsWith('--crt-directory=')) {
       crtDirectory = arg.substring(16);
+    } else if (arg.startsWith('--signing-identity=')) {
+      signingIdentity = arg.substring(19);
+    } else if (arg.startsWith('--notary-profile=')) {
+      notaryProfile = arg.substring(17);
+    } else if (arg.startsWith('--signing-keychain=')) {
+      signingKeychain = arg.substring(19);
     } else {
       throw ArgumentError(
-        'Usage: package.dart [--name=NAME] [--entry=FILE] [--crt-directory=DIR]',
+        'Usage: package.dart [--name=NAME] [--entry=FILE] [--crt-directory=DIR] '
+        '[--signing-identity=IDENTITY --notary-profile=PROFILE [--signing-keychain=PATH]]',
       );
     }
   }
   validatePackageName(name);
+  final signing = MacosSigning.fromOptions(
+    identity: signingIdentity,
+    notaryProfile: notaryProfile,
+    keychain: signingKeychain,
+  );
+  if (signing.isDistribution && !Platform.isMacOS) {
+    throw ArgumentError('Developer ID signing requires macOS');
+  }
   if (Platform.isWindows) {
     await packageWindows(name: name, entry: entry, crtDirectory: crtDirectory);
     return;
@@ -87,30 +106,16 @@ Future<void> main(List<String> args) async {
 <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
 ''');
-    for (final file in [
-      nativeLibraryName('gpuidart'),
-      'gpuidart-launcher',
-      name,
-    ]) {
-      await command('codesign', [
-        '--force',
-        '--sign',
-        '-',
-        '${payload.path}/$file',
-      ]);
-    }
-    await command('codesign', [
-      '--force',
-      '--sign',
-      '-',
-      '${stage.path}/$name.app',
-    ]);
-    await command('codesign', [
-      '--verify',
-      '--deep',
-      '--strict',
-      '${stage.path}/$name.app',
-    ]);
+    await signing.sign(
+      stage: stage,
+      app: Directory('${stage.path}/$name.app'),
+      binaries: [
+        File('${payload.path}/${nativeLibraryName('gpuidart')}'),
+        File('${payload.path}/gpuidart-launcher'),
+        File(binary),
+        File('${stage.path}/verify'),
+      ],
+    );
   }
   final metadata = jsonDecode(
     await command('cargo', [
@@ -137,6 +142,8 @@ Future<void> main(List<String> args) async {
       .copy('${stage.path}/AccessKit-LICENSE-MIT.txt');
   await File('native/vendor/LICENSE-APACHE')
       .copy('${stage.path}/AccessKit-LICENSE-APACHE.txt');
+  await File('native/vendor/block-0.1.6/LICENSE-MIT')
+      .copy('${stage.path}/Block-LICENSE-MIT.txt');
   final dartSdk = await command(dartExecutable, [
     'run',
     'tool/src/dart_sdk.dart',
@@ -175,17 +182,24 @@ Future<void> main(List<String> args) async {
       ),
     };
   }
-  await File('${stage.path}/README.txt')
-      .writeAsString('''GPUI-Dart $target evaluation package
+  await File('${stage.path}/README.txt').writeAsString(
+    '''GPUI-Dart $target ${signing.isDistribution ? 'distribution' : 'evaluation'} package
 Run ${Platform.isMacOS ? '$name.app/Contents/MacOS/$name or open $name.app' : './$name'}.
 Keep the complete package together. No Dart/Rust SDK is needed to run it.
 Run ./verify --report=verification.json to check hashes, dependencies, loaded libraries and the application's self-test.
 On a machine without developer inspection tools, use ./verify --runtime-only --report=verification.json; this uses the retained build-time dependency inspection and still checks actual loaded images.
 See RELEASE-CHECKS.md for OS prerequisites and human checks.
-${Platform.isMacOS ? 'This app has an ad-hoc signature. Developer ID distribution and notarization are unverified.' : 'Requires Ubuntu 24.04 x64, X11 and the documented system runtime libraries.'}
+${Platform.isMacOS ? (signing.isDistribution ? 'Developer ID signed and notarized. The app has a stapled ticket. The standalone verifier uses online notarization lookup.' : 'This app has an ad-hoc signature. Use the Developer ID packaging options for notarized distribution.') : 'Requires Ubuntu 24.04 x64, X11 and the documented system runtime libraries.'}
 GPUI-Dart is MIT licensed. See LICENSE for the project's copyright and terms.
 Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, AccessKit-LICENSE-*.txt, Dart-LICENSE.txt and THIRD-PARTY.json.
-''');
+''',
+  );
+  final notarization = signing.isDistribution
+      ? await signing.notarize(
+          stage: stage,
+          app: Directory('${stage.path}/$name.app'),
+        )
+      : null;
   final files = await stage
       .list(recursive: true, followLinks: false)
       .where((f) => f is File)
@@ -206,8 +220,11 @@ Third-party dependencies retain their own licenses. See GPUI-Kit-LICENSE.txt, Ac
         ? 'macOS 15 ARM64'
         : 'Ubuntu 24.04 x64, glibc 2.39, X11',
     'signing': Platform.isMacOS
-        ? 'ad-hoc evaluation; not notarized'
+        ? (signing.isDistribution
+              ? 'developer-id; notarized'
+              : 'ad-hoc evaluation; not notarized')
         : 'unsigned evaluation archive',
+    'notarization': ?notarization,
     'build': await sourceManifest(entry),
     'files': [
       for (final file in files)

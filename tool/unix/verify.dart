@@ -11,6 +11,7 @@ Future<void> main(List<String> args) async {
   var reportFile = File('${root.path}/verification.json');
   var environmentKind = 'development_machine';
   var runtimeOnly = false;
+  var requireNotarized = false;
   for (final arg in args) {
     if (arg.startsWith('--report=')) {
       reportFile = File(arg.substring(9)).absolute;
@@ -18,9 +19,11 @@ Future<void> main(List<String> args) async {
       environmentKind = arg.substring(14);
     } else if (arg == '--runtime-only') {
       runtimeOnly = true;
+    } else if (arg == '--require-notarized') {
+      requireNotarized = true;
     } else {
       throw ArgumentError(
-        'Usage: ./verify [--runtime-only] [--report=FILE] [--environment=development_machine|clean_vm|clean_machine|clean_container]',
+        'Usage: ./verify [--runtime-only] [--require-notarized] [--report=FILE] [--environment=development_machine|clean_vm|clean_machine|clean_container]',
       );
     }
   }
@@ -39,6 +42,7 @@ Future<void> main(List<String> args) async {
     'package_path': root.path,
     'os': Platform.operatingSystemVersion,
     'runtime_only': runtimeOnly,
+    'require_notarized': requireNotarized,
   };
   Future<void> save() async {
     await reportFile.parent.create(recursive: true);
@@ -56,6 +60,15 @@ Future<void> main(List<String> args) async {
       await File('${root.path}/manifest.json').readAsString(),
     ) as Map<String, dynamic>;
     report['manifest'] = manifest;
+    final notarized = manifest['signing'] == 'developer-id; notarized';
+    if (requireNotarized && (!Platform.isMacOS || !notarized)) {
+      throw StateError('A notarized Developer ID macOS package is required');
+    }
+    if (notarized &&
+        (manifest['notarization'] is! Map ||
+            manifest['notarization']['status'] != 'Accepted')) {
+      throw StateError('Missing accepted notarization receipt');
+    }
     report['installed_payload_bytes'] =
         (manifest['files'] as List).fold<int>(
           0,
@@ -139,10 +152,67 @@ Future<void> main(List<String> args) async {
       report['signature_verification'] = {
         'status': signature.exitCode,
         'stderr': signature.stderr,
-        'scope':
-            'Ad-hoc signature integrity; no Developer ID or notarization claim',
+        'scope': notarized ? 'Developer ID signature integrity' : 'Ad-hoc signature integrity; no Developer ID or notarization claim',
       };
       if (signature.exitCode != 0) throw StateError('Invalid app signature');
+      if (notarized) {
+        final checks = <String, Object>{};
+        report['notarization_verification'] = checks;
+        Future<void> check(
+          String key,
+          String tool,
+          List<String> arguments,
+        ) async {
+          final result = await Process.run(tool, arguments);
+          checks[key] = {
+            'status': result.exitCode,
+            'stdout': result.stdout,
+            'stderr': result.stderr,
+          };
+          if (result.exitCode != 0) {
+            throw StateError('Notarized package check failed: $key');
+          }
+        }
+
+        for (final file in [
+          executable,
+          library,
+          helper,
+          File(Platform.resolvedExecutable),
+        ]) {
+          await check(file.path, '/usr/bin/codesign', [
+            '--verify',
+            '--strict',
+            '--test-requirement=anchor apple generic and certificate leaf[field.1.2.840.113635.100.6.1.13] exists',
+            file.path,
+          ]);
+        }
+        await check('distribution', '/usr/bin/syspolicy_check', [
+          'distribution',
+          app.path,
+        ]);
+        await check('gatekeeper', '/usr/sbin/spctl', [
+          '--assess',
+          '--type',
+          'execute',
+          '--verbose=2',
+          app.path,
+        ]);
+        await check('verifier_online_ticket', '/usr/bin/codesign', [
+          '--verify',
+          '--verbose=4',
+          '--check-notarization',
+          '-R=notarized',
+          Platform.resolvedExecutable,
+        ]);
+        if (!runtimeOnly) {
+          await check('stapled_ticket', '/usr/bin/xcrun', [
+            'stapler',
+            'validate',
+            app.path,
+          ]);
+        }
+      }
     }
     final temporary = await Directory.systemTemp.createTemp(
       'gpuidart-package-run-',

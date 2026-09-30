@@ -1,0 +1,32 @@
+{
+  "crate": "block-0.1.6",
+  "crate_url": "https://static.crates.io/crates/block/block-0.1.6.crate",
+  "crate_sha256": "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a",
+  "upstream_repository": "https://github.com/SSheldon/rust-block",
+  "upstream_commit": "47178790cfc9d4a8b092051d8b413b78bd31254a",
+  "upstream_revision_note": "All four files in the published archive match this release commit byte-for-byte.",
+  "source_sha256": {
+    "Cargo.toml": "24df2f33b48c9e756a4f864f882c1ab07a159b6c2b790f45af2e8162499b6719",
+    "README.md": "01c56329fa14f48ea1c9c7986c3660c41beeff2477f61c2d36bd8e666b9fc562",
+    "src/lib.rs": "eb31678adf63b53109d9b94eba23699fd5f9ebfdb950f6e1a57ad51bb6a146fa",
+    "src/test_utils.rs": "271bd579b67e2440134227cf8ee52c1b8c22854eb0c7923b46306b51810c2cf1",
+    "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  "patched_sha256": {
+    "src/lib.rs": "bf799f4d01bb497fdcffe7a5e28d998e721ed45c1be866ed1b454df39ce876a9",
+    "Cargo.toml": "ca2b5dbb4f0c2e3e5c74b2e32e78f2dd27a9adff4262ff0521a7ae5701325428"
+  },
+  "extra_sources": {
+    "LICENSE-MIT": {
+      "url": "https://raw.githubusercontent.com/SSheldon/rust-block/0c123b7be1e5e5fb14d561352a461c909b931baf/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "upstream_pull_request": "https://github.com/SSheldon/rust-block/pull/14",
+      "note": "The block 0.1.6 archive declares MIT in Cargo.toml and contains no license file. This verbatim MIT text is from an open upstream PR, not the release archive or a merged upstream license file."
+    }
+  },
+  "patch_notes": [
+    "Replace uninhabited enum Class with inhabited opaque repr(C) zero-sized struct",
+    "Specify the implicit C ABI at all 10 extern declaration/signature sites",
+    "Specify existing implicit edition 2015 explicitly"
+  ]
+}

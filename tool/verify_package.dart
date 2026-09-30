@@ -8,16 +8,23 @@ import 'src/archives.dart';
 
 Future<void> main(List<String> args) async {
   final runtimeOnly = args.contains('--runtime-only');
-  args = args.where((arg) => arg != '--runtime-only').toList();
+  final requireNotarized = args.contains('--require-notarized');
+  args = args
+      .where((arg) => arg != '--runtime-only' && arg != '--require-notarized')
+      .toList();
   if (args.isEmpty || args.length > 3) {
     throw ArgumentError(
-      'Usage: verify_package.dart ARCHIVE [REPORT] [ENVIRONMENT] [--runtime-only]',
+      'Usage: verify_package.dart ARCHIVE [REPORT] [ENVIRONMENT] '
+      '[--runtime-only] [--require-notarized]',
     );
   }
   final archive = File(args[0]).absolute;
   final report = File(
     args.length > 1 ? args[1] : 'build/package-verification.json',
   ).absolute;
+  if (requireNotarized && !Platform.isMacOS) {
+    throw ArgumentError('--require-notarized requires macOS');
+  }
   if (Platform.isWindows) {
     if (runtimeOnly) {
       throw UnsupportedError('--runtime-only is a Unix verifier option');
@@ -45,6 +52,7 @@ Future<void> main(List<String> args) async {
     '${directory.path}/verify${Platform.isWindows ? '.exe' : ''}',
     [
       if (runtimeOnly) '--runtime-only',
+      if (requireNotarized) '--require-notarized',
       '--report=${report.path}',
       '--environment=${args.length > 2 ? args[2] : 'development_machine'}',
     ],

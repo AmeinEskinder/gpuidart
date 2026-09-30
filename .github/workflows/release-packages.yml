@@ -93,8 +93,13 @@ jobs:
       - name: Verify macOS extraction and record release-native baselines
         if: runner.os == 'macOS'
         run: |
+          dart run tool/verify_macos_keychain.dart build/package-evidence/keychain-lifecycle.json
           dart run tool/record_platform_environment.dart build/package-evidence/environment.json
           build/bin/gpuidart verify build/Watchlist-macos-arm64.tar.gz build/package-evidence/verification.json
+          if build/bin/gpuidart verify build/Watchlist-macos-arm64.tar.gz build/package-evidence/reject-evaluation.json --require-notarized; then
+            echo 'Evaluation package incorrectly passed notarized verification'
+            exit 1
+          fi
           # Exercise the no-developer-tools path without changing the runner's Xcode installation.
           if DEVELOPER_DIR=/gpuidart-no-developer-tools /usr/bin/xcrun --find otool >build/package-evidence/unavailable-otool.log 2>&1; then exit 1; fi
           DEVELOPER_DIR=/gpuidart-no-developer-tools build/bin/gpuidart verify build/Watchlist-macos-arm64.tar.gz build/package-evidence/runtime-only.json development_machine --runtime-only

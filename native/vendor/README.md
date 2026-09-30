@@ -1,4 +1,24 @@
-# Pinned accessibility dependency corrections
+# Pinned dependency corrections
+
+## Objective-C block compatibility
+
+`block-0.1.6` is required by the pinned macOS graphics dependencies. Its
+published source declares `_NSConcreteStackBlock` with an uninhabited Rust
+enum. New Rust versions reject that static declaration. The
+[compatibility patch](block-compatibility.patch) uses an inhabited opaque
+`repr(C)` struct, writes the existing C ABI explicitly, and records the
+previously implicit Rust 2015 edition. API signatures and block layout stay
+the same. The macOS CI gate denies future-incompatible and missing-ABI lints
+for this dependency, then exercises the native runtime.
+
+The crate's [provenance](block-0.1.6/UPSTREAM.json) records the release archive,
+original and patched hashes, and the separate source of its MIT permission
+text. The published archive declares MIT but omits a license file. The copied
+permission text comes from upstream's open license-file pull request, as
+recorded in that provenance. Remove this override when a compatible upstream
+release contains these fixes.
+
+## Accessibility corrections
 
 The four AccessKit crates come from the existing lockfile, upstream commit
 `c88605b96d04431f9c3c792464a0f2f253480e94`. They are path overrides in the workspace

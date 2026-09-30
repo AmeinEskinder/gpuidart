@@ -33,7 +33,7 @@ pub(crate) fn now() -> Option<Stamp> {
     {
         let mut thread = 0;
         (unsafe { libc::pthread_threadid_np(0, &mut thread) } == 0).then(|| Stamp {
-            ticks: unsafe { libc::mach_absolute_time() } as i64,
+            ticks: unsafe { mach2::mach_time::mach_absolute_time() } as i64,
             thread,
         })
     }

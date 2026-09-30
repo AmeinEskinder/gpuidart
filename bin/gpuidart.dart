@@ -18,7 +18,9 @@ Usage: gpuidart [--sdk=PATH] COMMAND [ARGUMENTS]
   check [--headless]               Run the SDK checks
   package [--name=NAME] [--entry=FILE] [--crt-directory=DIR]
                                   Build a desktop application archive
-  verify ARCHIVE [REPORT] [ENVIRONMENT] [--runtime-only]
+          [--signing-identity=IDENTITY --notary-profile=PROFILE]
+          [--signing-keychain=PATH]  Sign and notarize a macOS package
+  verify ARCHIVE [REPORT] [ENVIRONMENT] [--runtime-only] [--require-notarized]
                                   Verify a packaged application
   exec COMMAND [ARGUMENTS]         Run a tool with the discovered toolchain
 

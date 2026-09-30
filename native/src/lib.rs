@@ -347,6 +347,7 @@ pub unsafe extern "C" fn gd_run(host: *const Host) -> i32 {
 /// shows up as an access violation on an unrelated thread. The reservation is
 /// virtual and only touched pages are committed.
 /// The thread stays parked for the life of the process once the loop returns.
+#[cfg(not(target_os = "macos"))]
 const UI_THREAD_STACK_BYTES: usize = 64 << 20;
 
 unsafe fn run(host: *const Host) -> i32 {

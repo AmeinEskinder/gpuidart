@@ -43,6 +43,10 @@ jobs:
         run: |
           dart run tool/build_cli.dart
           build/bin/gpuidart check --headless
+      - name: Enforce macOS API and dependency compatibility
+        run: |
+          cargo rustc --locked -p gpuidart --lib -- -D deprecated -D dead_code
+          cargo rustc --locked -p block --lib -- -D future-incompatible -D missing_abi
 
   window:
     needs: headless

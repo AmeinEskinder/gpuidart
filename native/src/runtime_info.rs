@@ -64,8 +64,8 @@ pub(crate) fn read() -> Value {
     #[cfg(target_os = "macos")]
     unsafe {
         let mut libraries = std::collections::BTreeSet::new();
-        for i in 0..libc::_dyld_image_count() {
-            let name = libc::_dyld_get_image_name(i);
+        for i in 0..mach2::dyld::_dyld_image_count() {
+            let name = mach2::dyld::_dyld_get_image_name(i);
             if !name.is_null() {
                 libraries.insert(
                     std::ffi::CStr::from_ptr(name)

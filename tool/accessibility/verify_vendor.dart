@@ -8,6 +8,7 @@ import 'package:crypto/crypto.dart';
 void main() {
   var checked = 0;
   for (final name in [
+    'block-0.1.6',
     'accesskit_atspi_common-0.19.1',
     'accesskit_consumer-0.38.0',
     'accesskit_windows-0.34.0',
@@ -49,5 +50,5 @@ void main() {
       }
     }
   }
-  stdout.writeln('Verified $checked pinned accessibility dependency files.');
+  stdout.writeln('Verified $checked pinned dependency files.');
 }
