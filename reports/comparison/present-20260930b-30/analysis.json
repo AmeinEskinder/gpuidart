@@ -1,0 +1,119 @@
+﻿{
+    "private_bytes":  {
+                          "p50":  198610944,
+                          "p99":  208588800,
+                          "samples":  40,
+                          "max":  208588800,
+                          "p95":  205910016
+                      },
+    "input_count":  300,
+    "input_delivery":  {
+                           "planned":  300,
+                           "uninjected":  0,
+                           "injected":  300,
+                           "excess":  0
+                       },
+    "duration_ms":  10000.8621,
+    "flutter_frame_timing":  {
+                                 "scope":  "every frame since the first, from FrameTiming; includes startup and warmup",
+                                 "raster_us":  {
+                                                   "samples":  316,
+                                                   "p50":  2308,
+                                                   "p95":  4603,
+                                                   "p99":  5194,
+                                                   "max":  39291
+                                               },
+                                 "total_us":  {
+                                                  "samples":  316,
+                                                  "p50":  5712,
+                                                  "p95":  9640,
+                                                  "p99":  10514,
+                                                  "max":  87502
+                                              },
+                                 "limit":  "Flutter FrameTiming build and raster phases for every frame since startup; the estimator matches the process percentiles but the history is cumulative",
+                                 "build_us":  {
+                                                  "samples":  316,
+                                                  "p50":  2101,
+                                                  "p95":  4056,
+                                                  "p99":  4602,
+                                                  "max":  8420
+                                              }
+                             },
+    "presentation":  {
+                         "between_presents_ms":  {
+                                                     "p50":  33.3889,
+                                                     "p99":  50.9726,
+                                                     "samples":  297,
+                                                     "max":  52.1598,
+                                                     "p95":  35.5208
+                                                 },
+                         "estimated_missed_workload_slots":  18,
+                         "input_to_response_display_ms":  null,
+                         "frames_not_displayed":  3,
+                         "input_associated_display_ms":  null,
+                         "target_period_ms":  33.333333333333336,
+                         "frames":  298,
+                         "input_to_response_present_ms":  null,
+                         "latency_limit":  "ETW input association does not prove the frame contains the changed cell; the response figures come from the traced run\u0027s changed-frame correlation in input-analysis.json",
+                         "between_display_changes_ms":  {
+                                                            "p50":  33.3602,
+                                                            "p99":  50.1095,
+                                                            "samples":  294,
+                                                            "max":  66.712600000000009,
+                                                            "p95":  50.0242
+                                                        }
+                     },
+    "solid_draw_overlay":  null,
+    "scheduled_inputs_missed":  0,
+    "delivery_quality":  "no skipped input deadlines; inspect recorded input jitter separately",
+    "correctness":  {
+                        "issues":  [
+
+                                   ],
+                        "observed_updates":  300,
+                        "passed":  true,
+                        "expected_view_stage":  null,
+                        "expected_updates":  300,
+                        "expected_scroll_y":  0,
+                        "expected_cells":  2400,
+                        "observed_cells":  2400,
+                        "application_price":  "Tick 000300",
+                        "observed_scroll_y":  0.0,
+                        "native_price":  null,
+                        "expected_price":  "Tick 000300",
+                        "observed_view_stage":  null
+                    },
+    "equal_work_timing_eligible":  true,
+    "dart_publication":  null,
+    "status":  "ETW captured; response-frame correlation and parity review still required",
+    "native_diagnostics":  null,
+    "window_available_ms":  78.8207,
+    "cpu_percent_one_core":  26.872683305972192,
+    "working_set_bytes":  {
+                              "p50":  191188992,
+                              "p99":  201932800,
+                              "samples":  40,
+                              "max":  201932800,
+                              "p95":  197791744
+                          },
+    "application_work":  {
+                             "flutter_visible_rows":  {
+                                                          "start":  0,
+                                                          "end":  10
+                                                      },
+                             "view":  null,
+                             "updates":  300,
+                             "solid_row_components_created":  null,
+                             "solid_scroll_offset":  null,
+                             "shell_cell_builds":  null,
+                             "solid_mounted_window":  null,
+                             "shell_view_builds":  null,
+                             "flutter_scroll_y":  0.0,
+                             "shell_visible_range":  null,
+                             "flutter_row_builds":  5418,
+                             "cells_written":  2400
+                         },
+    "workload":  "burst",
+    "implementation":  "flutter",
+    "run_id":  "present-20260930b-30"
+}

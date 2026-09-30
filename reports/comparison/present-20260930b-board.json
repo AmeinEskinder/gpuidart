@@ -1,0 +1,1905 @@
+{
+  "rule": "a run counts when it is equal work and its instrument answers at least 98 percent of its inputs for both present and display; the Dart fixture is read from its swap chain statistics, the Flutter fixture from PresentMon",
+  "summary": {
+    "cell/dart": {
+      "runs_counting": 6,
+      "runs": 6,
+      "sources": [
+        "DXGI frame statistics (present-feedback.csv)"
+      ],
+      "input_to_present_p50_ms": [
+        15.351,
+        12.275,
+        17.663,
+        14.88,
+        6.619,
+        4.728
+      ],
+      "input_to_present_p95_ms": [
+        21.331,
+        20.862,
+        19.939,
+        18.065,
+        18.017,
+        17.597
+      ],
+      "input_to_display_p50_ms": [
+        45.76,
+        38.258,
+        43.024,
+        41.859,
+        37.79,
+        46.644
+      ],
+      "input_to_display_p95_ms": [
+        96.28,
+        45.29,
+        47.611,
+        45.139,
+        49.557,
+        48.986
+      ],
+      "cpu_percent_one_core": [
+        9.99833607691008,
+        5.781029916191091,
+        6.717898372023378,
+        6.249950375394019,
+        2.8123857608903924,
+        2.812327238737724
+      ]
+    },
+    "cell/flutter": {
+      "runs_counting": 6,
+      "runs": 6,
+      "sources": [
+        "PresentMon (present.csv)"
+      ],
+      "input_to_present_p50_ms": [
+        14.904,
+        14.974,
+        16.463,
+        16.673,
+        13.438,
+        10.05
+      ],
+      "input_to_present_p95_ms": [
+        20.316,
+        21.236,
+        22.771,
+        26.426,
+        20.431,
+        19.913
+      ],
+      "input_to_display_p50_ms": [
+        38.451,
+        39.258,
+        39.539,
+        38.79,
+        45.107,
+        35.799
+      ],
+      "input_to_display_p95_ms": [
+        44.855,
+        55.077,
+        54.321,
+        57.625,
+        48.638,
+        52.868
+      ],
+      "cpu_percent_one_core": [
+        4.374709606776302,
+        3.7498919656124707,
+        8.906101000930253,
+        12.03054861901551,
+        4.218172911763942,
+        2.812136390764674
+      ]
+    },
+    "burst/dart": {
+      "runs_counting": 6,
+      "runs": 8,
+      "sources": [
+        "DXGI frame statistics (present-feedback.csv)"
+      ],
+      "input_to_present_p50_ms": [
+        16.576,
+        10.28,
+        6.737,
+        12.059,
+        15.831,
+        7.172
+      ],
+      "input_to_present_p95_ms": [
+        24.7,
+        15.068,
+        15.546,
+        15.917,
+        18.824,
+        11.201
+      ],
+      "input_to_display_p50_ms": [
+        44.297,
+        37.842,
+        36.479,
+        41.487,
+        42.913,
+        34.787
+      ],
+      "input_to_display_p95_ms": [
+        60.321,
+        41.429,
+        43.845,
+        45.252,
+        45.865,
+        38.672
+      ],
+      "cpu_percent_one_core": [
+        49.996876195175325,
+        21.247278648550694,
+        13.74983197705324,
+        12.968014194874582,
+        19.841738047761954,
+        20.622142183536205
+      ]
+    },
+    "burst/flutter": {
+      "runs_counting": 7,
+      "runs": 8,
+      "sources": [
+        "PresentMon (present.csv)"
+      ],
+      "input_to_present_p50_ms": [
+        13.239,
+        12.886,
+        16.553,
+        15.917,
+        15.822,
+        7.877,
+        17.202
+      ],
+      "input_to_present_p95_ms": [
+        21.92,
+        20.218,
+        20.505,
+        20.466,
+        19.491,
+        21.017,
+        21.623
+      ],
+      "input_to_display_p50_ms": [
+        41.039,
+        41.226,
+        39.012,
+        38.824,
+        36.761,
+        29.667,
+        38.93
+      ],
+      "input_to_display_p95_ms": [
+        46.222,
+        45.446,
+        51.443,
+        54.374,
+        51.149,
+        42.579,
+        57.454
+      ],
+      "cpu_percent_one_core": [
+        24.842049064900525,
+        30.624727746170336,
+        21.248541075169776,
+        28.904481623814252,
+        25.466314147051833,
+        19.99892225807951,
+        26.872683305972192
+      ]
+    },
+    "scroll/dart": {
+      "runs_counting": 6,
+      "runs": 6,
+      "sources": [
+        "DXGI frame statistics (present-feedback.csv)"
+      ],
+      "input_to_present_p50_ms": [
+        11.126,
+        5.455,
+        12.055,
+        2.88,
+        12.855,
+        5.562
+      ],
+      "input_to_present_p95_ms": [
+        15.066,
+        17.309,
+        15.58,
+        16.857,
+        16.182,
+        10.871
+      ],
+      "input_to_display_p50_ms": [
+        35.453,
+        30.514,
+        40.309,
+        32.547,
+        41.19,
+        32.151
+      ],
+      "input_to_display_p95_ms": [
+        38.682,
+        44.433,
+        43.499,
+        45.77,
+        44.669,
+        35.906
+      ],
+      "cpu_percent_one_core": [
+        39.21660642029307,
+        37.81004007879247,
+        23.59290914871794,
+        17.967531981007006,
+        21.715366745860994,
+        28.745757126248165
+      ]
+    },
+    "scroll/flutter": {
+      "runs_counting": 5,
+      "runs": 10,
+      "sources": [
+        "PresentMon (present.csv)"
+      ],
+      "input_to_present_p50_ms": [
+        9.609,
+        6.872,
+        3.407,
+        12.494,
+        3.685
+      ],
+      "input_to_present_p95_ms": [
+        15.312,
+        13.285,
+        16.904,
+        15.37,
+        7.223
+      ],
+      "input_to_display_p50_ms": [
+        32.189,
+        28.98,
+        36.048,
+        35.836,
+        27.015
+      ],
+      "input_to_display_p95_ms": [
+        45.717,
+        48.176,
+        40.662,
+        49.353,
+        41.505
+      ],
+      "cpu_percent_one_core": [
+        32.498575587432,
+        55.92952109452065,
+        19.218479403809994,
+        23.12390300204158,
+        19.529363463489425
+      ]
+    }
+  },
+  "runs": [
+    {
+      "run": "present-20260930b-0",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 597,
+      "presents_shown_in_window": 454,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 16.576,
+        "p95": 24.7,
+        "p99": 26.013,
+        "max": 26.695
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 44.297,
+        "p95": 60.321,
+        "p99": 73.33,
+        "max": 76.307
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 127,
+      "presents_never_displayed_in_window": 143,
+      "between_presents_ms": {
+        "n": 596,
+        "p50": 16.551,
+        "p95": 27.913,
+        "p99": 29.093,
+        "max": 30.943
+      },
+      "present_to_display_ms": {
+        "n": 454,
+        "p50": 27.662,
+        "p95": 35.174,
+        "p99": 42.438,
+        "max": 46.282
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 5000,
+      "cpu_percent_one_core": 49.996876195175325,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-0",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 71,
+      "presents_shown_in_window": 50,
+      "input_to_present_ms": {
+        "n": 50,
+        "p50": 15.351,
+        "p95": 21.331,
+        "p99": 23.015,
+        "max": 23.015
+      },
+      "input_to_display_ms": {
+        "n": 50,
+        "p50": 45.76,
+        "p95": 96.28,
+        "p99": 115.458,
+        "max": 115.458
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 18,
+      "presents_never_displayed_in_window": 21,
+      "between_presents_ms": {
+        "n": 70,
+        "p50": 184.45,
+        "p95": 216.149,
+        "p99": 216.525,
+        "max": 216.525
+      },
+      "present_to_display_ms": {
+        "n": 50,
+        "p50": 24.898,
+        "p95": 84.165,
+        "p99": 99.978,
+        "max": 99.978
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 1000,
+      "cpu_percent_one_core": 9.99833607691008,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-0",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 598,
+      "presents_shown_in_window": 596,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 11.126,
+        "p95": 15.066,
+        "p99": 16.38,
+        "max": 19.989
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 35.453,
+        "p95": 38.682,
+        "p99": 39.395,
+        "max": 51.24
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 3,
+      "presents_never_displayed_in_window": 2,
+      "between_presents_ms": {
+        "n": 597,
+        "p50": 16.621,
+        "p95": 19.004,
+        "p99": 19.886,
+        "max": 24.037
+      },
+      "present_to_display_ms": {
+        "n": 596,
+        "p50": 24.121,
+        "p95": 27.775,
+        "p99": 28.386,
+        "max": 28.961
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 3921.875,
+      "cpu_percent_one_core": 39.21660642029307,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-10",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "presents_displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 14.904,
+        "p95": 20.316,
+        "p99": 21.98,
+        "max": 21.98
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 38.451,
+        "p95": 44.855,
+        "p99": 47.632,
+        "max": 47.632
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 437.5,
+      "cpu_percent_one_core": 4.374709606776302,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-11",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "presents_displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 14.974,
+        "p95": 21.236,
+        "p99": 22.026,
+        "max": 22.026
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 39.258,
+        "p95": 55.077,
+        "p99": 56.636,
+        "max": 56.636
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 375,
+      "cpu_percent_one_core": 3.7498919656124707,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-12",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 84,
+      "presents_displayed_in_window": 83,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 16.463,
+        "p95": 22.771,
+        "p99": 26.05,
+        "max": 26.05
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 39.539,
+        "p95": 54.321,
+        "p99": 61.248,
+        "max": 61.248
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 890.625,
+      "cpu_percent_one_core": 8.906101000930253,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-13",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 107,
+      "presents_displayed_in_window": 98,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 16.673,
+        "p95": 26.426,
+        "p99": 27.748,
+        "max": 27.748
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 38.79,
+        "p95": 57.625,
+        "p99": 140.393,
+        "max": 140.393
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 1203.125,
+      "cpu_percent_one_core": 12.03054861901551,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-14",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "presents_displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 13.438,
+        "p95": 20.431,
+        "p99": 24.733,
+        "max": 24.733
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 45.107,
+        "p95": 48.638,
+        "p99": 49.556,
+        "max": 49.556
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 421.875,
+      "cpu_percent_one_core": 4.218172911763942,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-15",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 339,
+      "presents_displayed_in_window": 330,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 13.239,
+        "p95": 21.92,
+        "p99": 23.361,
+        "max": 23.877
+      },
+      "input_to_display_ms": {
+        "n": 299,
+        "p50": 41.039,
+        "p95": 46.222,
+        "p99": 58.77,
+        "max": 59.434
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 2484.375,
+      "cpu_percent_one_core": 24.842049064900525,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-16",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 320,
+      "presents_displayed_in_window": 320,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 12.886,
+        "p95": 20.218,
+        "p99": 25.14,
+        "max": 28.533
+      },
+      "input_to_display_ms": {
+        "n": 299,
+        "p50": 41.226,
+        "p95": 45.446,
+        "p99": 57.306,
+        "max": 60.443
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 3062.5,
+      "cpu_percent_one_core": 30.624727746170336,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-17",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 300,
+      "presents_displayed_in_window": 300,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 16.553,
+        "p95": 20.505,
+        "p99": 21.596,
+        "max": 22.61
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 39.012,
+        "p95": 51.443,
+        "p99": 52.605,
+        "max": 55.948
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 2125,
+      "cpu_percent_one_core": 21.248541075169776,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-18",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 365,
+      "presents_displayed_in_window": 361,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 15.917,
+        "p95": 20.466,
+        "p99": 22.47,
+        "max": 23.837
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 38.824,
+        "p95": 54.374,
+        "p99": 56.941,
+        "max": 58.557
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 2890.625,
+      "cpu_percent_one_core": 28.904481623814252,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-19",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 298,
+      "presents_displayed_in_window": 298,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 15.822,
+        "p95": 19.491,
+        "p99": 23.334,
+        "max": 29.748
+      },
+      "input_to_display_ms": {
+        "n": 299,
+        "p50": 36.761,
+        "p95": 51.149,
+        "p99": 55.475,
+        "max": 55.924
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 2546.875,
+      "cpu_percent_one_core": 25.466314147051833,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-1",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 50,
+      "presents_shown_in_window": 50,
+      "input_to_present_ms": {
+        "n": 50,
+        "p50": 12.275,
+        "p95": 20.862,
+        "p99": 21.163,
+        "max": 21.163
+      },
+      "input_to_display_ms": {
+        "n": 50,
+        "p50": 38.258,
+        "p95": 45.29,
+        "p99": 47.071,
+        "max": 47.071
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 49,
+        "p50": 200.049,
+        "p95": 217.021,
+        "p99": 219.947,
+        "max": 219.947
+      },
+      "present_to_display_ms": {
+        "n": 50,
+        "p50": 24.478,
+        "p95": 27.485,
+        "p99": 27.988,
+        "max": 27.988
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 578.125,
+      "cpu_percent_one_core": 5.781029916191091,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-20",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": false,
+      "inputs": 296,
+      "deadlines_missed": 4,
+      "presents_in_window": 340,
+      "presents_displayed_in_window": 308,
+      "input_to_present_ms": {
+        "n": 295,
+        "p50": 12.327,
+        "p95": 23.408,
+        "p99": 25.361,
+        "max": 26.837
+      },
+      "input_to_display_ms": {
+        "n": 295,
+        "p50": 46.456,
+        "p95": 52.364,
+        "p99": 60.314,
+        "max": 60.942
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 4531.25,
+      "cpu_percent_one_core": 45.31143789989562,
+      "source": "PresentMon (present.csv)",
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-21",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 606,
+      "presents_displayed_in_window": 600,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 9.609,
+        "p95": 15.312,
+        "p99": 16.583,
+        "max": 17.62
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 32.189,
+        "p95": 45.717,
+        "p99": 46.724,
+        "max": 48.049
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 3250,
+      "cpu_percent_one_core": 32.498575587432,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-22",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": false,
+      "inputs": 599,
+      "deadlines_missed": 1,
+      "presents_in_window": 602,
+      "presents_displayed_in_window": 578,
+      "input_to_present_ms": {
+        "n": 599,
+        "p50": 13.189,
+        "p95": 16.396,
+        "p99": 18.041,
+        "max": 23.189
+      },
+      "input_to_display_ms": {
+        "n": 599,
+        "p50": 37.047,
+        "p95": 40.561,
+        "p99": 55.791,
+        "max": 57.897
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 5390.625,
+      "cpu_percent_one_core": 53.9031489518408,
+      "source": "PresentMon (present.csv)",
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-23",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": false,
+      "inputs": 598,
+      "deadlines_missed": 2,
+      "presents_in_window": 601,
+      "presents_displayed_in_window": 550,
+      "input_to_present_ms": {
+        "n": 598,
+        "p50": 5.657,
+        "p95": 14.628,
+        "p99": 16.676,
+        "max": 24.562
+      },
+      "input_to_display_ms": {
+        "n": 598,
+        "p50": 29.403,
+        "p95": 47.737,
+        "p99": 55.009,
+        "max": 61.795
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 6906.25,
+      "cpu_percent_one_core": 69.05511662693024,
+      "source": "PresentMon (present.csv)",
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-24",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": false,
+      "inputs": 595,
+      "deadlines_missed": 5,
+      "presents_in_window": 600,
+      "presents_displayed_in_window": 542,
+      "input_to_present_ms": {
+        "n": 595,
+        "p50": 10.582,
+        "p95": 15.668,
+        "p99": 16.968,
+        "max": 18.419
+      },
+      "input_to_display_ms": {
+        "n": 595,
+        "p50": 35.678,
+        "p95": 49.719,
+        "p99": 52.825,
+        "max": 53.826
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 4843.75,
+      "cpu_percent_one_core": 48.43187802759856,
+      "source": "PresentMon (present.csv)",
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-25",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": false,
+      "inputs": 598,
+      "deadlines_missed": 2,
+      "presents_in_window": 600,
+      "presents_displayed_in_window": 559,
+      "input_to_present_ms": {
+        "n": 598,
+        "p50": 8.465,
+        "p95": 14.846,
+        "p99": 18.43,
+        "max": 20.573
+      },
+      "input_to_display_ms": {
+        "n": 598,
+        "p50": 35.321,
+        "p95": 50.464,
+        "p99": 52.629,
+        "max": 58.312
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 7843.75,
+      "cpu_percent_one_core": 78.42732248636094,
+      "source": "PresentMon (present.csv)",
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-26",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 600,
+      "presents_displayed_in_window": 546,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 6.872,
+        "p95": 13.285,
+        "p99": 15.472,
+        "max": 20.524
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 28.98,
+        "p95": 48.176,
+        "p99": 64.641,
+        "max": 81.414
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 5593.75,
+      "cpu_percent_one_core": 55.92952109452065,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-27",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 598,
+      "presents_shown_in_window": 598,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 10.28,
+        "p95": 15.068,
+        "p99": 18.155,
+        "max": 18.435
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 37.842,
+        "p95": 41.429,
+        "p99": 44.684,
+        "max": 45.999
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 597,
+        "p50": 16.24,
+        "p95": 21.354,
+        "p99": 22.554,
+        "max": 23.356
+      },
+      "present_to_display_ms": {
+        "n": 598,
+        "p50": 28.799,
+        "p95": 31.035,
+        "p99": 31.277,
+        "max": 31.5
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 2125,
+      "cpu_percent_one_core": 21.247278648550694,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-28",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": false,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 597,
+      "presents_shown_in_window": 524,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 8.036,
+        "p95": 18.048,
+        "p99": 22.478,
+        "max": 25.044
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 33.633,
+        "p95": 52.475,
+        "p99": 66.13,
+        "max": 67.712
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 69,
+      "presents_never_displayed_in_window": 73,
+      "between_presents_ms": {
+        "n": 596,
+        "p50": 16.648,
+        "p95": 25.924,
+        "p99": 28.685,
+        "max": 33.245
+      },
+      "present_to_display_ms": {
+        "n": 524,
+        "p50": 28.154,
+        "p95": 35.178,
+        "p99": 45.124,
+        "max": 51.921
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 3421.875,
+      "cpu_percent_one_core": 34.21746034391963,
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-29",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 353,
+      "presents_displayed_in_window": 351,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 7.877,
+        "p95": 21.017,
+        "p99": 22.2,
+        "max": 22.209
+      },
+      "input_to_display_ms": {
+        "n": 299,
+        "p50": 29.667,
+        "p95": 42.579,
+        "p99": 56.181,
+        "max": 59.042
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 2000,
+      "cpu_percent_one_core": 19.99892225807951,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-2",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": false,
+      "inputs": 299,
+      "deadlines_missed": 1,
+      "presents_in_window": 583,
+      "presents_shown_in_window": 557,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 7.659,
+        "p95": 20.193,
+        "p99": 27.782,
+        "max": 41.957
+      },
+      "input_to_display_ms": {
+        "n": 299,
+        "p50": 33.172,
+        "p95": 46.166,
+        "p99": 63.478,
+        "max": 77.1
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 19,
+      "presents_never_displayed_in_window": 26,
+      "between_presents_ms": {
+        "n": 582,
+        "p50": 16.647,
+        "p95": 23.067,
+        "p99": 34.149,
+        "max": 98.183
+      },
+      "present_to_display_ms": {
+        "n": 557,
+        "p50": 24.76,
+        "p95": 30.038,
+        "p99": 30.357,
+        "max": 30.924
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 3734.375,
+      "cpu_percent_one_core": 37.34124029523976,
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-2",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 55,
+      "presents_shown_in_window": 50,
+      "input_to_present_ms": {
+        "n": 50,
+        "p50": 17.663,
+        "p95": 19.939,
+        "p99": 20.124,
+        "max": 20.124
+      },
+      "input_to_display_ms": {
+        "n": 50,
+        "p50": 43.024,
+        "p95": 47.611,
+        "p99": 76.006,
+        "max": 76.006
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 5,
+      "presents_never_displayed_in_window": 5,
+      "between_presents_ms": {
+        "n": 54,
+        "p50": 199.813,
+        "p95": 216.651,
+        "p99": 231.958,
+        "max": 231.958
+      },
+      "present_to_display_ms": {
+        "n": 50,
+        "p50": 24.411,
+        "p95": 27.334,
+        "p99": 32.978,
+        "max": 32.978
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 671.875,
+      "cpu_percent_one_core": 6.717898372023378,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-2",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 599,
+      "presents_shown_in_window": 599,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 5.455,
+        "p95": 17.309,
+        "p99": 22.055,
+        "max": 23.066
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 30.514,
+        "p95": 44.433,
+        "p99": 46.592,
+        "max": 47.426
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 598,
+        "p50": 16.686,
+        "p95": 19.793,
+        "p99": 22.879,
+        "max": 23.959
+      },
+      "present_to_display_ms": {
+        "n": 599,
+        "p50": 25.067,
+        "p95": 28.017,
+        "p99": 30.042,
+        "max": 31.096
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 3781.25,
+      "cpu_percent_one_core": 37.81004007879247,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-30",
+      "implementation": "flutter",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 299,
+      "presents_displayed_in_window": 296,
+      "input_to_present_ms": {
+        "n": 299,
+        "p50": 17.202,
+        "p95": 21.623,
+        "p99": 24.869,
+        "max": 25.376
+      },
+      "input_to_display_ms": {
+        "n": 299,
+        "p50": 38.93,
+        "p95": 57.454,
+        "p99": 72.579,
+        "max": 76.781
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 2687.5,
+      "cpu_percent_one_core": 26.872683305972192,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-31",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": false,
+      "inputs": 599,
+      "deadlines_missed": 1,
+      "presents_in_window": 602,
+      "presents_displayed_in_window": 555,
+      "input_to_present_ms": {
+        "n": 599,
+        "p50": 5.397,
+        "p95": 7.389,
+        "p99": 8.3,
+        "max": 17.076
+      },
+      "input_to_display_ms": {
+        "n": 599,
+        "p50": 27.616,
+        "p95": 41.219,
+        "p99": 45.126,
+        "max": 45.992
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 2312.5,
+      "cpu_percent_one_core": 23.123672932410408,
+      "source": "PresentMon (present.csv)",
+      "counts": false
+    },
+    {
+      "run": "present-20260930b-32",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 608,
+      "presents_displayed_in_window": 556,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 3.407,
+        "p95": 16.904,
+        "p99": 18.004,
+        "max": 18.787
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 36.048,
+        "p95": 40.662,
+        "p99": 54.425,
+        "max": 57.15
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 1921.875,
+      "cpu_percent_one_core": 19.218479403809994,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-33",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 605,
+      "presents_displayed_in_window": 541,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 12.494,
+        "p95": 15.37,
+        "p99": 16.121,
+        "max": 17.866
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 35.836,
+        "p95": 49.353,
+        "p99": 52.087,
+        "max": 53.785
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 2312.5,
+      "cpu_percent_one_core": 23.12390300204158,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-34",
+      "implementation": "flutter",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 601,
+      "presents_displayed_in_window": 546,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 3.685,
+        "p95": 7.223,
+        "p99": 16.66,
+        "max": 20.025
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 27.015,
+        "p95": 41.505,
+        "p99": 44.401,
+        "max": 56.366
+      },
+      "inputs_without_a_later_present": 0,
+      "cpu_ms": 1953.125,
+      "cpu_percent_one_core": 19.529363463489425,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-3",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 51,
+      "presents_shown_in_window": 50,
+      "input_to_present_ms": {
+        "n": 50,
+        "p50": 14.88,
+        "p95": 18.065,
+        "p99": 19.142,
+        "max": 19.142
+      },
+      "input_to_display_ms": {
+        "n": 50,
+        "p50": 41.859,
+        "p95": 45.139,
+        "p99": 53.783,
+        "max": 53.783
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 1,
+      "presents_never_displayed_in_window": 1,
+      "between_presents_ms": {
+        "n": 50,
+        "p50": 199.927,
+        "p95": 216.05,
+        "p99": 216.704,
+        "max": 216.704
+      },
+      "present_to_display_ms": {
+        "n": 50,
+        "p50": 26.396,
+        "p95": 27.905,
+        "p99": 38.878,
+        "max": 38.878
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 625,
+      "cpu_percent_one_core": 6.249950375394019,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-3",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 600,
+      "presents_shown_in_window": 600,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 12.055,
+        "p95": 15.58,
+        "p99": 16.533,
+        "max": 18.256
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 40.309,
+        "p95": 43.499,
+        "p99": 43.995,
+        "max": 44.433
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 599,
+        "p50": 16.629,
+        "p95": 18.267,
+        "p99": 19.45,
+        "max": 20.224
+      },
+      "present_to_display_ms": {
+        "n": 600,
+        "p50": 28.12,
+        "p95": 29.026,
+        "p99": 29.305,
+        "max": 29.449
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 2359.375,
+      "cpu_percent_one_core": 23.59290914871794,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-4",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 599,
+      "presents_shown_in_window": 599,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 6.737,
+        "p95": 15.546,
+        "p99": 17.36,
+        "max": 18.398
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 36.479,
+        "p95": 43.845,
+        "p99": 46.584,
+        "max": 47.285
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 598,
+        "p50": 16.549,
+        "p95": 19.959,
+        "p99": 20.734,
+        "max": 21.169
+      },
+      "present_to_display_ms": {
+        "n": 599,
+        "p50": 30.021,
+        "p95": 31.776,
+        "p99": 31.906,
+        "max": 32.034
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 1375,
+      "cpu_percent_one_core": 13.74983197705324,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-4",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 55,
+      "presents_shown_in_window": 50,
+      "input_to_present_ms": {
+        "n": 50,
+        "p50": 6.619,
+        "p95": 18.017,
+        "p99": 18.689,
+        "max": 18.689
+      },
+      "input_to_display_ms": {
+        "n": 50,
+        "p50": 37.79,
+        "p95": 49.557,
+        "p99": 49.588,
+        "max": 49.588
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 5,
+      "presents_never_displayed_in_window": 5,
+      "between_presents_ms": {
+        "n": 54,
+        "p50": 199.859,
+        "p95": 217.321,
+        "p99": 217.826,
+        "max": 217.826
+      },
+      "present_to_display_ms": {
+        "n": 50,
+        "p50": 29.931,
+        "p95": 30.429,
+        "p99": 30.708,
+        "max": 30.708
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 281.25,
+      "cpu_percent_one_core": 2.8123857608903924,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-4",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 599,
+      "presents_shown_in_window": 599,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 2.88,
+        "p95": 16.857,
+        "p99": 18.552,
+        "max": 20.192
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 32.547,
+        "p95": 45.77,
+        "p99": 48.144,
+        "max": 48.584
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 598,
+        "p50": 16.635,
+        "p95": 18.525,
+        "p99": 19.497,
+        "max": 20.229
+      },
+      "present_to_display_ms": {
+        "n": 599,
+        "p50": 29.239,
+        "p95": 30.225,
+        "p99": 31.69,
+        "max": 31.852
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 1796.875,
+      "cpu_percent_one_core": 17.967531981007006,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-5",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 597,
+      "presents_shown_in_window": 595,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 12.059,
+        "p95": 15.917,
+        "p99": 17.46,
+        "max": 19.639
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 41.487,
+        "p95": 45.252,
+        "p99": 47.051,
+        "max": 63.847
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 2,
+      "presents_never_displayed_in_window": 2,
+      "between_presents_ms": {
+        "n": 596,
+        "p50": 16.738,
+        "p95": 19.647,
+        "p99": 20.717,
+        "max": 32.306
+      },
+      "present_to_display_ms": {
+        "n": 595,
+        "p50": 30.138,
+        "p95": 31.813,
+        "p99": 31.941,
+        "max": 32.062
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 1296.875,
+      "cpu_percent_one_core": 12.968014194874582,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-5",
+      "implementation": "dart",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 61,
+      "presents_shown_in_window": 50,
+      "input_to_present_ms": {
+        "n": 50,
+        "p50": 4.728,
+        "p95": 17.597,
+        "p99": 17.841,
+        "max": 17.841
+      },
+      "input_to_display_ms": {
+        "n": 50,
+        "p50": 46.644,
+        "p95": 48.986,
+        "p99": 49.766,
+        "max": 49.766
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 11,
+      "presents_never_displayed_in_window": 11,
+      "between_presents_ms": {
+        "n": 60,
+        "p50": 199.274,
+        "p95": 201.375,
+        "p99": 217.244,
+        "max": 217.244
+      },
+      "present_to_display_ms": {
+        "n": 50,
+        "p50": 30.231,
+        "p95": 30.85,
+        "p99": 31.037,
+        "max": 31.037
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 281.25,
+      "cpu_percent_one_core": 2.812327238737724,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-5",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 600,
+      "presents_shown_in_window": 600,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 12.855,
+        "p95": 16.182,
+        "p99": 17.243,
+        "max": 17.934
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 41.19,
+        "p95": 44.669,
+        "p99": 45.374,
+        "max": 45.981
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 599,
+        "p50": 16.651,
+        "p95": 18.193,
+        "p99": 19.004,
+        "max": 19.499
+      },
+      "present_to_display_ms": {
+        "n": 600,
+        "p50": 28.431,
+        "p95": 29.452,
+        "p99": 29.737,
+        "max": 29.975
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 2171.875,
+      "cpu_percent_one_core": 21.715366745860994,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-6",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 597,
+      "presents_shown_in_window": 596,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 15.831,
+        "p95": 18.824,
+        "p99": 19.815,
+        "max": 20.982
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 42.913,
+        "p95": 45.865,
+        "p99": 46.502,
+        "max": 62.712
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 1,
+      "presents_never_displayed_in_window": 1,
+      "between_presents_ms": {
+        "n": 596,
+        "p50": 16.8,
+        "p95": 21.308,
+        "p99": 22.491,
+        "max": 31.826
+      },
+      "present_to_display_ms": {
+        "n": 596,
+        "p50": 27.928,
+        "p95": 30.755,
+        "p99": 31.073,
+        "max": 31.295
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 1984.375,
+      "cpu_percent_one_core": 19.841738047761954,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-7",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 598,
+      "presents_shown_in_window": 598,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 7.172,
+        "p95": 11.201,
+        "p99": 19.553,
+        "max": 20.157
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 34.787,
+        "p95": 38.672,
+        "p99": 46.077,
+        "max": 47.046
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 597,
+        "p50": 16.526,
+        "p95": 21.056,
+        "p99": 21.899,
+        "max": 31.787
+      },
+      "present_to_display_ms": {
+        "n": 598,
+        "p50": 28.333,
+        "p95": 30.816,
+        "p99": 31.125,
+        "max": 31.261
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 2062.5,
+      "cpu_percent_one_core": 20.622142183536205,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-8",
+      "implementation": "dart",
+      "workload": "scroll",
+      "eligible": true,
+      "inputs": 600,
+      "deadlines_missed": 0,
+      "presents_in_window": 599,
+      "presents_shown_in_window": 599,
+      "input_to_present_ms": {
+        "n": 600,
+        "p50": 5.562,
+        "p95": 10.871,
+        "p99": 20.446,
+        "max": 22.091
+      },
+      "input_to_display_ms": {
+        "n": 600,
+        "p50": 32.151,
+        "p95": 35.906,
+        "p99": 47.149,
+        "max": 48.119
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 0,
+      "presents_never_displayed_in_window": 0,
+      "between_presents_ms": {
+        "n": 598,
+        "p50": 16.619,
+        "p95": 19.384,
+        "p99": 21.05,
+        "max": 23.448
+      },
+      "present_to_display_ms": {
+        "n": 599,
+        "p50": 26.554,
+        "p95": 28.597,
+        "p99": 30.508,
+        "max": 31.273
+      },
+      "source": "DXGI frame statistics (present-feedback.csv)",
+      "cpu_ms": 2875,
+      "cpu_percent_one_core": 28.745757126248165,
+      "counts": true
+    },
+    {
+      "run": "present-20260930b-9",
+      "implementation": "flutter",
+      "workload": "cell",
+      "eligible": true,
+      "inputs": 50,
+      "deadlines_missed": 0,
+      "presents_in_window": 49,
+      "presents_displayed_in_window": 49,
+      "input_to_present_ms": {
+        "n": 49,
+        "p50": 10.05,
+        "p95": 19.913,
+        "p99": 21.309,
+        "max": 21.309
+      },
+      "input_to_display_ms": {
+        "n": 49,
+        "p50": 35.799,
+        "p95": 52.868,
+        "p99": 53.622,
+        "max": 53.622
+      },
+      "inputs_without_a_later_present": 1,
+      "cpu_ms": 281.25,
+      "cpu_percent_one_core": 2.812136390764674,
+      "source": "PresentMon (present.csv)",
+      "counts": true
+    }
+  ]
+}
