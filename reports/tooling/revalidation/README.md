@@ -5,6 +5,23 @@ partitions, with up to three running concurrently and a separate final auditor.
 The coordinator independently checked source equality, artifact hashes, hosted
 workflow results and the reference correction.
 
+## Corrected-source verification
+
+A later Windows CI run exposed a timing assumption in the live large-view test.
+The [failure record](../large-view-ci-failure.md) explains the two-diagnostic race
+and the reviewed test-only correction. All seven workflows, fresh native CLI
+and release artifacts, and the local Windows platform probe then passed at
+`c1eb6a992c8423c62fff9a80d80ea93c34a55dd9`. Current counts and provenance are in
+[completion.json](../completion.json). The earlier partition reports below
+preserve their original audited revisions.
+
+The [independent refreshed evidence audit](corrected-evidence.md) passed all
+422 source records, six artifact hashes, 48 package payloads, three sets of
+412 provenance hashes, runtime/accessibility/reload receipts and the seven
+live workflow results. No migration blocker was found.
+
+## Earlier partition audits
+
 Implementation revision: `d02a4ce7b6b317d0115ba7dac344e6b22e775eb4`.
 Audited documentation/evidence revision:
 `a2600907a8013a5e890ce9c23c248f02f5f6887c`.

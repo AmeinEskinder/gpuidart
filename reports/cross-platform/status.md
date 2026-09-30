@@ -5,7 +5,7 @@ implementation with automated host acceptance, not a stable-release declaration.
 The public Dart API, native ABI 1 and snapshot/dataset format are unchanged.
 The GPUI Kit dependency pin is unchanged.
 
-The Dart/Rust migration source **`d02a4ce`** passed Windows, macOS, and Linux SDK,
+The Dart/Rust migration source **`c1eb6a9`** passed Windows, macOS, and Linux SDK,
 runtime, accessibility, lifecycle, and release-package checks. The
 [migration completion report](../tooling/completion.json) contains the current
 counts, CI links, and artifact hashes. The broader desktop acceptance items below

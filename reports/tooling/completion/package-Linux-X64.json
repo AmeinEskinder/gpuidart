@@ -1,8 +1,8 @@
 {
   "passed": true,
-  "tested_at_utc": "2026-09-30T01:49:07.951817Z",
+  "tested_at_utc": "2026-09-30T03:20:11.750124Z",
   "environment_declared_by_operator": "development_machine",
-  "package_path": "/tmp/gpuidart-extracted-CMUFZH",
+  "package_path": "/tmp/gpuidart-extracted-SJFJJG",
   "os": "Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026",
   "runtime_only": false,
   "manifest": {
@@ -13,19 +13,19 @@
     "build_dependency_inspection": {
       "Watchlist": {
         "tool": "ldd",
-        "output": "linux-vdso.so.1 (0x00007f1f8356f000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f1f83555000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f1f83550000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f1f83467000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f1f82a00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f1f83571000)"
+        "output": "linux-vdso.so.1 (0x00007fe1e45b6000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fe1e459c000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fe1e4597000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fe1e3f17000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe1e3c00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fe1e45b8000)"
       },
       "libgpuidart.so": {
         "tool": "ldd",
-        "output": "linux-vdso.so.1 (0x00007f4b161fa000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f4b161bc000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007f4b13bb7000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007f4b161b2000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f4b13b89000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f4b13aa0000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f4b13800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f4b161fc000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007f4b161aa000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f4b161a2000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007f4b13a82000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007f4b13a6c000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007f4b13a5d000)"
+        "output": "linux-vdso.so.1 (0x00007fa1040d5000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fa104097000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007fa10404e000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007fa104044000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fa104016000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fa101917000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa101600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fa1040d7000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007fa10400e000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fa104006000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007fa103fe8000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007fa103fd2000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007fa103fc1000)"
       },
       "gpuidart-launcher": {
         "tool": "ldd",
-        "output": "linux-vdso.so.1 (0x00007f111d137000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f111d09d000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f111ce00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f111d139000)"
+        "output": "linux-vdso.so.1 (0x00007fee47e5c000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fee47dc2000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fee47a00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fee47e5e000)"
       },
       "verify": {
         "tool": "ldd",
-        "output": "linux-vdso.so.1 (0x00007f5ad74c9000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f5ad74af000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f5ad74aa000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f5ad73c1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5ad6a00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f5ad74cb000)"
+        "output": "linux-vdso.so.1 (0x00007f74ffadb000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f74ffac1000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f74ffabc000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f74ff9d3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f74ff000000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f74ffadd000)"
       }
     },
     "executable": "Watchlist",
@@ -33,7 +33,7 @@
     "minimum_os": "Ubuntu 24.04 x64, glibc 2.39, X11",
     "signing": "unsigned evaluation archive",
     "build": {
-      "git_commit": "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
+      "git_commit": "c1eb6a992c8423c62fff9a80d80ea93c34a55dd9",
       "source_dirty": false,
       "source_files": [
         {
@@ -1694,7 +1694,7 @@
       "dart": "Dart SDK version: 3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
       "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
       "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
-      "built_at_utc": "2026-09-30T01:49:00.146973Z"
+      "built_at_utc": "2026-09-30T03:20:05.614799Z"
     },
     "files": [
       {
@@ -1765,7 +1765,7 @@
       {
         "name": "libgpuidart.so",
         "bytes": 49424736,
-        "sha256": "94c3721e8cbd26ac0ee09245fce6afefb9c313cf7fcf55d946fe3f7b7306c6d1"
+        "sha256": "3b611b30e4a6757bd153859c1ac5d75a2892f95957baf726145a667bb5db5c09"
       },
       {
         "name": "verify",
@@ -1777,41 +1777,41 @@
   "installed_payload_bytes": 64300042,
   "installed_size_scope": "Extracted payload including verifier, manifest and documentation; excludes system runtime prerequisites",
   "dependency_inspection": {
-    "/tmp/gpuidart-extracted-CMUFZH/Watchlist": {
+    "/tmp/gpuidart-extracted-SJFJJG/Watchlist": {
       "status": 0,
-      "stdout": "\tlinux-vdso.so.1 (0x00007f328729f000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f3287285000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f3287280000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f3287197000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f3286800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f32872a1000)\n",
+      "stdout": "\tlinux-vdso.so.1 (0x00007fdd11bac000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fdd11b92000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fdd11b8d000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fdd11517000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fdd11200000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fdd11bae000)\n",
       "stderr": ""
     },
-    "/tmp/gpuidart-extracted-CMUFZH/libgpuidart.so": {
+    "/tmp/gpuidart-extracted-SJFJJG/libgpuidart.so": {
       "status": 0,
-      "stdout": "\tlinux-vdso.so.1 (0x00007fd4c55a3000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fd4c2fca000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007fd4c2f81000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007fd4c2f77000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd4c2f49000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fd4c2e60000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd4c2c00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fd4c55a5000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007fd4c2e5a000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fd4c2e52000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007fd4c2e34000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007fd4c2e1e000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007fd4c2bf1000)\n",
+      "stdout": "\tlinux-vdso.so.1 (0x00007eff43d50000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007eff43d12000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007eff43cc9000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007eff43cbf000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007eff43c91000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007eff43ba8000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007eff41200000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007eff43d52000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007eff43ba0000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007eff43b98000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007eff415e2000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007eff415cc000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007eff415bd000)\n",
       "stderr": ""
     },
-    "/tmp/gpuidart-extracted-CMUFZH/gpuidart-launcher": {
+    "/tmp/gpuidart-extracted-SJFJJG/gpuidart-launcher": {
       "status": 0,
-      "stdout": "\tlinux-vdso.so.1 (0x00007fd283422000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd283388000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd283000000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fd283424000)\n",
+      "stdout": "\tlinux-vdso.so.1 (0x00007f811126b000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f81111d1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f8110e00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f811126d000)\n",
       "stderr": ""
     },
-    "/tmp/gpuidart-extracted-CMUFZH/verify": {
+    "/tmp/gpuidart-extracted-SJFJJG/verify": {
       "status": 0,
-      "stdout": "\tlinux-vdso.so.1 (0x00007f2fd22ae000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f2fd2294000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f2fd228f000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2fd21a6000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2fd1800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f2fd22b0000)\n",
+      "stdout": "\tlinux-vdso.so.1 (0x00007fa1068bb000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fa1068a1000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fa10689c000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fa1067b3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa105e00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fa1068bd000)\n",
       "stderr": ""
     }
   },
-  "working_directory": "/tmp/gpuidart-package-run-CPWCGT",
+  "working_directory": "/tmp/gpuidart-package-run-JBXZEI",
   "environment": {
     "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-    "HOME": "/tmp/gpuidart-package-run-CPWCGT/home",
-    "TMPDIR": "/tmp/gpuidart-package-run-CPWCGT",
+    "HOME": "/tmp/gpuidart-package-run-JBXZEI/home",
+    "TMPDIR": "/tmp/gpuidart-package-run-JBXZEI",
     "DISPLAY": ":99",
-    "XAUTHORITY": "/tmp/xvfb-run.MAr9xs/Xauthority",
+    "XAUTHORITY": "/tmp/xvfb-run.bfhrkY/Xauthority",
     "XDG_RUNTIME_DIR": "/run/user/1001",
     "LANG": "C.UTF-8",
     "LIBGL_ALWAYS_SOFTWARE": "1"
   },
   "application_exit_code": 0,
   "stderr": "",
-  "stdout": "{\"application\":\"watchlist\",\"mode\":\"aot\",\"passed\":true,\"rows\":1000,\"native\":{\"charts\":{},\"theme\":{\"descriptor\":{\"mode\":\"light\"},\"resolved\":{\"background\":\"#FFFFFF\",\"foreground\":\"#0A0A0A\",\"primary\":\"#171717\",\"primary_foreground\":\"#FAFAFA\",\"secondary\":\"#E5E5E5\",\"secondary_foreground\":\"#171717\",\"muted\":\"#F5F5F5\",\"muted_foreground\":\"#737373\",\"accent\":\"#F5F5F5\",\"accent_foreground\":\"#171717\",\"danger\":\"#EF4444\",\"danger_foreground\":\"#FAFAFA\",\"border\":\"#E5E5E5\",\"success\":\"#22C55E\",\"warning\":\"#EAB308\",\"info\":\"#06B6D4\"}},\"revision\":8,\"native_process_id\":5957,\"inputs\":{\"search\":{\"entity\":4294967298,\"text\":\"\",\"selection\":{\"start\":0,\"end\":0},\"focused\":false}},\"tables\":{\"watchlist\":{\"entity\":4294967300,\"visible_rows\":{\"start\":0,\"end\":8},\"row_count\":1000,\"dataset\":\"instruments\",\"dataset_revision\":4,\"scroll_y\":0.0,\"view\":{\"source_rows\":1000,\"view_rows\":1000,\"groups\":0,\"spec_hash\":6086514543335466803,\"pending\":false},\"selection\":{\"row\":null,\"record\":null},\"focused\":false}},\"lists\":{},\"subtrees\":{},\"labels\":{\"title\":\"Market watch\",\"source\":\"Sample instruments and prices. No live market feed.\",\"summary\":\"1000 instruments shown · 0 saved\",\"selection\":\"ALP0000 · Alpine Research · 100.07\",\"status\":\"ALP0000 removed from shortlist.\"},\"scrolls\":{},\"panes\":{},\"trees\":{},\"active_sheet\":null,\"controls\":{},\"focus_handle\":null,\"window\":{\"width\":960.0,\"height\":720.0,\"scale_factor\":1.0,\"scroll_y\":0.0},\"native\":{\"materializations\":3,\"rows_constructed\":32,\"cells_constructed\":120,\"data_records_checked\":3,\"data_cells_written\":3,\"view_recomputes\":5,\"view_jobs\":0,\"dataset_copies\":0},\"frame_gaps\":{\"frames\":3,\"longest_gap_us\":841877,\"since_mark_us\":893465},\"draw\":{\"samples\":3,\"p50_us\":2635.775,\"p95_us\":13393.919,\"p99_us\":13393.919},\"dirty_to_present_submit\":{\"samples\":1,\"p50_us\":33128.447,\"p95_us\":33128.447,\"p99_us\":33128.447},\"present_interval\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0},\"input_to_frame\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0}},\"runtime\":{\"application\":{\"pid\":5957,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":824419,\"cpu_system_us\":93292,\"memory_peak_bytes\":{\"rss\":212692992},\"memory_peak_source\":\"getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes\",\"loaded_images\":[\"/tmp/gpuidart-extracted-CMUFZH/Watchlist\",\"/tmp/gpuidart-extracted-CMUFZH/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so\",\"/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":213307392,\"Pss\":189725696,\"Pss_Dirty\":123191296,\"Pss_Anon\":79327232,\"Pss_File\":98589696,\"Pss_Shmem\":11808768,\"Shared_Clean\":42156032,\"Shared_Dirty\":16384,\"Private_Clean\":47951872,\"Private_Dirty\":123183104,\"Referenced\":213307392,\"Anonymous\":79327232,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false},\"ui\":{\"pid\":5957,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":931464,\"cpu_system_us\":104624,\"memory_peak_bytes\":{\"rss\":215707648},\"memory_peak_source\":\"getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes\",\"loaded_images\":[\"/tmp/gpuidart-extracted-CMUFZH/Watchlist\",\"/tmp/gpuidart-extracted-CMUFZH/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so\",\"/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":216150016,\"Pss\":192568320,\"Pss_Dirty\":126033920,\"Pss_Anon\":79351808,\"Pss_File\":98589696,\"Pss_Shmem\":14626816,\"Shared_Clean\":42156032,\"Shared_Dirty\":16384,\"Private_Clean\":47951872,\"Private_Dirty\":126025728,\"Referenced\":216150016,\"Anonymous\":79351808,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false}},\"metrics\":{\"description_builds\":8,\"encoded_snapshots\":7,\"operation_publications\":7,\"resubmitted_publications\":0,\"patches\":0,\"encoded_bytes\":3891,\"ffi_callbacks\":26,\"ui_callbacks\":0,\"diagnostic_callbacks\":9,\"description_build\":{\"samples\":8,\"p50_us\":48,\"p95_us\":94,\"p99_us\":94},\"encode\":{\"samples\":7,\"p50_us\":12,\"p95_us\":25,\"p99_us\":25},\"publish_to_applied\":{\"samples\":7,\"p50_us\":165,\"p95_us\":91111,\"p99_us\":91111},\"initial\":{\"bytes\":63171,\"encode_us\":747},\"data_messages\":3,\"data_bytes\":439,\"data_records_checked\":3,\"data_cells_written\":3,\"data_encode\":{\"samples\":3,\"p50_us\":4,\"p95_us\":6,\"p99_us\":6},\"data_pack\":{\"samples\":0,\"p50_us\":0,\"p95_us\":0,\"p99_us\":0},\"data_publish_to_applied\":{\"samples\":3,\"p50_us\":122,\"p95_us\":129,\"p99_us\":129},\"native_data_parse\":{\"samples\":3,\"p50_us\":4,\"p95_us\":7,\"p99_us\":7},\"native_data_apply\":{\"samples\":3,\"p50_us\":10,\"p95_us\":54,\"p99_us\":54},\"native_snapshot_apply\":{\"samples\":7,\"p50_us\":22,\"p95_us\":123,\"p99_us\":123}}}\n",
+  "stdout": "{\"application\":\"watchlist\",\"mode\":\"aot\",\"passed\":true,\"rows\":1000,\"native\":{\"charts\":{},\"theme\":{\"descriptor\":{\"mode\":\"light\"},\"resolved\":{\"background\":\"#FFFFFF\",\"foreground\":\"#0A0A0A\",\"primary\":\"#171717\",\"primary_foreground\":\"#FAFAFA\",\"secondary\":\"#E5E5E5\",\"secondary_foreground\":\"#171717\",\"muted\":\"#F5F5F5\",\"muted_foreground\":\"#737373\",\"accent\":\"#F5F5F5\",\"accent_foreground\":\"#171717\",\"danger\":\"#EF4444\",\"danger_foreground\":\"#FAFAFA\",\"border\":\"#E5E5E5\",\"success\":\"#22C55E\",\"warning\":\"#EAB308\",\"info\":\"#06B6D4\"}},\"revision\":8,\"native_process_id\":6105,\"inputs\":{\"search\":{\"entity\":4294967298,\"text\":\"\",\"selection\":{\"start\":0,\"end\":0},\"focused\":false}},\"tables\":{\"watchlist\":{\"entity\":4294967300,\"visible_rows\":{\"start\":0,\"end\":8},\"row_count\":1000,\"dataset\":\"instruments\",\"dataset_revision\":4,\"scroll_y\":0.0,\"view\":{\"source_rows\":1000,\"view_rows\":1000,\"groups\":0,\"spec_hash\":6086514543335466803,\"pending\":false},\"selection\":{\"row\":null,\"record\":null},\"focused\":false}},\"lists\":{},\"subtrees\":{},\"labels\":{\"title\":\"Market watch\",\"source\":\"Sample instruments and prices. No live market feed.\",\"summary\":\"1000 instruments shown · 0 saved\",\"selection\":\"ALP0000 · Alpine Research · 100.07\",\"status\":\"ALP0000 removed from shortlist.\"},\"scrolls\":{},\"panes\":{},\"trees\":{},\"active_sheet\":null,\"controls\":{},\"focus_handle\":null,\"window\":{\"width\":960.0,\"height\":720.0,\"scale_factor\":1.0,\"scroll_y\":0.0},\"native\":{\"materializations\":3,\"rows_constructed\":32,\"cells_constructed\":120,\"data_records_checked\":3,\"data_cells_written\":3,\"view_recomputes\":5,\"view_jobs\":0,\"dataset_copies\":0},\"frame_gaps\":{\"frames\":3,\"longest_gap_us\":752012,\"since_mark_us\":801013},\"draw\":{\"samples\":3,\"p50_us\":2650.111,\"p95_us\":10436.607,\"p99_us\":10436.607},\"dirty_to_present_submit\":{\"samples\":1,\"p50_us\":35192.831,\"p95_us\":35192.831,\"p99_us\":35192.831},\"present_interval\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0},\"input_to_frame\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0}},\"runtime\":{\"application\":{\"pid\":6105,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":762459,\"cpu_system_us\":112184,\"memory_peak_bytes\":{\"rss\":213004288},\"memory_peak_source\":\"getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes\",\"loaded_images\":[\"/tmp/gpuidart-extracted-SJFJJG/Watchlist\",\"/tmp/gpuidart-extracted-SJFJJG/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so\",\"/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":213729280,\"Pss\":190199808,\"Pss_Dirty\":123625472,\"Pss_Anon\":79810560,\"Pss_File\":98580480,\"Pss_Shmem\":11808768,\"Shared_Clean\":42106880,\"Shared_Dirty\":16384,\"Private_Clean\":47988736,\"Private_Dirty\":123617280,\"Referenced\":213729280,\"Anonymous\":79810560,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false},\"ui\":{\"pid\":6105,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":762811,\"cpu_system_us\":116209,\"memory_peak_bytes\":{\"rss\":213135360},\"memory_peak_source\":\"getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes\",\"loaded_images\":[\"/tmp/gpuidart-extracted-SJFJJG/Watchlist\",\"/tmp/gpuidart-extracted-SJFJJG/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so\",\"/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":213757952,\"Pss\":190228480,\"Pss_Dirty\":123654144,\"Pss_Anon\":79839232,\"Pss_File\":98580480,\"Pss_Shmem\":11808768,\"Shared_Clean\":42106880,\"Shared_Dirty\":16384,\"Private_Clean\":47988736,\"Private_Dirty\":123645952,\"Referenced\":213757952,\"Anonymous\":79839232,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false}},\"metrics\":{\"description_builds\":8,\"encoded_snapshots\":7,\"operation_publications\":7,\"resubmitted_publications\":0,\"patches\":0,\"encoded_bytes\":3891,\"ffi_callbacks\":26,\"ui_callbacks\":0,\"diagnostic_callbacks\":9,\"description_build\":{\"samples\":8,\"p50_us\":58,\"p95_us\":77,\"p99_us\":77},\"encode\":{\"samples\":7,\"p50_us\":13,\"p95_us\":25,\"p99_us\":25},\"publish_to_applied\":{\"samples\":7,\"p50_us\":163,\"p95_us\":397,\"p99_us\":397},\"initial\":{\"bytes\":63171,\"encode_us\":799},\"data_messages\":3,\"data_bytes\":439,\"data_records_checked\":3,\"data_cells_written\":3,\"data_encode\":{\"samples\":3,\"p50_us\":7,\"p95_us\":9,\"p99_us\":9},\"data_pack\":{\"samples\":0,\"p50_us\":0,\"p95_us\":0,\"p99_us\":0},\"data_publish_to_applied\":{\"samples\":3,\"p50_us\":117,\"p95_us\":35017,\"p99_us\":35017},\"native_data_parse\":{\"samples\":3,\"p50_us\":5,\"p95_us\":8,\"p99_us\":8},\"native_data_apply\":{\"samples\":3,\"p50_us\":11,\"p95_us\":52,\"p99_us\":52},\"native_snapshot_apply\":{\"samples\":7,\"p50_us\":26,\"p95_us\":108,\"p99_us\":108}}}\n",
   "application": {
     "application": "watchlist",
     "mode": "aot",
@@ -1843,7 +1843,7 @@
         }
       },
       "revision": 8,
-      "native_process_id": 5957,
+      "native_process_id": 6105,
       "inputs": {
         "search": {
           "entity": 4294967298,
@@ -1913,20 +1913,20 @@
       },
       "frame_gaps": {
         "frames": 3,
-        "longest_gap_us": 841877,
-        "since_mark_us": 893465
+        "longest_gap_us": 752012,
+        "since_mark_us": 801013
       },
       "draw": {
         "samples": 3,
-        "p50_us": 2635.775,
-        "p95_us": 13393.919,
-        "p99_us": 13393.919
+        "p50_us": 2650.111,
+        "p95_us": 10436.607,
+        "p99_us": 10436.607
       },
       "dirty_to_present_submit": {
         "samples": 1,
-        "p50_us": 33128.447,
-        "p95_us": 33128.447,
-        "p99_us": 33128.447
+        "p50_us": 35192.831,
+        "p95_us": 35192.831,
+        "p99_us": 35192.831
       },
       "present_interval": {
         "samples": 0,
@@ -1943,18 +1943,18 @@
     },
     "runtime": {
       "application": {
-        "pid": 5957,
+        "pid": 6105,
         "os": "linux",
         "arch": "x86_64",
-        "cpu_user_us": 824419,
-        "cpu_system_us": 93292,
+        "cpu_user_us": 762459,
+        "cpu_system_us": 112184,
         "memory_peak_bytes": {
-          "rss": 212692992
+          "rss": 213004288
         },
         "memory_peak_source": "getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes",
         "loaded_images": [
-          "/tmp/gpuidart-extracted-CMUFZH/Watchlist",
-          "/tmp/gpuidart-extracted-CMUFZH/libgpuidart.so",
+          "/tmp/gpuidart-extracted-SJFJJG/Watchlist",
+          "/tmp/gpuidart-extracted-SJFJJG/libgpuidart.so",
           "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
           "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0",
           "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0",
@@ -2014,18 +2014,18 @@
         ],
         "loaded_images_source": "/proc/self/maps executable file mappings",
         "memory_bytes": {
-          "Rss": 213307392,
-          "Pss": 189725696,
-          "Pss_Dirty": 123191296,
-          "Pss_Anon": 79327232,
-          "Pss_File": 98589696,
+          "Rss": 213729280,
+          "Pss": 190199808,
+          "Pss_Dirty": 123625472,
+          "Pss_Anon": 79810560,
+          "Pss_File": 98580480,
           "Pss_Shmem": 11808768,
-          "Shared_Clean": 42156032,
+          "Shared_Clean": 42106880,
           "Shared_Dirty": 16384,
-          "Private_Clean": 47951872,
-          "Private_Dirty": 123183104,
-          "Referenced": 213307392,
-          "Anonymous": 79327232,
+          "Private_Clean": 47988736,
+          "Private_Dirty": 123617280,
+          "Referenced": 213729280,
+          "Anonymous": 79810560,
           "KSM": 0,
           "LazyFree": 0,
           "AnonHugePages": 6291456,
@@ -2041,18 +2041,18 @@
         "main_thread": false
       },
       "ui": {
-        "pid": 5957,
+        "pid": 6105,
         "os": "linux",
         "arch": "x86_64",
-        "cpu_user_us": 931464,
-        "cpu_system_us": 104624,
+        "cpu_user_us": 762811,
+        "cpu_system_us": 116209,
         "memory_peak_bytes": {
-          "rss": 215707648
+          "rss": 213135360
         },
         "memory_peak_source": "getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes",
         "loaded_images": [
-          "/tmp/gpuidart-extracted-CMUFZH/Watchlist",
-          "/tmp/gpuidart-extracted-CMUFZH/libgpuidart.so",
+          "/tmp/gpuidart-extracted-SJFJJG/Watchlist",
+          "/tmp/gpuidart-extracted-SJFJJG/libgpuidart.so",
           "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
           "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0",
           "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0",
@@ -2112,18 +2112,18 @@
         ],
         "loaded_images_source": "/proc/self/maps executable file mappings",
         "memory_bytes": {
-          "Rss": 216150016,
-          "Pss": 192568320,
-          "Pss_Dirty": 126033920,
-          "Pss_Anon": 79351808,
-          "Pss_File": 98589696,
-          "Pss_Shmem": 14626816,
-          "Shared_Clean": 42156032,
+          "Rss": 213757952,
+          "Pss": 190228480,
+          "Pss_Dirty": 123654144,
+          "Pss_Anon": 79839232,
+          "Pss_File": 98580480,
+          "Pss_Shmem": 11808768,
+          "Shared_Clean": 42106880,
           "Shared_Dirty": 16384,
-          "Private_Clean": 47951872,
-          "Private_Dirty": 126025728,
-          "Referenced": 216150016,
-          "Anonymous": 79351808,
+          "Private_Clean": 47988736,
+          "Private_Dirty": 123645952,
+          "Referenced": 213757952,
+          "Anonymous": 79839232,
           "KSM": 0,
           "LazyFree": 0,
           "AnonHugePages": 6291456,
@@ -2151,25 +2151,25 @@
       "diagnostic_callbacks": 9,
       "description_build": {
         "samples": 8,
-        "p50_us": 48,
-        "p95_us": 94,
-        "p99_us": 94
+        "p50_us": 58,
+        "p95_us": 77,
+        "p99_us": 77
       },
       "encode": {
         "samples": 7,
-        "p50_us": 12,
+        "p50_us": 13,
         "p95_us": 25,
         "p99_us": 25
       },
       "publish_to_applied": {
         "samples": 7,
-        "p50_us": 165,
-        "p95_us": 91111,
-        "p99_us": 91111
+        "p50_us": 163,
+        "p95_us": 397,
+        "p99_us": 397
       },
       "initial": {
         "bytes": 63171,
-        "encode_us": 747
+        "encode_us": 799
       },
       "data_messages": 3,
       "data_bytes": 439,
@@ -2177,9 +2177,9 @@
       "data_cells_written": 3,
       "data_encode": {
         "samples": 3,
-        "p50_us": 4,
-        "p95_us": 6,
-        "p99_us": 6
+        "p50_us": 7,
+        "p95_us": 9,
+        "p99_us": 9
       },
       "data_pack": {
         "samples": 0,
@@ -2189,34 +2189,34 @@
       },
       "data_publish_to_applied": {
         "samples": 3,
-        "p50_us": 122,
-        "p95_us": 129,
-        "p99_us": 129
+        "p50_us": 117,
+        "p95_us": 35017,
+        "p99_us": 35017
       },
       "native_data_parse": {
         "samples": 3,
-        "p50_us": 4,
-        "p95_us": 7,
-        "p99_us": 7
+        "p50_us": 5,
+        "p95_us": 8,
+        "p99_us": 8
       },
       "native_data_apply": {
         "samples": 3,
-        "p50_us": 10,
-        "p95_us": 54,
-        "p99_us": 54
+        "p50_us": 11,
+        "p95_us": 52,
+        "p99_us": 52
       },
       "native_snapshot_apply": {
         "samples": 7,
-        "p50_us": 22,
-        "p95_us": 123,
-        "p99_us": 123
+        "p50_us": 26,
+        "p95_us": 108,
+        "p99_us": 108
       }
     }
   },
   "limitation": "Hash, extracted launch, dependency and native-window checks only. Environment cleanliness is an operator declaration. Human IME, Retina/fractional scaling and physical presentation remain separate checks.",
   "archive": {
     "path": "/home/runner/work/gpuidart/gpuidart/build/Watchlist-linux-x64.tar.gz",
-    "sha256": "927db5c72ec678c1d5277f0264f88edf8a3e074c72c8bb5c5b7e0940fc186529",
-    "bytes": 22954959
+    "sha256": "9ac23f79928ef0d5fab1eff8ffd4efb710cf912160fd65fedf972ab89703614b",
+    "bytes": 22955029
   }
 }
