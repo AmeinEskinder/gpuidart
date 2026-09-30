@@ -18,6 +18,15 @@ Table datasets upload once. View snapshots reference them by ID; cell and row ed
 
 This implements a small direct adapter over GPUI Kit. It does not replace Shell's QuickJS engine. See [the integration decision](docs/integration.md) for the source findings and next experiments.
 
+## Language architecture
+
+GPUI-Dart maintained implementation:
+
+- Dart — framework and developer-facing tooling
+- Rust — native runtime, GPUI integration, OS/platform layer
+
+No maintained PowerShell, Swift, C#, Python, C, or C++ implementation is used. Any remaining C/C++, TypeScript, or JavaScript in the repository exists only in ABI declarations or benchmark/comparison fixtures and is not part of the maintained framework implementation: `native/include/gpuidart.h` declares the FFI boundary and is implemented in Rust, the Flutter Windows runner fixture contains C/C++, and the Solid and QuickJS comparison fixtures contain TypeScript and JavaScript. `dart run tool/check.dart` enforces this split through the source inventory.
+
 ## Run
 
 Requirements: Windows x64, Dart 3.13+, Rust 1.98.1, MSVC x64 build tools and a Windows SDK. The Dart tools discover a project-local installation under `.tools` or an installed Visual Studio C++ toolchain. On another machine, install the standard Rust and Visual Studio C++ toolchains first.
