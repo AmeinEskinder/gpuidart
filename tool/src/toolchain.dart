@@ -172,7 +172,7 @@ String toolExecutable(String name, Map<String, String> environment) {
         final cached = File('$directory/cache/dart-sdk/bin/dart.exe');
         if (cached.existsSync()) return cached.absolute.path;
       }
-      return file.absolute.path;
+      return file.absolute.uri.toFilePath(windows: Platform.isWindows);
     }
   }
   return name;

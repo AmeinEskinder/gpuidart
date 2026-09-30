@@ -59,10 +59,13 @@ Future<void> main(List<String> args) async {
     await run('cargo', ['fmt', '--manifest-path', manifest, '--', '--check']);
     await run('cargo', ['test', '--locked', '--manifest-path', manifest]);
   }
-  await run(dartExecutable, ['run', 'tool/build_cli.dart']);
-  await run('build/bin/gpuidart${Platform.isWindows ? '.exe' : ''}', [
-    'doctor',
+  final checkCli = 'build/check/gpuidart${Platform.isWindows ? '.exe' : ''}';
+  await run(dartExecutable, [
+    'run',
+    'tool/build_cli.dart',
+    '--output=$checkCli',
   ]);
+  await run(checkCli, ['doctor']);
   await run('rustfmt', [
     '--edition',
     '2024',

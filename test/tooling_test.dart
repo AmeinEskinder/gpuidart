@@ -86,6 +86,12 @@ void main() {
         File(toolExecutable('my-tool', {'PATH': bin.path})).absolute.uri,
         executable.absolute.uri,
       );
+      if (Platform.isWindows) {
+        expect(
+          toolExecutable('my-tool', {'PATH': bin.path}),
+          isNot(contains('/')),
+        );
+      }
     },
   );
 
