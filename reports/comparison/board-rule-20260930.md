@@ -21,6 +21,15 @@ The rule for the board is therefore:
    the present and the display figure. A cell with fewer is reported as not
    claimed, whatever its figures.
 
+4. **Scroll at a cadence both fixtures can hold, if sixty a second fails
+   to count.** If the Flutter fixture is still short of six counting scroll
+   runs at sixty wheel events a second after five rounds of added runs (it
+   loses runs to driver deadlines missed by one to five events in 600),
+   the scroll workload is run for both fixtures at thirty wheel events a
+   second, six counting runs each, and the scroll cells are claimed at that
+   cadence and stated as such. The sixty-a-second runs stay in the record
+   with their counts.
+
 The adaptive repaint itself is accepted into the default on its own A/B,
 six runs a side, before the board: the cell workload within the figures of
 the repaint firing on every update (input to display about 26 ms at the
