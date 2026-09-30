@@ -5,7 +5,8 @@ import 'src/dev_session.dart';
 import 'src/windows_tool.dart';
 
 Future<void> main() async {
-  final fixture = await Directory('.cache').createTemp('launcher-failures-');
+  final cache = await Directory('.cache').create(recursive: true);
+  final fixture = await cache.createTemp('launcher-failures-');
   final entry = File('${fixture.path}/main.dart');
   await entry.writeAsString('''
 import 'dart:async';

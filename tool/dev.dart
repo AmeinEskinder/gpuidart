@@ -17,19 +17,22 @@ Future<void> main(List<String> args) async {
   if (!File(entry).existsSync()) {
     throw ArgumentError('Entry point not found: $entry');
   }
-  final session = await DevSession.start(
-    entry: entry,
-    arguments: args.skip(1).toList(),
-  );
+  DevSession? activeSession;
   Timer? debounce;
   var closing = false;
   var reload = Future<void>.value();
   final watchers = <StreamSubscription<FileSystemEvent>>[];
   final interrupt = ProcessSignal.sigint.watch().listen((_) {
     closing = true;
-    unawaited(session.close());
+    unawaited(activeSession?.close());
   });
   try {
+    final session = await DevSession.start(
+      entry: entry,
+      arguments: args.skip(1).toList(),
+    );
+    activeSession = session;
+    if (closing) return;
     for (final path in {
       File(entry).absolute.parent.path,
       Directory('lib').absolute.path,
@@ -63,7 +66,7 @@ Future<void> main(List<String> args) async {
     for (final watcher in watchers) {
       await watcher.cancel();
     }
+    await activeSession?.close();
     await reload;
-    await session.close();
   }
 }

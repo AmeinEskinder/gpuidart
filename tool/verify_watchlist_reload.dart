@@ -30,7 +30,8 @@ Future<void> main(List<String> args) async {
   final reportFile = File(reportPath).absolute;
   await reportFile.parent.create(recursive: true);
   final tracePath = '${reportFile.path}.trace.json';
-  final fixture = await Directory('.cache').createTemp('watchlist-reload-');
+  final cache = await Directory('.cache').create(recursive: true);
+  final fixture = await cache.createTemp('watchlist-reload-');
   final app = await File('example/watchlist/app.dart')
       .copy('${fixture.path}/app.dart');
   final entry = await File('example/watchlist/main.dart')

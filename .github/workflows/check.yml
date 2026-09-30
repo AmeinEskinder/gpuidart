@@ -33,9 +33,22 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: x64
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: windows-sdk-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            windows-sdk-
+            accessibility-Windows-X64-
       - name: Install the pinned Rust toolchain
         run: rustup show active-toolchain
       - name: Restore locked Dart dependencies
         run: dart pub get --enforce-lockfile
       - name: Native and full Dart checks including live windows
-        run: dart run tool/check.dart
+        run: |
+          dart run tool/build_cli.dart
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          build/bin/gpuidart.exe check

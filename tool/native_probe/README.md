@@ -30,6 +30,8 @@ Windows uses native IUIAutomation, including FullDescription, supported control
 patterns and physical pointer movement. Its tree can also include native title
 bar controls that the former managed UIA client did not enumerate. Existing
 application node properties and pattern names keep the same report schema.
+An unavailable element during a query uses the same bounded status-75 restart
+contract as Linux. Actions and other COM failures are not retried.
 
 Linux uses libatspi with its original timeouts. A known stale object during a
 query exits with status 75, and the Dart driver retries the complete query in a
@@ -40,9 +42,11 @@ PID, checks actual GVariant argument signatures and waits for both addition and
 removal signals. It creates its report exclusively and records failures.
 
 macOS requires Accessibility authorization. It reads AX attributes and actions,
-including the application menu bar, and retries only invalid-element query
-failures up to four times. Permission denial is an error. Actions are never
-retried on any platform, and every traversal has a 4,096-element bound.
+including the application menu bar. Invalid-element reads restart discovery up
+to four times, including target discovery before an action. The typed stale-read
+error is emitted only before sending the action. Failed action calls are never
+replayed. Permission denial is an error, and every traversal has a 4,096-element
+bound.
 
 The platform declarations follow the public
 [GNOME libatspi API](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/),

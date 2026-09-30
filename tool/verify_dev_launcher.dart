@@ -7,6 +7,7 @@ import 'package:vm_service/vm_service_io.dart';
 
 import 'src/windows_tool.dart';
 import 'src/toolchain.dart';
+import 'src/owned_process.dart';
 
 Future<void> main(List<String> args) async {
   String? cli;
@@ -28,11 +29,12 @@ Future<void> main(List<String> args) async {
       .copy('${fixture.path}/app.dart');
   final entry = await File('example/watchlist/main.dart')
       .copy('${fixture.path}/main.dart');
-  final process = await Process.start(cli ?? dartExecutable, [
+  final owned = await OwnedProcess.start(cli ?? dartExecutable, [
     'run',
     if (cli == null) 'tool/dev.dart',
     entry.absolute.path,
   ]);
+  final process = owned.process;
   final serviceUri = Completer<Uri>();
   final watching = Completer<void>();
   final reloaded = Completer<void>();
@@ -110,10 +112,16 @@ Future<void> main(List<String> args) async {
     stderr.writeln('Launcher check failed: $error\n$errors');
     rethrow;
   } finally {
-    process.kill();
-    await process.exitCode;
-    await service?.dispose();
-    await out.cancel();
-    await err.cancel();
+    try {
+      if (!Platform.isWindows) {
+        process.kill(ProcessSignal.sigint);
+        await process.exitCode.timeout(const Duration(seconds: 70));
+      }
+    } finally {
+      await owned.stop();
+      await service?.dispose();
+      await out.cancel();
+      await err.cancel();
+    }
   }
 }

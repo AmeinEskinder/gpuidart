@@ -92,13 +92,13 @@ impl Drop for Cf {
 }
 
 #[derive(Debug)]
-struct StaleElement(String);
-impl fmt::Display for StaleElement {
+struct StaleRead(String);
+impl fmt::Display for StaleRead {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Invalid AX element at {}", self.0)
     }
 }
-impl std::error::Error for StaleElement {}
+impl std::error::Error for StaleRead {}
 
 unsafe fn string(value: Ref) -> Result<String> {
     if CFGetTypeID(value) != CFStringGetTypeID() {
@@ -141,7 +141,7 @@ unsafe fn attribute(element: Ref, key: &str) -> Result<Option<Cf>> {
     let mut value = ptr::null();
     match AXUIElementCopyAttributeValue(element, key_string.0, &mut value) {
         0 => Ok(Some(Cf::owned(value)?)),
-        -25202 => Err(StaleElement(key.to_owned()).into()),
+        -25202 => Err(StaleRead(key.to_owned()).into()),
         -25205 | -25212 => Ok(None),
         code => Err(format!("{key}: AXError {code}").into()),
     }
@@ -237,7 +237,7 @@ unsafe fn attempt(request: &Request, restarts: &[String]) -> Result<Value> {
             let mut actions = ptr::null();
             let status = AXUIElementCopyActionNames(element.0, &mut actions);
             if status == -25202 {
-                return Err(StaleElement("AXActionNames".into()).into());
+                return Err(StaleRead("AXActionNames".into()).into());
             }
             if status != 0 && status != -25208 {
                 return Err(format!("AX actions: {status}").into());
@@ -346,11 +346,7 @@ pub fn accessibility(request: &Request) -> Result<Value> {
     let mut restarts = Vec::new();
     loop {
         match unsafe { attempt(request, &restarts) } {
-            Err(error)
-                if request.operation == "query"
-                    && restarts.len() < 4
-                    && error.downcast_ref::<StaleElement>().is_some() =>
-            {
+            Err(error) if restarts.len() < 4 && error.downcast_ref::<StaleRead>().is_some() => {
                 restarts.push(error.to_string());
                 std::thread::sleep(std::time::Duration::from_millis(50));
             }

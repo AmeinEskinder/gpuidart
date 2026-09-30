@@ -10,7 +10,8 @@ Future<void> main(List<String> args) async {
   }
   output.parent.createSync(recursive: true);
   await Directory('.cache').create(recursive: true);
-  final fixture = await Directory('.cache').createTemp('terminal-reload-');
+  final cache = await Directory('.cache').create(recursive: true);
+  final fixture = await cache.createTemp('terminal-reload-');
   await Directory('${fixture.path}/terminal').create();
   await Directory('${fixture.path}/watchlist').create();
   final component = await File('example/terminal/app.dart')

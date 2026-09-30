@@ -9,7 +9,8 @@ void require(bool condition, String message) {
 
 Future<void> main() async {
   // The tested source copy can be edited without changing the developer's files.
-  final fixture = await Directory('.cache').createTemp('reload-');
+  final cache = await Directory('.cache').create(recursive: true);
+  final fixture = await cache.createTemp('reload-');
   final app = await File('example/app.dart').copy('${fixture.path}/app.dart');
   final entry = await File('example/main.dart')
       .copy('${fixture.path}/main.dart');

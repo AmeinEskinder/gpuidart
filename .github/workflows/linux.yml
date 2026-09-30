@@ -44,7 +44,9 @@ jobs:
           rustup show active-toolchain
           dart pub get --enforce-lockfile
       - name: Native and headless Dart contracts
-        run: dart run tool/check.dart --headless
+        run: |
+          dart run tool/build_cli.dart
+          build/bin/gpuidart check --headless
 
   window:
     needs: headless
