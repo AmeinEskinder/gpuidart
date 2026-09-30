@@ -234,7 +234,7 @@ elevated session for the Dart fixture (C); CI is green with the docs lint
 through the catalog commits, and the
 sheet kind's live test took three commits to pass on Linux and macOS.
 
-Verification: at the async-view head the native library suite runs 111 tests (two
+Verification: at the async-view head the native library suite runs 115 tests (two
 ignored timing probes) and the Dart suite 127, including the live-window,
 list, secondary-window, sliced-dataset and released-copy suites and the tab,
 radio, menu, theme, chart and tooltip suites merged from `main`, on the debug

@@ -113,6 +113,13 @@ it was shown at). The renderer's drop reads the statistics once more so the
 last presents are named too. Nothing changes when the variable is unset: one
 `Option` check per present.
 
+The same patch keeps the instants of the last three presents of each window
+(`gpui_windows::last_presents(hwnd)`, set on every present whether or not
+the variable is set, dropped with the renderer). The adapter's repaint on
+update reads it to tell a window that is painting at every tick, where an
+extra frame would be rendered for nothing, from one that has been idle; the
+clock is per window so that one window's presents never mark another busy.
+
 The benchmark runner sets the variable for the GPUI fixtures when it captures
 or traces. The reason is in the capture report of 2026-09-29: PresentMon, with
 or without elevation, follows almost none of a composed flip-model swap

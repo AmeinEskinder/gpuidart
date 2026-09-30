@@ -1,8 +1,7 @@
 diff --git a/native/vendor/gpui-pre-windows-0.3.7/src/directx_renderer.rs b/native/vendor/gpui-pre-windows-0.3.7/src/directx_renderer.rs
-index f8b86bc..dcdcc93 100644
 --- a/native/vendor/gpui-pre-windows-0.3.7/src/directx_renderer.rs
 +++ b/native/vendor/gpui-pre-windows-0.3.7/src/directx_renderer.rs
-@@ -24,6 +24,87 @@ use crate::*;
+@@ -24,6 +24,103 @@
  use gpui::*;
  
  pub(crate) const DISABLE_DIRECT_COMPOSITION: &str = "GPUI_DISABLE_DIRECT_COMPOSITION";
@@ -13,6 +12,22 @@ index f8b86bc..dcdcc93 100644
 +/// not follow composed flips to the display on every system, the swap chain
 +/// does.
 +pub(crate) const PRESENT_FEEDBACK: &str = "GPUI_PRESENT_FEEDBACK";
++
++/// The instants of the last three presents of each window's swap chain,
++/// newest first, so that an adapter can tell a window that is painting at
++/// every tick from one that has been idle. Set on every present and
++/// dropped with the renderer.
++static LAST_PRESENTS: std::sync::Mutex<Vec<(isize, [Option<std::time::Instant>; 3])>> =
++    std::sync::Mutex::new(Vec::new());
++
++pub fn last_presents(hwnd: isize) -> [Option<std::time::Instant>; 3] {
++    LAST_PRESENTS
++        .lock()
++        .unwrap_or_else(|poisoned| poisoned.into_inner())
++        .iter()
++        .find(|(window, _)| *window == hwnd)
++        .map_or([None; 3], |(_, presents)| *presents)
++}
 +
 +struct PresentFeedback {
 +    path: std::path::PathBuf,
@@ -90,7 +105,7 @@ index f8b86bc..dcdcc93 100644
  const RENDER_TARGET_FORMAT: DXGI_FORMAT = DXGI_FORMAT_B8G8R8A8_UNORM;
  // This configuration is used for MSAA rendering on paths only, and it's guaranteed to be supported by DirectX 11.
  const PATH_MULTISAMPLE_COUNT: u32 = 4;
-@@ -54,6 +135,7 @@ pub(crate) struct DirectXRenderer {
+@@ -54,6 +151,7 @@
      /// In that case we want to discard the first frame that we draw as we got reset in the middle of a frame
      /// meaning we lost all the allocated gpu textures and scene resources.
      skip_draws: bool,
@@ -98,7 +113,7 @@ index f8b86bc..dcdcc93 100644
  }
  
  /// Direct3D objects
-@@ -194,6 +276,7 @@ impl DirectXRenderer {
+@@ -194,6 +292,7 @@
              width: 1,
              height: 1,
              skip_draws: false,
@@ -106,7 +121,7 @@ index f8b86bc..dcdcc93 100644
          })
      }
  
-@@ -243,13 +326,16 @@ impl DirectXRenderer {
+@@ -243,13 +342,27 @@
  
      #[inline]
      fn present(&mut self) -> Result<()> {
@@ -124,16 +139,32 @@ index f8b86bc..dcdcc93 100644
 +            .swap_chain;
 +        let start = self.present_feedback.as_ref().map(|_| PresentFeedback::qpc());
 +        let result = unsafe { swap_chain.Present(0, DXGI_PRESENT(0)) };
++        {
++            let window = self.hwnd.0 as isize;
++            let now = Some(std::time::Instant::now());
++            let mut all = LAST_PRESENTS
++                .lock()
++                .unwrap_or_else(|poisoned| poisoned.into_inner());
++            match all.iter_mut().find(|(known, _)| *known == window) {
++                Some((_, presents)) => *presents = [now, presents[0], presents[1]],
++                None => all.push((window, [now, None, None])),
++            }
++        }
 +        if let (Some(feedback), Some(start)) = (&mut self.present_feedback, start) {
 +            feedback.record(swap_chain, start);
 +        }
          result.ok().context("Presenting swap chain failed")
      }
  
-@@ -1283,6 +1369,14 @@ struct PathSprite {
+@@ -1283,6 +1396,19 @@
  
  impl Drop for DirectXRenderer {
      fn drop(&mut self) {
++        let window = self.hwnd.0 as isize;
++        LAST_PRESENTS
++            .lock()
++            .unwrap_or_else(|poisoned| poisoned.into_inner())
++            .retain(|(known, _)| *known != window);
 +        if let Some(feedback) = &mut self.present_feedback {
 +            // The last presents reach the display after the last call that
 +            // could have read them; one more reading names them.
@@ -145,3 +176,15 @@ index f8b86bc..dcdcc93 100644
          #[cfg(debug_assertions)]
          if let Some(devices) = &self.devices {
              report_live_objects(&devices.device).ok();
+diff --git a/native/vendor/gpui-pre-windows-0.3.7/src/gpui_windows.rs b/native/vendor/gpui-pre-windows-0.3.7/src/gpui_windows.rs
+--- a/native/vendor/gpui-pre-windows-0.3.7/src/gpui_windows.rs
++++ b/native/vendor/gpui-pre-windows-0.3.7/src/gpui_windows.rs
+@@ -20,6 +20,8 @@
+ mod window;
+ mod wrapper;
+ 
++pub use directx_renderer::last_presents;
++
+ pub(crate) use clipboard::*;
+ pub(crate) use destination_list::*;
+ pub(crate) use direct_write::*;

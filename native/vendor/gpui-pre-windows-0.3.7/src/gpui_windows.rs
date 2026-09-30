@@ -20,6 +20,8 @@ mod vsync;
 mod window;
 mod wrapper;
 
+pub use directx_renderer::last_presents;
+
 pub(crate) use clipboard::*;
 pub(crate) use destination_list::*;
 pub(crate) use direct_write::*;

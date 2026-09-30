@@ -3432,15 +3432,37 @@ impl Windows {
     }
 }
 
+/// Whether a window is presenting at a frame cadence right now, judged by
+/// its own last three presents: the longer of the two gaps between them is
+/// the cadence (a repaint between two ticks leaves one short gap), it
+/// counts as one up to 50 ms, and the window is still in it while the
+/// newest present is younger than the cadence and a half. The interval is
+/// the window's own, so a 59 Hz panel and a 144 Hz one need no constant.
+#[cfg(windows)]
+fn painting_every_tick(presents: [Option<Instant>; 3]) -> bool {
+    const SLOWEST_CADENCE: Duration = Duration::from_millis(50);
+    let [Some(newest), Some(previous), older] = presents else {
+        return false;
+    };
+    let mut cadence = newest.duration_since(previous);
+    if let Some(older) = older {
+        cadence = cadence.max(previous.duration_since(older));
+    }
+    cadence <= SLOWEST_CADENCE && newest.elapsed() < cadence + cadence / 2
+}
+
 /// Asks Windows to repaint the window now that an update from the
 /// application has landed. GPUI draws a dirty window at the next vsync tick,
 /// which is up to a frame away from a change that is already applied; the
-/// repaint request draws it at once, at most once per 4 ms. Off unless
-/// `GPUIDART_DRAW_ON_UPDATE=1`: on a burst of thirty clicks a second the
-/// window is dirty at every tick anyway, so the extra frame is rendered and
-/// presented but never displayed (about ninety presents a second on a
-/// sixty hertz display); on a click every 200 ms it takes the changed
-/// frame to the display 17 to 20 ms sooner.
+/// repaint request draws it at once, at most once per 4 ms. By default it
+/// fires unless the window is presenting at a frame cadence, the
+/// sign of a burst or a stream that paints at every tick and would render
+/// the extra frame for nothing; a lone frame just before the update, the
+/// hover or the press of the click itself, does not hold it back, so a
+/// click on a quiet window gets the early frame (17 to 20 ms sooner on
+/// the display). `GPUIDART_DRAW_ON_UPDATE=0` turns it off and `always`
+/// fires it after every update, which on a burst of thirty clicks a second
+/// rendered one present per click the display never took.
 #[cfg(windows)]
 fn draw_now(
     cx: &mut gpui::AsyncApp,
@@ -3448,8 +3470,22 @@ fn draw_now(
     last: &Cell<Option<Instant>>,
 ) {
     use raw_window_handle::{HasWindowHandle, RawWindowHandle};
-    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    if !*ENABLED.get_or_init(|| std::env::var("GPUIDART_DRAW_ON_UPDATE").is_ok_and(|v| v == "1")) {
+    #[derive(Clone, Copy, PartialEq)]
+    enum Policy {
+        Never,
+        Idle,
+        Always,
+    }
+    static POLICY: std::sync::OnceLock<Policy> = std::sync::OnceLock::new();
+    let policy =
+        *POLICY.get_or_init(
+            || match std::env::var("GPUIDART_DRAW_ON_UPDATE").as_deref() {
+                Ok("0") => Policy::Never,
+                Ok("always") => Policy::Always,
+                _ => Policy::Idle,
+            },
+        );
+    if policy == Policy::Never {
         return;
     }
     if last
@@ -3468,9 +3504,14 @@ fn draw_now(
         ) -> i32;
     }
     const RDW_INVALIDATE: u32 = 0x0001;
-    let _ = cx.update_window(handle.into(), |_, window, _| {
+    let requested = cx.update_window(handle.into(), |_, window, _| {
         if let Ok(raw) = window.window_handle() {
             if let RawWindowHandle::Win32(win32) = raw.as_raw() {
+                if policy == Policy::Idle
+                    && painting_every_tick(gpui_windows::last_presents(win32.hwnd.get()))
+                {
+                    return false;
+                }
                 unsafe {
                     RedrawWindow(
                         win32.hwnd.get() as *mut std::ffi::c_void,
@@ -3479,10 +3520,14 @@ fn draw_now(
                         RDW_INVALIDATE,
                     );
                 }
+                return true;
             }
         }
+        false
     });
-    last.set(Some(Instant::now()));
+    if let Ok(true) = requested {
+        last.set(Some(Instant::now()));
+    }
 }
 
 #[cfg(not(windows))]
@@ -3851,3 +3896,36 @@ mod radio_tests;
 #[cfg(test)]
 #[path = "ui/charts_tests.rs"]
 mod charts_tests;
+
+#[cfg(all(test, windows))]
+mod repaint_tests {
+    use super::painting_every_tick;
+    use std::time::{Duration, Instant};
+
+    fn ago(ms: u64) -> Option<Instant> {
+        Some(Instant::now() - Duration::from_millis(ms))
+    }
+
+    #[test]
+    fn a_window_presenting_at_every_tick_is_busy() {
+        assert!(painting_every_tick([ago(5), ago(22), ago(39)]));
+        assert!(painting_every_tick([ago(3), ago(10), ago(17)]));
+    }
+
+    #[test]
+    fn a_lone_frame_before_the_update_does_not_make_it_busy() {
+        assert!(!painting_every_tick([ago(2), ago(202), ago(212)]));
+        assert!(!painting_every_tick([ago(2), None, None]));
+        assert!(!painting_every_tick([None, None, None]));
+    }
+
+    #[test]
+    fn a_cadence_that_stopped_is_idle_again() {
+        assert!(!painting_every_tick([ago(300), ago(317), ago(334)]));
+    }
+
+    #[test]
+    fn a_repaint_between_two_ticks_keeps_the_tick_cadence() {
+        assert!(painting_every_tick([ago(12), ago(21), ago(38)]));
+    }
+}

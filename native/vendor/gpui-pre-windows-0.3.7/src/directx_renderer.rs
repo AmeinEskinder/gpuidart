@@ -32,6 +32,22 @@ pub(crate) const DISABLE_DIRECT_COMPOSITION: &str = "GPUI_DISABLE_DIRECT_COMPOSI
 /// does.
 pub(crate) const PRESENT_FEEDBACK: &str = "GPUI_PRESENT_FEEDBACK";
 
+/// The instants of the last three presents of each window's swap chain,
+/// newest first, so that an adapter can tell a window that is painting at
+/// every tick from one that has been idle. Set on every present and
+/// dropped with the renderer.
+static LAST_PRESENTS: std::sync::Mutex<Vec<(isize, [Option<std::time::Instant>; 3])>> =
+    std::sync::Mutex::new(Vec::new());
+
+pub fn last_presents(hwnd: isize) -> [Option<std::time::Instant>; 3] {
+    LAST_PRESENTS
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .iter()
+        .find(|(window, _)| *window == hwnd)
+        .map_or([None; 3], |(_, presents)| *presents)
+}
+
 struct PresentFeedback {
     path: std::path::PathBuf,
     lines: Vec<String>,
@@ -333,6 +349,17 @@ impl DirectXRenderer {
             .swap_chain;
         let start = self.present_feedback.as_ref().map(|_| PresentFeedback::qpc());
         let result = unsafe { swap_chain.Present(0, DXGI_PRESENT(0)) };
+        {
+            let window = self.hwnd.0 as isize;
+            let now = Some(std::time::Instant::now());
+            let mut all = LAST_PRESENTS
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            match all.iter_mut().find(|(known, _)| *known == window) {
+                Some((_, presents)) => *presents = [now, presents[0], presents[1]],
+                None => all.push((window, [now, None, None])),
+            }
+        }
         if let (Some(feedback), Some(start)) = (&mut self.present_feedback, start) {
             feedback.record(swap_chain, start);
         }
@@ -1369,6 +1396,11 @@ struct PathSprite {
 
 impl Drop for DirectXRenderer {
     fn drop(&mut self) {
+        let window = self.hwnd.0 as isize;
+        LAST_PRESENTS
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .retain(|(known, _)| *known != window);
         if let Some(feedback) = &mut self.present_feedback {
             // The last presents reach the display after the last call that
             // could have read them; one more reading names them.
