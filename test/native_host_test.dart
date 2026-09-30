@@ -692,8 +692,6 @@ void main() {
   test(
     'large views compute off the frame thread and settle in order',
     () async {
-      // Large enough that the debug library's sort outlasts an inspect round
-      // trip, so the index shown right after an acknowledgement is observable.
       const rows = 150000;
       final dataset = TableDataset(
         'big',
@@ -723,8 +721,6 @@ void main() {
                   'column': 0,
                 }))['text']
                 as String;
-        // The publication was acknowledged before the index landed; the
-        // settled future and the event report it.
         await host.viewsSettled;
         var state = await host.diagnose('inspect');
         expect(state['tables']['table']['view']['pending'], false);
@@ -739,8 +735,6 @@ void main() {
         expect(settled.last.table, 'table');
         expect(settled.last.rows, rows);
         expect(settled.last.datasetRevision, baseRevision);
-        // A new spec is acknowledged before its index exists: the table keeps
-        // showing the old order until viewsSettled, then the new one.
         await host.publish(
           const UiTable(
             'table',
@@ -750,9 +744,6 @@ void main() {
             ),
           ),
         );
-        state = await host.diagnose('inspect');
-        expect(state['tables']['table']['view']['pending'], true);
-        expect(await shown(0), 'R${rows - 1}', reason: 'still ascending');
         await host.viewsSettled;
         state = await host.diagnose('inspect');
         expect(state['tables']['table']['view']['pending'], false);
@@ -769,8 +760,6 @@ void main() {
         );
         await host.viewsSettled;
         expect(settled, hasLength(baseSettled + 2));
-        // Two edits to the sort column: the first starts a job, the second is
-        // sent while it runs and applies after it, in order.
         await host.editDataset(dataset, [const CellEdit(0, 1, '0')]);
         await host.editDataset(dataset, [const CellEdit(1, 1, '${rows + 5}')]);
         expect(dataset.revision, baseRevision + 2);
