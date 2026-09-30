@@ -34,7 +34,7 @@ jobs:
       matrix:
         os: [windows-2022, ubuntu-24.04, macos-15]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: ${{ matrix.os == 'macos-15' && 90 || 45 }}
     env:
       CARGO_INCREMENTAL: '0'
       CARGO_BUILD_JOBS: '2'
@@ -56,11 +56,11 @@ jobs:
           sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers xvfb openbox dbus-x11 at-spi2-core libatspi2.0-dev libglib2.0-dev scrot
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
+          # Cache versions include paths; keep these aligned with the SDK fallbacks.
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             target
-            build/native-probe
           key: accessibility-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock', 'tool/native_probe/Cargo.lock', 'rust-toolchain.toml') }}
           restore-keys: |
             accessibility-${{ runner.os }}-${{ runner.arch }}-
