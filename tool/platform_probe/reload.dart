@@ -56,8 +56,6 @@ Future<void> main(List<String> args) async {
     report['after_invalid'] = await session.call('inspect');
     await entry.writeAsString(changed);
     report['recovery'] = await session.reload();
-    // The native resize is deliberately delayed; permit it to render before close.
-    await Future<void>.delayed(const Duration(seconds: 1));
     await session.close();
     final status = await session.process.exitCode;
     report['exit_code'] = status;

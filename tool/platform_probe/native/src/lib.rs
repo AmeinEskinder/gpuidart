@@ -10,7 +10,7 @@ use std::sync::{
     Arc,
     atomic::{AtomicU32, Ordering},
 };
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 static SIGNAL: AtomicU32 = AtomicU32::new(0);
 static KEEP_ALIVE: AtomicU32 = AtomicU32::new(0);
@@ -87,16 +87,21 @@ struct Probe {
 impl Render for Probe {
     fn render(&mut self, window: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
         let count = self.renders.fetch_add(1, Ordering::Relaxed) + 1;
-        if window.viewport_size() == size(px(720.), px(420.)) {
-            self.resized.store(1, Ordering::Release);
-        }
-        if count <= 3 || self.last_size != Some(window.viewport_size()) {
+        let viewport_size = window.viewport_size();
+        if viewport_size == size(px(720.), px(420.)) && self.resized.swap(1, Ordering::AcqRel) == 0
+        {
             report(
-                "render",
-                serde_json::json!({"count": count, "size": format!("{:?}", window.viewport_size()), "scale": window.scale_factor(), "gpu": window.gpu_specs()}),
+                "resized_render",
+                serde_json::json!({"count": count, "size": format!("{viewport_size:?}")}),
             );
         }
-        self.last_size = Some(window.viewport_size());
+        if count <= 3 || self.last_size != Some(viewport_size) {
+            report(
+                "render",
+                serde_json::json!({"count": count, "size": format!("{viewport_size:?}"), "scale": window.scale_factor(), "gpu": window.gpu_specs()}),
+            );
+        }
+        self.last_size = Some(viewport_size);
         let clicks = self.clicks.clone();
         div()
             .v_flex()
@@ -260,17 +265,28 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
         }
         cx.activate(true);
         cx.spawn(async move |cx| {
-            let steps = if commands.is_some() || KEEP_ALIVE.load(Ordering::Acquire) == 1 { 3000 } else { 500 };
-            for step in 0..steps {
+            let deadline = Instant::now() + Duration::from_secs(30);
+            let needs_input = std::env::var("GPUIDART_PROBE_INPUT").as_deref() == Ok("1")
+                || std::env::var("GPUIDART_PROBE_DISPATCH").as_deref() == Ok("1");
+            let dispatch_input =
+                std::env::var("GPUIDART_PROBE_DISPATCH").as_deref() == Ok("1");
+            let mut resize_requested = false;
+            let mut input_dispatched = false;
+            let mut callback_echoed = callback.is_none();
+            loop {
                 cx.background_executor()
                     .timer(Duration::from_millis(10))
                     .await;
-                if step == 50 {
+                if !resize_requested && quit_renders.load(Ordering::Acquire) >= 1 {
                     let _ =
                         window.update(cx, |_, window, _| window.resize(size(px(720.), px(420.))));
                     report("resize_requested", serde_json::Value::Null);
+                    resize_requested = true;
                 }
-                if step == 100 && std::env::var("GPUIDART_PROBE_DISPATCH").as_deref() == Ok("1") {
+                if dispatch_input
+                    && !input_dispatched
+                    && quit_resized.load(Ordering::Acquire) == 1
+                {
                     let _ = window.update(cx, |_, window, cx| {
                         let input = view.read(cx).input.clone();
                         input.update(cx, |input, cx| input.focus(window, cx));
@@ -286,6 +302,7 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
                         }), cx);
                         report("gpui_input_dispatched", serde_json::json!({"scope": "Synthetic GPUI events on a real window; bypasses OS event injection and IME"}));
                     });
+                    input_dispatched = true;
                 }
                 let signal = SIGNAL.swap(0, Ordering::AcqRel);
                 if signal != 0 {
@@ -302,6 +319,9 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
                     }
                     if let Some(callback) = callback {
                         callback(signal);
+                        if signal == 7 {
+                            callback_echoed = true;
+                        }
                     }
                     if signal == 99 { break; }
                 }
@@ -332,6 +352,21 @@ fn run(callback: Option<Callback>, commands: Option<Receiver<ProbeCommand>>) -> 
                     if closing {
                         break;
                     }
+                }
+                let ready = quit_resized.load(Ordering::Acquire) == 1
+                    && callback_echoed
+                    && (!needs_input
+                        || (quit_input_matches.load(Ordering::Acquire) == 1
+                            && quit_clicks.load(Ordering::Acquire) >= 1));
+                if commands.is_none()
+                    && KEEP_ALIVE.load(Ordering::Acquire) != 1
+                    && ready
+                {
+                    break;
+                }
+                if Instant::now() >= deadline {
+                    report("native_deadline", serde_json::Value::Null);
+                    break;
                 }
             }
             report(

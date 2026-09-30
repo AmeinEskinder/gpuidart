@@ -61,10 +61,13 @@ Future<void> main(List<String> args) async {
   final callbacks = <int>[];
   final pending = <int, Completer<void>>{};
   final echoed = Completer<void>();
+  final heartbeatReady = Completer<void>();
   final callback = NativeCallable<Callback>.listener((int value) {
     callbacks.add(value);
     report('dart_callback', {'value': value, ...thread(path)});
-    if (value == 1) signal(codeSignal());
+    if (value == 1) {
+      unawaited(heartbeatReady.future.then((_) => signal(codeSignal())));
+    }
     pending.remove(value)?.complete();
     if (value == 7 && !echoed.isCompleted) echoed.complete();
   });
@@ -101,10 +104,10 @@ Future<void> main(List<String> args) async {
   }
   final timer = Stopwatch()..start();
   var ticks = 0;
-  final heartbeat = Timer.periodic(
-    const Duration(milliseconds: 20),
-    (_) => ticks++,
-  );
+  final heartbeat = Timer.periodic(const Duration(milliseconds: 20), (_) {
+    ticks++;
+    if (!heartbeatReady.isCompleted) heartbeatReady.complete();
+  });
   // This timeout exits the probe process. It must never free a live callback.
   final deadline = Timer(const Duration(seconds: 30), () {
     report('deadline', {'ticks': ticks});

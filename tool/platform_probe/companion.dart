@@ -10,14 +10,16 @@ Future<void> main(List<String> args) async {
   final native = args.first;
   final process = await Process.start(native, ['--stdio']);
   final ready = Completer<void>();
+  final resized = Completer<void>();
   final checkpoints = <Map<String, dynamic>>[];
   final pending = <Completer<Map<String, dynamic>>>[];
   Map<String, dynamic>? applied;
   var ticks = 0;
-  final heartbeat = Timer.periodic(
-    const Duration(milliseconds: 20),
-    (_) => ticks++,
-  );
+  final heartbeatReady = Completer<void>();
+  final heartbeat = Timer.periodic(const Duration(milliseconds: 20), (_) {
+    ticks++;
+    if (!heartbeatReady.isCompleted) heartbeatReady.complete();
+  });
   var exited = false;
   final deadline = Timer(const Duration(seconds: 35), () {
     process.kill(ProcessSignal.sigkill);
@@ -40,6 +42,9 @@ Future<void> main(List<String> args) async {
               !ready.isCompleted) {
             ready.complete();
           }
+          if (event['stage'] == 'resized_render' && !resized.isCompleted) {
+            resized.complete();
+          }
           if (event['stage'] == 'label_applied') {
             applied = {
               ...event['detail'] as Map<String, dynamic>,
@@ -59,9 +64,16 @@ Future<void> main(List<String> args) async {
     return completion.future.timeout(const Duration(seconds: 5));
   }
 
-  void close() {
-    if (!exited) process.stdin.writeln(jsonEncode({'op': 'close'}));
+  Future<void> close() async {
+    if (!exited) {
+      process.stdin.writeln(jsonEncode({'op': 'close'}));
+      await process.stdin.flush();
+    }
   }
+
+  Future<void> waitForEvidence() =>
+      Future.wait([resized.future, heartbeatReady.future])
+          .timeout(const Duration(seconds: 8));
 
   try {
     await ready.future.timeout(const Duration(seconds: 15));
@@ -69,7 +81,12 @@ Future<void> main(List<String> args) async {
     registerExtension(
       'ext.gpuidart.inspect',
       (_, _) async => ServiceExtensionResponse.result(
-        jsonEncode({'applied': applied, 'dart_pid': pid, 'ticks': ticks}),
+        jsonEncode({
+          'applied': applied,
+          'dart_pid': pid,
+          'ticks': ticks,
+          'resized_render': resized.isCompleted,
+        }),
       ),
     );
     registerExtension(
@@ -78,12 +95,13 @@ Future<void> main(List<String> args) async {
           ServiceExtensionResponse.result(jsonEncode(await publish())),
     );
     registerExtension('ext.gpuidart.close', (_, _) async {
-      close();
+      await waitForEvidence();
+      await close();
       return ServiceExtensionResponse.result('{"closing":true}');
     });
     if (!serve) {
-      await Future<void>.delayed(const Duration(seconds: 2));
-      close();
+      await waitForEvidence();
+      await close();
     }
     final status = await process.exitCode;
     exited = true;
