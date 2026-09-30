@@ -59,7 +59,7 @@ retain the commands used at their recorded revisions.
 
 ## Verification
 
-Source `8491da1` passed all seven hosted workflows. The
+Source `d02a4ce` passed all seven hosted workflows. The
 [completion report](../reports/tooling/completion.json) records source revisions,
 test counts, artifact hashes, package provenance, and raw verification reports.
 
@@ -73,20 +73,21 @@ The native suites retain two ignored timing probes on Windows and one on each
 Unix target. Each Unix Dart suite skips two Windows-only cases. Formatting,
 Dart analysis, helper-crate checks, documentation checks, and actionlint passed.
 Clippy completed successfully with existing warnings recorded in the report.
-The actual Windows executable also passed `gpuidart check` locally. Its check
-build goes under `build/check` so it cannot overwrite the running CLI.
+The actual Windows executable also passed `gpuidart check` locally at `8491da1`;
+the hosted Windows gate repeats that command at `d02a4ce`. Its check build goes
+under `build/check` so it cannot overwrite the running CLI.
 
 Hosted evidence at this source revision:
 
-- [Windows SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102296),
-  [macOS SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102400), and
-  [Linux SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102270).
-- [Three-platform accessibility](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102476).
+- [Windows SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530654),
+  [macOS SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530660), and
+  [Linux SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530640).
+- [Three-platform accessibility](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656535626).
   Linux received 50 cache additions and 47 removals with no invalid events.
-- [Native platform probes](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102321) and
-  [Unix process lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102378).
-- [Release packages and native CLI artifacts](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102472).
-  All three package reports record `source_dirty: false` and source `8491da1`.
+- [Native platform probes](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530729) and
+  [Unix process lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530692).
+- [Release packages and native CLI artifacts](https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530668).
+  All three package reports record `source_dirty: false` and source `d02a4ce`.
   Artifacts are retained for 30 days; their hashes are in the completion report.
 
 The compiled CLI drove packaging, extraction verification, and file-watching
@@ -97,6 +98,17 @@ that interruption during both startup and watching stops the child application.
 Accessibility checks covered controls, disabled state, settings, watchlist,
 terminal JIT/AOT, and reload on each operating system.
 
+The final platform probes also close the timing failures retained in
+[run 36653889801](https://github.com/AmeinEskinder/gpuidart/actions/runs/36653889801).
+Input starts after the probe's own window renders. Companion close waits for a
+resized render, and direct Dart probes complete a heartbeat and callback round
+trip before the native loop exits. The final Windows local probe and hosted
+macOS/Linux probes passed with those checks active. Raw
+[Linux input](../reports/tooling/completion/linux-native-input.log),
+[macOS companion AOT](../reports/tooling/completion/macos-companion-aot.log), and
+[Windows Dart AOT](../reports/tooling/completion/windows-probe-aot.log) checkpoints
+are retained. Linux display inventory also passed with `xrandr` available.
+
 ## Measured source composition
 
 `dart run tool/source_inventory.dart` reads committed Git blobs and rejects
@@ -104,10 +116,10 @@ maintained implementation outside Dart and Rust. It runs in the full check gate.
 The [source inventory](../reports/tooling/source-composition.json) lists every
 recognized source file, its Git object, scope, byte count, and line count.
 
-| Maintained implementation at `8491da1` | Files | Bytes | Share |
+| Maintained implementation at `d02a4ce` | Files | Bytes | Share |
 | --- | ---: | ---: | ---: |
-| Dart | 175 | 885,137 | 47.79% |
-| Rust | 66 | 966,988 | 52.21% |
+| Dart | 175 | 888,832 | 47.85% |
+| Rust | 66 | 968,526 | 52.15% |
 | PowerShell, C#, Swift, Python | 0 | 0 | 0% |
 
 The baseline `9f825a2` contained 31 PowerShell, three C#, two Swift, and two
@@ -115,8 +127,8 @@ Python files. The completion report records all 38 removed paths. Percentages
 use source bytes, without padding or removal to change the ratio.
 
 Across all recognized repository source, including vendored dependencies,
-comparison applications, and the C ABI header, the measured split is 84.35%
-Rust, 15.15% Dart, and 0.51% C/C++/JavaScript/TypeScript after rounding. These
+comparison applications, and the C ABI header, the measured split is 84.30%
+Rust, 15.19% Dart, and 0.51% C/C++/JavaScript/TypeScript after rounding. These
 excluded scopes are explicit in the inventory. CI YAML, manifests, documentation,
 and evidence are not implementation source. Historical reports retain old
 commands as evidence of what ran at their recorded revisions.

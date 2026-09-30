@@ -1,6 +1,6 @@
 {
-    "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
-    "recorded_utc":  "2026-09-30T01:02:42.4619269Z",
+    "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
+    "recorded_utc":  "2026-09-30T01:57:01.0924614Z",
     "passed":  true,
     "platforms":  {
                       "Windows":  "PASS",
@@ -322,60 +322,60 @@
                                                   ],
                          "composition_report":  "source-composition.json",
                          "maintained_source":  {
-                                                   "source_bytes":  1852125,
+                                                   "source_bytes":  1857358,
                                                    "languages":  {
                                                                      "Dart":  {
                                                                                   "files":  175,
-                                                                                  "bytes":  885137,
-                                                                                  "lines":  26812,
-                                                                                  "byte_percent":  47.79034892353378
+                                                                                  "bytes":  888832,
+                                                                                  "lines":  26918,
+                                                                                  "byte_percent":  47.85464083929969
                                                                               },
                                                                      "Rust":  {
                                                                                   "files":  66,
-                                                                                  "bytes":  966988,
-                                                                                  "lines":  26471,
-                                                                                  "byte_percent":  52.20965107646622
+                                                                                  "bytes":  968526,
+                                                                                  "lines":  26506,
+                                                                                  "byte_percent":  52.14535916070031
                                                                               }
                                                                  }
                                                },
                          "repository_source":  {
-                                                   "source_bytes":  6045991,
+                                                   "source_bytes":  6051224,
                                                    "languages":  {
                                                                      "Dart":  {
                                                                                   "files":  177,
-                                                                                  "bytes":  915718,
-                                                                                  "lines":  27693,
-                                                                                  "byte_percent":  15.145871040826888
+                                                                                  "bytes":  919413,
+                                                                                  "lines":  27799,
+                                                                                  "byte_percent":  15.193835164588188
                                                                               },
                                                                      "Rust":  {
                                                                                   "files":  230,
-                                                                                  "bytes":  5099661,
-                                                                                  "lines":  143820,
-                                                                                  "byte_percent":  84.34780997854611
+                                                                                  "bytes":  5101199,
+                                                                                  "lines":  143855,
+                                                                                  "byte_percent":  84.30028371119629
                                                                               },
                                                                      "C++":  {
                                                                                  "files":  5,
                                                                                  "bytes":  14265,
                                                                                  "lines":  482,
-                                                                                 "byte_percent":  0.235941469314129
+                                                                                 "byte_percent":  0.23573743097264288
                                                                              },
                                                                      "C":  {
                                                                                "files":  6,
                                                                                "bytes":  9289,
                                                                                "lines":  251,
-                                                                               "byte_percent":  0.15363899813942825
+                                                                               "byte_percent":  0.1535061336351125
                                                                            },
                                                                      "JavaScript":  {
                                                                                         "files":  1,
                                                                                         "bytes":  2496,
                                                                                         "lines":  45,
-                                                                                        "byte_percent":  0.041283554672840235
+                                                                                        "byte_percent":  0.04124785332686412
                                                                                     },
                                                                      "TypeScript":  {
                                                                                         "files":  3,
                                                                                         "bytes":  4562,
                                                                                         "lines":  75,
-                                                                                        "byte_percent":  0.07545495850059981
+                                                                                        "byte_percent":  0.0753897062809111
                                                                                     }
                                                                  }
                                                },
@@ -425,7 +425,8 @@
                                                         "pid":  23384,
                                                         "exit_code":  0,
                                                         "elapsed_us":  107313906,
-                                                        "finished_utc":  "2026-09-30T00:50:47.496430Z"
+                                                        "finished_utc":  "2026-09-30T00:50:47.496430Z",
+                                                        "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387"
                                                     },
                   "format":  "passed",
                   "dart_analysis":  "no issues",
@@ -442,7 +443,8 @@
                                                           "--all-targets",
                                                           "--no-deps"
                                                       ],
-                                          "exit_code":  0
+                                          "exit_code":  0,
+                                          "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387"
                                       },
                                       {
                                           "scope":  "clippy-probe-final",
@@ -456,7 +458,8 @@
                                                           "--all-targets",
                                                           "--no-deps"
                                                       ],
-                                          "exit_code":  0
+                                          "exit_code":  0,
+                                          "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387"
                                       },
                                       {
                                           "scope":  "clippy-macos-probe-final",
@@ -472,17 +475,36 @@
                                                           "--all-targets",
                                                           "--no-deps"
                                                       ],
-                                          "exit_code":  0
+                                          "exit_code":  0,
+                                          "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387"
+                                      },
+                                      {
+                                          "scope":  "platform-probe",
+                                          "passed":  true,
+                                          "command":  [
+                                                          "cargo",
+                                                          "clippy",
+                                                          "--locked",
+                                                          "-p",
+                                                          "gpuidart-platform-probe",
+                                                          "--all-targets",
+                                                          "--no-deps"
+                                                      ],
+                                          "exit_code":  0,
+                                          "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
+                                          "warnings":  3,
+                                          "report":  "completion/platform-clippy.json",
+                                          "log":  "completion/platform-clippy.log"
                                       }
                                   ],
-                  "clippy_warnings":  "Existing native warnings and helper suggestions remain; Clippy exits 0. Native lib: 54 warnings; native tests: 56 including duplicates; Windows probe: 2; Windows helper and benchmark driver: 1 each."
+                  "clippy_warnings":  "Existing native warnings and helper suggestions remain; Clippy exits 0. Native lib: 54 warnings; native tests: 56 including duplicates; Windows probe: 2; Windows helper and benchmark driver: 1 each. Platform probe: 3 existing let-unit-value warnings (duplicated in lib tests), checked at d02a4ce."
               },
     "ci":  [
                {
                    "scope":  "windows-sdk",
-                   "run_id":  36652102296,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102296",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656530654,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530654",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
@@ -493,9 +515,9 @@
                },
                {
                    "scope":  "macos-sdk",
-                   "run_id":  36652102400,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102400",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656530660,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530660",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
@@ -510,9 +532,9 @@
                },
                {
                    "scope":  "linux-sdk",
-                   "run_id":  36652102270,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102270",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656530640,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530640",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
@@ -527,17 +549,17 @@
                },
                {
                    "scope":  "accessibility",
-                   "run_id":  36652102476,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102476",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656535626,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656535626",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
-                                    "name":  "platform (ubuntu-24.04)",
+                                    "name":  "platform (macos-15)",
                                     "conclusion":  "success"
                                 },
                                 {
-                                    "name":  "platform (macos-15)",
+                                    "name":  "platform (ubuntu-24.04)",
                                     "conclusion":  "success"
                                 },
                                 {
@@ -548,26 +570,26 @@
                },
                {
                    "scope":  "lifecycle",
-                   "run_id":  36652102378,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102378",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656530692,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530692",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
-                                    "name":  "processes (macos-15)",
+                                    "name":  "processes (ubuntu-24.04)",
                                     "conclusion":  "success"
                                 },
                                 {
-                                    "name":  "processes (ubuntu-24.04)",
+                                    "name":  "processes (macos-15)",
                                     "conclusion":  "success"
                                 }
                             ]
                },
                {
                    "scope":  "platform",
-                   "run_id":  36652102321,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102321",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656530729,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530729",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
@@ -582,13 +604,13 @@
                },
                {
                    "scope":  "packages",
-                   "run_id":  36652102472,
-                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102472",
-                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "run_id":  36656530668,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36656530668",
+                   "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                    "conclusion":  "success",
                    "jobs":  [
                                 {
-                                    "name":  "package (macos-15)",
+                                    "name":  "package (ubuntu-24.04)",
                                     "conclusion":  "success"
                                 },
                                 {
@@ -596,7 +618,7 @@
                                     "conclusion":  "success"
                                 },
                                 {
-                                    "name":  "package (ubuntu-24.04)",
+                                    "name":  "package (macos-15)",
                                     "conclusion":  "success"
                                 }
                             ]
@@ -606,9 +628,9 @@
                      {
                          "platform":  "Windows-X64",
                          "passed":  true,
-                         "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                         "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                          "source_dirty":  false,
-                         "source_sha256":  "7ed73cc82af7c00e188e2dc98fbef9c36d63570dfb942f51db74b2f4687efdd9",
+                         "source_sha256":  "c6d75f18a363be8833cdba796423cde544176758f72d422c7d6eca7f9157fe91",
                          "package_report":  "completion/package-Windows-X64.json",
                          "compiled_cli_reload_report":  "completion/cli-reload-Windows-X64.json",
                          "file_save_reloaded":  true,
@@ -618,9 +640,9 @@
                      {
                          "platform":  "macOS-ARM64",
                          "passed":  true,
-                         "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                         "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                          "source_dirty":  false,
-                         "source_sha256":  "0603d42fbc57accfe0e57acd5e388715b1961a1dda305eb49d36d266e0891066",
+                         "source_sha256":  "78ef343614b15de1a31c134c25f9268a0d7760ed06ab189015630ad9f6b23aca",
                          "package_report":  "completion/package-macOS-ARM64.json",
                          "compiled_cli_reload_report":  "completion/cli-reload-macOS-ARM64.json",
                          "file_save_reloaded":  true,
@@ -630,9 +652,9 @@
                      {
                          "platform":  "Linux-X64",
                          "passed":  true,
-                         "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                         "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
                          "source_dirty":  false,
-                         "source_sha256":  "0603d42fbc57accfe0e57acd5e388715b1961a1dda305eb49d36d266e0891066",
+                         "source_sha256":  "78ef343614b15de1a31c134c25f9268a0d7760ed06ab189015630ad9f6b23aca",
                          "package_report":  "completion/package-Linux-X64.json",
                          "compiled_cli_reload_report":  "completion/cli-reload-Linux-X64.json",
                          "file_save_reloaded":  true,
@@ -644,109 +666,109 @@
                       {
                           "artifact":  "evaluation-package-Linux-X64",
                           "file":  "Watchlist-linux-x64.tar.gz",
-                          "bytes":  22955046,
-                          "sha256":  "5e378ed75f1c0009a0e941b1c1e0871ac195c9e2f5006146a5597927f2dd6d54",
-                          "local_path":  ".cache/migration-completion/validated/packages/evaluation-package-Linux-X64/Watchlist-linux-x64.tar.gz"
+                          "bytes":  22954959,
+                          "sha256":  "927db5c72ec678c1d5277f0264f88edf8a3e074c72c8bb5c5b7e0940fc186529",
+                          "local_path":  ".cache/migration-completion/validated-final/packages/evaluation-package-Linux-X64/Watchlist-linux-x64.tar.gz"
                       },
                       {
                           "artifact":  "evaluation-package-macOS-ARM64",
                           "file":  "Watchlist-macos-arm64.tar.gz",
-                          "bytes":  13991276,
-                          "sha256":  "a2178ffc285cff4158ad0ddb9b6d0a1c1b888f0292f5f994261957882cdfb295",
-                          "local_path":  ".cache/migration-completion/validated/packages/evaluation-package-macOS-ARM64/Watchlist-macos-arm64.tar.gz"
+                          "bytes":  13991272,
+                          "sha256":  "2b75436a1daa55f03b1ab4ee61974de10770574c24638900aae0e512e2721635",
+                          "local_path":  ".cache/migration-completion/validated-final/packages/evaluation-package-macOS-ARM64/Watchlist-macos-arm64.tar.gz"
                       },
                       {
                           "artifact":  "evaluation-package-Windows-X64",
                           "file":  "Watchlist-windows-x64.zip",
-                          "bytes":  15814901,
-                          "sha256":  "9e8ba0594b51bfcae571d260638990ad550941efba314432ab09327a40ccbbe8",
-                          "local_path":  ".cache/migration-completion/validated/packages/evaluation-package-Windows-X64/Watchlist-windows-x64.zip"
+                          "bytes":  15814889,
+                          "sha256":  "df6290dc3204cffd2d8190990aef059ce78c4a13cc867f3710d8c4de308f64d2",
+                          "local_path":  ".cache/migration-completion/validated-final/packages/evaluation-package-Windows-X64/Watchlist-windows-x64.zip"
                       },
                       {
                           "artifact":  "gpuidart-cli-Linux-X64",
                           "file":  "gpuidart-cli.tar.gz",
-                          "bytes":  3285772,
-                          "sha256":  "325c91034cf9723494aa8ac23c53e639d0a4c0fe444d915cf1c4ce77c627e077",
-                          "local_path":  ".cache/migration-completion/validated/packages/gpuidart-cli-Linux-X64/gpuidart-cli.tar.gz"
+                          "bytes":  3285716,
+                          "sha256":  "4499faece490542d1fcaa55bfeff3e03c2c9cc71ce2cb76c4430624dabf62580",
+                          "local_path":  ".cache/migration-completion/validated-final/packages/gpuidart-cli-Linux-X64/gpuidart-cli.tar.gz"
                       },
                       {
                           "artifact":  "gpuidart-cli-macOS-ARM64",
                           "file":  "gpuidart-cli.tar.gz",
-                          "bytes":  3087130,
-                          "sha256":  "a7acf28247375126d0236f959ef865dbeaa9abed661b7df8d19f3628ea0d16f4",
-                          "local_path":  ".cache/migration-completion/validated/packages/gpuidart-cli-macOS-ARM64/gpuidart-cli.tar.gz"
+                          "bytes":  3087126,
+                          "sha256":  "bea35bb69ec8f713296d65a2d08e78107ed4fe5478651c911e289ef712315386",
+                          "local_path":  ".cache/migration-completion/validated-final/packages/gpuidart-cli-macOS-ARM64/gpuidart-cli.tar.gz"
                       },
                       {
                           "artifact":  "gpuidart-cli-Windows-X64",
                           "file":  "bin/gpuidart.exe",
                           "bytes":  8115712,
                           "sha256":  "2ffefc2cff7e86e63b0991c10354588176bd5e22412d23a53414de2304ebcd8f",
-                          "local_path":  ".cache/migration-completion/validated/packages/gpuidart-cli-Windows-X64/bin/gpuidart.exe"
+                          "local_path":  ".cache/migration-completion/validated-final/packages/gpuidart-cli-Windows-X64/bin/gpuidart.exe"
                       }
                   ],
     "hosted_artifacts":  [
                              {
-                                 "id":  11071590106,
-                                 "name":  "evaluation-package-macOS-ARM64",
-                                 "size_in_bytes":  13944291,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071590106/zip",
-                                 "expires_at":  "2026-10-30T00:54:51Z"
-                             },
-                             {
-                                 "id":  11071385858,
-                                 "name":  "gpuidart-cli-macOS-ARM64",
-                                 "size_in_bytes":  3077642,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071385858/zip",
-                                 "expires_at":  "2026-10-30T00:54:53Z"
-                             },
-                             {
-                                 "id":  11071231880,
-                                 "name":  "evaluation-package-Windows-X64",
-                                 "size_in_bytes":  15784291,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071231880/zip",
-                                 "expires_at":  "2026-10-30T00:57:47Z"
-                             },
-                             {
-                                 "id":  11071041834,
-                                 "name":  "evaluation-package-Linux-X64",
-                                 "size_in_bytes":  22863494,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071041834/zip",
-                                 "expires_at":  "2026-10-30T00:55:54Z"
-                             },
-                             {
-                                 "id":  11071007103,
+                                 "id":  11072893052,
                                  "name":  "package-evidence-Windows-X64",
-                                 "size_in_bytes":  26769,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071007103/zip",
-                                 "expires_at":  "2026-10-30T00:57:46Z"
+                                 "size_in_bytes":  26790,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072893052/zip",
+                                 "expires_at":  "2026-10-30T01:51:31Z"
                              },
                              {
-                                 "id":  11070882235,
+                                 "id":  11072853240,
+                                 "name":  "evaluation-package-Windows-X64",
+                                 "size_in_bytes":  15784283,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072853240/zip",
+                                 "expires_at":  "2026-10-30T01:51:32Z"
+                             },
+                             {
+                                 "id":  11072613885,
                                  "name":  "gpuidart-cli-Windows-X64",
                                  "size_in_bytes":  3464412,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070882235/zip",
-                                 "expires_at":  "2026-10-30T00:57:50Z"
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072613885/zip",
+                                 "expires_at":  "2026-10-30T01:51:34Z"
                              },
                              {
-                                 "id":  11070782226,
-                                 "name":  "gpuidart-cli-Linux-X64",
-                                 "size_in_bytes":  3278290,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070782226/zip",
-                                 "expires_at":  "2026-10-30T00:55:57Z"
-                             },
-                             {
-                                 "id":  11070712477,
-                                 "name":  "package-evidence-Linux-X64",
-                                 "size_in_bytes":  114149,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070712477/zip",
-                                 "expires_at":  "2026-10-30T00:55:53Z"
-                             },
-                             {
-                                 "id":  11070444854,
+                                 "id":  11072527368,
                                  "name":  "package-evidence-macOS-ARM64",
-                                 "size_in_bytes":  260659,
-                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070444854/zip",
-                                 "expires_at":  "2026-10-30T00:54:50Z"
+                                 "size_in_bytes":  260629,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072527368/zip",
+                                 "expires_at":  "2026-10-30T01:50:53Z"
+                             },
+                             {
+                                 "id":  11072447485,
+                                 "name":  "package-evidence-Linux-X64",
+                                 "size_in_bytes":  114385,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072447485/zip",
+                                 "expires_at":  "2026-10-30T01:50:00Z"
+                             },
+                             {
+                                 "id":  11072442482,
+                                 "name":  "evaluation-package-Linux-X64",
+                                 "size_in_bytes":  22863427,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072442482/zip",
+                                 "expires_at":  "2026-10-30T01:50:01Z"
+                             },
+                             {
+                                 "id":  11072352665,
+                                 "name":  "evaluation-package-macOS-ARM64",
+                                 "size_in_bytes":  13944446,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072352665/zip",
+                                 "expires_at":  "2026-10-30T01:50:55Z"
+                             },
+                             {
+                                 "id":  11072267608,
+                                 "name":  "gpuidart-cli-Linux-X64",
+                                 "size_in_bytes":  3278177,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072267608/zip",
+                                 "expires_at":  "2026-10-30T01:50:03Z"
+                             },
+                             {
+                                 "id":  11072207896,
+                                 "name":  "gpuidart-cli-macOS-ARM64",
+                                 "size_in_bytes":  3077606,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11072207896/zip",
+                                 "expires_at":  "2026-10-30T01:50:57Z"
                              }
                          ],
     "accessibility":  {
@@ -764,7 +786,7 @@
 
                                                           ],
                                               "passed":  true,
-                                              "process":  5933,
+                                              "process":  6131,
                                               "remove":  47
                                           }
                       },
@@ -779,7 +801,7 @@
                      "packages":  "Release optimization; Windows ZIP and Unix tar.gz; macOS ad-hoc evaluation signing, not notarized.",
                      "native_negative_probes":  "macOS worker/direct Dart launches are expected main-thread failures; Rust main and companion JIT/AOT/reload pass.",
                      "existing_capabilities":  "Linux EditableText and Windows UIA Grid/Table coordinate patterns remain outside the current backend capability set.",
-                     "display_diagnostic":  "8491da1 runtime probes passed while optional Linux xrandr inventory was unavailable; the CI dependency follow-up installs x11-xserver-utils."
+                     "display_diagnostic":  "Linux xrandr inventory passed at d02a4ce with x11-xserver-utils installed."
                  },
     "review":  {
                    "models":  [
@@ -787,8 +809,32 @@
                                   "Claude Fable 5.1",
                                   "Grok 4.6"
                               ],
-                   "result":  "GPT-6 Astra final evidence audit clean for 8491da1. All accepted code findings fixed; all seven CI results, test counts, six artifact hashes, package provenance, 24 accessibility report hashes and source composition independently verified. Optional xrandr dependency follow-up is separate from these source results.",
+                   "result":  "Final source and evidence audits clean at d02a4ce. Seven passing workflows, six artifact hashes, three clean package provenance records, 24 accessibility results, all platform checkpoints, exact source composition, and retained Clippy receipts independently verified. No remaining migration review blockers.",
                    "dropouts":  "One Grok inventory worker returned malformed output; not counted as completed review. Parent completed inventory with a behavioral test."
                },
-    "decision_trail":  "../tooling-migration.tsv"
+    "decision_trail":  "../tooling-migration.tsv",
+    "previous_verified_source":  "8491da1f77e91cc6764aa5749000db0438f39387",
+    "platform_probes":  [
+                            {
+                                "platform":  "Windows-X64",
+                                "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
+                                "passed":  true,
+                                "report":  "completion/platform-Windows-X64.json",
+                                "checks":  12
+                            },
+                            {
+                                "platform":  "Linux-X64",
+                                "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
+                                "passed":  true,
+                                "report":  "completion/platform-Linux-X64.json",
+                                "checks":  16
+                            },
+                            {
+                                "platform":  "macOS-ARM64",
+                                "source_commit":  "d02a4ce7b6b317d0115ba7dac344e6b22e775eb4",
+                                "passed":  true,
+                                "report":  "completion/platform-macOS-ARM64.json",
+                                "checks":  14
+                            }
+                        ]
 }

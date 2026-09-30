@@ -1,6 +1,6 @@
 # Hosted Windows CI
 
-The current Dart/Rust migration source `8491da1` passed the full compiled-CLI
+The current Dart/Rust migration source `d02a4ce` passed the full compiled-CLI
 Windows gate, including live-window tests. See the
 [migration completion report](../tooling/completion.json) for current evidence.
 The chronology below preserves earlier runs and their original scope.

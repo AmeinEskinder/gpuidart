@@ -1,0 +1,55 @@
+warning: this let-binding has unit value
+   --> tool\platform_probe\native\src\lib.rs:311:25
+    |
+311 | /                         let _ = view.update(cx, |view, cx| {
+312 | |                             view.label = format!("Dart signal {signal}");
+313 | |                             report("signal_applied", serde_json::json!({
+314 | |                                 "value": signal, "input_entity": format!("{:?}", view.input.entity_id()),
+...   |
+317 | |                             cx.notify();
+318 | |                         });
+    | |___________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#let_unit_value
+    = note: `#[warn(clippy::let_unit_value)]` on by default
+help: omit the `let` binding
+    |
+311 -                         let _ = view.update(cx, |view, cx| {
+311 +                         view.update(cx, |view, cx| {
+    |
+
+warning: this let-binding has unit value
+   --> tool\platform_probe\native\src\lib.rs:337:33
+    |
+337 | / ...                   let _ = view.update(cx, |view, cx| {
+338 | | ...                       view.label = label;
+339 | | ...                       report(
+340 | | ...                           "label_applied",
+...   |
+347 | | ...                       cx.notify();
+348 | | ...                   });
+    | |_________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#let_unit_value
+help: omit the `let` binding
+    |
+337 -                                 let _ = view.update(cx, |view, cx| {
+337 +                                 view.update(cx, |view, cx| {
+    |
+
+warning: this let-binding has unit value
+   --> tool\platform_probe\native\src\lib.rs:381:13
+    |
+381 |             let _ = cx.update(|cx| cx.quit());
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#let_unit_value
+help: omit the `let` binding
+    |
+381 -             let _ = cx.update(|cx| cx.quit());
+381 +             cx.update(|cx| cx.quit());
+    |
+
+warning: `gpuidart-platform-probe` (lib) generated 3 warnings (run `cargo clippy --fix --lib -p gpuidart-platform-probe -- --no-deps` to apply 3 suggestions)
+warning: `gpuidart-platform-probe` (lib test) generated 3 warnings (3 duplicates)
+    Finished `dev` profile [unoptimized] target(s) in 1.72s
