@@ -64,6 +64,7 @@ if ($Packaged) {
     $env:GPUIDART_LIBRARY = Join-Path $packageFolder 'gpuidart.dll'
 }
 $trace = $null
+$traceSession = $null
 $traceStatus = 'not requested'
 $app = $null
 $window = [IntPtr]::Zero
@@ -78,9 +79,10 @@ try {
         # in five of nine runs (13 of 50 in one), while the unfiltered capture
         # kept them all. The runner reduces the file to the fixture's process
         # afterwards and the capture ends itself shortly after the run.
+        $traceSession = 'gpuidart-' + [guid]::NewGuid().ToString('N').Substring(0, 12)
         $trace = Start-Process -FilePath (Join-Path $root '.tools/presentmon/PresentMon.exe') -ArgumentList @(
             '--output_file', ('"' + (Join-Path $folder 'present.csv') + '"'),
-            '--qpc_time', '--timed', ($Seconds + 25), '--terminate_after_timed', '--no_console_stats', '--session_name', ('gpuidart-' + [guid]::NewGuid().ToString('N').Substring(0, 12))
+            '--qpc_time', '--timed', ($Seconds + 25), '--terminate_after_timed', '--no_console_stats', '--session_name', $traceSession
         ) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $folder 'present.stdout.log') -RedirectStandardError (Join-Path $folder 'present.stderr.log')
         Start-Sleep -Milliseconds 700
         $trace.Refresh()
@@ -321,6 +323,11 @@ try {
         if ($window -ne [IntPtr]::Zero) { [BenchmarkWindow]::Close($window) }
         if (-not $app.WaitForExit(3000)) { Stop-Process -Id $app.Id }
     }
-    if ($trace -and -not $trace.HasExited) { Stop-Process -Id $trace.Id }
+    if ($trace -and -not $trace.HasExited) {
+        # A killed PresentMon leaves its ETW session running, and a few such
+        # orphans make every later capture lose its events; stop it by name.
+        Stop-Process -Id $trace.Id
+        if ($traceSession) { cmd /c "logman stop $traceSession -ets >nul 2>&1" | Out-Null }
+    }
 }
 if ($observationExitCode) { exit $observationExitCode }
