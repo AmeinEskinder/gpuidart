@@ -16,7 +16,7 @@ param(
 $ErrorActionPreference = 'Stop'
 if ($BackgroundSmoke -and $CapturePresent) { throw 'BackgroundSmoke cannot capture presentation measurements' }
 if ($TraceInput -and ($BackgroundSmoke -or $Packaged -or $Implementation -notin @('rust','dart'))) { throw 'Input tracing requires an unpackaged foreground Rust or Dart fixture' }
-if ($TraceInput -and $Implementation -eq 'dart' -and -not (Test-Path (Join-Path $root 'build/comparison-trace/gpuidart.dll'))) { throw 'Input tracing needs the trace library from benchmarks/build-trace.ps1' }
+if ($TraceInput -and $Implementation -eq 'dart' -and -not (Test-Path (Join-Path (Split-Path -Parent $PSScriptRoot) 'build/comparison-trace/gpuidart.dll'))) { throw 'Input tracing needs the trace library from benchmarks/build-trace.ps1' }
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 Add-Type -Path (Join-Path $PSScriptRoot 'windows.cs') -ReferencedAssemblies System.Drawing
