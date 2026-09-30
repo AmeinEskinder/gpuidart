@@ -1,6 +1,7 @@
 #![allow(non_upper_case_globals)] // Preserve the SDK enum names in matches.
 use crate::{Request, Result};
 use serde_json::{json, Value};
+use std::fmt;
 use windows::{
     core::{BSTR, PCWSTR},
     Win32::{
@@ -28,6 +29,15 @@ impl Drop for Com {
     }
 }
 
+#[derive(Debug)]
+pub struct StaleTree(String);
+impl fmt::Display for StaleTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+impl std::error::Error for StaleTree {}
+
 unsafe fn context() -> Value {
     let mut pid = 0;
     GetWindowThreadProcessId(GetForegroundWindow(), Some(&mut pid));
@@ -53,7 +63,7 @@ fn optional_pattern<T>(result: windows::core::Result<T>) -> Result<Option<T>> {
     }
 }
 
-pub fn accessibility(request: &Request) -> Result<Value> {
+fn accessibility_inner(request: &Request) -> Result<Value> {
     let _com = Com::init()?;
     unsafe {
         let automation: IUIAutomation =
@@ -313,6 +323,20 @@ pub fn accessibility(request: &Request) -> Result<Value> {
             json!({"api":"UIAutomationClient", "process":request.process, "context":context(), "nodes":nodes}),
         )
     }
+}
+
+pub fn accessibility(request: &Request) -> Result<Value> {
+    let result = accessibility_inner(request);
+    if request.operation == "query" {
+        if let Err(error) = &result {
+            if let Some(error) = error.downcast_ref::<windows::core::Error>() {
+                if error.code().0 as u32 == UIA_E_ELEMENTNOTAVAILABLE {
+                    return Err(StaleTree(format!("Stale UIA element: {error}")).into());
+                }
+            }
+        }
+    }
+    result
 }
 
 pub fn environment() -> Result<Value> {

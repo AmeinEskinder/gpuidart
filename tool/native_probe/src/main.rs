@@ -58,8 +58,8 @@ fn main() {
         Ok(None) => (),
         Err(error) => {
             eprintln!("{error}");
-            #[cfg(target_os = "linux")]
-            if error.downcast_ref::<linux::StaleTree>().is_some() {
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
+            if error.downcast_ref::<platform::StaleTree>().is_some() {
                 std::process::exit(75);
             }
             std::process::exit(1);

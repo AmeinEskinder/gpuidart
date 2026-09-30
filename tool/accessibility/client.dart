@@ -41,7 +41,7 @@ Future<Map<String, dynamic>> platformQuery(
     final text = await output;
     final (error, _) = _splitStages(await errors);
     if (status == 75 &&
-        Platform.isLinux &&
+        (Platform.isLinux || Platform.isWindows) &&
         operation == 'query' &&
         restarts.length < 4) {
       restarts.add(error);
@@ -54,7 +54,9 @@ Future<Map<String, dynamic>> platformQuery(
       );
     }
     final result = jsonDecode(text) as Map<String, dynamic>;
-    if (Platform.isLinux) result['query_restarts'] = restarts;
+    if (Platform.isLinux || restarts.isNotEmpty) {
+      result['query_restarts'] = restarts;
+    }
     if (error.isNotEmpty) result['client_stderr'] = error;
     return result;
   }
