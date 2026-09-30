@@ -42,9 +42,12 @@ Future<void> packageWindows({
   final crtArchive = File(
     '.tools/downloads/Microsoft.VC.14.44.17.14.CRT.Redist.X64.base.vsix',
   );
-  if (crtDirectory != null) {
-    await File('$crtDirectory/vcruntime140.dll')
-        .copy('${stage.path}/vcruntime140.dll');
+  final redist = toolchainEnvironment()['VCToolsRedistDir'];
+  final crt =
+      crtDirectory ??
+      (redist == null ? null : '$redist/x64/Microsoft.VC143.CRT');
+  if (crt != null) {
+    await File('$crt/vcruntime140.dll').copy('${stage.path}/vcruntime140.dll');
   } else if (crtArchive.existsSync()) {
     await extractCrt(crtArchive, File('${stage.path}/vcruntime140.dll'));
   } else {

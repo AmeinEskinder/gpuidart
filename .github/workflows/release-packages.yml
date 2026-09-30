@@ -1,21 +1,34 @@
-name: Unix release packages
+name: Release packages
 
 on:
+  push:
+    paths:
+      - 'bin/**'
+      - 'lib/**'
+      - 'native/**'
+      - 'launcher/**'
+      - 'tool/**'
+      - 'example/**'
+      - 'Cargo.*'
+      - 'pubspec.*'
+      - 'rust-toolchain.toml'
+      - '.github/workflows/release-packages.yml'
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: unix-packages-${{ github.ref }}
-  cancel-in-progress: false
+  group: release-packages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   package:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, ubuntu-24.04]
+        os: [windows-2022, macos-15, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     env:
@@ -31,11 +44,15 @@ jobs:
       - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d
         with:
           sdk: '3.13.4'
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
       - name: Install Linux build and display dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 mesa-vulkan-drivers vulkan-tools x11-utils xvfb openbox xauth xdotool
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libwayland-dev libwebkit2gtk-4.1-dev libxkbcommon-x11-dev libx11-xcb-dev libssl-dev libzstd-dev libvulkan1 libatspi2.0-dev mesa-vulkan-drivers vulkan-tools x11-utils xvfb openbox xauth xdotool
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         id: cache
         with:
@@ -47,21 +64,42 @@ jobs:
           restore-keys: |
             unix-package-${{ runner.os }}-${{ runner.arch }}-
             platform-probe-${{ runner.os }}-${{ runner.arch }}-
-      - name: Build AOT evaluation package
+      - name: Build native CLI
         run: |
+          set -o pipefail
           mkdir -p build/package-evidence
           rustup show active-toolchain
           dart pub get --enforce-lockfile
-          dart run tool/package.dart --name=Watchlist 2>&1 | tee build/package-evidence/build.log
+          dart run tool/build_cli.dart
+          build/bin/gpuidart doctor --json | tee build/package-evidence/doctor.json
+      - name: Build Unix AOT evaluation package with the compiled CLI
+        if: runner.os != 'Windows'
+        run: |
+          set -o pipefail
+          build/bin/gpuidart package --name=Watchlist 2>&1 | tee build/package-evidence/build.log
+      - name: Build and verify Windows AOT evaluation package with the compiled CLI
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $crt = Join-Path $env:VCToolsRedistDir 'x64/Microsoft.VC143.CRT'
+          dart run tool/performance/run_logged.dart build/package-evidence/build build/bin/gpuidart.exe package --name=Watchlist "--crt-directory=$crt"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          build/bin/gpuidart.exe verify build/Watchlist-windows-x64.zip build/package-evidence/verification.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dart run tool/verify_package_failures.dart --zip=build/Watchlist-windows-x64.zip --report=build/package-evidence/failure-cases.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:GPUIDART_LIBRARY = Join-Path $pwd 'target/release/gpuidart.dll'
+          dart run tool/verify_dev_launcher.dart --cli=build/bin/gpuidart.exe --report=build/package-evidence/cli-reload.json
       - name: Verify macOS extraction and record release-native baselines
         if: runner.os == 'macOS'
         run: |
           dart run tool/record_platform_environment.dart build/package-evidence/environment.json
-          dart run tool/verify_package.dart build/Watchlist-macos-arm64.tar.gz build/package-evidence/verification.json
+          build/bin/gpuidart verify build/Watchlist-macos-arm64.tar.gz build/package-evidence/verification.json
           # Exercise the no-developer-tools path without changing the runner's Xcode installation.
           if DEVELOPER_DIR=/gpuidart-no-developer-tools /usr/bin/xcrun --find otool >build/package-evidence/unavailable-otool.log 2>&1; then exit 1; fi
-          DEVELOPER_DIR=/gpuidart-no-developer-tools dart run tool/verify_package.dart build/Watchlist-macos-arm64.tar.gz build/package-evidence/runtime-only.json development_machine --runtime-only
+          DEVELOPER_DIR=/gpuidart-no-developer-tools build/bin/gpuidart verify build/Watchlist-macos-arm64.tar.gz build/package-evidence/runtime-only.json development_machine --runtime-only
           dart run tool/run_host_baselines.dart build/package-evidence/baselines
+          GPUIDART_LIBRARY="$PWD/target/release/libgpuidart.dylib" GPUIDART_LAUNCHER="$PWD/target/release/gpuidart-launcher" dart run tool/verify_dev_launcher.dart --cli=build/bin/gpuidart --report=build/package-evidence/cli-reload.json
       - name: Verify Linux extraction and record release-native baselines
         if: runner.os == 'Linux'
         run: |
@@ -69,8 +107,9 @@ jobs:
           unset WAYLAND_DISPLAY ZED_HEADLESS
           openbox >build/package-evidence/openbox.log 2>&1 &
           dart run tool/record_platform_environment.dart build/package-evidence/environment.json
-          dart run tool/verify_package.dart build/Watchlist-linux-x64.tar.gz build/package-evidence/verification.json
+          build/bin/gpuidart verify build/Watchlist-linux-x64.tar.gz build/package-evidence/verification.json
           dart run tool/run_host_baselines.dart build/package-evidence/baselines
+          GPUIDART_LIBRARY="$PWD/target/release/libgpuidart.so" GPUIDART_LAUNCHER="$PWD/target/release/gpuidart-launcher" dart run tool/verify_dev_launcher.dart --cli=build/bin/gpuidart --report=build/package-evidence/cli-reload.json
           CHECKS
       - name: Verify X11 logical and physical geometry at two scales
         if: runner.os == 'Linux'
@@ -108,7 +147,21 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: evaluation-package-${{ runner.os }}-${{ runner.arch }}
-          path: build/Watchlist-*.tar.gz
+          path: |
+            build/Watchlist-*.tar.gz
+            build/Watchlist-windows-x64.zip
+          retention-days: 30
+      - name: Archive Unix CLI with executable permissions
+        if: runner.os != 'Windows'
+        run: tar -czf build/gpuidart-cli.tar.gz -C build/bin gpuidart
+      - name: Retain native CLI
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: gpuidart-cli-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/bin/gpuidart.exe
+            build/gpuidart-cli.tar.gz
+          if-no-files-found: error
           retention-days: 30
       - name: Retain release compilation cache
         if: always() && steps.cache.outputs.cache-hit != 'true'

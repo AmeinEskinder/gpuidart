@@ -8,15 +8,29 @@ import 'package:vm_service/vm_service_io.dart';
 import 'src/windows_tool.dart';
 import 'src/toolchain.dart';
 
-Future<void> main() async {
-  final fixture = await Directory('.cache').createTemp('watchlist-launcher-');
+Future<void> main(List<String> args) async {
+  String? cli;
+  var report = 'reports/sdk/launcher.json';
+  for (final arg in args) {
+    if (arg.startsWith('--cli=')) {
+      cli = File(arg.substring(6)).absolute.path;
+    } else if (arg.startsWith('--report=')) {
+      report = arg.substring(9);
+    } else {
+      throw ArgumentError(
+        'Usage: verify_dev_launcher.dart [--cli=FILE] [--report=FILE]',
+      );
+    }
+  }
+  final cache = await Directory('.cache').create(recursive: true);
+  final fixture = await cache.createTemp('watchlist-launcher-');
   final app = await File('example/watchlist/app.dart')
       .copy('${fixture.path}/app.dart');
   final entry = await File('example/watchlist/main.dart')
       .copy('${fixture.path}/main.dart');
-  final process = await Process.start(dartExecutable, [
+  final process = await Process.start(cli ?? dartExecutable, [
     'run',
-    'tool/dev.dart',
+    if (cli == null) 'tool/dev.dart',
     entry.absolute.path,
   ]);
   final serviceUri = Completer<Uri>();
@@ -71,12 +85,23 @@ Future<void> main() async {
     if (state['state']['labels']['title'] != 'Market watch from file watcher') {
       throw StateError('File watcher did not apply changed code');
     }
-    await watchlistStep(vm.pid!, 'close');
+    if (Platform.isWindows) {
+      await watchlistStep(vm.pid!, 'close');
+    } else {
+      try {
+        await service
+            .callServiceExtension('ext.gpuidart.close', isolateId: isolateId)
+            .timeout(const Duration(seconds: 5));
+      } catch (error) {
+        errors.writeln('Close RPC: $error');
+      }
+    }
     final status = await process.exitCode.timeout(const Duration(seconds: 15));
     if (status != 0) throw StateError('Launcher exited with $status: $errors');
-    await Directory('reports/sdk').create(recursive: true);
-    await File('reports/sdk/launcher.json').writeAsString(
-      '${jsonEncode({'passed': true, 'custom_entry': entry.path, 'file_save_reloaded': true, 'window_close_stopped_launcher': true, 'close_method': 'WM_CLOSE to application HWND', 'exit_code': status})}\n',
+    final result = File(report);
+    await result.parent.create(recursive: true);
+    await result.writeAsString(
+      '${jsonEncode({'passed': true, 'platform': Platform.operatingSystem, 'cli': cli, 'custom_entry': entry.path, 'file_save_reloaded': true, 'window_close_stopped_launcher': true, 'close_method': Platform.isWindows ? 'WM_CLOSE to application HWND' : 'ext.gpuidart.close closes the native host', 'exit_code': status})}\n',
     );
     stdout.writeln(
       'PASS: launcher watched a custom entry directory, reloaded saved code and exited after window close.',

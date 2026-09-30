@@ -37,5 +37,5 @@ jobs:
         run: rustup show active-toolchain
       - name: Restore locked Dart dependencies
         run: dart pub get --enforce-lockfile
-      - name: Native headless and Dart protocol checks
-        run: dart run tool/check.dart --headless
+      - name: Native and full Dart checks including live windows
+        run: dart run tool/check.dart

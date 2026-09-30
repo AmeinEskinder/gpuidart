@@ -90,7 +90,7 @@ remains open.
 To reproduce automated acceptance from committed source:
 
 ```powershell
-./tool/verify_mvp.ps1 -Name WatchlistRelease
+dart run tool/verify_mvp.dart --name=WatchlistRelease
 ```
 
 The command replaces root reports. Preserve prior evidence before a new run.

@@ -1,7 +1,8 @@
 # Portable packaging and baseline checks
 
 `tool/build.dart`, `tool/package.dart` and `tool/verify_package.dart` provide one
-Dart command family. Windows delegates to its existing PowerShell implementation.
+Dart command family. Windows orchestration uses Dart and native OS inspection
+uses the Rust helper in `tool/windows/native`.
 Unix packages use release-native builds and Dart AOT, record source/file hashes,
 and include a compiled standalone verifier. macOS uses an ad-hoc signed `.app`;
 Linux uses an archive with documented system runtime prerequisites.
@@ -13,10 +14,11 @@ processes. It records native dimensions/scale and macOS main-thread ownership.
 Temporary packages and reports are retained. A failed attempt writes `passed:
 false`; a successful old report cannot remain as the current result.
 
-The manually dispatched `Unix release packages` workflow builds both declared
-targets, verifies extraction, records three JIT and three AOT baseline runs in
-alternating order, and tests the Linux artifact in a fresh runtime-only Ubuntu
-container. Artifacts and logs are retained separately. Human input, physical
+The [release workflow](../../.github/workflows/release-packages.yml) builds the
+native CLI and packages on Windows, macOS, and Linux. It verifies extraction and
+compiled CLI reload, records three JIT and three AOT baseline runs on Unix, and
+tests the Linux artifact in a fresh runtime-only Ubuntu container. Artifacts and
+logs are retained separately. Human input, physical
 scaling, clean desktop/VM launch and macOS Developer ID/notarization remain
 separate gates. See [the observation sheets](../../docs/unix-release-checks.md).
 

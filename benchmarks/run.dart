@@ -120,7 +120,8 @@ Future<int> runBenchmark(List<String> args) async {
       release = o.flag('release-records'),
       isolate = o.flag('flutter-isolate');
   o.done();
-  if (!implementations.contains(implementation) || !rates.containsKey(workload)) {
+  if (!implementations.contains(implementation) ||
+      !rates.containsKey(workload)) {
     throw ArgumentError('Unknown implementation or workload');
   }
   if (!RegExp(r'^[A-Za-z0-9][A-Za-z0-9_.-]*$').hasMatch(runId)) {

@@ -16,10 +16,13 @@ version. Those earlier passes are valid clean-VM launches, but they are not
 evidence that GPU sharing was disabled. Their raw requested settings remain
 unchanged in the retained reports.
 
-`tool/prepare_windows_release_checks.ps1` now accepts `-VGpu Enable|Disable`,
+At that revision, `tool/prepare_windows_release_checks.ps1` accepted `-VGpu Enable|Disable`,
 defaulting to `Enable`. The candidate identity and environment report record
 the setting. All other preparation settings, including disabled networking,
 and the candidate ZIP stayed the same.
+
+The current equivalent is `dart run tool/prepare_windows_release_checks.dart
+--vgpu=Disable`; see [Windows setup](../../../docs/windows-test-setup.md).
 
 Microsoft documents [software rendering with GPU sharing disabled](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file).
 The first `Disable` guest reached a desktop and passed package verification.

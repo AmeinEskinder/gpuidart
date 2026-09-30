@@ -45,6 +45,11 @@ Future<void> main(List<String> args) async {
   }
 
   await run(dartExecutable, ['run', 'tool/accessibility/verify_vendor.dart']);
+  await run(dartExecutable, [
+    'run',
+    'tool/source_inventory.dart',
+    '--report=build/source-inventory.json',
+  ]);
   await run('cargo', ['fmt', '--all', '--check']);
   for (final manifest in [
     'tool/native_probe/Cargo.toml',
@@ -89,8 +94,12 @@ Future<void> main(List<String> args) async {
     'format',
     '--output=none',
     '--set-exit-if-changed',
+    'bin',
     'lib',
+    'example',
     'test',
+    'tool',
+    'benchmarks',
   ]);
   await run(dartExecutable, ['analyze', '--fatal-infos']);
   await run(dartExecutable, ['test', 'benchmarks/analysis_test.dart']);

@@ -13,6 +13,10 @@ the native library hash for each side.
 
 ## Method
 
+This records the pre-migration command. For a new comparison, use
+`dart run tool/performance/run_update_gate.dart`; its current arguments are in
+the [performance guide](../../../tool/performance/README.md).
+
 `tool/performance/run_update_gate.ps1` builds release artifacts for each side
 into a side-specific native directory, records the source revision beside
 them, runs `tool/performance/run_snapshot_gate.dart` (three repetitions,
@@ -102,4 +106,3 @@ operation kind.
 with plain and with cached sections. The mixed workload's per-frame median
 is flat because reorders move every cached section; a property-only run
 shows the frame after an edit at about a fifth at 2,048 nodes.
-

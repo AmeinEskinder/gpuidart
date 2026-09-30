@@ -77,7 +77,7 @@ remain pending until the operator chooses to restart. Afterward, run from
 Administrator PowerShell to finish any remaining capabilities:
 
 ```powershell
-& 'D:\Dev\gpuidart\tool\windows\enable_release_checks.ps1' -Japanese
+dart run tool/windows/enable_release_checks.dart --japanese
 ```
 
 Complete the pending Windows restart later to proceed with Sandbox setup and

@@ -16,9 +16,12 @@ and [the tracing run metadata](run-36177754108.json). The diagnostic preparation
 fix passed in [the reload investigation run](run-36179272099.json), with 12
 native and 22 headless Dart tests.
 
-These jobs run `./tool/check.ps1 -Headless` with pinned toolchains and dependencies.
+These historical jobs ran `./tool/check.ps1 -Headless` with pinned toolchains and dependencies.
 They do not verify GPU interaction, code reload, AOT packaging, clean-machine
 launch or IME composition.
+
+The current [workflow guide](../../docs/ci.md) describes the Dart/Rust checks and
+three-platform release jobs that replaced those commands.
 
 The later probe commit `ac7aed4` failed [run 36181630592](https://github.com/AmeinEskinder/gpuidart/actions/runs/36181630592)
 at Dart analysis because its Windows DPI helper used a relative `lib/` import.

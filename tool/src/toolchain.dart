@@ -107,6 +107,10 @@ Map<String, String> toolchainEnvironment({
         '$vc/lib/x64;$sdk/Lib/$version/ucrt/x64;$sdk/Lib/$version/um/x64',
       );
       put('VCToolsInstallDir', '$vc/');
+      final redist = _latestDirectory(
+        '${Directory(vc).parent.parent.parent.path}/Redist/MSVC',
+      );
+      if (redist != null) put('VCToolsRedistDir', '$redist/');
       put('WindowsSdkDir', '$sdk/');
       put('WindowsSDKVersion', '$version/');
       put('CC', '$compiler/cl.exe');

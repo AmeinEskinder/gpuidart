@@ -1,5 +1,9 @@
 # Windows PowerShell child environment
 
+This is historical evidence for the removed PowerShell launcher. Current setup
+and release commands use Dart and Rust, as described in the
+[migration record](../../../docs/tooling-migration.md).
+
 [Windows CI at `6a00278`](https://github.com/AmeinEskinder/gpuidart/actions/runs/36213592776)
 failed the new preparation test because `Get-FileHash` could not be loaded.
 All 36 other headless Dart tests passed. The [failure excerpt](ci-failure.log)

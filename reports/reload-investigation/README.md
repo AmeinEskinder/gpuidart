@@ -60,7 +60,7 @@ was produced for this diagnostic milestone.
 Reproduce:
 
 ```powershell
-./tool/check.ps1
+dart run tool/check.dart
 dart run tool/verify_watchlist_reload.dart --report=build/reload-default.json
 dart run tool/verify_watchlist_reload.dart --report=build/reload-traced.json --prepare-delay-ms=0 --trace
 ```

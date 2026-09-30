@@ -4,11 +4,11 @@
 
 | Workflow | Runner | Checks |
 | --- | --- | --- |
-| Windows SDK checks | Windows Server 2022 x64 | Formatting, analysis, native tests and Dart tests excluding `live-window` |
+| Windows SDK checks | Windows Server 2022 x64 | Formatting, analysis, native tests and the full Dart suite including live windows |
 | macOS SDK checks | macOS 15 ARM64 | Separate headless and native-window jobs; settings JIT/AOT verifier, 100k JIT/AOT trace smoke and code reload |
 | Linux SDK checks | Ubuntu 24.04 x64 | Separate headless and X11/Xvfb/Openbox/Mesa window jobs; settings JIT/AOT verifier, 100k JIT/AOT trace smoke and code reload |
 | Unix process lifecycle | macOS 15 ARM64 / Ubuntu 24.04 x64 | Owned process-group cleanup, including orphan and failed exec |
-| Unix release packages | Same Unix targets, manual dispatch | Release/AOT packages, extraction/dependency checks, three JIT/AOT baselines per target; Linux runtime-only container |
+| Release packages | Windows Server 2022 x64, macOS 15 ARM64, Ubuntu 24.04 x64 | Native CLI and release/AOT packages, extracted package verification and compiled CLI reload; Unix JIT/AOT baselines and Linux runtime-only container |
 
 The [cross-platform evidence](../reports/cross-platform/status.md) records source
 revisions and executed test counts. macOS hosted graphics use Apple Paravirtual
@@ -19,9 +19,9 @@ human IME. Package results and clean desktop/VM checks have separate gates.
 
 [SDK checks](../.github/workflows/check.yml) runs on pushes, pull requests and manual dispatch in GitHub Actions. It uses Windows Server 2022, Dart 3.13.4 and the Rust version in rust-toolchain.toml. Dependency resolution respects both committed lockfiles. Actions are pinned to commit hashes, and the job has read-only repository permissions.
 
-The job runs `dart run tool/check.dart --headless`. This checks Rust and Dart formatting, runs native headless tests, analyzes Dart and runs every Dart test except those tagged live-window. The fault DLL still exercises the real FFI callback and runner-isolate lifecycle. The live-window tests require the normal local command without Headless.
+The job runs `dart run tool/check.dart`. This checks Rust and Dart formatting, runs native tests, analyzes Dart, builds the CLI and runs its doctor, and runs every Dart test including live windows. The fault DLL exercises the real FFI callback and runner-isolate lifecycle. Use `--headless` locally when no desktop is available.
 
-The hosted job does not perform GPU window interaction, code reload, AOT packaging, clean-machine verification or human IME checks. Run `dart run tool/verify_mvp.dart` on the development Windows desktop for the full local acceptance gate. Clean-machine and human checks remain separate.
+The separate [release workflow](../.github/workflows/release-packages.yml) builds native CLI executables and packages on all three targets. It drives packaging, extraction verification and code reload through the compiled CLI, then retains the binaries and reports. Run `dart run tool/verify_mvp.dart` on the development Windows desktop for local acceptance. Hosted development images do not establish clean-machine launch or human IME behavior.
 
 The workflow has been checked with actionlint and its Headless command has passed locally. Hosted Windows runs passed at `9c88cd6` and `d463696`; see [the saved CI evidence](../reports/ci/README.md). Results are specific to those source revisions. Hosted images contain development dependencies and cannot establish clean-machine packaging even after a successful job.
 

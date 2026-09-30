@@ -26,9 +26,9 @@ Reproduce with:
 ```powershell
 dart run tool/verify_dev_failures.dart
 dart run tool/verify_dev_launcher.dart
-./tool/package.ps1 -Name WatchlistMvp
-./tool/verify_package.ps1 -Zip build/WatchlistMvp-windows-x64.zip -ReportPath reports/sdk/package-candidate.json
-./tool/verify_package_failures.ps1
+dart run tool/package.dart --name=WatchlistMvp
+dart run tool/verify_package.dart build/WatchlistMvp-windows-x64.zip reports/sdk/package-candidate.json
+dart run tool/verify_package_failures.dart
 ```
 
 These are development-machine checks. Clean Windows launch and human IME checks remain open.
