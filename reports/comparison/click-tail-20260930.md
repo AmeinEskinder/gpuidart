@@ -38,12 +38,13 @@ of 0.3 ms. Everything else is under a millisecond except the driver's own
 cursor positioning before the injection (up to 20 ms at the 95th percentile
 of a run, charged to no fixture).
 
-The adapter can ask Windows to repaint the window as soon as a publication,
+The adapter asks Windows to repaint the window as soon as a publication,
 an operation update or a dataset update is applied (`RedrawWindow` with an
-invalidation, at most once every 4 ms, Windows only, on with
-`GPUIDART_DRAW_ON_UPDATE=1`; see [the SDK guide](../../docs/sdk.md#frame-scheduling-on-windows)).
-The A/B below was run with the switch on against off; the default is
-decided at the end.
+invalidation, at most once every 4 ms, Windows only; see
+[the SDK guide](../../docs/sdk.md#frame-scheduling-on-windows)). The first
+A/B below measured that repaint firing on every update against it off; the
+sections after it say why the shipped default is neither, but the repaint
+held back while the window is presenting at a frame cadence.
 Six runs each side, run by the owner on 2026-09-30 in one session:
 [click-a-20260930-0](click-a-20260930-0) to [-5](click-a-20260930-5) with the
 switch off and [click-b-20260930-0](click-b-20260930-0) to
@@ -153,16 +154,107 @@ between two readings that straddled two vertical blanks, so the off side's
 107 and 218 overstate, while the on side's 297 is arithmetic (893 presented,
 597 shown).
 
+## The default after the first A/B, and why it did not stand
+
+By the rule set for that A/B (on only if neither burst nor scroll regresses
+in presents never taken or CPU) the repaint went off by default at
+`08fcac8`. The owner then ruled the rule too blunt: the burst's cost is a
+discarded present, not something a person sees, and the repaint is the
+framework's best measured latency advantage on the input a person feels
+most, a lone click on a quiet window. The default should be adaptive: fire
+on a quiet window, hold back on one that is already painting at every tick.
+
+## The adaptive rule
+
+**First attempt, retained as a failure.** The first adaptive build took
+"the window last painted" from the view's own render
+([cell-a-20260930d-0](cell-a-20260930d-0) to [-5](cell-a-20260930d-5),
+[cell-b-20260930d-0](cell-b-20260930d-0) to [-5](cell-b-20260930d-5),
+[burst-a-20260930d-0](burst-a-20260930d-0) to [-5](burst-a-20260930d-5),
+[burst-b-20260930d-0](burst-b-20260930d-0) to [-5](burst-b-20260930d-5)).
+GPUI does not render the view on every frame it paints, so a bursting
+window read as idle: the burst still made 842 presents in ten seconds
+[722, 894] against 597, and on the cell workload 46 of 300 clicks had a
+view render just before the edit and lost the early frame (input to display
+32.4 ms at the median, 46.2 at the 95th percentile). GPUI's next-frame
+callback cannot observe frames either, since registering one demands a
+frame.
+
+**The rule as shipped.** The vendored Windows renderer keeps the instants
+of each window's last three presents (`gpui_windows::last_presents`, in
+[present-feedback.patch](../../native/vendor/present-feedback.patch)). The
+repaint is held back while the window is presenting at a frame cadence:
+the longer gap between those presents is the interval, it counts as a
+cadence up to 50 ms, and the window is in it while its newest present is
+younger than that interval and a half. No refresh rate is assumed (this
+panel presents 16.1 to 17.1 ms apart, not 16.6), a lone hover or press
+frame just before the edit does not hold the repaint back, and each window
+is judged by its own presents.
+
+Six runs a side in one sitting on 2026-09-30 at 19:05 to 19:17, all equal
+work ([cell-a-20260930f-1](cell-a-20260930f-1) to [-6](cell-a-20260930f-6)
+off, [cell-b-20260930f-0](cell-b-20260930f-0) to [-5](cell-b-20260930f-5)
+adaptive, [cell-c-20260930f-0](cell-c-20260930f-0) to
+[-5](cell-c-20260930f-5) with `GPUIDART_DRAW_ON_UPDATE=always` on the same
+build, [burst-a-20260930f-0](burst-a-20260930f-0) to
+[-5](burst-a-20260930f-5) off and [burst-b-20260930f-0](burst-b-20260930f-0)
+to [-5](burst-b-20260930f-5) adaptive; the first off cell run was stopped
+by the driver because an editor window covered the click target, and was
+rerun as run 6). From the injection completed, medians with the per-run
+range:
+
+| Cell | Off | Adaptive (default) | Always, same sitting |
+| --- | --- | --- | --- |
+| Input to present p50 / p95, ms | 14.0 [7.8, 18.0] / 20.2 [17.8, 22.7] | 2.8 [2.6, 2.9] / 4.1 [3.9, 5.3] | 3.2 [2.8, 7.3] / 4.9 [4.0, 12.1] |
+| Input to display p50 / p95, ms | 43.4 [37.5, 45.7] / 48.2 [46.8, 48.8] | 31.6 [26.0, 34.4] / 37.6 [31.4, 37.9] | 33.0 [27.8, 70.0] / 37.3 [31.4, 304.9] |
+| Presents in the window (50 clicks) | 50.5 [49, 58] | 50 [49, 52] | 56.5 [50, 59] |
+| Presents the display never took | 1 [0, 8] | 0.5 [0, 2] | 7.5 [0, 19] |
+| CPU, percent of one core | 4.1 [2.5, 5.9] | 3.1 [2.0, 3.7] | not compared |
+
+| Burst | Off | Adaptive (default) |
+| --- | --- | --- |
+| Input to present p50 / p95, ms | 14.2 [7.2, 16.0] / 20.3 [18.7, 22.9] | 7.3 [5.9, 16.5] / 18.7 [12.7, 19.6] |
+| Input to display p50 / p95, ms | 43.2 [34.2, 44.0] / 48.9 [46.1, 60.0] | 35.5 [34.6, 42.9] / 45.8 [39.3, 47.0] |
+| Presents in the window (300 clicks) | 597 [586, 597] | 598 [598, 599] |
+| Presents the display never took | 12 [1, 70] | 2 [1, 7] |
+| CPU, percent of one core | 26.6 [20.8, 38.9] | 22.3 [18.3, 24.5] |
+
+On the cell workload the repaint fired on every one of the 300 clicks (no
+click's frame came more than 3 ms after its edit, and the first present
+after a click was the changed frame in 48 to 50 of 50), so the adaptive
+rule and the unconditional one are the same policy there, and they measure
+the same in the same sitting. On the burst the window made the presents of
+the tick and no more. Scroll sends no update through the repaint and is
+unchanged by construction.
+
+## Against the acceptance stated beforehand
+
+The acceptance for the adaptive default was written in
+[the board rule](board-rule-20260930.md) before these runs: cell within the
+figures of the repaint firing on every update (about 26 ms to the display
+at the median, about 34 at the 95th percentile), burst within the figures
+of the repaint off on presents made (about 597), scroll unchanged.
+
+- **Burst: met.** 598 presents against 597.
+- **Scroll: met** by construction.
+- **Cell: met against the policy, not against the figures of the earlier
+  sitting.** The 26 and 34 ms were the unconditional repaint on the night
+  of 2026-09-30. In this sitting the adaptive default reads 31.6 and 37.6,
+  and the unconditional repaint on the same build reads 33.0 and 37.3. The
+  difference between the sittings is after the Present call, not before
+  it: input to present is 2.8 ms here against 3.2 then, while present to
+  display is 27.9 to 28.7 ms here against 22.7 then for the same kind of
+  present, which is where the vertical blank falls relative to the
+  driver's clicks and what the compositor adds. Against the repaint off in
+  the same sitting the default is 11.8 ms sooner at the median and 10.6 at
+  the 95th percentile; the earlier sitting's gap was 19.0 and 14.3.
+
 ## The default
 
-Off. The rule for this A/B was that the default stays on only if neither
-burst nor scroll regresses in presents never taken or in CPU; burst
-regresses in presents never taken, by about one rendered and unshown
-frame per click. The switch stays available as `GPUIDART_DRAW_ON_UPDATE=1`
-for an application whose updates answer single inputs, where it takes the
-changed frame to the display 19 ms sooner at the median on the cell
-workload, and the SDK guide says what it costs under a burst. The board
-of 2026-09-30 is measured with the default.
+Adaptive, as measured above: the repaint fires unless the window is
+presenting at a frame cadence. `GPUIDART_DRAW_ON_UPDATE=0` turns it off and
+`GPUIDART_DRAW_ON_UPDATE=always` fires it after every update. The board is
+measured with the default.
 
 ## Where the Dart fixture's display half comes from
 

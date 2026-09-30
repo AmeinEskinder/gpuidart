@@ -1,0 +1,564 @@
+{
+  "a_prefix": "reports/comparison/cell-a-20260930f",
+  "b_prefix": "reports/comparison/cell-b-20260930f",
+  "workloads": {
+    "cell": {
+      "a": [
+        {
+          "run": "cell-a-20260930f-1",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 49,
+          "presents_shown_in_window": 48,
+          "input_to_present_ms": {
+            "n": 49,
+            "p50": 12.865,
+            "p95": 19.553,
+            "p99": 20.128,
+            "max": 20.128
+          },
+          "input_to_display_ms": {
+            "n": 48,
+            "p50": 42.306,
+            "p95": 48.238,
+            "p99": 48.377,
+            "max": 48.377
+          },
+          "inputs_without_a_later_present": 1,
+          "inputs_whose_present_was_not_seen_displayed": 1,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 1,
+          "between_presents_ms": {
+            "n": 48,
+            "p50": 200.207,
+            "p95": 217.149,
+            "p99": 217.697,
+            "max": 217.697
+          },
+          "present_to_display_ms": {
+            "n": 48,
+            "p50": 29.171,
+            "p95": 30.764,
+            "p99": 30.961,
+            "max": 30.961
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 250,
+          "cpu_percent_one_core": 2.499740501938494,
+          "never_displayed": 1
+        },
+        {
+          "run": "cell-a-20260930f-2",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 58,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 7.817,
+            "p95": 20.898,
+            "p99": 22.829,
+            "max": 22.829
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 37.52,
+            "p95": 48.835,
+            "p99": 49.647,
+            "max": 49.647
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 8,
+          "presents_never_displayed_in_window": 8,
+          "between_presents_ms": {
+            "n": 57,
+            "p50": 197.511,
+            "p95": 217.412,
+            "p99": 219.065,
+            "max": 219.065
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 27.871,
+            "p95": 30.104,
+            "p99": 30.636,
+            "max": 30.636
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 312.5,
+          "cpu_percent_one_core": 3.1248789109422006,
+          "never_displayed": 8
+        },
+        {
+          "run": "cell-a-20260930f-3",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 51,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 17.209,
+            "p95": 22.718,
+            "p99": 24.376,
+            "max": 24.376
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 44.694,
+            "p95": 47.6,
+            "p99": 63.624,
+            "max": 63.624
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 1,
+          "presents_never_displayed_in_window": 1,
+          "between_presents_ms": {
+            "n": 50,
+            "p50": 199.86,
+            "p95": 218.643,
+            "p99": 219.548,
+            "max": 219.548
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 26.857,
+            "p95": 29.559,
+            "p99": 42.761,
+            "max": 42.761
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 500,
+          "cpu_percent_one_core": 4.999199378219577,
+          "never_displayed": 1
+        },
+        {
+          "run": "cell-a-20260930f-4",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 49,
+          "presents_shown_in_window": 48,
+          "input_to_present_ms": {
+            "n": 49,
+            "p50": 12.286,
+            "p95": 17.75,
+            "p99": 18.259,
+            "max": 18.259
+          },
+          "input_to_display_ms": {
+            "n": 48,
+            "p50": 41.743,
+            "p95": 46.785,
+            "p99": 48.567,
+            "max": 48.567
+          },
+          "inputs_without_a_later_present": 1,
+          "inputs_whose_present_was_not_seen_displayed": 1,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 1,
+          "between_presents_ms": {
+            "n": 48,
+            "p50": 200.395,
+            "p95": 215.823,
+            "p99": 217.737,
+            "max": 217.737
+          },
+          "present_to_display_ms": {
+            "n": 48,
+            "p50": 29.048,
+            "p95": 30.564,
+            "p99": 30.755,
+            "max": 30.755
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 453.125,
+          "cpu_percent_one_core": 4.530916841684631,
+          "never_displayed": 1
+        },
+        {
+          "run": "cell-a-20260930f-5",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 55,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 18.006,
+            "p95": 21.735,
+            "p99": 24.376,
+            "max": 24.376
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 45.736,
+            "p95": 48.359,
+            "p99": 58.622,
+            "max": 58.622
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 5,
+          "presents_never_displayed_in_window": 5,
+          "between_presents_ms": {
+            "n": 54,
+            "p50": 199.046,
+            "p95": 215.406,
+            "p99": 218.496,
+            "max": 218.496
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 25.699,
+            "p95": 29.369,
+            "p99": 38.143,
+            "max": 38.143
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 593.75,
+          "cpu_percent_one_core": 5.937448937939133,
+          "never_displayed": 5
+        },
+        {
+          "run": "cell-a-20260930f-6",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 50,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 15.226,
+            "p95": 19.129,
+            "p99": 21.159,
+            "max": 21.159
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 44.559,
+            "p95": 48.184,
+            "p99": 48.258,
+            "max": 48.258
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 0,
+          "between_presents_ms": {
+            "n": 49,
+            "p50": 199.849,
+            "p95": 216.792,
+            "p99": 218.713,
+            "max": 218.713
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 29.381,
+            "p95": 30.491,
+            "p99": 30.749,
+            "max": 30.749
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 359.375,
+          "cpu_percent_one_core": 3.5936581101621234,
+          "never_displayed": 0
+        }
+      ],
+      "b": [
+        {
+          "run": "cell-b-20260930f-0",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 50,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 2.873,
+            "p95": 4.45,
+            "p99": 4.796,
+            "max": 4.796
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 27.57,
+            "p95": 31.443,
+            "p99": 31.648,
+            "max": 31.648
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 0,
+          "between_presents_ms": {
+            "n": 49,
+            "p50": 199.673,
+            "p95": 213.656,
+            "p99": 217.201,
+            "max": 217.201
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 24.526,
+            "p95": 28.452,
+            "p99": 28.619,
+            "max": 28.619
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 312.5,
+          "cpu_percent_one_core": 3.124524603581565,
+          "never_displayed": 0
+        },
+        {
+          "run": "cell-b-20260930f-1",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 50,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 2.553,
+            "p95": 3.901,
+            "p99": 4.255,
+            "max": 4.255
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 29.758,
+            "p95": 37.68,
+            "p99": 38.655,
+            "max": 38.655
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 0,
+          "between_presents_ms": {
+            "n": 49,
+            "p50": 200.121,
+            "p95": 208.943,
+            "p99": 211.945,
+            "max": 211.945
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 25.807,
+            "p95": 35.379,
+            "p99": 35.762,
+            "max": 35.762
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 203.125,
+          "cpu_percent_one_core": 2.0310779880051957,
+          "never_displayed": 0
+        },
+        {
+          "run": "cell-b-20260930f-2",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 50,
+          "presents_shown_in_window": 48,
+          "input_to_present_ms": {
+            "n": 49,
+            "p50": 2.714,
+            "p95": 4.096,
+            "p99": 4.217,
+            "max": 4.217
+          },
+          "input_to_display_ms": {
+            "n": 48,
+            "p50": 33.67,
+            "p95": 37.379,
+            "p99": 38.688,
+            "max": 38.688
+          },
+          "inputs_without_a_later_present": 1,
+          "inputs_whose_present_was_not_seen_displayed": 1,
+          "inputs_whose_first_present_was_superseded": 1,
+          "presents_never_displayed_in_window": 2,
+          "between_presents_ms": {
+            "n": 49,
+            "p50": 199.546,
+            "p95": 206.661,
+            "p99": 209.018,
+            "max": 209.018
+          },
+          "present_to_display_ms": {
+            "n": 48,
+            "p50": 30.0,
+            "p95": 34.383,
+            "p99": 34.975,
+            "max": 34.975
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 265.625,
+          "cpu_percent_one_core": 2.656114219441102,
+          "never_displayed": 2
+        },
+        {
+          "run": "cell-b-20260930f-3",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 49,
+          "presents_shown_in_window": 48,
+          "input_to_present_ms": {
+            "n": 49,
+            "p50": 2.654,
+            "p95": 3.964,
+            "p99": 4.855,
+            "max": 4.855
+          },
+          "input_to_display_ms": {
+            "n": 48,
+            "p50": 33.416,
+            "p95": 37.521,
+            "p99": 37.745,
+            "max": 37.745
+          },
+          "inputs_without_a_later_present": 1,
+          "inputs_whose_present_was_not_seen_displayed": 1,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 1,
+          "between_presents_ms": {
+            "n": 48,
+            "p50": 200.041,
+            "p95": 206.725,
+            "p99": 209.479,
+            "max": 209.479
+          },
+          "present_to_display_ms": {
+            "n": 48,
+            "p50": 30.398,
+            "p95": 34.779,
+            "p99": 35.271,
+            "max": 35.271
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 312.5,
+          "cpu_percent_one_core": 3.1247775158408717,
+          "never_displayed": 1
+        },
+        {
+          "run": "cell-b-20260930f-4",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 50,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 2.826,
+            "p95": 4.129,
+            "p99": 4.588,
+            "max": 4.588
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 26.027,
+            "p95": 37.934,
+            "p99": 41.015,
+            "max": 41.015
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 0,
+          "presents_never_displayed_in_window": 0,
+          "between_presents_ms": {
+            "n": 49,
+            "p50": 200.101,
+            "p95": 211.061,
+            "p99": 212.32,
+            "max": 212.32
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 22.306,
+            "p95": 34.715,
+            "p99": 36.603,
+            "max": 36.603
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 375,
+          "cpu_percent_one_core": 3.749866729736425,
+          "never_displayed": 0
+        },
+        {
+          "run": "cell-b-20260930f-5",
+          "implementation": "dart",
+          "workload": "cell",
+          "eligible": true,
+          "inputs": 50,
+          "deadlines_missed": 0,
+          "presents_in_window": 52,
+          "presents_shown_in_window": 50,
+          "input_to_present_ms": {
+            "n": 50,
+            "p50": 2.787,
+            "p95": 5.298,
+            "p99": 6.167,
+            "max": 6.167
+          },
+          "input_to_display_ms": {
+            "n": 50,
+            "p50": 34.382,
+            "p95": 37.662,
+            "p99": 40.387,
+            "max": 40.387
+          },
+          "inputs_without_a_later_present": 0,
+          "inputs_whose_present_was_not_seen_displayed": 0,
+          "inputs_whose_first_present_was_superseded": 2,
+          "presents_never_displayed_in_window": 2,
+          "between_presents_ms": {
+            "n": 51,
+            "p50": 199.995,
+            "p95": 207.61,
+            "p99": 212.042,
+            "max": 212.042
+          },
+          "present_to_display_ms": {
+            "n": 50,
+            "p50": 31.192,
+            "p95": 34.815,
+            "p99": 35.139,
+            "max": 35.139
+          },
+          "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)",
+          "cpu_ms": 328.125,
+          "cpu_percent_one_core": 3.281047067238891,
+          "never_displayed": 2
+        }
+      ]
+    }
+  }
+}
