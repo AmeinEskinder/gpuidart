@@ -23,7 +23,9 @@ comparison applications retain their own languages.
 - [x] Move benchmark orchestration and analysis into Dart and input into Rust.
 - [x] Update callers, CI, and current documentation; retain historical reports.
 - [x] Review each independent change and run the integrated checks.
-- [x] Audit evidence and document remaining platform verification limits.
+- [x] Build native CLIs and release packages on Windows, macOS, and Linux.
+- [x] Verify runtime, accessibility, reload, and packaging on all three targets.
+- [x] Measure committed source and retain CI, artifact, and review evidence.
 
 ## Entry points
 
@@ -57,24 +59,69 @@ retain the commands used at their recorded revisions.
 
 ## Verification
 
-The local Windows full gate passed: 111 native tests (two timing probes ignored),
-three snapshot experiment tests, 140 Dart tests, nine benchmark analysis tests, helper-crate formatting and
-tests, compiled CLI doctor, analyzer, and documentation checks. The full log is
-`.cache/migration/integrated-check.log`.
+Source `8491da1` passed all seven hosted workflows. The
+[completion report](../reports/tooling/completion.json) records source revisions,
+test counts, artifact hashes, package provenance, and raw verification reports.
 
-Windows package extraction and standalone verification passed outside the
-checkout with a restricted PATH, including AOT self-test, sibling runtime DLLs,
-Common Controls v6, and PerMonitorV2 at 120 DPI. Failure checks rejected tampering
+| Target | SDK tests | Runtime and release result |
+| --- | --- | --- |
+| Windows Server 2022 x64 | 111 native, 141 Dart, 3 snapshot, 9 benchmark analysis | PASS, native CLI, extracted release/AOT package, accessibility, reload and package failure cases |
+| macOS 15 ARM64 | 115 native, 116 headless Dart, 29 window Dart, 3 snapshot, 9 benchmark analysis, 7 lifecycle | PASS, native CLI, Metal/AX runtime, companion JIT/AOT, extracted release package and reload |
+| Ubuntu 24.04 x64 | 115 native, 116 headless Dart, 29 window Dart, 3 snapshot, 9 benchmark analysis, 7 lifecycle | PASS, native CLI, X11 runtime, AT-SPI cache events, extracted release package, clean runtime container and reload |
+
+The native suites retain two ignored timing probes on Windows and one on each
+Unix target. Each Unix Dart suite skips two Windows-only cases. Formatting,
+Dart analysis, helper-crate checks, documentation checks, and actionlint passed.
+Clippy completed successfully with existing warnings recorded in the report.
+The actual Windows executable also passed `gpuidart check` locally. Its check
+build goes under `build/check` so it cannot overwrite the running CLI.
+
+Hosted evidence at this source revision:
+
+- [Windows SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102296),
+  [macOS SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102400), and
+  [Linux SDK](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102270).
+- [Three-platform accessibility](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102476).
+  Linux received 50 cache additions and 47 removals with no invalid events.
+- [Native platform probes](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102321) and
+  [Unix process lifecycle](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102378).
+- [Release packages and native CLI artifacts](https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102472).
+  All three package reports record `source_dirty: false` and source `8491da1`.
+  Artifacts are retained for 30 days; their hashes are in the completion report.
+
+The compiled CLI drove packaging, extraction verification, and file-watching
+reload on all three targets. Windows package failure checks rejected tampering
 and missing self-test success, replaced stale success reports, hashed ignored
-application entries, and preserved Unicode stdout/stderr. Watchlist interaction,
-resize/scroll/update stability, code reload, startup failures, and child-process
-cleanup passed through the replacement helpers.
+application entries, and preserved Unicode output. Unix lifecycle tests proved
+that interruption during both startup and watching stops the child application.
+Accessibility checks covered controls, disabled state, settings, watchlist,
+terminal JIT/AOT, and reload on each operating system.
 
-The final package from source commit `f1cbb16` passed through the compiled CLI.
-Its metadata records `source_dirty: false` even with an updated audit report in
-the working tree, and its Dart license matches the selected SDK. The compiled
-CLI also passed the file-watching reload and window-close test. See
-[verification.json](../reports/tooling/verification.json) for hashes and artifacts.
+## Measured source composition
+
+`dart run tool/source_inventory.dart` reads committed Git blobs and rejects
+maintained implementation outside Dart and Rust. It runs in the full check gate.
+The [source inventory](../reports/tooling/source-composition.json) lists every
+recognized source file, its Git object, scope, byte count, and line count.
+
+| Maintained implementation at `8491da1` | Files | Bytes | Share |
+| --- | ---: | ---: | ---: |
+| Dart | 175 | 885,137 | 47.79% |
+| Rust | 66 | 966,988 | 52.21% |
+| PowerShell, C#, Swift, Python | 0 | 0 | 0% |
+
+The baseline `9f825a2` contained 31 PowerShell, three C#, two Swift, and two
+Python files. The completion report records all 38 removed paths. Percentages
+use source bytes, without padding or removal to change the ratio.
+
+Across all recognized repository source, including vendored dependencies,
+comparison applications, and the C ABI header, the measured split is 84.35%
+Rust, 15.15% Dart, and 0.51% C/C++/JavaScript/TypeScript after rounding. These
+excluded scopes are explicit in the inventory. CI YAML, manifests, documentation,
+and evidence are not implementation source. Historical reports retain old
+commands as evidence of what ran at their recorded revisions.
+
+## Earlier parity evidence
 
 Benchmark analysis matched the old scripts across 121 directories, 39 input
 traces, six series summaries, and six Markdown reports. Two floating-point
@@ -83,34 +130,30 @@ fixture runs passed ten background clicks, ten foreground clicks, and 120
 foreground wheel events, with zero missed input deadlines. Details are in
 [benchmark_migration.json](../reports/tooling/benchmark_migration.json).
 
-Windows accessibility passed all nine control steps and disabled-state checks
-against the newly built runtime. One earlier query timed out while other
-live-window tests were running; the serial rerun passed. Both attempts are
-retained under `.cache/migration`. Run desktop accessibility checks serially.
-The legacy/new tree comparison matched the 14 shared nodes; the native UIA
-client also returned six real nonclient title-bar controls.
-That comparison used an existing DLL whose exact source revision was not
-reconstructed; the final control and disabled-state runs used the rebuilt DLL.
+The [earlier Windows migration record](../reports/tooling/verification.json)
+retains the `f1cbb16` package and local verification. Earlier UIA comparisons
+matched 14 shared nodes, with six additional real nonclient title-bar controls
+from the Rust client. Linux GTK comparisons matched six nodes and private-bus
+cache signal acceptance. The final hosted checks above exercise GPUI itself.
 
-Linux helper build/link and GTK query, text, toggle, and absent-process checks
-passed with Rust 1.98.1. Six GTK nodes matched the Python client exactly.
-Typed cache signals on a private AT-SPI bus produced identical acceptance and
-rejection results. These checks exercise the client; the GTK fixture emitted no
-cache events to either client, so it cannot establish GPUI cache delivery.
+## Verification scope
 
-## Remaining platform checks
+The three declared targets are verified for development and evaluation releases.
+The macOS package uses ad-hoc signing and is not notarized. Its runtime-only
+check disables developer-tool discovery on a hosted development machine. Linux
+also passed in a fresh container without Dart or Rust SDKs; `ldd` dependency
+inspection remained enabled. Hosted graphics do not establish physical display,
+mixed-monitor, or human IME behavior. Clean Mac deployment and distribution
+signing remain separate product-release acceptance work.
 
-- The macOS helper cross-checks, but runtime AX/Metal behavior and macOS linking
-  need the macOS CI runner or a Mac.
-- GPUI's Linux cache-event delivery still needs the hosted accessibility gate.
-- Hosted workflows have been updated but have not run for this migration.
-- Windows feature installation/restart and a new Sandbox launch were not run.
-  Preparation and standalone package verification were exercised locally.
-- Full Rust/Shell/Solid/Flutter benchmark fixture rebuilding and Unix analyzer
-  execution were not repeated. The fresh input runs used the Dart fixture.
+Windows feature installation/restart and a new Sandbox launch were not repeated.
+Full third-party benchmark fixture rebuilding was not repeated; analysis parity,
+fresh Dart fixture input, and the automated analysis suites were verified.
+Existing backend limits include Linux EditableText and Windows UIA Grid/Table
+coordinate patterns. These are recorded capabilities, not legacy implementations.
 
-Independent GPT-6 Astra review found no remaining code blockers after fixes for
-reserved package names, actual Dart SDK license discovery, source-only dirty
-metadata, and separation of OS/setup queries from firmware identity checks.
+Independent review by GPT-6 Astra and Claude Fable 5.1 identified and closed
+native CLI self-check, Windows path/environment, process cleanup, and stale
+accessibility-read bugs. Grok 4.6 reviewed packaging and command responsibilities.
 
 The decision trail is in [tooling-migration.tsv](../reports/tooling-migration.tsv).

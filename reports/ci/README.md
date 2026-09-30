@@ -1,5 +1,10 @@
 # Hosted Windows CI
 
+The current Dart/Rust migration source `8491da1` passed the full compiled-CLI
+Windows gate, including live-window tests. See the
+[migration completion report](../tooling/completion.json) for current evidence.
+The chronology below preserves earlier runs and their original scope.
+
 The first hosted-execution gate is complete. GitHub Actions reports success for
 the recorded Windows Server 2022 jobs:
 

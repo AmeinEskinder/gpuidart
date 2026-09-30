@@ -5,7 +5,13 @@ implementation with automated host acceptance, not a stable-release declaration.
 The public Dart API, native ABI 1 and snapshot/dataset format are unchanged.
 The GPUI Kit dependency pin is unchanged.
 
-Current feature-stack source **`bb6a894`** passed the three SDK workflows, Unix
+The Dart/Rust migration source **`8491da1`** passed Windows, macOS, and Linux SDK,
+runtime, accessibility, lifecycle, and release-package checks. The
+[migration completion report](../tooling/completion.json) contains the current
+counts, CI links, and artifact hashes. The broader desktop acceptance items below
+retain their separate scope.
+
+Earlier feature-stack source **`bb6a894`** passed the three SDK workflows, Unix
 process lifecycle and [updated Unix packaging](https://github.com/AmeinEskinder/gpuidart/actions/runs/36210888777).
 All nine Windows local release checks also passed. [Current release records](../release/README.md)
 identify the new artifacts and preserve the remaining desktop gates. The tables

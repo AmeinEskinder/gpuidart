@@ -1,0 +1,794 @@
+{
+    "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+    "recorded_utc":  "2026-09-30T01:02:42.4619269Z",
+    "passed":  true,
+    "platforms":  {
+                      "Windows":  "PASS",
+                      "macOS":  "PASS",
+                      "Linux":  "PASS"
+                  },
+    "architecture":  {
+                         "maintained_implementation_languages":  [
+                                                                     "Dart",
+                                                                     "Rust"
+                                                                 ],
+                         "legacy_files_remaining":  0,
+                         "baseline_commit":  "9f825a2cb5f4e90b18a5a9ddd17c1177ae4272bd",
+                         "removed_legacy_files":  [
+                                                      {
+                                                          "path":  "benchmarks/analyze-input.ps1",
+                                                          "object":  "d26126fb609c31475555a7426f407b92bbb025fa",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  8009,
+                                                          "lines":  118
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/analyze.ps1",
+                                                          "object":  "421b743e2301bd49da5157c7e96fc957eab53a3b",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  9538,
+                                                          "lines":  117
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/build-trace.ps1",
+                                                          "object":  "a423e21fce98006aef9d80aab1b4d1bdb572f98f",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  1046,
+                                                          "lines":  15
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/build.ps1",
+                                                          "object":  "c95d68674fcd89aa7f25213d265c6e7cdb51b401",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  2466,
+                                                          "lines":  49
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/calibrate-wheel.ps1",
+                                                          "object":  "9fb19e8acc6d31d2cd3d1ee616686d7bf9bed66d",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  3560,
+                                                          "lines":  61
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/install-presentmon.ps1",
+                                                          "object":  "daa9c6c602b88a6b08705b460e22bfa8ffb7b73c",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  630,
+                                                          "lines":  10
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/package.ps1",
+                                                          "object":  "02cbc0070f38321827ed8dabec61894866314648",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  4621,
+                                                          "lines":  66
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/report-pair.ps1",
+                                                          "object":  "78f24595deac1425fdbf816eab0e6217e77a7c88",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  7291,
+                                                          "lines":  124
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/resume-series.ps1",
+                                                          "object":  "93581abcfb8578928552cde57ada5ff2818812d2",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  2914,
+                                                          "lines":  41
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/run.ps1",
+                                                          "object":  "d294bf60653d1e59192f5bef364d26e8e325f7f0",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  22696,
+                                                          "lines":  326
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/suite.ps1",
+                                                          "object":  "61d5335e9ba1301eef1f09df69346e820affe7f0",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  1461,
+                                                          "lines":  24
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/summarize-pair.ps1",
+                                                          "object":  "e7a3a7da3f3fe249e67905777a2a9fd18c2f2dd7",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  4224,
+                                                          "lines":  57
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/test-analysis.ps1",
+                                                          "object":  "26df23d9a0dfe925172321b32347c1db76702031",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  4248,
+                                                          "lines":  58
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/test-input-analysis.ps1",
+                                                          "object":  "188293126257c45f6b0986c20b029eeb5b46ddf9",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  6206,
+                                                          "lines":  69
+                                                      },
+                                                      {
+                                                          "path":  "benchmarks/windows.cs",
+                                                          "object":  "d86405c39312ecf4dc2b64d57a7eca3df86c87e7",
+                                                          "language":  "C#",
+                                                          "scope":  "maintained",
+                                                          "bytes":  18576,
+                                                          "lines":  299
+                                                      },
+                                                      {
+                                                          "path":  "tool/accessibility/cache_events.py",
+                                                          "object":  "591b25607ac49e80333f578257aab11527f7148f",
+                                                          "language":  "Python",
+                                                          "scope":  "maintained",
+                                                          "bytes":  3259,
+                                                          "lines":  77
+                                                      },
+                                                      {
+                                                          "path":  "tool/accessibility/linux.py",
+                                                          "object":  "c6d7d824dccb737fa1e87b01d48852e370418667",
+                                                          "language":  "Python",
+                                                          "scope":  "maintained",
+                                                          "bytes":  6322,
+                                                          "lines":  141
+                                                      },
+                                                      {
+                                                          "path":  "tool/accessibility/macos.swift",
+                                                          "object":  "7737b3f759a71572c431d3f71ff8db22470d6f52",
+                                                          "language":  "Swift",
+                                                          "scope":  "maintained",
+                                                          "bytes":  6977,
+                                                          "lines":  127
+                                                      },
+                                                      {
+                                                          "path":  "tool/accessibility/windows.ps1",
+                                                          "object":  "cb0041d4e060ac3786c9e4e635998c76900b7d10",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  6979,
+                                                          "lines":  101
+                                                      },
+                                                      {
+                                                          "path":  "tool/accessibility/windows_description.cs",
+                                                          "object":  "d5c351f2306f30aa3a4c162ef8a715ac6e9b83b7",
+                                                          "language":  "C#",
+                                                          "scope":  "maintained",
+                                                          "bytes":  3505,
+                                                          "lines":  76
+                                                      },
+                                                      {
+                                                          "path":  "tool/accessibility/windows_pointer.cs",
+                                                          "object":  "0add612d15ebccc5f9af3acc1d26369e99fb2154",
+                                                          "language":  "C#",
+                                                          "scope":  "maintained",
+                                                          "bytes":  851,
+                                                          "lines":  19
+                                                      },
+                                                      {
+                                                          "path":  "tool/build.ps1",
+                                                          "object":  "fc52184e4b66b47dd23a0d2d675c5ec2f73755b5",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  395,
+                                                          "lines":  12
+                                                      },
+                                                      {
+                                                          "path":  "tool/build_test_fixtures.ps1",
+                                                          "object":  "84ccc5cceb187e1081f3436f5d81607e3a50e114",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  320,
+                                                          "lines":  4
+                                                      },
+                                                      {
+                                                          "path":  "tool/check.ps1",
+                                                          "object":  "677501cebb285acaca59b3691d0f12bf21837359",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  271,
+                                                          "lines":  8
+                                                      },
+                                                      {
+                                                          "path":  "tool/env.ps1",
+                                                          "object":  "e5f7be3f7be181a65e5bc0ce36ef321dbfeac24e",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  1674,
+                                                          "lines":  27
+                                                      },
+                                                      {
+                                                          "path":  "tool/package.ps1",
+                                                          "object":  "6187c466075bc7b798157a6c0eab022b185257e3",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  9141,
+                                                          "lines":  121
+                                                      },
+                                                      {
+                                                          "path":  "tool/performance/run_update_gate.ps1",
+                                                          "object":  "e3b9bfe2f73b6df7d22713268c5bc6f67eeb9b29",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  3472,
+                                                          "lines":  63
+                                                      },
+                                                      {
+                                                          "path":  "tool/platform_probe/metal.swift",
+                                                          "object":  "b05af9fa783190fd5e4274c696b08386f5b42060",
+                                                          "language":  "Swift",
+                                                          "scope":  "maintained",
+                                                          "bytes":  660,
+                                                          "lines":  18
+                                                      },
+                                                      {
+                                                          "path":  "tool/prepare_windows_release_checks.ps1",
+                                                          "object":  "6f2379b697848771aec6f1ee53b14f246b122e37",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  3255,
+                                                          "lines":  58
+                                                      },
+                                                      {
+                                                          "path":  "tool/verify_mvp.ps1",
+                                                          "object":  "58840cb797433f74a8460e9e45f5f73614fb2d1a",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  6051,
+                                                          "lines":  93
+                                                      },
+                                                      {
+                                                          "path":  "tool/verify_package.ps1",
+                                                          "object":  "50e279a0ef0f6e3206e4e710ff7fc335fa3a0f05",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  977,
+                                                          "lines":  16
+                                                      },
+                                                      {
+                                                          "path":  "tool/verify_package_failures.ps1",
+                                                          "object":  "350269dc4773b16a7001451990f7128fb8ba4324",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  4271,
+                                                          "lines":  70
+                                                      },
+                                                      {
+                                                          "path":  "tool/verify_windows_prerequisites.ps1",
+                                                          "object":  "45cac43ef07b4d2755a2ce6c8d115ca7e8ac4ca7",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  5526,
+                                                          "lines":  69
+                                                      },
+                                                      {
+                                                          "path":  "tool/windows/capability_state.ps1",
+                                                          "object":  "55e9665b8bf1733bf2ad9d4a4830cde5136f033f",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  537,
+                                                          "lines":  10
+                                                      },
+                                                      {
+                                                          "path":  "tool/windows/enable_release_checks.ps1",
+                                                          "object":  "9ee3a14a439aa7f9cfc5708e5f9883a83afc6fd4",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  10953,
+                                                          "lines":  176
+                                                      },
+                                                      {
+                                                          "path":  "tool/windows/sandbox_release_check.ps1",
+                                                          "object":  "35681c531cd838d3410cfd93b926afaf07bb7ea5",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  4100,
+                                                          "lines":  65
+                                                      },
+                                                      {
+                                                          "path":  "tool/windows/verify.ps1",
+                                                          "object":  "fc804c427102d4985627caf6faf2c9e73ed3c53d",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  5228,
+                                                          "lines":  98
+                                                      },
+                                                      {
+                                                          "path":  "tool/windows/watchlist_probe.ps1",
+                                                          "object":  "732d156b7a9f6c7c278f965552eabf58d46da09e",
+                                                          "language":  "PowerShell",
+                                                          "scope":  "maintained",
+                                                          "bytes":  7524,
+                                                          "lines":  113
+                                                      }
+                                                  ],
+                         "composition_report":  "source-composition.json",
+                         "maintained_source":  {
+                                                   "source_bytes":  1852125,
+                                                   "languages":  {
+                                                                     "Dart":  {
+                                                                                  "files":  175,
+                                                                                  "bytes":  885137,
+                                                                                  "lines":  26812,
+                                                                                  "byte_percent":  47.79034892353378
+                                                                              },
+                                                                     "Rust":  {
+                                                                                  "files":  66,
+                                                                                  "bytes":  966988,
+                                                                                  "lines":  26471,
+                                                                                  "byte_percent":  52.20965107646622
+                                                                              }
+                                                                 }
+                                               },
+                         "repository_source":  {
+                                                   "source_bytes":  6045991,
+                                                   "languages":  {
+                                                                     "Dart":  {
+                                                                                  "files":  177,
+                                                                                  "bytes":  915718,
+                                                                                  "lines":  27693,
+                                                                                  "byte_percent":  15.145871040826888
+                                                                              },
+                                                                     "Rust":  {
+                                                                                  "files":  230,
+                                                                                  "bytes":  5099661,
+                                                                                  "lines":  143820,
+                                                                                  "byte_percent":  84.34780997854611
+                                                                              },
+                                                                     "C++":  {
+                                                                                 "files":  5,
+                                                                                 "bytes":  14265,
+                                                                                 "lines":  482,
+                                                                                 "byte_percent":  0.235941469314129
+                                                                             },
+                                                                     "C":  {
+                                                                               "files":  6,
+                                                                               "bytes":  9289,
+                                                                               "lines":  251,
+                                                                               "byte_percent":  0.15363899813942825
+                                                                           },
+                                                                     "JavaScript":  {
+                                                                                        "files":  1,
+                                                                                        "bytes":  2496,
+                                                                                        "lines":  45,
+                                                                                        "byte_percent":  0.041283554672840235
+                                                                                    },
+                                                                     "TypeScript":  {
+                                                                                        "files":  3,
+                                                                                        "bytes":  4562,
+                                                                                        "lines":  75,
+                                                                                        "byte_percent":  0.07545495850059981
+                                                                                    }
+                                                                 }
+                                               },
+                         "scope_rules":  {
+                                             "vendor":  "native/vendor/**; upstream sources and documented adapter patches",
+                                             "comparison":  "benchmarks/{native,dart,flutter,solid,shell}/**; comparison applications. JS/TS execute in the compared engines; Flutter Windows runner files belong to that fixture.",
+                                             "interface":  "native/include/gpuidart.h; C ABI declarations only, implemented in Rust",
+                                             "evidence":  "reports/**; retained historical evidence",
+                                             "maintained":  "All other recognized source files, including CLI, framework, tests, examples, benchmark drivers and analysis"
+                                         }
+                     },
+    "tests":  {
+                  "Windows":  {
+                                  "native":  111,
+                                  "native_timing_probes_ignored":  2,
+                                  "dart":  141,
+                                  "snapshot":  3,
+                                  "benchmark_analysis":  9
+                              },
+                  "macOS":  {
+                                "native":  115,
+                                "native_timing_probes_ignored":  1,
+                                "dart_headless":  116,
+                                "dart_window":  29,
+                                "windows_only_dart_skipped":  2,
+                                "snapshot":  3,
+                                "benchmark_analysis":  9,
+                                "unix_lifecycle":  7
+                            },
+                  "Linux":  {
+                                "native":  115,
+                                "native_timing_probes_ignored":  1,
+                                "dart_headless":  116,
+                                "dart_window":  29,
+                                "windows_only_dart_skipped":  2,
+                                "snapshot":  3,
+                                "benchmark_analysis":  9,
+                                "unix_lifecycle":  7
+                            },
+                  "local_compiled_cli_full_check":  {
+                                                        "command":  [
+                                                                        "build/bin/gpuidart.exe",
+                                                                        "check"
+                                                                    ],
+                                                        "started_utc":  "2026-09-30T00:49:00.179200Z",
+                                                        "passed":  true,
+                                                        "pid":  23384,
+                                                        "exit_code":  0,
+                                                        "elapsed_us":  107313906,
+                                                        "finished_utc":  "2026-09-30T00:50:47.496430Z"
+                                                    },
+                  "format":  "passed",
+                  "dart_analysis":  "no issues",
+                  "actionlint":  "passed",
+                  "rust_clippy":  [
+                                      {
+                                          "scope":  "clippy-final",
+                                          "passed":  true,
+                                          "command":  [
+                                                          "cargo",
+                                                          "clippy",
+                                                          "--locked",
+                                                          "--workspace",
+                                                          "--all-targets",
+                                                          "--no-deps"
+                                                      ],
+                                          "exit_code":  0
+                                      },
+                                      {
+                                          "scope":  "clippy-probe-final",
+                                          "passed":  true,
+                                          "command":  [
+                                                          "cargo",
+                                                          "clippy",
+                                                          "--locked",
+                                                          "--manifest-path",
+                                                          "tool/native_probe/Cargo.toml",
+                                                          "--all-targets",
+                                                          "--no-deps"
+                                                      ],
+                                          "exit_code":  0
+                                      },
+                                      {
+                                          "scope":  "clippy-macos-probe-final",
+                                          "passed":  true,
+                                          "command":  [
+                                                          "cargo",
+                                                          "clippy",
+                                                          "--locked",
+                                                          "--manifest-path",
+                                                          "tool/native_probe/Cargo.toml",
+                                                          "--target",
+                                                          "aarch64-apple-darwin",
+                                                          "--all-targets",
+                                                          "--no-deps"
+                                                      ],
+                                          "exit_code":  0
+                                      }
+                                  ],
+                  "clippy_warnings":  "Existing native warnings and helper suggestions remain; Clippy exits 0. Native lib: 54 warnings; native tests: 56 including duplicates; Windows probe: 2; Windows helper and benchmark driver: 1 each."
+              },
+    "ci":  [
+               {
+                   "scope":  "windows-sdk",
+                   "run_id":  36652102296,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102296",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "windows",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               },
+               {
+                   "scope":  "macos-sdk",
+                   "run_id":  36652102400,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102400",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "headless",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "window",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               },
+               {
+                   "scope":  "linux-sdk",
+                   "run_id":  36652102270,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102270",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "headless",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "window",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               },
+               {
+                   "scope":  "accessibility",
+                   "run_id":  36652102476,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102476",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "platform (ubuntu-24.04)",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "platform (macos-15)",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "platform (windows-2022)",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               },
+               {
+                   "scope":  "lifecycle",
+                   "run_id":  36652102378,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102378",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "processes (macos-15)",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "processes (ubuntu-24.04)",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               },
+               {
+                   "scope":  "platform",
+                   "run_id":  36652102321,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102321",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "probe (macos-15)",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "probe (ubuntu-24.04)",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               },
+               {
+                   "scope":  "packages",
+                   "run_id":  36652102472,
+                   "url":  "https://github.com/AmeinEskinder/gpuidart/actions/runs/36652102472",
+                   "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                   "conclusion":  "success",
+                   "jobs":  [
+                                {
+                                    "name":  "package (macos-15)",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "package (windows-2022)",
+                                    "conclusion":  "success"
+                                },
+                                {
+                                    "name":  "package (ubuntu-24.04)",
+                                    "conclusion":  "success"
+                                }
+                            ]
+               }
+           ],
+    "packages":  [
+                     {
+                         "platform":  "Windows-X64",
+                         "passed":  true,
+                         "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                         "source_dirty":  false,
+                         "source_sha256":  "7ed73cc82af7c00e188e2dc98fbef9c36d63570dfb942f51db74b2f4687efdd9",
+                         "package_report":  "completion/package-Windows-X64.json",
+                         "compiled_cli_reload_report":  "completion/cli-reload-Windows-X64.json",
+                         "file_save_reloaded":  true,
+                         "native_close_stopped_launcher":  true,
+                         "close_method":  "WM_CLOSE to application HWND"
+                     },
+                     {
+                         "platform":  "macOS-ARM64",
+                         "passed":  true,
+                         "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                         "source_dirty":  false,
+                         "source_sha256":  "0603d42fbc57accfe0e57acd5e388715b1961a1dda305eb49d36d266e0891066",
+                         "package_report":  "completion/package-macOS-ARM64.json",
+                         "compiled_cli_reload_report":  "completion/cli-reload-macOS-ARM64.json",
+                         "file_save_reloaded":  true,
+                         "native_close_stopped_launcher":  true,
+                         "close_method":  "ext.gpuidart.close closes the native host"
+                     },
+                     {
+                         "platform":  "Linux-X64",
+                         "passed":  true,
+                         "source_commit":  "8491da1f77e91cc6764aa5749000db0438f39387",
+                         "source_dirty":  false,
+                         "source_sha256":  "0603d42fbc57accfe0e57acd5e388715b1961a1dda305eb49d36d266e0891066",
+                         "package_report":  "completion/package-Linux-X64.json",
+                         "compiled_cli_reload_report":  "completion/cli-reload-Linux-X64.json",
+                         "file_save_reloaded":  true,
+                         "native_close_stopped_launcher":  true,
+                         "close_method":  "ext.gpuidart.close closes the native host"
+                     }
+                 ],
+    "artifacts":  [
+                      {
+                          "artifact":  "evaluation-package-Linux-X64",
+                          "file":  "Watchlist-linux-x64.tar.gz",
+                          "bytes":  22955046,
+                          "sha256":  "5e378ed75f1c0009a0e941b1c1e0871ac195c9e2f5006146a5597927f2dd6d54",
+                          "local_path":  ".cache/migration-completion/validated/packages/evaluation-package-Linux-X64/Watchlist-linux-x64.tar.gz"
+                      },
+                      {
+                          "artifact":  "evaluation-package-macOS-ARM64",
+                          "file":  "Watchlist-macos-arm64.tar.gz",
+                          "bytes":  13991276,
+                          "sha256":  "a2178ffc285cff4158ad0ddb9b6d0a1c1b888f0292f5f994261957882cdfb295",
+                          "local_path":  ".cache/migration-completion/validated/packages/evaluation-package-macOS-ARM64/Watchlist-macos-arm64.tar.gz"
+                      },
+                      {
+                          "artifact":  "evaluation-package-Windows-X64",
+                          "file":  "Watchlist-windows-x64.zip",
+                          "bytes":  15814901,
+                          "sha256":  "9e8ba0594b51bfcae571d260638990ad550941efba314432ab09327a40ccbbe8",
+                          "local_path":  ".cache/migration-completion/validated/packages/evaluation-package-Windows-X64/Watchlist-windows-x64.zip"
+                      },
+                      {
+                          "artifact":  "gpuidart-cli-Linux-X64",
+                          "file":  "gpuidart-cli.tar.gz",
+                          "bytes":  3285772,
+                          "sha256":  "325c91034cf9723494aa8ac23c53e639d0a4c0fe444d915cf1c4ce77c627e077",
+                          "local_path":  ".cache/migration-completion/validated/packages/gpuidart-cli-Linux-X64/gpuidart-cli.tar.gz"
+                      },
+                      {
+                          "artifact":  "gpuidart-cli-macOS-ARM64",
+                          "file":  "gpuidart-cli.tar.gz",
+                          "bytes":  3087130,
+                          "sha256":  "a7acf28247375126d0236f959ef865dbeaa9abed661b7df8d19f3628ea0d16f4",
+                          "local_path":  ".cache/migration-completion/validated/packages/gpuidart-cli-macOS-ARM64/gpuidart-cli.tar.gz"
+                      },
+                      {
+                          "artifact":  "gpuidart-cli-Windows-X64",
+                          "file":  "bin/gpuidart.exe",
+                          "bytes":  8115712,
+                          "sha256":  "2ffefc2cff7e86e63b0991c10354588176bd5e22412d23a53414de2304ebcd8f",
+                          "local_path":  ".cache/migration-completion/validated/packages/gpuidart-cli-Windows-X64/bin/gpuidart.exe"
+                      }
+                  ],
+    "hosted_artifacts":  [
+                             {
+                                 "id":  11071590106,
+                                 "name":  "evaluation-package-macOS-ARM64",
+                                 "size_in_bytes":  13944291,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071590106/zip",
+                                 "expires_at":  "2026-10-30T00:54:51Z"
+                             },
+                             {
+                                 "id":  11071385858,
+                                 "name":  "gpuidart-cli-macOS-ARM64",
+                                 "size_in_bytes":  3077642,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071385858/zip",
+                                 "expires_at":  "2026-10-30T00:54:53Z"
+                             },
+                             {
+                                 "id":  11071231880,
+                                 "name":  "evaluation-package-Windows-X64",
+                                 "size_in_bytes":  15784291,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071231880/zip",
+                                 "expires_at":  "2026-10-30T00:57:47Z"
+                             },
+                             {
+                                 "id":  11071041834,
+                                 "name":  "evaluation-package-Linux-X64",
+                                 "size_in_bytes":  22863494,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071041834/zip",
+                                 "expires_at":  "2026-10-30T00:55:54Z"
+                             },
+                             {
+                                 "id":  11071007103,
+                                 "name":  "package-evidence-Windows-X64",
+                                 "size_in_bytes":  26769,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11071007103/zip",
+                                 "expires_at":  "2026-10-30T00:57:46Z"
+                             },
+                             {
+                                 "id":  11070882235,
+                                 "name":  "gpuidart-cli-Windows-X64",
+                                 "size_in_bytes":  3464412,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070882235/zip",
+                                 "expires_at":  "2026-10-30T00:57:50Z"
+                             },
+                             {
+                                 "id":  11070782226,
+                                 "name":  "gpuidart-cli-Linux-X64",
+                                 "size_in_bytes":  3278290,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070782226/zip",
+                                 "expires_at":  "2026-10-30T00:55:57Z"
+                             },
+                             {
+                                 "id":  11070712477,
+                                 "name":  "package-evidence-Linux-X64",
+                                 "size_in_bytes":  114149,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070712477/zip",
+                                 "expires_at":  "2026-10-30T00:55:53Z"
+                             },
+                             {
+                                 "id":  11070444854,
+                                 "name":  "package-evidence-macOS-ARM64",
+                                 "size_in_bytes":  260659,
+                                 "archive_download_url":  "https://api.github.com/repos/AmeinEskinder/gpuidart/actions/artifacts/11070444854/zip",
+                                 "expires_at":  "2026-10-30T00:54:50Z"
+                             }
+                         ],
+    "accessibility":  {
+                          "summary":  "completion/accessibility.json",
+                          "controls":  9,
+                          "settings":  15,
+                          "watchlist":  7,
+                          "terminal_jit":  15,
+                          "terminal_aot":  15,
+                          "terminal_reload":  "passed on all three",
+                          "linux_cache":  {
+                                              "add":  50,
+                                              "api":  "Gio.DBusConnection",
+                                              "invalid":  [
+
+                                                          ],
+                                              "passed":  true,
+                                              "process":  5933,
+                                              "remove":  47
+                                          }
+                      },
+    "coverage":  {
+                     "targets":  [
+                                     "Windows Server 2022 x64",
+                                     "macOS 15 ARM64",
+                                     "Ubuntu 24.04 x64"
+                                 ],
+                     "linux_container":  "Fresh runtime image without Dart or Rust SDK; ldd dependency inspection remains enabled.",
+                     "macos_runtime_only":  "Verified with developer-tool discovery disabled on the hosted development machine.",
+                     "packages":  "Release optimization; Windows ZIP and Unix tar.gz; macOS ad-hoc evaluation signing, not notarized.",
+                     "native_negative_probes":  "macOS worker/direct Dart launches are expected main-thread failures; Rust main and companion JIT/AOT/reload pass.",
+                     "existing_capabilities":  "Linux EditableText and Windows UIA Grid/Table coordinate patterns remain outside the current backend capability set.",
+                     "display_diagnostic":  "8491da1 runtime probes passed while optional Linux xrandr inventory was unavailable; the CI dependency follow-up installs x11-xserver-utils."
+                 },
+    "review":  {
+                   "models":  [
+                                  "GPT-6 Astra",
+                                  "Claude Fable 5.1",
+                                  "Grok 4.6"
+                              ],
+                   "result":  "GPT-6 Astra final evidence audit clean for 8491da1. All accepted code findings fixed; all seven CI results, test counts, six artifact hashes, package provenance, 24 accessibility report hashes and source composition independently verified. Optional xrandr dependency follow-up is separate from these source results.",
+                   "dropouts":  "One Grok inventory worker returned malformed output; not counted as completed review. Parent completed inventory with a behavioral test."
+               },
+    "decision_trail":  "../tooling-migration.tsv"
+}

@@ -1,0 +1,3551 @@
+{
+  "source_commit": "8491da1f77e91cc6764aa5749000db0438f39387",
+  "method": "Tracked regular source blobs at the stated Git commit. Byte and line counts use Git object contents, independent of checkout line endings. Percentages use recognized source bytes, not all repository assets. This is not GitHub Linguist classification.",
+  "tracked_files": 7950,
+  "extensions": {
+    ".dart": "Dart",
+    ".rs": "Rust",
+    ".ps1": "PowerShell",
+    ".psm1": "PowerShell",
+    ".cs": "C#",
+    ".csx": "C#",
+    ".swift": "Swift",
+    ".py": "Python",
+    ".pyw": "Python",
+    ".js": "JavaScript",
+    ".jsx": "JavaScript",
+    ".mjs": "JavaScript",
+    ".ts": "TypeScript",
+    ".tsx": "TypeScript",
+    ".c": "C",
+    ".h": "C",
+    ".cpp": "C++",
+    ".cc": "C++",
+    ".hpp": "C++",
+    ".m": "Objective-C",
+    ".mm": "Objective-C++",
+    ".sh": "Shell",
+    ".bash": "Shell",
+    ".rb": "Ruby",
+    ".go": "Go",
+    ".java": "Java",
+    ".kt": "Kotlin",
+    ".metal": "Metal",
+    ".wgsl": "WGSL",
+    ".glsl": "GLSL"
+  },
+  "scope_rules": {
+    "vendor": "native/vendor/**; upstream sources and documented adapter patches",
+    "comparison": "benchmarks/{native,dart,flutter,solid,shell}/**; comparison applications. JS/TS execute in the compared engines; Flutter Windows runner files belong to that fixture.",
+    "interface": "native/include/gpuidart.h; C ABI declarations only, implemented in Rust",
+    "evidence": "reports/**; retained historical evidence",
+    "maintained": "All other recognized source files, including CLI, framework, tests, examples, benchmark drivers and analysis"
+  },
+  "repository_source": {
+    "source_bytes": 6045991,
+    "languages": {
+      "Dart": {
+        "files": 177,
+        "bytes": 915718,
+        "lines": 27693,
+        "byte_percent": 15.145871040826888
+      },
+      "Rust": {
+        "files": 230,
+        "bytes": 5099661,
+        "lines": 143820,
+        "byte_percent": 84.34780997854611
+      },
+      "C++": {
+        "files": 5,
+        "bytes": 14265,
+        "lines": 482,
+        "byte_percent": 0.235941469314129
+      },
+      "C": {
+        "files": 6,
+        "bytes": 9289,
+        "lines": 251,
+        "byte_percent": 0.15363899813942825
+      },
+      "JavaScript": {
+        "files": 1,
+        "bytes": 2496,
+        "lines": 45,
+        "byte_percent": 0.041283554672840235
+      },
+      "TypeScript": {
+        "files": 3,
+        "bytes": 4562,
+        "lines": 75,
+        "byte_percent": 0.07545495850059981
+      }
+    }
+  },
+  "by_scope": {
+    "maintained": {
+      "source_bytes": 1852125,
+      "languages": {
+        "Dart": {
+          "files": 175,
+          "bytes": 885137,
+          "lines": 26812,
+          "byte_percent": 47.79034892353378
+        },
+        "Rust": {
+          "files": 66,
+          "bytes": 966988,
+          "lines": 26471,
+          "byte_percent": 52.20965107646622
+        }
+      }
+    },
+    "vendor": {
+      "source_bytes": 4121809,
+      "languages": {
+        "Rust": {
+          "files": 162,
+          "bytes": 4121809,
+          "lines": 117054,
+          "byte_percent": 100.0
+        }
+      }
+    },
+    "comparison": {
+      "source_bytes": 68624,
+      "languages": {
+        "Dart": {
+          "files": 2,
+          "bytes": 30581,
+          "lines": 881,
+          "byte_percent": 44.56312660293775
+        },
+        "C++": {
+          "files": 5,
+          "bytes": 14265,
+          "lines": 482,
+          "byte_percent": 20.78718815574726
+        },
+        "C": {
+          "files": 5,
+          "bytes": 5856,
+          "lines": 185,
+          "byte_percent": 8.53345768244346
+        },
+        "Rust": {
+          "files": 2,
+          "bytes": 10864,
+          "lines": 295,
+          "byte_percent": 15.83119608300303
+        },
+        "JavaScript": {
+          "files": 1,
+          "bytes": 2496,
+          "lines": 45,
+          "byte_percent": 3.637211471205409
+        },
+        "TypeScript": {
+          "files": 3,
+          "bytes": 4562,
+          "lines": 75,
+          "byte_percent": 6.6478200046630915
+        }
+      }
+    },
+    "interface": {
+      "source_bytes": 3433,
+      "languages": {
+        "C": {
+          "files": 1,
+          "bytes": 3433,
+          "lines": 66,
+          "byte_percent": 100.0
+        }
+      }
+    },
+    "evidence": {
+      "source_bytes": 0,
+      "languages": {}
+    }
+  },
+  "passed": true,
+  "violations": [],
+  "files": [
+    {
+      "path": "benchmarks/analysis_test.dart",
+      "object": "07293be2489bcffad011270d750e9841db9f2389",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 13836,
+      "lines": 438
+    },
+    {
+      "path": "benchmarks/analyze.dart",
+      "object": "3413b10b022d20cbcc6ccde2241ff8a79f5f2752",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9377,
+      "lines": 224
+    },
+    {
+      "path": "benchmarks/analyze_input.dart",
+      "object": "4f9e0bc33d9151eba4da386a6e8cc8e06bf88d71",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 7529,
+      "lines": 191
+    },
+    {
+      "path": "benchmarks/build.dart",
+      "object": "5948f7b9b87212604c3b5abcc9f5e32670835c77",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2744,
+      "lines": 111
+    },
+    {
+      "path": "benchmarks/build_trace.dart",
+      "object": "47c086ad6c3cf012d9a14ee9f44bd96311fec56d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1201,
+      "lines": 47
+    },
+    {
+      "path": "benchmarks/calibrate_wheel.dart",
+      "object": "9d10009687a2615f46f4f91c291cc497f01f5b2b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2130,
+      "lines": 63
+    },
+    {
+      "path": "benchmarks/dart/main.dart",
+      "object": "4f54c0f4112edd16aa5755a3fc838f368eecccbb",
+      "language": "Dart",
+      "scope": "comparison",
+      "bytes": 9911,
+      "lines": 274
+    },
+    {
+      "path": "benchmarks/driver/src/main.rs",
+      "object": "1cd6b0e471f661d009ae0101b9fcdebf0db0d547",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 897,
+      "lines": 33
+    },
+    {
+      "path": "benchmarks/driver/src/schedule.rs",
+      "object": "1e3502cbc3316e4f10d155fd60557fefdd79415e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2057,
+      "lines": 65
+    },
+    {
+      "path": "benchmarks/driver/src/windows.rs",
+      "object": "0c3f71fdec3145648caaea68b8129acbe5187dc0",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 33740,
+      "lines": 1043
+    },
+    {
+      "path": "benchmarks/flutter/lib/main.dart",
+      "object": "26ddd4bc8704056f952b9496ea27474f1ee45276",
+      "language": "Dart",
+      "scope": "comparison",
+      "bytes": 20670,
+      "lines": 607
+    },
+    {
+      "path": "benchmarks/flutter/windows/flutter/generated_plugin_registrant.cc",
+      "object": "8b6d4680af388f28db8742ef7fb8246e2bb1fffb",
+      "language": "C++",
+      "scope": "comparison",
+      "bytes": 164,
+      "lines": 11
+    },
+    {
+      "path": "benchmarks/flutter/windows/flutter/generated_plugin_registrant.h",
+      "object": "dc139d85a93101cc0f6e9db03a3e1a9f68e8dd7e",
+      "language": "C",
+      "scope": "comparison",
+      "bytes": 302,
+      "lines": 15
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/flutter_window.cpp",
+      "object": "955ee3038f988929fac2dedb6a307ebd45dfcfd7",
+      "language": "C++",
+      "scope": "comparison",
+      "bytes": 2122,
+      "lines": 71
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/flutter_window.h",
+      "object": "6da0652f05f28fc6950cec20ebdfbae89b665479",
+      "language": "C",
+      "scope": "comparison",
+      "bytes": 928,
+      "lines": 33
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/main.cpp",
+      "object": "9489c84c7399af7a27a1d9ba347fc4498a212a39",
+      "language": "C++",
+      "scope": "comparison",
+      "bytes": 1277,
+      "lines": 43
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/resource.h",
+      "object": "66a65d1e4a79f230031ec0e0959a721039e7282f",
+      "language": "C",
+      "scope": "comparison",
+      "bytes": 432,
+      "lines": 16
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/utils.cpp",
+      "object": "3cb71466549c0c087512f3465765191e4f7507be",
+      "language": "C++",
+      "scope": "comparison",
+      "bytes": 2168,
+      "lines": 69
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/utils.h",
+      "object": "3879d54755798567f0f318d63340508d5668eb96",
+      "language": "C",
+      "scope": "comparison",
+      "bytes": 672,
+      "lines": 19
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/win32_window.cpp",
+      "object": "60608d0fe5bff3a7a7e05d5a232944a1a8effe5f",
+      "language": "C++",
+      "scope": "comparison",
+      "bytes": 8534,
+      "lines": 288
+    },
+    {
+      "path": "benchmarks/flutter/windows/runner/win32_window.h",
+      "object": "e901dde684ea8ba25c50ea5dc7d5900da31a30d4",
+      "language": "C",
+      "scope": "comparison",
+      "bytes": 3522,
+      "lines": 102
+    },
+    {
+      "path": "benchmarks/install_presentmon.dart",
+      "object": "07d5033cfdaa924c55eeae2b7d0c58c23e1080a1",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1399,
+      "lines": 42
+    },
+    {
+      "path": "benchmarks/native/src/input_trace.rs",
+      "object": "c360dc878fbe5a41e14c89be7dfc695fbdf125ff",
+      "language": "Rust",
+      "scope": "comparison",
+      "bytes": 2836,
+      "lines": 79
+    },
+    {
+      "path": "benchmarks/native/src/main.rs",
+      "object": "891ede6ec9c4d402a8029211356bcf4e875666b5",
+      "language": "Rust",
+      "scope": "comparison",
+      "bytes": 8028,
+      "lines": 216
+    },
+    {
+      "path": "benchmarks/package.dart",
+      "object": "0a6d07ed6516a0c27ce9675ce9b8214e6278b3c2",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4637,
+      "lines": 121
+    },
+    {
+      "path": "benchmarks/report_pair.dart",
+      "object": "361fc6d5ba771593f9d744f2589167b357e7bed8",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6241,
+      "lines": 196
+    },
+    {
+      "path": "benchmarks/resume_series.dart",
+      "object": "fbf4ef6512a5c3ad5368ddb027008f078884e880",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2649,
+      "lines": 86
+    },
+    {
+      "path": "benchmarks/run.dart",
+      "object": "cb9b6879d1d94e511811ae52002df4f60f9d60f5",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 13756,
+      "lines": 378
+    },
+    {
+      "path": "benchmarks/shell/main.js",
+      "object": "5b44c78bd3d16b17c116e4bf830224acd7dd6656",
+      "language": "JavaScript",
+      "scope": "comparison",
+      "bytes": 2496,
+      "lines": 45
+    },
+    {
+      "path": "benchmarks/solid/app.tsx",
+      "object": "68db1c6c9eea52824676b7f41327e68da8fd804a",
+      "language": "TypeScript",
+      "scope": "comparison",
+      "bytes": 3881,
+      "lines": 61
+    },
+    {
+      "path": "benchmarks/solid/build.ts",
+      "object": "e717a89fa334629a82a55d356ce396d8bc0bef49",
+      "language": "TypeScript",
+      "scope": "comparison",
+      "bytes": 503,
+      "lines": 10
+    },
+    {
+      "path": "benchmarks/solid/main.ts",
+      "object": "22d60993fe935accf3e5d2c9746e40dcbd33c241",
+      "language": "TypeScript",
+      "scope": "comparison",
+      "bytes": 178,
+      "lines": 4
+    },
+    {
+      "path": "benchmarks/src/common.dart",
+      "object": "37866fa7fca6289d55f5cf23fb2a497d97193341",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6831,
+      "lines": 224
+    },
+    {
+      "path": "benchmarks/src/process.dart",
+      "object": "ec56284d8d4a3092d241e013833eb11f220323bd",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2565,
+      "lines": 86
+    },
+    {
+      "path": "benchmarks/suite.dart",
+      "object": "29d44cdccdada500385d409f4531fc976a13a723",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1333,
+      "lines": 42
+    },
+    {
+      "path": "benchmarks/summarize_pair.dart",
+      "object": "23b420f1b46e085aa8365c79e4986f29eb4f4c0d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4292,
+      "lines": 123
+    },
+    {
+      "path": "bin/gpuidart.dart",
+      "object": "6afa1b5ee43534fbb63115223265827e039ef570",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3015,
+      "lines": 89
+    },
+    {
+      "path": "example/app.dart",
+      "object": "40ed0a96f6b1aca071f21d04b6641751b198503f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 834,
+      "lines": 28
+    },
+    {
+      "path": "example/main.dart",
+      "object": "fa9f45b2b7eb5231a83a1c191f1efe5b9dcb41a2",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4938,
+      "lines": 152
+    },
+    {
+      "path": "example/measure_data.dart",
+      "object": "6f9acb8030bb2585c4009bcb95621acd6e3c81ee",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6364,
+      "lines": 178
+    },
+    {
+      "path": "example/settings/app.dart",
+      "object": "63e37af64273f6d4a547dcc1f250c389bc572dc5",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 11808,
+      "lines": 378
+    },
+    {
+      "path": "example/settings/main.dart",
+      "object": "7dae2b2c232801372bf5826a13e728879595eba3",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 384,
+      "lines": 19
+    },
+    {
+      "path": "example/terminal/app.dart",
+      "object": "618ced259b26b1e74dbff696d298d8676d14c0cf",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 19617,
+      "lines": 636
+    },
+    {
+      "path": "example/terminal/main.dart",
+      "object": "7bea36d2e6df81311ac1396c923b939391203258",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3059,
+      "lines": 91
+    },
+    {
+      "path": "example/watchlist/app.dart",
+      "object": "20acfa570c53080e3a8f9e245d2478638c12258c",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9076,
+      "lines": 301
+    },
+    {
+      "path": "example/watchlist/main.dart",
+      "object": "cc4db7dca3429d4d80aada191da986efc66dfc40",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9769,
+      "lines": 297
+    },
+    {
+      "path": "launcher/src/main.rs",
+      "object": "e9aec1467c3b33e4b47e7dfcec8d5f1646d4e65e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2160,
+      "lines": 56
+    },
+    {
+      "path": "lib/development.dart",
+      "object": "732fe2854e5b0782c029a0948eae08954ecb406f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 809,
+      "lines": 25
+    },
+    {
+      "path": "lib/gpuidart.dart",
+      "object": "ff9fe5af4b5ddc51d37d5512e4dd16f3a591d0f4",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 765,
+      "lines": 31
+    },
+    {
+      "path": "lib/src/actions.dart",
+      "object": "948b7d4ec5d429dae6259397c499b3c2cf077bfc",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2391,
+      "lines": 70
+    },
+    {
+      "path": "lib/src/charts.dart",
+      "object": "dc9019b45a419267e9846e1628b540cba49b8563",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1728,
+      "lines": 63
+    },
+    {
+      "path": "lib/src/companion.dart",
+      "object": "87e99eff761b71e48bd57cc2efa8b811eb3a6490",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2573,
+      "lines": 89
+    },
+    {
+      "path": "lib/src/dataset.dart",
+      "object": "5e7ab8ce6e08eb13ab88dd27917325be63049457",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 29947,
+      "lines": 953
+    },
+    {
+      "path": "lib/src/format.dart",
+      "object": "07d1e6b71862ed2feee9e726c392b900efa4e374",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1793,
+      "lines": 65
+    },
+    {
+      "path": "lib/src/host.dart",
+      "object": "ac8dc1d3bdd0736b1d7fbf88bbeb481a935a5975",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 60712,
+      "lines": 1830
+    },
+    {
+      "path": "lib/src/input_commands.dart",
+      "object": "9894ed9f8bf03411490f65d69f8bb266df94469a",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2138,
+      "lines": 59
+    },
+    {
+      "path": "lib/src/input_state.dart",
+      "object": "fbc9fe31b8e459983712fc0dfb6933786bb40c72",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3414,
+      "lines": 111
+    },
+    {
+      "path": "lib/src/memo.dart",
+      "object": "1fb904eef6b7a269735499ab3311ced108ead19d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1277,
+      "lines": 44
+    },
+    {
+      "path": "lib/src/menus.dart",
+      "object": "48eeec0869a29b1e99b80e2f9153156dbe513363",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2291,
+      "lines": 90
+    },
+    {
+      "path": "lib/src/metrics.dart",
+      "object": "aa48c0f42ec34b06bcf14a67c616dcbba9eda975",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3046,
+      "lines": 86
+    },
+    {
+      "path": "lib/src/native_event.dart",
+      "object": "0a58736f6dcd937521d3eaec2484e5d3e1ce5cac",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 7845,
+      "lines": 235
+    },
+    {
+      "path": "lib/src/nodes.dart",
+      "object": "95d5b8b9cd24deb638e70246b590dbd4cd779825",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 39554,
+      "lines": 1359
+    },
+    {
+      "path": "lib/src/platform.dart",
+      "object": "905c37eb07ac58c34ca474dc1ff4f835ae6813ed",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1499,
+      "lines": 48
+    },
+    {
+      "path": "lib/src/runtime_info.dart",
+      "object": "1f460cac622db0d2aa1a81c0b2085dd67cf74b9c",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1271,
+      "lines": 40
+    },
+    {
+      "path": "lib/src/semantics.dart",
+      "object": "3cf9606c876779bb33e4a78e95b9d867fae51378",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2740,
+      "lines": 92
+    },
+    {
+      "path": "lib/src/style.dart",
+      "object": "aadf4aeb0590c6faa2cc65831172f9cfa331ab04",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 8214,
+      "lines": 302
+    },
+    {
+      "path": "lib/src/table_view.dart",
+      "object": "be96af1a182428fe09a1e94775c0d6b50bf27f83",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3015,
+      "lines": 94
+    },
+    {
+      "path": "lib/src/theme.dart",
+      "object": "bcddd56d9d4e6922cf92f73b9231b2b1e6f0ed26",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1122,
+      "lines": 29
+    },
+    {
+      "path": "lib/src/trace_clock.dart",
+      "object": "7e4c570353576934560f1f58b0ba7a266aa35186",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5526,
+      "lines": 170
+    },
+    {
+      "path": "lib/src/tracing.dart",
+      "object": "73143d67035674ec9c633efa847152003a4d1c7b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 12839,
+      "lines": 425
+    },
+    {
+      "path": "lib/src/tree_diff.dart",
+      "object": "68a57fbcfc9f9e1d9bb963cb9d5405502e67fe7c",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 12453,
+      "lines": 374
+    },
+    {
+      "path": "lib/src/window_options.dart",
+      "object": "da51dd04c968804dea6f4ded4c01471b20986a15",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 692,
+      "lines": 27
+    },
+    {
+      "path": "lib/src/windows.dart",
+      "object": "2f4f512d087c99e14c4f91851efd7813874c141e",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 978,
+      "lines": 26
+    },
+    {
+      "path": "lib/tracing.dart",
+      "object": "2da231c7318dd2a4f2ef09696ca82e29101f3b36",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 127,
+      "lines": 4
+    },
+    {
+      "path": "native/build.rs",
+      "object": "98f53f453421a6214cefccdd4bd1a54c813c0ae0",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 400,
+      "lines": 8
+    },
+    {
+      "path": "native/include/gpuidart.h",
+      "object": "14f0e750e0d63aaa2ee12714bf17c392164a920a",
+      "language": "C",
+      "scope": "interface",
+      "bytes": 3433,
+      "lines": 66
+    },
+    {
+      "path": "native/src/allocations.rs",
+      "object": "660749f7c7047324defb05978284873fb6919f1f",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 1829,
+      "lines": 64
+    },
+    {
+      "path": "native/src/bin/snapshot_experiment.rs",
+      "object": "ba325a5aec97c98fcb077f0c85aa8d4c03d344e0",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 164,
+      "lines": 6
+    },
+    {
+      "path": "native/src/boundary.rs",
+      "object": "262fff202fc2d6b17530b7fca247eb7180fa313d",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 1113,
+      "lines": 29
+    },
+    {
+      "path": "native/src/clock.rs",
+      "object": "36f87900c3761ec4ebe140b3b02ce924d532a37e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 1179,
+      "lines": 40
+    },
+    {
+      "path": "native/src/companion.rs",
+      "object": "e051a2983a5d8fb9c1d0b8a1c75f3180fd91a91a",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 15697,
+      "lines": 467
+    },
+    {
+      "path": "native/src/datasets.rs",
+      "object": "1460b3bdc27b6afda1077defd942a53c1508809c",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 30495,
+      "lines": 824
+    },
+    {
+      "path": "native/src/datasets/tests.rs",
+      "object": "12443cc858e5360e3e8160d3a78433d5b64ac8e6",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 24559,
+      "lines": 742
+    },
+    {
+      "path": "native/src/diagnostics.rs",
+      "object": "8e58beb5e8920975963fa5ca714c2705f213ddd7",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 11709,
+      "lines": 355
+    },
+    {
+      "path": "native/src/experiment.rs",
+      "object": "72056a372e4842c2d333b802a288e9cc36b532f0",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 3178,
+      "lines": 102
+    },
+    {
+      "path": "native/src/experiment/model.rs",
+      "object": "a968bb726fc9b64b0cd122d29e7943b85b79bd26",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 10705,
+      "lines": 327
+    },
+    {
+      "path": "native/src/ffi_tests.rs",
+      "object": "fd192474019e319fb7ebbcb9442c9a36d9a8ecdb",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 6827,
+      "lines": 130
+    },
+    {
+      "path": "native/src/heap_profile.rs",
+      "object": "53bee384dc5d56688fa8de20e915701c8d421bc7",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2378,
+      "lines": 63
+    },
+    {
+      "path": "native/src/input_control.rs",
+      "object": "7551dc2d82ce1bc0d6daa9299f95e743476506c7",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 3803,
+      "lines": 117
+    },
+    {
+      "path": "native/src/lib.rs",
+      "object": "9d5f63e0cd7d3c77c0a326d681ddf06019b654ce",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 22322,
+      "lines": 693
+    },
+    {
+      "path": "native/src/paint_trace.rs",
+      "object": "0e9da0e6c9ab67d75ddaa0ab8a983e2767893a98",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 4550,
+      "lines": 155
+    },
+    {
+      "path": "native/src/protocol.rs",
+      "object": "54d4ceca59cac7cbb8db9b88c4ef65e692fdefbe",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 151292,
+      "lines": 4053
+    },
+    {
+      "path": "native/src/protocol/apply.rs",
+      "object": "2cb6f40bd7471650d2c98ecd254ef2c6a3107f8c",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 19603,
+      "lines": 524
+    },
+    {
+      "path": "native/src/protocol/charts.rs",
+      "object": "c0c216a1ec415e185d215d11f0e5dd2d33d8c50a",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 1045,
+      "lines": 39
+    },
+    {
+      "path": "native/src/protocol/menus.rs",
+      "object": "88a781de0bfb99cef33f7ee138710193611f019e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 5732,
+      "lines": 172
+    },
+    {
+      "path": "native/src/protocol/navigation.rs",
+      "object": "73733f9eb125d352ea4cb5cb5de00c9aca9747f8",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2611,
+      "lines": 72
+    },
+    {
+      "path": "native/src/protocol/semantics.rs",
+      "object": "7116a9a65711708428ec02cc030499987b049453",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 5989,
+      "lines": 175
+    },
+    {
+      "path": "native/src/protocol/theme.rs",
+      "object": "153b182287a0286a615fa140f26ca7260e211905",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2641,
+      "lines": 76
+    },
+    {
+      "path": "native/src/runtime_info.rs",
+      "object": "5fba4c6ffef9148073a0d39546674cfb0562bdf9",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 17727,
+      "lines": 464
+    },
+    {
+      "path": "native/src/startup_probe_tests.rs",
+      "object": "1aec290ab5074a2a3b4b716abe57c4d535487a76",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 5276,
+      "lines": 145
+    },
+    {
+      "path": "native/src/trace.rs",
+      "object": "8679d9639b6535c97de01edfecc4de04860fdd97",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 12235,
+      "lines": 404
+    },
+    {
+      "path": "native/src/ui.rs",
+      "object": "df858bd998545a995aeb3e35feaf285ce265312e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 154164,
+      "lines": 3852
+    },
+    {
+      "path": "native/src/ui/charts.rs",
+      "object": "51aff46375b1a645b8ecd6c7cb779025f6d8222f",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 10322,
+      "lines": 299
+    },
+    {
+      "path": "native/src/ui/charts_tests.rs",
+      "object": "e474e15f7813cbfc4d957f5772824c52b6c22088",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 8297,
+      "lines": 248
+    },
+    {
+      "path": "native/src/ui/choices.rs",
+      "object": "dce4ce01d032f44a20a4413685079a5cd87bdb44",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 12415,
+      "lines": 341
+    },
+    {
+      "path": "native/src/ui/control_root.rs",
+      "object": "0fa89de6c60b3541c1aef0e2a3a484be7c638986",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 7310,
+      "lines": 221
+    },
+    {
+      "path": "native/src/ui/controls.rs",
+      "object": "a5816afa92c84a2311a37093be4de83bab3a1be7",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 21757,
+      "lines": 519
+    },
+    {
+      "path": "native/src/ui/controls_tests.rs",
+      "object": "c0039a4b5b38bfbd16a576d1cff9ef4bbb4998a7",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 15777,
+      "lines": 457
+    },
+    {
+      "path": "native/src/ui/dialogs.rs",
+      "object": "d2de3458bec007b06ae60e8fa6ec4aeb0393dc08",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 7857,
+      "lines": 192
+    },
+    {
+      "path": "native/src/ui/experiment.rs",
+      "object": "45db0b924d409a89e4f1b8d9c67ce150c73a2a8e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 15431,
+      "lines": 385
+    },
+    {
+      "path": "native/src/ui/experiment/frame.rs",
+      "object": "b107d9e618ea8250e44f5396e5df0472ddf1705f",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 4020,
+      "lines": 152
+    },
+    {
+      "path": "native/src/ui/experiment/tests.rs",
+      "object": "717d73f2fd358d73bd29c02ec6e0d9ad0ce94ad7",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 3213,
+      "lines": 80
+    },
+    {
+      "path": "native/src/ui/input_tests.rs",
+      "object": "90baf94e4cc49eecbacf561694edbe285db3da6d",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 8311,
+      "lines": 218
+    },
+    {
+      "path": "native/src/ui/inputs.rs",
+      "object": "af5f660552bb5b6b3ced0c5cb9e1c6d2ae9a9596",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 4677,
+      "lines": 124
+    },
+    {
+      "path": "native/src/ui/menus.rs",
+      "object": "0013cfa007967585efb7a7bf40eab60dc40f92cc",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 5667,
+      "lines": 158
+    },
+    {
+      "path": "native/src/ui/menus_tests.rs",
+      "object": "9304660dbc414e5532e8e1bb1aa2a4ec6912192c",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 6505,
+      "lines": 188
+    },
+    {
+      "path": "native/src/ui/radio_tests.rs",
+      "object": "5fcaf3fce3eb02c81e878724ca9d4f6777017c24",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 5974,
+      "lines": 154
+    },
+    {
+      "path": "native/src/ui/row_menus.rs",
+      "object": "1c6eaa1cea28e5ed3ee0c7befc1386c2f595a39d",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 9162,
+      "lines": 287
+    },
+    {
+      "path": "native/src/ui/row_menus/tests.rs",
+      "object": "9b1909be19e82d4b6481d9e3e6f826a78a5d8675",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 8165,
+      "lines": 252
+    },
+    {
+      "path": "native/src/ui/semantics.rs",
+      "object": "9e39f69e3f5f60f59b6f81eea2379b356934cd06",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 4475,
+      "lines": 118
+    },
+    {
+      "path": "native/src/ui/semantics_tests.rs",
+      "object": "787724a6b93f310199053bf2d67e540a2558a997",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 6452,
+      "lines": 154
+    },
+    {
+      "path": "native/src/ui/slider.rs",
+      "object": "e48c176eba4e98bc654ad7e4333744b37cad0389",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2795,
+      "lines": 86
+    },
+    {
+      "path": "native/src/ui/tabs_tests.rs",
+      "object": "93c5acbe64a86cc3c7e4724cb9773ace4abb92fe",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 5773,
+      "lines": 149
+    },
+    {
+      "path": "native/src/ui/tests.rs",
+      "object": "83b547e57cb827bc012e85c6b62168bc71ce3c52",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 123649,
+      "lines": 3296
+    },
+    {
+      "path": "native/src/ui/theming.rs",
+      "object": "bd0ecd0e30cf2277921e817cb4709bb8d6361a96",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 4036,
+      "lines": 105
+    },
+    {
+      "path": "native/src/ui/tooltip_tests.rs",
+      "object": "a60a1788ed6a5ce906f9adcfab8b09f86c7de504",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2099,
+      "lines": 63
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/action.rs",
+      "object": "bbdfdf70c9119be40685f22f172748ad66f38a71",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 432,
+      "lines": 14
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/adapter.rs",
+      "object": "6b7db3c35f8a520757bc3f1e9d6f88b10653a56f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 28798,
+      "lines": 822
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/callback.rs",
+      "object": "81dce9b920cc412b943aa712305b8ec6e106e1d2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 592,
+      "lines": 15
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/context.rs",
+      "object": "79e5fd77a23c6c46c0fc8b47ded4338512213905",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3846,
+      "lines": 122
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/error.rs",
+      "object": "b61290324943d1ca0014adc477de25cd95b9b52c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1011,
+      "lines": 33
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/events.rs",
+      "object": "aadc1a5a49c093f9fafb75d2de84ffb593110642",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1426,
+      "lines": 69
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/filters.rs",
+      "object": "2802d57e64d170d2d78937dec1493a84a5957f85",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 282,
+      "lines": 6
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/lib.rs",
+      "object": "f296305f73d69c63206337b5c72df1ba8a23460b",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 902,
+      "lines": 33
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/node.rs",
+      "object": "0a27fe8c08c2c763404eb4bdfb7c6cec3546135d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 67177,
+      "lines": 1944
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/rect.rs",
+      "object": "7705dec924dbe9f7a5121c5224febb128cef4daa",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 898,
+      "lines": 37
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/simplified.rs",
+      "object": "9ff3580c15982219883dd183755fdea27435625b",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 30021,
+      "lines": 901
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/text_attributes.rs",
+      "object": "0893f2f7a67ac25592940d421c97056ddebd2fe2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2121,
+      "lines": 79
+    },
+    {
+      "path": "native/vendor/accesskit_atspi_common-0.19.1/src/util.rs",
+      "object": "0671254e8d93b564b0c3550b830cef7f5d2cd0cf",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 4607,
+      "lines": 134
+    },
+    {
+      "path": "native/vendor/accesskit_consumer-0.38.0/src/filters.rs",
+      "object": "c2cb66de6dbd7a0d87547844be80a2e3f8eba2e4",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 13941,
+      "lines": 421
+    },
+    {
+      "path": "native/vendor/accesskit_consumer-0.38.0/src/iterators.rs",
+      "object": "23fd15ae68d3d30d59abc796366786fb2e6dd1d7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 32863,
+      "lines": 1060
+    },
+    {
+      "path": "native/vendor/accesskit_consumer-0.38.0/src/lib.rs",
+      "object": "11f7ae8e8e5db25a82f8a6498cc24e895a2d5f83",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7557,
+      "lines": 212
+    },
+    {
+      "path": "native/vendor/accesskit_consumer-0.38.0/src/node.rs",
+      "object": "86c608c3bb7e67add61d9bcf06760ec5b6ee1246",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 66556,
+      "lines": 2094
+    },
+    {
+      "path": "native/vendor/accesskit_consumer-0.38.0/src/text.rs",
+      "object": "bd9ec4b173094f19fd2f2b6b9aeae06b9858576a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 102639,
+      "lines": 2836
+    },
+    {
+      "path": "native/vendor/accesskit_consumer-0.38.0/src/tree.rs",
+      "object": "75f227c747a0babb8f3416f70ee3560c096c8c4e",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 114995,
+      "lines": 3187
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/adapter.rs",
+      "object": "afca31f829433e697939c6a4a95e43373e691359",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 8999,
+      "lines": 271
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/bus.rs",
+      "object": "9da5b45c5022dfdc35a13bde0fa755464e14f534",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 16679,
+      "lines": 475
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/accessible.rs",
+      "object": "ad61060cd8bfdf85ef4e8039e41d1d2adca0bbae",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6978,
+      "lines": 246
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/action.rs",
+      "object": "e982468e74ee388bfc43e6d865286b3c47356652",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1453,
+      "lines": 51
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/application.rs",
+      "object": "6ad408b3b8d5a1e8613ddf6f09d8261a37984bb1",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1054,
+      "lines": 39
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/cache.rs",
+      "object": "349eb501821aad6edbf91a6247992daf81ad7f90",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 9981,
+      "lines": 314
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/component.rs",
+      "object": "a457b52a491546e84a7a334ed2d301f408422a5c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2359,
+      "lines": 76
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/hyperlink.rs",
+      "object": "fbb12f7e3930891f9cba111cac155ac6b9243812",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1930,
+      "lines": 63
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/mod.rs",
+      "object": "7e33c1e4deb0726d0cfc3647d87975d6130dd18c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1048,
+      "lines": 41
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/selection.rs",
+      "object": "b311a905d85fb1871b81e1cd1e9a7980299060bf",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2669,
+      "lines": 82
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/text.rs",
+      "object": "c861cbd1b27a23ab3a692c020131a3b87e787b2a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 4796,
+      "lines": 163
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/value.rs",
+      "object": "e410acdf32877b29b0dce7ff7cf2201cebaf425f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1417,
+      "lines": 49
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/mod.rs",
+      "object": "799e9f3ac22a3baf3c73a33d3207c9fe02c804fe",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 418,
+      "lines": 13
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/object_address.rs",
+      "object": "8acd0ec5db1ba4f27584bb69bd3e3ff587c9b933",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1341,
+      "lines": 45
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/object_id.rs",
+      "object": "91ed0eba8967dd12edb4fe5d4e2880b1c0ac9a53",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2282,
+      "lines": 79
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/context.rs",
+      "object": "5a990886fff31f2c8795579accc66d2fa46ab9f8",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 9395,
+      "lines": 298
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/executor.rs",
+      "object": "f227af42c623333f54493a7fd7969eed6c9b7dc3",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 4452,
+      "lines": 158
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/lib.rs",
+      "object": "d7c558c57c600346d78cc5d09171ef84d8268a8c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 972,
+      "lines": 27
+    },
+    {
+      "path": "native/vendor/accesskit_unix-0.22.1/src/util.rs",
+      "object": "15073021b32e838b1d7c1840b0bd7cff7cb5db10",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1616,
+      "lines": 42
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/adapter.rs",
+      "object": "f1158fbbe2320366d4f3f1d1be1bd83829a1f7b4",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 26729,
+      "lines": 674
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/context.rs",
+      "object": "72e5ce5c499043c1ffad96513e69ddbeef1abea4",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3046,
+      "lines": 98
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/filters.rs",
+      "object": "e8614e8d184d4c9d51713e23a9e428461594bfd2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 356,
+      "lines": 8
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/lib.rs",
+      "object": "7aee09b3ef654ca5d8b1450a24f68cd400948bc6",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 501,
+      "lines": 22
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/node.rs",
+      "object": "0e118dde54bd7e577d09f335ac0e19c4020a1e49",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 58871,
+      "lines": 1547
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/subclass.rs",
+      "object": "db2d2b6875bdda72d8fed6add59c08495ab1bac2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6721,
+      "lines": 204
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/tests/mod.rs",
+      "object": "10612da1bde60ba1946c725eaea32dc3f173d24c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11733,
+      "lines": 338
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/tests/simple.rs",
+      "object": "5a0934a64bc0f5ac8f2eddc40a91da5c74d67c0b",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6874,
+      "lines": 198
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/tests/subclassed.rs",
+      "object": "a83e1b54f3751c706855f73932b07019874d8ffa",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 5469,
+      "lines": 177
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/text.rs",
+      "object": "07a45b8995d855cd253b071eafdbcf7f49c796b0",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 22495,
+      "lines": 651
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/util.rs",
+      "object": "b6e4d36f3957c36721e5fa8360aa51a5fc5daa4f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 14680,
+      "lines": 536
+    },
+    {
+      "path": "native/vendor/accesskit_windows-0.34.0/src/window_handle.rs",
+      "object": "0538d5bfc2d9a9a9e33c1880cb0feb45209e64c8",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 753,
+      "lines": 32
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/build.rs",
+      "object": "79ca3f96a73c09a7c16290db21ac7bf162c84db7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 825,
+      "lines": 24
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/_accessibility.rs",
+      "object": "af14b638cd086c3bf8e2be1888b152d67b8fbfc3",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11011,
+      "lines": 295
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/_ownership_and_data_flow.rs",
+      "object": "68699cce7f595eca8172569ad51f10b3cabc27d2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7413,
+      "lines": 140
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/action.rs",
+      "object": "fda5084c10066f2bee3f616f303d8e6fbec11815",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 16166,
+      "lines": 459
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app.rs",
+      "object": "612d3df588273e3dd19f5ebe6d3220d68d4994dc",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 125700,
+      "lines": 3451
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/async_context.rs",
+      "object": "c3af6028be6516a226e1c736b31811e2cad8af02",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 17480,
+      "lines": 551
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/bench_context.rs",
+      "object": "15eef07eb57b358bb045da09e0a8ecc66c8da8cc",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 60433,
+      "lines": 1596
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/context.rs",
+      "object": "bce22b59f3751b7854f5127cf99737b55b89a186",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 32448,
+      "lines": 959
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/entity_map.rs",
+      "object": "4184503ba3a23ff6400b51b5aa5026b661d63edb",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 41687,
+      "lines": 1302
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/headless_app_context.rs",
+      "object": "6ac4bfe9f8510b6c1a9eebca7f9ab7dde8038906",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 9459,
+      "lines": 284
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/test_app.rs",
+      "object": "bf265fd7bffade108aacca753dd1c4e037f96524",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 19985,
+      "lines": 645
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/test_context.rs",
+      "object": "a4c9fb6528c2a534dcecb337c9cadd0dba854243",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 48141,
+      "lines": 1436
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/app/visual_test_context.rs",
+      "object": "b54802a299b83b16c6f70e43bc4c540de896ef6a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 16045,
+      "lines": 484
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/arena.rs",
+      "object": "ea5968f84e9cb08dd878e5e09195eb88f587b1ce",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11567,
+      "lines": 401
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/asset_cache.rs",
+      "object": "4c7bee1207632edd94252c5dabbcc9d6f8a24c70",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11806,
+      "lines": 358
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/assets.rs",
+      "object": "cb8b47ed0166ba1bf67842766cd50cdd30e8a6d2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3813,
+      "lines": 133
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/bounds_tree.rs",
+      "object": "e95e32477b912b810607b20306be5f7d53c76df2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 16419,
+      "lines": 472
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/color.rs",
+      "object": "3bd893f99357051e1936f52e22c4c40d6dd24887",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 30454,
+      "lines": 1070
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/colors.rs",
+      "object": "ef11ef57fdb363dae3f910db2e540e3de02fe453",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3302,
+      "lines": 122
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/debug_overlay.rs",
+      "object": "0cca543ea5d4b0cf45d4509bbfe05c227f8b9255",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 15300,
+      "lines": 428
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/element.rs",
+      "object": "d6556258e15f7cac891e14861a2cd323fa09f6cf",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 29450,
+      "lines": 813
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/anchored.rs",
+      "object": "29260061bb72ef9ca4dc66ac12919c9407d246cb",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 13364,
+      "lines": 398
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/animation.rs",
+      "object": "e0768935d9155abd5ca4af12884aa1981a56590a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 35832,
+      "lines": 1028
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/canvas.rs",
+      "object": "d57d2f604166626137403b746656f433a77579f2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2752,
+      "lines": 95
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/container_query.rs",
+      "object": "0363ce6900835b0a5116bc8398167085ae291ad9",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3760,
+      "lines": 126
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/deferred.rs",
+      "object": "ddf324a6b26b861ca0e7ef1c2ede3d648abe82a2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6862,
+      "lines": 206
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/div.rs",
+      "object": "c32ac995ec5e72577dcc208ba3f89dd606142a66",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 224598,
+      "lines": 5634
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/image_cache.rs",
+      "object": "84948145aa869a09032e292e6b6b0ca679b8726d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 10665,
+      "lines": 330
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/img.rs",
+      "object": "2c77e5f32ad12a8fafb88305ba208ca74a80cdac",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 35463,
+      "lines": 983
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/list.rs",
+      "object": "fa21d107062ab9ce56cf6bb4f90342bf053ab0e3",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 111335,
+      "lines": 2973
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/mod.rs",
+      "object": "8a2a1b70a7bf28464547009020efa9caff8f0cff",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 434,
+      "lines": 27
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/surface.rs",
+      "object": "ac1c247b47ec81bca06e458827786f549ca2d747",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3356,
+      "lines": 121
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/svg.rs",
+      "object": "176072f1c88a5635d1b8d703ac0eab5237e43a6d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 9044,
+      "lines": 303
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/text.rs",
+      "object": "d1896ad0a65cc659f39d18cd601e2f9f2342ee64",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 47129,
+      "lines": 1349
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/elements/uniform_list.rs",
+      "object": "0a449a20a3cf4c0d676c6d03053baff1d8de6e8a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 33672,
+      "lines": 865
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/executor.rs",
+      "object": "b4348e940d0ea217a0191c19426ee42120c3edaf",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 20747,
+      "lines": 574
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/geometry.rs",
+      "object": "1c87031c7aad8df10827152debe6f74672d7c07f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 120411,
+      "lines": 4020
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/gestures.rs",
+      "object": "ec611576efb00e37d781c049937aee4b13944601",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 91013,
+      "lines": 2211
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/global.rs",
+      "object": "a16934c129d70c3a7be5272dd8704a443b521f5b",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2542,
+      "lines": 75
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/gpui.rs",
+      "object": "387729e8a3ec2a140c3ff1d1ea496a3284ea4545",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11628,
+      "lines": 373
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/input.rs",
+      "object": "4167aa09905b09ab818f9d95b1646e71339eafbd",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 15038,
+      "lines": 485
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/inspector.rs",
+      "object": "d353690e319e923fc783298c06c93cc000fe0bf4",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 9580,
+      "lines": 271
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/interactive.rs",
+      "object": "913cf1ba7905adc46ba6d6799848bbcc49fe8e13",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 31608,
+      "lines": 971
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/key_dispatch.rs",
+      "object": "5db400fab980f11f9e0ae8d79092fdb80c38cb4b",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 75081,
+      "lines": 2027
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/keymap.rs",
+      "object": "bef0d03a2b951805ff6b966b57070055049200cd",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 34828,
+      "lines": 927
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/keymap/binding.rs",
+      "object": "fc4b32941b85f4cdea31aaba7198d3e7043ee481",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 4741,
+      "lines": 143
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/keymap/context.rs",
+      "object": "27f361bbe28a812a2b8996433854504d26bfece7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 32639,
+      "lines": 891
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/path_builder.rs",
+      "object": "40a6e71e0a1738adf1ed261183d2340682826992",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 10513,
+      "lines": 347
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform.rs",
+      "object": "c03653ed942186d7935f9f76036d6a1a49e83909",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 119336,
+      "lines": 3457
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/app_menu.rs",
+      "object": "27c20c00badc50a965560073885f09a4e271ce5e",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11423,
+      "lines": 426
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/keyboard.rs",
+      "object": "10b8620258ecffd41e8018fc539c47812df0fe05",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 1225,
+      "lines": 41
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/keystroke.rs",
+      "object": "c45c7c1b335addf2c91df2a45a04d5c958910ec7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 23052,
+      "lines": 776
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/layer_shell.rs",
+      "object": "8be1b5fcdb46c98acb80e6970edbc5a856f180bb",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2987,
+      "lines": 83
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/popup.rs",
+      "object": "a1f8d7ea0d572f2cca45828a7da2e7613b8c7e5c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 5650,
+      "lines": 134
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/scap_screen_capture.rs",
+      "object": "797e19ba23f715c372d76fd349577dde16a66f6f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11934,
+      "lines": 325
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/test.rs",
+      "object": "a327d8fe942e1463ea26b019351277bcb040dda2",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 275,
+      "lines": 12
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/dispatcher.rs",
+      "object": "c48e491347485bf217bc724654b01b3ca539cdd4",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 4204,
+      "lines": 148
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/display.rs",
+      "object": "c4adb014aa523668677e1ba40b5499485a8932b5",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 723,
+      "lines": 33
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/platform.rs",
+      "object": "4bf08387848a40c5851fa03d1f66ddb3e83a5883",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 24179,
+      "lines": 742
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/window.rs",
+      "object": "14fb8896b24a71cc47f1963c81aae0fc4f9f0828",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 19096,
+      "lines": 591
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/threaded_dispatcher.rs",
+      "object": "b1fb4974df945e84a8e5fe83a0ade3967473520a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 26946,
+      "lines": 744
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform/visual_test.rs",
+      "object": "0454c31014ac905e5d0b0e232447bcc6517cbe44",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 8114,
+      "lines": 272
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/platform_scheduler.rs",
+      "object": "a555a5a36a5fbaa5a463f9037172ea20316e4df4",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 16772,
+      "lines": 457
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/prelude.rs",
+      "object": "b5185a25e8619886f9a2240da26e4d2b4cabd0ff",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 489,
+      "lines": 9
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/profiler.rs",
+      "object": "e8108c106b8c456925e72b1424a7e285f536fdcb",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 56564,
+      "lines": 1644
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/profiler/actions.rs",
+      "object": "a4892f8ac223957bd93e612a30ddbfb580b839b8",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6202,
+      "lines": 213
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/profiler/hang.rs",
+      "object": "23d63aa658bd049db5adc49f27db53014b9ee2ca",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 53513,
+      "lines": 1304
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/profiler/journal.rs",
+      "object": "ed6ac6c5889007dbcca31bdf03ae3fc11fe76b77",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 112267,
+      "lines": 3001
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/queue.rs",
+      "object": "3e02b1359d9003ded61440d8eb8ee5c11e8579b8",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 13134,
+      "lines": 446
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/scene.rs",
+      "object": "ea0f5d7e31af4330b8ecafb613f26e49a32b8878",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 31085,
+      "lines": 949
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/shared_uri.rs",
+      "object": "e257aaf08da0a5f4d500919e376d5a22e9ab5d7d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 627,
+      "lines": 25
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/spring.rs",
+      "object": "efc878061be7c6996993a629c9917034842fc420",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 27610,
+      "lines": 830
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/style.rs",
+      "object": "9150fdded91b817305454f18beb0a0b7d6c5966a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 54147,
+      "lines": 1529
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/styled.rs",
+      "object": "a24982a6acb6071701d2258e47a5f25a86d1ee89",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 33010,
+      "lines": 904
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/subscription.rs",
+      "object": "b0c55a3966192ea0a15011e3cd2d14498c680c46",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11066,
+      "lines": 351
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/svg_renderer.rs",
+      "object": "798fb2a9657b4a895bccf8837386d4105b458928",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 18565,
+      "lines": 525
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/tab_stop.rs",
+      "object": "bde651ae5c4572dbe5a795c91082dc8d8cc58b7e",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 18973,
+      "lines": 615
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/taffy.rs",
+      "object": "b9e583a8df43a95a8dd87ae73822ad52efb0d5ee",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 28113,
+      "lines": 776
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/test.rs",
+      "object": "a93424edeab601339e64bac5d8350511568ed41a",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7717,
+      "lines": 220
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/text_system.rs",
+      "object": "cf6bb10293699bb4b9a5c8149f996822444fd732",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 51974,
+      "lines": 1505
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/text_system/font_fallbacks.rs",
+      "object": "63dc89ba41ea9cf44bdffb7d81d3015d696f4413",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 635,
+      "lines": 21
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/text_system/font_features.rs",
+      "object": "c1ab72b417a53b86a5b43f7a90aec9e439aa1fab",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 4756,
+      "lines": 154
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/text_system/line.rs",
+      "object": "f5210052e2b73d03521c35207b0e05550aba3e48",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 73982,
+      "lines": 1979
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/text_system/line_layout.rs",
+      "object": "f0bf1211114e4522a5310067e2549ba2727a4c1d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 40252,
+      "lines": 1190
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/text_system/line_wrapper.rs",
+      "object": "678e9e0f1859e270ee1fb1ea21d5db92c177e948",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 54368,
+      "lines": 1587
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/util.rs",
+      "object": "13ee752dadf00ac0f4f2e450bb908ba544550943",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 8167,
+      "lines": 252
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/view.rs",
+      "object": "f24a4da9b7906e1c1f8dfd110f75fd6ef9c5aad8",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 19358,
+      "lines": 593
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/window.rs",
+      "object": "d09fb29e2c3f4afb5b9879f0e4473d8a3a6d6ee9",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 361472,
+      "lines": 9316
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/window/a11y.rs",
+      "object": "5b63821232a73dcdcac5bb7c402b7b31645982e1",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 34973,
+      "lines": 905
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/window/a11y/debug.rs",
+      "object": "ae98aa52837b11b7183601dcbf70d6503a14f598",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11527,
+      "lines": 330
+    },
+    {
+      "path": "native/vendor/gpui-pre-0.3.7/src/window/prompts.rs",
+      "object": "980c6f6812405a8fbf4f8c6e24388ab4f967a94c",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6719,
+      "lines": 232
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/build.rs",
+      "object": "1db95715e26daf9ab0ca5097183a763cf3aa8340",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7683,
+      "lines": 242
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/clipboard.rs",
+      "object": "cd0694ab3159984ee7e66f0d71f8c3a6c6ea16b6",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 12957,
+      "lines": 388
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/destination_list.rs",
+      "object": "d6967c01d2410fa5cfa6a5ed7b255a6a6872238f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7044,
+      "lines": 207
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/dialog.rs",
+      "object": "16866cfc35a9236a835d0095b5ee063421a1273d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11442,
+      "lines": 340
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/direct_manipulation.rs",
+      "object": "9adcbed343bec61530329a1673f0185cae41c115",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 12095,
+      "lines": 359
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/direct_write.rs",
+      "object": "633b83f8b653294deaeaa450acf2df7d92a889c6",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 75833,
+      "lines": 2158
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/directx_atlas.rs",
+      "object": "622c1cb6040ae6817692fc9f4ffb89dcc43f142e",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 14420,
+      "lines": 420
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/directx_devices.rs",
+      "object": "8e65e6e626aa9bca9bdf60d268d2309ec4b4c1e1",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6143,
+      "lines": 194
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/directx_renderer.rs",
+      "object": "dcdcc93ee86ce2df9f7e2b794a1cbce5aaae78bf",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 76291,
+      "lines": 2164
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/dispatcher.rs",
+      "object": "55f18b50c0716d55c283b3b840ab2030e891454d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7052,
+      "lines": 191
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/display.rs",
+      "object": "ee02309d8c7f3c92938c2154d1db30721599993d",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 6446,
+      "lines": 210
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/events.rs",
+      "object": "f1910b56b5013f16ba840664c3dcfcf88ed00a66",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 65876,
+      "lines": 1806
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/gpui_windows.rs",
+      "object": "e7a45a034dc235dab7bc49cad209f9cdef143802",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 952,
+      "lines": 43
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/keyboard.rs",
+      "object": "8164bc1564d48b4adcb23deb40e91ee28a00a656",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 11243,
+      "lines": 371
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/platform.rs",
+      "object": "348aaa3f23f14c75eabbb221dec95979f2a07db7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 61652,
+      "lines": 1760
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/system_notifications.rs",
+      "object": "b0075f0e39d781761f0bd19ce6210ab0cff12bba",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 7614,
+      "lines": 198
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/system_settings.rs",
+      "object": "8cce544be1b910269ad42eb3e33a5a66cbef2056",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 2551,
+      "lines": 87
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/util.rs",
+      "object": "b3badd84d104b123ab7e6cdb3129034641ead4f7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 5638,
+      "lines": 191
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/vsync.rs",
+      "object": "51fbdf6c5000937959c8048ff7f5918d4b112499",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 3010,
+      "lines": 81
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/window.rs",
+      "object": "73f56d7a54b68bfee17c7c0290babbe4c122bf0f",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 61476,
+      "lines": 1733
+    },
+    {
+      "path": "native/vendor/gpui-pre-windows-0.3.7/src/wrapper.rs",
+      "object": "60bbc433cabc1c6b7c72c9912196ad58f4093da7",
+      "language": "Rust",
+      "scope": "vendor",
+      "bytes": 940,
+      "lines": 53
+    },
+    {
+      "path": "test/action_test.dart",
+      "object": "3f5ce07cf2a1a63e1be18adf770a958c883ad1e6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1062,
+      "lines": 43
+    },
+    {
+      "path": "test/chart_host_test.dart",
+      "object": "aae95b588039f2d258746368b111e5fe2c938d27",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1773,
+      "lines": 58
+    },
+    {
+      "path": "test/chart_test.dart",
+      "object": "8a59452ed78a696c0e6ffdb8d3a2af3e691eb3dc",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2195,
+      "lines": 90
+    },
+    {
+      "path": "test/companion_lifecycle_test.dart",
+      "object": "e930494e227de6009debb5482ee3fd8c93e311d3",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1858,
+      "lines": 55
+    },
+    {
+      "path": "test/controlled_input_test.dart",
+      "object": "8c494d7a841b8bc44af7771df9e39aa47358ac99",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3990,
+      "lines": 125
+    },
+    {
+      "path": "test/controls_test.dart",
+      "object": "ff13ff71f72b6a3b39e788e47421a2171d19b413",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 25667,
+      "lines": 934
+    },
+    {
+      "path": "test/dev_session_test.dart",
+      "object": "6b606a95d1e42395558f836bd0ad53f783fd64d2",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2304,
+      "lines": 80
+    },
+    {
+      "path": "test/fixtures/companion_client.dart",
+      "object": "e7c3e5487202799ab523359526ff1c5eb19d0e94",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 632,
+      "lines": 20
+    },
+    {
+      "path": "test/fixtures/fault_host.rs",
+      "object": "8e167033131567b02e663a75b1fc767059ae568c",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 6325,
+      "lines": 204
+    },
+    {
+      "path": "test/format_test.dart",
+      "object": "55cea89f2754a04e3481eefe65f203792e1afca7",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2186,
+      "lines": 86
+    },
+    {
+      "path": "test/host_fault_test.dart",
+      "object": "62cc4c906f45ff071097f182e66e28e4d5b6c758",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6163,
+      "lines": 195
+    },
+    {
+      "path": "test/input_state_test.dart",
+      "object": "3216d5c441ad9be51e12b532069899d4b6e1f069",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3400,
+      "lines": 113
+    },
+    {
+      "path": "test/memo_test.dart",
+      "object": "2726ecca8225b72335b432eb715123cd325ad01f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1014,
+      "lines": 31
+    },
+    {
+      "path": "test/menus_host_test.dart",
+      "object": "e87711d6e637f820d49d90802deb4346484a0a81",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1748,
+      "lines": 54
+    },
+    {
+      "path": "test/menus_test.dart",
+      "object": "be08f127d6951dc86296dfe96c7316fa6ca2441e",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1525,
+      "lines": 49
+    },
+    {
+      "path": "test/model_test.dart",
+      "object": "bb2ece7cbb5ae344bbc3fcf3a7ce731da8238176",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2838,
+      "lines": 94
+    },
+    {
+      "path": "test/native_event_test.dart",
+      "object": "8456d663d9c173f5f73c2be340405767989cf7bc",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4476,
+      "lines": 160
+    },
+    {
+      "path": "test/native_host_test.dart",
+      "object": "e1d43b31637a10249f1e4d21065eeee48bef319b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 39765,
+      "lines": 1162
+    },
+    {
+      "path": "test/native_trace_test.dart",
+      "object": "933987c0dde5d71ff5aa5bac0c4fa78f48f51caf",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6456,
+      "lines": 176
+    },
+    {
+      "path": "test/owned_process_test.dart",
+      "object": "0e0d0633ac3e6de44b6e9e96203fe776b4d16adc",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4231,
+      "lines": 131
+    },
+    {
+      "path": "test/radio_host_test.dart",
+      "object": "640139554aacab807507c502bb970b73bcaf94e1",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1680,
+      "lines": 52
+    },
+    {
+      "path": "test/radio_test.dart",
+      "object": "0a599233d16973b85bf6e71bd28e294a9c7e739d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2479,
+      "lines": 84
+    },
+    {
+      "path": "test/row_menu_host_test.dart",
+      "object": "fa90f5fccb73eb824686671cf682f30a34a83481",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1953,
+      "lines": 64
+    },
+    {
+      "path": "test/row_menu_test.dart",
+      "object": "b11cb6126d60075c36c7032737e9020bd9256a0b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1407,
+      "lines": 52
+    },
+    {
+      "path": "test/semantics_test.dart",
+      "object": "423e05ba1bdbe5980d7e8bafe691aa0b2f1d29a8",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2923,
+      "lines": 91
+    },
+    {
+      "path": "test/source_inventory_test.dart",
+      "object": "73327abb45f909212f100fce338521120946baf4",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3330,
+      "lines": 94
+    },
+    {
+      "path": "test/style_test.dart",
+      "object": "c95da331203f5b751e563cf5204ac232a2dfb9d8",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4717,
+      "lines": 161
+    },
+    {
+      "path": "test/table_view_test.dart",
+      "object": "5ca109c1d445bc86f2598c5543f7c9d56d36c648",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3288,
+      "lines": 126
+    },
+    {
+      "path": "test/tabs_host_test.dart",
+      "object": "2ba27fb4f0b3472f1558c8695be7a162997de11d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1724,
+      "lines": 53
+    },
+    {
+      "path": "test/tabs_test.dart",
+      "object": "a148b93ea4d11efb942f26fd5b43e86c2444fbaa",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2355,
+      "lines": 80
+    },
+    {
+      "path": "test/theme_host_test.dart",
+      "object": "c300d14975ad4114c2c379de130a370b0300d6a2",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1431,
+      "lines": 43
+    },
+    {
+      "path": "test/theme_test.dart",
+      "object": "837627a0813fbbaf39aa960b95390490417424c6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 966,
+      "lines": 34
+    },
+    {
+      "path": "test/tooling_test.dart",
+      "object": "0825cf429c07f855f0ade3da124c85dada83beed",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3905,
+      "lines": 121
+    },
+    {
+      "path": "test/tooltip_test.dart",
+      "object": "a795b63edd18c3c6878efc6cbbe3c74b0c6db723",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 751,
+      "lines": 28
+    },
+    {
+      "path": "test/tracing_test.dart",
+      "object": "8ece1f1ee9f583b9e8665fd555fa43d8ee75faec",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2212,
+      "lines": 73
+    },
+    {
+      "path": "test/tree_diff_test.dart",
+      "object": "c31416604bd682f40af2977d89f0677eccfe60db",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 19083,
+      "lines": 566
+    },
+    {
+      "path": "test/windows_preparation_test.dart",
+      "object": "793197e3f1ed721ba4e4e2fa7a7132c4a142622f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5205,
+      "lines": 159
+    },
+    {
+      "path": "tool/accessibility/cache_events.dart",
+      "object": "c9da60eb99afc97efaae4bbceefeb29b05f7feee",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2172,
+      "lines": 69
+    },
+    {
+      "path": "tool/accessibility/client.dart",
+      "object": "17ef54013bc838463e8d4cc57e985605bebefb48",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3196,
+      "lines": 88
+    },
+    {
+      "path": "tool/accessibility/controls.dart",
+      "object": "47e09d94ee1a974d63a0be14d559af7b31513019",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 7463,
+      "lines": 215
+    },
+    {
+      "path": "tool/accessibility/disabled.dart",
+      "object": "8c4ad65caddff31c7b0b28f83ccb2e5862c06f9a",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4181,
+      "lines": 140
+    },
+    {
+      "path": "tool/accessibility/probe.dart",
+      "object": "65ff83adcd679c1689233790a076772b0e1c51d8",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2806,
+      "lines": 76
+    },
+    {
+      "path": "tool/accessibility/settings_track.dart",
+      "object": "238022d18247551ac8dca3eee7f495505e2d09f4",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3602,
+      "lines": 96
+    },
+    {
+      "path": "tool/accessibility/terminal_track.dart",
+      "object": "afc80659c9c36cc3c4e59dbd1ec235faadd04e6b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6301,
+      "lines": 192
+    },
+    {
+      "path": "tool/accessibility/verify_vendor.dart",
+      "object": "f27b1d823daaf72222af3094fb3607934adc5a81",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1834,
+      "lines": 53
+    },
+    {
+      "path": "tool/accessibility/watchlist.dart",
+      "object": "74d3938dace6b65e965d6b45adadb3805729726f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6290,
+      "lines": 172
+    },
+    {
+      "path": "tool/build.dart",
+      "object": "bab3f934cbc58b43620bf985f5385c30ca4f3505",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 257,
+      "lines": 8
+    },
+    {
+      "path": "tool/build_cli.dart",
+      "object": "fa6b912d8bd3675bea5fc529e38995ffb8663713",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 736,
+      "lines": 27
+    },
+    {
+      "path": "tool/build_test_fixtures.dart",
+      "object": "f15c208623756d70d62893725f14c69616553795",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 490,
+      "lines": 20
+    },
+    {
+      "path": "tool/capture_host_baseline.dart",
+      "object": "38642995681af78bc8528f24c3dfc8ab311e232b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2485,
+      "lines": 72
+    },
+    {
+      "path": "tool/capture_publication_trace.dart",
+      "object": "573ee5bc131474a3737e88500d03a21f073d47a1",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2825,
+      "lines": 92
+    },
+    {
+      "path": "tool/check.dart",
+      "object": "a877d839336b42f4ccc5fad9aa65eba847f74d86",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4163,
+      "lines": 137
+    },
+    {
+      "path": "tool/dev.dart",
+      "object": "138c0b8fc692656beb3114cc96f1573adf50ef81",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2132,
+      "lines": 72
+    },
+    {
+      "path": "tool/docs_check.dart",
+      "object": "3e4b8ad1f20a7fc03b0e3dd3449ca51611c52364",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5208,
+      "lines": 162
+    },
+    {
+      "path": "tool/doctor.dart",
+      "object": "6a8a85af762a184a0788ddab54e7dfc2f917c64d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1770,
+      "lines": 67
+    },
+    {
+      "path": "tool/env.dart",
+      "object": "004cdb455441fa07ad21b6ee7bdead0115abaccb",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 370,
+      "lines": 16
+    },
+    {
+      "path": "tool/measure_data.dart",
+      "object": "d816de8e5be46c46e5318485c72093c992f0d648",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4829,
+      "lines": 83
+    },
+    {
+      "path": "tool/native_probe/build.dart",
+      "object": "654523d6bcfe2f0512fdb842e2cffd4dbf5b8706",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 108,
+      "lines": 5
+    },
+    {
+      "path": "tool/native_probe/client.dart",
+      "object": "0fea512aab20d9f79ca4679af4e407b72e575bee",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 743,
+      "lines": 27
+    },
+    {
+      "path": "tool/native_probe/src/linux.rs",
+      "object": "9c29a600cba4a43d5461827a06f41c90b41d0699",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 16097,
+      "lines": 433
+    },
+    {
+      "path": "tool/native_probe/src/linux/cache.rs",
+      "object": "cdbec6393147b13c66cccf63343911fb7e5c8a00",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 8980,
+      "lines": 292
+    },
+    {
+      "path": "tool/native_probe/src/macos.rs",
+      "object": "2c61d26c01645e1735862fb5f9b7121d2a68f0cb",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 15052,
+      "lines": 421
+    },
+    {
+      "path": "tool/native_probe/src/main.rs",
+      "object": "7b1d0637670557e7795c66a98dbd2bb28eb475ac",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 2304,
+      "lines": 68
+    },
+    {
+      "path": "tool/native_probe/src/windows.rs",
+      "object": "8cd524a12a5844fbdd8d2031f449b403d1b50beb",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 17418,
+      "lines": 445
+    },
+    {
+      "path": "tool/package.dart",
+      "object": "9fb5fc5e5406dff8af56afbfadc8c4b55338863a",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 8587,
+      "lines": 233
+    },
+    {
+      "path": "tool/performance/bench_diff.dart",
+      "object": "6d7fb8037c739beb3c30c37f2aff32e2807c42b6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1514,
+      "lines": 40
+    },
+    {
+      "path": "tool/performance/bench_frames_live.dart",
+      "object": "544d71b608d24078bda9a1529d78198670cd7b18",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2092,
+      "lines": 51
+    },
+    {
+      "path": "tool/performance/bench_memo.dart",
+      "object": "3ab6ffd4b611b1aaebc001ecf4c98f0b8c3de266",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2034,
+      "lines": 51
+    },
+    {
+      "path": "tool/performance/bench_patch_live.dart",
+      "object": "a43684de60410f3d4357356b7cd7fe112c8f3018",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2615,
+      "lines": 65
+    },
+    {
+      "path": "tool/performance/capture_baseline.dart",
+      "object": "0c5d72455f9ef0c8eec6669baf1311d9759cf700",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5908,
+      "lines": 161
+    },
+    {
+      "path": "tool/performance/capture_encoding.dart",
+      "object": "69a38e412ffd91bc38c5c0b3459ab3048da730b6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3998,
+      "lines": 139
+    },
+    {
+      "path": "tool/performance/capture_snapshot_gate.dart",
+      "object": "cd589833072a40bb0d1ff0c8507d2f778bfc5078",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4956,
+      "lines": 136
+    },
+    {
+      "path": "tool/performance/capture_strategy.dart",
+      "object": "67b9bd1d07e84282399e7d4243d3927c33ec0c99",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 14539,
+      "lines": 413
+    },
+    {
+      "path": "tool/performance/compare_frames.dart",
+      "object": "87a581fe26ac6b0f1e6bb2b6e1a03b5e952a6d16",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1866,
+      "lines": 44
+    },
+    {
+      "path": "tool/performance/compare_update_gate.dart",
+      "object": "db6a2ecedb516cd5a95a07041707ea27b850cf29",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2917,
+      "lines": 87
+    },
+    {
+      "path": "tool/performance/experiment_diff.dart",
+      "object": "98b0c3535816d00912effcd5b49232aca5ca3a26",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2103,
+      "lines": 65
+    },
+    {
+      "path": "tool/performance/experiment_transport.dart",
+      "object": "c9da9ddf1c817fe7bc0aa79781a1f912a3c5ed59",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3348,
+      "lines": 101
+    },
+    {
+      "path": "tool/performance/measure_floor.dart",
+      "object": "5744d5166f2ae2b4557a3d03e77f7562d477dc07",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3461,
+      "lines": 89
+    },
+    {
+      "path": "tool/performance/measure_large_dataset.dart",
+      "object": "39ac686a5210385e1e1d4593ff86457437cc6352",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3708,
+      "lines": 99
+    },
+    {
+      "path": "tool/performance/run_baselines.dart",
+      "object": "976de9e4655af312ed5b75ffdcdc5b1f5adf0a81",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 8489,
+      "lines": 228
+    },
+    {
+      "path": "tool/performance/run_encoding.dart",
+      "object": "ed989842dca1b767379ceb111e13d0e0cd217fe2",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3626,
+      "lines": 101
+    },
+    {
+      "path": "tool/performance/run_logged.dart",
+      "object": "70f1d51496d17d5e7e71abc57625049688a78db6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1699,
+      "lines": 52
+    },
+    {
+      "path": "tool/performance/run_snapshot_gate.dart",
+      "object": "b0c6a1545b6975d5b21e0c182f07a1812b8a7045",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4088,
+      "lines": 108
+    },
+    {
+      "path": "tool/performance/run_strategies.dart",
+      "object": "900286ab89406716d42f27a639983f8252812d86",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4728,
+      "lines": 118
+    },
+    {
+      "path": "tool/performance/run_update_gate.dart",
+      "object": "85d010c8a1f0ff2c2c0f44f23c050a0c1f38576c",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2853,
+      "lines": 89
+    },
+    {
+      "path": "tool/performance/snapshot_fixture.dart",
+      "object": "89c86f1043aa943bb81dec01c84180d525677456",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2594,
+      "lines": 95
+    },
+    {
+      "path": "tool/performance/summarize_baselines.dart",
+      "object": "b14f741d4c809da7559e9659e0ff9a75dc21816d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5033,
+      "lines": 129
+    },
+    {
+      "path": "tool/performance/summarize_encoding.dart",
+      "object": "f378b488d6f70fff3971defb5d6427f8dd0c302a",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2220,
+      "lines": 59
+    },
+    {
+      "path": "tool/performance/summarize_snapshot_gate.dart",
+      "object": "bd6956b21d02ca69a86ec7f9e48f5f06213a62d3",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4695,
+      "lines": 129
+    },
+    {
+      "path": "tool/performance/summarize_strategies.dart",
+      "object": "313682bae9046b4aac0bddaaa8f4812a2600bb01",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5407,
+      "lines": 141
+    },
+    {
+      "path": "tool/platform_probe/companion.dart",
+      "object": "2d029eea0afb0bb4882b7370fd92b003ad90f556",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3961,
+      "lines": 127
+    },
+    {
+      "path": "tool/platform_probe/native/build.rs",
+      "object": "1653af59712c21921d1e720a20d944d6bb93f83d",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 115,
+      "lines": 2
+    },
+    {
+      "path": "tool/platform_probe/native/src/lib.rs",
+      "object": "0bc44fa796ea465c60ac2827e565e16b7ccac00d",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 14061,
+      "lines": 367
+    },
+    {
+      "path": "tool/platform_probe/native/src/main.rs",
+      "object": "f35b10c13f7782697c5272bd828cc228247c3a6e",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 610,
+      "lines": 21
+    },
+    {
+      "path": "tool/platform_probe/probe.dart",
+      "object": "8c599766526c4d7af7511206a994251423bbd889",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3995,
+      "lines": 126
+    },
+    {
+      "path": "tool/platform_probe/reload.dart",
+      "object": "5dc8a922f368518174d0bf5bfe14809ef06ad27f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2796,
+      "lines": 76
+    },
+    {
+      "path": "tool/platform_probe/reload_ffi.dart",
+      "object": "d282c96f85ada5a91b50996c74ca3d30ba800591",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2207,
+      "lines": 62
+    },
+    {
+      "path": "tool/platform_probe/run.dart",
+      "object": "e430a4690d81ae15a3436ab450a6d4301567f98c",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9935,
+      "lines": 307
+    },
+    {
+      "path": "tool/prepare_windows_release_checks.dart",
+      "object": "efa777eecb5c276eae56002a3d29022976e1f8f8",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4303,
+      "lines": 111
+    },
+    {
+      "path": "tool/record_platform_environment.dart",
+      "object": "e25e9dc40bb77b0fb39ddc15f1af3927cc850631",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2301,
+      "lines": 67
+    },
+    {
+      "path": "tool/run_host_baselines.dart",
+      "object": "443d241dc0d3e7a50d2dfcef33f59b74e1b4b1e9",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3656,
+      "lines": 94
+    },
+    {
+      "path": "tool/source_inventory.dart",
+      "object": "f5e2b997e9e3ed1938f1a78feea147ee881d5cb8",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 7003,
+      "lines": 203
+    },
+    {
+      "path": "tool/src/archives.dart",
+      "object": "89f17b1d42f003219ecb7350fa4da1f96a654956",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2785,
+      "lines": 87
+    },
+    {
+      "path": "tool/src/commands.dart",
+      "object": "825280abe79de2ba677e5a2b174862ec378a16cb",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1783,
+      "lines": 67
+    },
+    {
+      "path": "tool/src/dart_sdk.dart",
+      "object": "f831cac97e7ae2b6a877434864eb8e1bf18bbb8f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 181,
+      "lines": 6
+    },
+    {
+      "path": "tool/src/dev_session.dart",
+      "object": "81c870d9da51c08903a94af02997d07f35dd453e",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6489,
+      "lines": 202
+    },
+    {
+      "path": "tool/src/owned_process.dart",
+      "object": "5cf01cc1e0a772a8409af65306acfa39f85428e7",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2185,
+      "lines": 58
+    },
+    {
+      "path": "tool/src/package_manifest.dart",
+      "object": "436cee7a58bf6d555bc7403ac549c4af11314c82",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2755,
+      "lines": 101
+    },
+    {
+      "path": "tool/src/toolchain.dart",
+      "object": "3a174b9cfe970c96132828fc06d64977e30f3122",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6342,
+      "lines": 179
+    },
+    {
+      "path": "tool/src/windows_package.dart",
+      "object": "17d5d8041c9a110ffd4837e6ac0127619e04f133",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5612,
+      "lines": 167
+    },
+    {
+      "path": "tool/src/windows_tool.dart",
+      "object": "f90ffd29f8ba968122bc46f2645d41d9783f654e",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 1250,
+      "lines": 50
+    },
+    {
+      "path": "tool/summarize.dart",
+      "object": "dfe494d363b5378d1d5e88374620e9e8ab87663b",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 7701,
+      "lines": 120
+    },
+    {
+      "path": "tool/unix/verify.dart",
+      "object": "9b7e4f6e24f8c27bc3b755dee7489e02427205ea",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9383,
+      "lines": 255
+    },
+    {
+      "path": "tool/verify_dev_failures.dart",
+      "object": "deaf8eedca36e0fa4dad7ccc2acd5dda5e00dba9",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2474,
+      "lines": 80
+    },
+    {
+      "path": "tool/verify_dev_launcher.dart",
+      "object": "d360d4704458a3d3096e4ce6579889d8da92a081",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4717,
+      "lines": 127
+    },
+    {
+      "path": "tool/verify_mvp.dart",
+      "object": "bd1b6c0964fdd81c8be4057d908d7a7cbe462ea6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3960,
+      "lines": 120
+    },
+    {
+      "path": "tool/verify_package.dart",
+      "object": "86b2e54063896589b914a8089e677a47e0c75ba4",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2080,
+      "lines": 64
+    },
+    {
+      "path": "tool/verify_package_failures.dart",
+      "object": "cb56b907f42c48c4d48b5c9986fe6401c3241c05",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4472,
+      "lines": 120
+    },
+    {
+      "path": "tool/verify_reload.dart",
+      "object": "b22334b6d524a0b56a3d0171bff9495c426e8dfe",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4153,
+      "lines": 115
+    },
+    {
+      "path": "tool/verify_settings.dart",
+      "object": "ebb50f2aa7e394f14de48ad949d1ca36e4934dd7",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9407,
+      "lines": 273
+    },
+    {
+      "path": "tool/verify_terminal.dart",
+      "object": "76f7b43f6222575722237d81a3a73ca97cc6f431",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9651,
+      "lines": 286
+    },
+    {
+      "path": "tool/verify_terminal_reload.dart",
+      "object": "c62cc549f2c6b7a0101c75933f11ced2d56ed7a4",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3826,
+      "lines": 112
+    },
+    {
+      "path": "tool/verify_watchlist_reload.dart",
+      "object": "2fe3c7f1582af9e10107394bf66ee880c792c60f",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 8276,
+      "lines": 230
+    },
+    {
+      "path": "tool/verify_watchlist_stability.dart",
+      "object": "6295420204f8ad7e6beb0c1ab0dc7838a785bf19",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4330,
+      "lines": 129
+    },
+    {
+      "path": "tool/verify_watchlist_ui.dart",
+      "object": "4cef73ae18e7da2f5d58114b39fe45dadda111b6",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 5627,
+      "lines": 135
+    },
+    {
+      "path": "tool/verify_windows_prerequisites.dart",
+      "object": "f1e7c3d75239be05cfa5d090b9de59feb73bb5dd",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 4676,
+      "lines": 126
+    },
+    {
+      "path": "tool/verify_x11_display.dart",
+      "object": "a5912311fba600af9e008a1ea56124eaba2190be",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3092,
+      "lines": 93
+    },
+    {
+      "path": "tool/windows/capability_state.dart",
+      "object": "85ba699e8383c3b90c365ae525c0fded936b9bec",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 543,
+      "lines": 19
+    },
+    {
+      "path": "tool/windows/common.dart",
+      "object": "921ba493351a8cfa24af9824b23e7f8f6666f599",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 2631,
+      "lines": 82
+    },
+    {
+      "path": "tool/windows/enable_release_checks.dart",
+      "object": "c943261a0f21d48cc22eac35711a87d07c163f43",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 9084,
+      "lines": 247
+    },
+    {
+      "path": "tool/windows/native/src/main.rs",
+      "object": "e1b386893777b97bc3e0962928ff07780c5e8f7b",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 337,
+      "lines": 15
+    },
+    {
+      "path": "tool/windows/native/src/platform.rs",
+      "object": "1362c900d044f8d5f42748a2a793ceddbd2c3d97",
+      "language": "Rust",
+      "scope": "maintained",
+      "bytes": 23473,
+      "lines": 662
+    },
+    {
+      "path": "tool/windows/sandbox_release_check.dart",
+      "object": "2ee9f3f588f0ab5b054390edacc9108c0030787d",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 3397,
+      "lines": 92
+    },
+    {
+      "path": "tool/windows/verify.dart",
+      "object": "798c5415966bd63ade84cc9d1e0e97c9a6711728",
+      "language": "Dart",
+      "scope": "maintained",
+      "bytes": 6244,
+      "lines": 166
+    }
+  ]
+}

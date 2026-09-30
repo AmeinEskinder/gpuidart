@@ -1,0 +1,2199 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-09-30T00:55:51.917544Z",
+  "environment_declared_by_operator": "clean_container",
+  "package_path": "/evaluation/extracted",
+  "os": "Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026",
+  "runtime_only": false,
+  "manifest": {
+    "target": "linux-x64",
+    "project_license": "MIT",
+    "native_abi": 1,
+    "companion_extension": 2,
+    "build_dependency_inspection": {
+      "Watchlist": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007ff889eea000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007ff889ed0000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007ff889ecb000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ff889de2000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ff889400000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ff889eec000)"
+      },
+      "libgpuidart.so": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007f222a3bc000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f2227dd7000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007f2227d8e000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007f222a39d000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f2227d60000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2227c77000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2227a00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f222a3be000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007f2227c71000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f2227c69000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007f2227c4b000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007f2227c35000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007f2227c26000)"
+      },
+      "gpuidart-launcher": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007fb9cfa72000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fb9cf9d8000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fb9cf600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fb9cfa74000)"
+      },
+      "verify": {
+        "tool": "ldd",
+        "output": "linux-vdso.so.1 (0x00007f95c4310000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f95c42f6000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f95c42f1000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f95c4208000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f95c3800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f95c4312000)"
+      }
+    },
+    "executable": "Watchlist",
+    "library": "libgpuidart.so",
+    "minimum_os": "Ubuntu 24.04 x64, glibc 2.39, X11",
+    "signing": "unsigned evaluation archive",
+    "build": {
+      "git_commit": "8491da1f77e91cc6764aa5749000db0438f39387",
+      "source_dirty": false,
+      "source_files": [
+        {
+          "path": "Cargo.lock",
+          "sha256": "f4714fed54f44f6d0f6c33e9288a3b53690977a3d6414fe75a96c8fa92b60166"
+        },
+        {
+          "path": "Cargo.toml",
+          "sha256": "429cacce1b659ba3b11aa548a479c22fe25b4360e56bacfab8b7ed7a1b56f436"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "09a57f07cfced3b344cbef7a277da22eb3f0bddfeae5c742d989e9c0827d98a2"
+        },
+        {
+          "path": "bin/gpuidart.dart",
+          "sha256": "8fcae9fcc14fb18b8c3baaabbab6ce978767a762d6e099d062e7b02cb8b12cb9"
+        },
+        {
+          "path": "example/app.dart",
+          "sha256": "8019540ffd5b1ee2f7e3996109fcd6a77c5a996e574efadf1ce5f18d5f840653"
+        },
+        {
+          "path": "example/main.dart",
+          "sha256": "6f0dfe9f1237e14565a650655388e161812ec03231eb01c020a8ef3593a5a1e7"
+        },
+        {
+          "path": "example/measure_data.dart",
+          "sha256": "8b5984915fd8fa31990de1cfcfea17b7c24bd03bc7812178812eff7c8d5bb9da"
+        },
+        {
+          "path": "example/settings/README.md",
+          "sha256": "e5e81b1175b8308df60ccd37a375a2ff907921cfd4116780e3c2a6a9172d5968"
+        },
+        {
+          "path": "example/settings/app.dart",
+          "sha256": "fe7cd0d9eef4a95433c68107689204e31fd418ed09ef40671edd034c44adb8dd"
+        },
+        {
+          "path": "example/settings/main.dart",
+          "sha256": "616870024aeff2e89d813e1ea49b35dab5870af1576bc408cd7d31c9083bb6e0"
+        },
+        {
+          "path": "example/terminal/README.md",
+          "sha256": "d2ba56b5e3e1fd8407e1d4b9087b21c43a3f1379114737d15a1ba5d7eedc8ede"
+        },
+        {
+          "path": "example/terminal/app.dart",
+          "sha256": "353e53131cdeff93ef77cd018757f79da9451db120b35ad87123f165b1a62c11"
+        },
+        {
+          "path": "example/terminal/main.dart",
+          "sha256": "3e009ee94e17b948592bc267ede56604736eaf88b877bce861e72cce0dd44a66"
+        },
+        {
+          "path": "example/watchlist/app.dart",
+          "sha256": "b49327b10e638d39562ccaafd02611d39e56b3b60916dc234091d43c02a38c64"
+        },
+        {
+          "path": "example/watchlist/main.dart",
+          "sha256": "5ea00a3583f2bb4ea14a5a212bd3a2f3ce1cbbbae324d19ee96971b30f2854da"
+        },
+        {
+          "path": "launcher/Cargo.toml",
+          "sha256": "6232dbe2cebfc3404ec4dc504bd1e1048bd130fcf57eb408f9842e03f7f68376"
+        },
+        {
+          "path": "launcher/src/main.rs",
+          "sha256": "d9c796c27eb2468607b874e6494b5588817fd54eca7581a6787d98f81e7b6282"
+        },
+        {
+          "path": "lib/development.dart",
+          "sha256": "7c776f1ea49b692615fbbf428a0856b49495ba7d7ec61d670cb6837a5190ca6f"
+        },
+        {
+          "path": "lib/gpuidart.dart",
+          "sha256": "e245ec511e86e28269ef6bfad1639506d139cfc19c5b860f057878363fe0e104"
+        },
+        {
+          "path": "lib/src/actions.dart",
+          "sha256": "754098dfbfdad9395f26ed5c17d26e6f5bbaae19f746cac50185bf5c0d8ed7dd"
+        },
+        {
+          "path": "lib/src/charts.dart",
+          "sha256": "a085ebabbe456ce7fe019457d6385bf31332f3b668e828cec12f81d6ec669bcd"
+        },
+        {
+          "path": "lib/src/companion.dart",
+          "sha256": "821fbbe1f4d4167169d8daa27190d852cc08b625e40a28a8951c2295b06df4ff"
+        },
+        {
+          "path": "lib/src/dataset.dart",
+          "sha256": "f9b3f0285ae95de12a553a22d6478c7c0af3ea346fc89de231ab9665c0760e10"
+        },
+        {
+          "path": "lib/src/format.dart",
+          "sha256": "e062b07b5f622c850543efdcddb8d4b92cc34a1641999db37284e937c1702d37"
+        },
+        {
+          "path": "lib/src/host.dart",
+          "sha256": "230fe229e1240a9e7f9722935508660f9b0aae7fd66da29018fb0fc402ce19f2"
+        },
+        {
+          "path": "lib/src/input_commands.dart",
+          "sha256": "571b80dc42d12da3da69bce971242b3f732052933ea01f793e19629d1f51f11b"
+        },
+        {
+          "path": "lib/src/input_state.dart",
+          "sha256": "a0f4529d437d0cd5615977f21f2b970bceabdb3983a2e960330dbd19b216b246"
+        },
+        {
+          "path": "lib/src/memo.dart",
+          "sha256": "c4d4e3787f576b8a91b98ab69ab4425e5b80345d154af8e7aa5dec7fd373b5b0"
+        },
+        {
+          "path": "lib/src/menus.dart",
+          "sha256": "b4a8791043fcdf29160e23c0c74fcf2b75b8182369bae170b9d7634f19078478"
+        },
+        {
+          "path": "lib/src/metrics.dart",
+          "sha256": "f8e6f1b5ee065d628e9d42b2057e5bdf027a496595b2da0cfa73cb83cc549adc"
+        },
+        {
+          "path": "lib/src/native_event.dart",
+          "sha256": "30c31cb3a7503f9b5b83b574f3c8170634b926a274f2d6074d3ea177f3b09981"
+        },
+        {
+          "path": "lib/src/nodes.dart",
+          "sha256": "c883b7589afb0b096412d41d4697fa3114acb5f9ee451fb9d5ab69f8dfc28fef"
+        },
+        {
+          "path": "lib/src/platform.dart",
+          "sha256": "a7e9d3e401ed154ed74c624068eee28bb20ab3e5522bc890f2fc1bef9a40ee64"
+        },
+        {
+          "path": "lib/src/runtime_info.dart",
+          "sha256": "824d2b22c2122af836ae24fc7f7eb90e39af02ed4583645612810549ee4634c5"
+        },
+        {
+          "path": "lib/src/semantics.dart",
+          "sha256": "7008d1bfa34266761acaa7d020b42bcf94e3cb33012e9f7d84396edbfe15c6a0"
+        },
+        {
+          "path": "lib/src/style.dart",
+          "sha256": "a45d5e01abe3ec18117f0dbc0b32e39e739ee88cff9a602f5fd672a2014eb17b"
+        },
+        {
+          "path": "lib/src/table_view.dart",
+          "sha256": "50fdae6a20c9016b27a6695e9038df67c4038423cec927bb44e0c8aeee1a99d1"
+        },
+        {
+          "path": "lib/src/theme.dart",
+          "sha256": "0e8fdc5f8933b4fbefd7689c84bca280f730164b8b713e6799cfc9cb2581f61f"
+        },
+        {
+          "path": "lib/src/trace_clock.dart",
+          "sha256": "e40c9a047d6431cc678a6fb8d5770d3e50d4a2f51eaf3d32d78bc865a4711e39"
+        },
+        {
+          "path": "lib/src/tracing.dart",
+          "sha256": "c572b0fbc12966e66c342f9ba427ded18bb6599ac5134f9a268f84cf186a9904"
+        },
+        {
+          "path": "lib/src/tree_diff.dart",
+          "sha256": "1d4fe0d6675a0a2b4cc5c05b5e0e9d0210947a7d7d065d7e803f8534b821d178"
+        },
+        {
+          "path": "lib/src/window_options.dart",
+          "sha256": "5729d98b4a36c41d56e8fd38138f9c217118b05bfc8875061f30e4d91d2d3a81"
+        },
+        {
+          "path": "lib/src/windows.dart",
+          "sha256": "a937f1791494cbb3418bca28035bcf241e50f2e0b52bd9f06d209c8ce750d1a2"
+        },
+        {
+          "path": "lib/tracing.dart",
+          "sha256": "2b80a77e7f03630d3b8b14b73c9f6e1c1412e981e34d33cf39be27052aa18c61"
+        },
+        {
+          "path": "native/Cargo.toml",
+          "sha256": "4f3e096fa845d26d2e4859044a881259c80cd662a3287db874e8889ad1a1f44e"
+        },
+        {
+          "path": "native/build.rs",
+          "sha256": "3044de7cec699db4d11d0a239102645ab2b067d373977ed3fffd0dd344ce4ee3"
+        },
+        {
+          "path": "native/include/gpuidart.h",
+          "sha256": "b5f98d06b6b63de6e4cb748fd965adc1588d66e98787167fb4f2980c4d270a4a"
+        },
+        {
+          "path": "native/src/allocations.rs",
+          "sha256": "a0c86b674f7f141eb2738137f6f98ca79bb5c44eef50712ec53dfc54f18a3898"
+        },
+        {
+          "path": "native/src/bin/snapshot_experiment.rs",
+          "sha256": "bc6814c5ec04cc98bc1eaae397faf6da354bd77560bc7f0916528443c69f44dc"
+        },
+        {
+          "path": "native/src/boundary.rs",
+          "sha256": "32f6aa3d58a45904fe9b49cf06a8bb0170654ec95c94c0a9e54283fcf12f2994"
+        },
+        {
+          "path": "native/src/clock.rs",
+          "sha256": "5aca9ea7e63cbce909fa4a5ab7bf61e9b7d10c475f6f20df25fb36cdf249d4af"
+        },
+        {
+          "path": "native/src/companion.rs",
+          "sha256": "1d645a257743211d5568f989e585ee2b4f9abc57792d7125dbf256990b9b0c55"
+        },
+        {
+          "path": "native/src/datasets.rs",
+          "sha256": "8b6ea9c9319d7ac8046a141bdd16a06e37ff8b87afcf2db2af1329499a3834a1"
+        },
+        {
+          "path": "native/src/datasets/tests.rs",
+          "sha256": "f0cdb216ad16d4036edd59943e5d3c554cc2d4591ac1c944992b920b8f5c762c"
+        },
+        {
+          "path": "native/src/diagnostics.rs",
+          "sha256": "1e449804396fa04417460d304c26a12e9702b8666c5da30d842406b2b77916d5"
+        },
+        {
+          "path": "native/src/experiment.rs",
+          "sha256": "7760bee36da4f077cb98703108d1547199e642e34e3bcb27f0120e44e3acbc4c"
+        },
+        {
+          "path": "native/src/experiment/model.rs",
+          "sha256": "38b8ff731df40f021f5322ed872e93a5bd92537de5ddc66e8f69202fb7e1a568"
+        },
+        {
+          "path": "native/src/ffi_tests.rs",
+          "sha256": "2328bc76ef3bf0fbfc7967c1f6da4c0cbd83b03f57f23c31b55fa5fceb1efcd3"
+        },
+        {
+          "path": "native/src/heap_profile.rs",
+          "sha256": "78b1285134b8bed5f13a06f53532021c681ac78dfd89967cfc10f8486f96d6b7"
+        },
+        {
+          "path": "native/src/input_control.rs",
+          "sha256": "3cc37b757204080056fd5ddfa23cf328018d9bfaedb9906b7fa4819b01225037"
+        },
+        {
+          "path": "native/src/lib.rs",
+          "sha256": "e1a40cc139d0b101d47167d13dd3a874007802dedda69b61ef8c76dd1fab4202"
+        },
+        {
+          "path": "native/src/paint_trace.rs",
+          "sha256": "be96b81b3e53e331b1336621d13f6fd68f7ce66d022ed605db4c47cd3077ad0f"
+        },
+        {
+          "path": "native/src/protocol.rs",
+          "sha256": "b2df92abcd85732ff246e70c7b2be6240850727730192762da3629c968640a23"
+        },
+        {
+          "path": "native/src/protocol/apply.rs",
+          "sha256": "70e2000d7911bd4ef5f6a720776a175dd0fd09e7085500a222f3a0c32395dc98"
+        },
+        {
+          "path": "native/src/protocol/charts.rs",
+          "sha256": "8171949411ea72a68226435769010cc1e72ee526e8332844dd480e7fc2e15bb3"
+        },
+        {
+          "path": "native/src/protocol/menus.rs",
+          "sha256": "1145248cec741a885912bcb66d138ac9634f1d90e246af54b9a061b780cd62d7"
+        },
+        {
+          "path": "native/src/protocol/navigation.rs",
+          "sha256": "3d51789618d4eaa2dbbf197a3d61e5ce2fb46df51612059c45cb2310af88158d"
+        },
+        {
+          "path": "native/src/protocol/semantics.rs",
+          "sha256": "e084db5a4ef3103a92b86c001b24f5ae7321053e8f8125105fd546ef6e8fd418"
+        },
+        {
+          "path": "native/src/protocol/theme.rs",
+          "sha256": "54e9b69383dea3830b83b0a84668e45232ecb7a05853e7149f3751993910f608"
+        },
+        {
+          "path": "native/src/runtime_info.rs",
+          "sha256": "3b2f0b90fabfc4001674174e2bd0889fb155d13a7cb73d64f82edb2cea038ec0"
+        },
+        {
+          "path": "native/src/startup_probe_tests.rs",
+          "sha256": "9694b082959ba9d994d2f3dd776779916c81712da8f80791a47becbe584b3c82"
+        },
+        {
+          "path": "native/src/trace.rs",
+          "sha256": "0bff72c4b3f4c034caeaf48759bf7bd77375cdda9c6f96ea7c0692c44bb43a38"
+        },
+        {
+          "path": "native/src/ui.rs",
+          "sha256": "363b5594811c3ea33fc4e5f314b86b8bd3332a96a5f1acea87490c80995fb7d8"
+        },
+        {
+          "path": "native/src/ui/charts.rs",
+          "sha256": "1fc47a49377925596d33747d07596bc98d0540bcd3f0f215dffca02f340440cd"
+        },
+        {
+          "path": "native/src/ui/charts_tests.rs",
+          "sha256": "7f43c4fbd0f892acff4bd5f9bd0a94bc1738e3f17f495e7613fa5b492caf671d"
+        },
+        {
+          "path": "native/src/ui/choices.rs",
+          "sha256": "a6fb4532b38fb28d9588319df141726fe92d92743f6405529d2694649450d9e7"
+        },
+        {
+          "path": "native/src/ui/control_root.rs",
+          "sha256": "0b01042cfd1ec5f0d8ef4af57b6587640e22bb5a2da27f9cf697d83d5ca4e9fb"
+        },
+        {
+          "path": "native/src/ui/controls.rs",
+          "sha256": "67f925c99382a6cd092b5c165a0900fb3f72f02cbe6b7fcc0aad8e0f9cecb2b1"
+        },
+        {
+          "path": "native/src/ui/controls_tests.rs",
+          "sha256": "be8052f70f93b1008c9664c26b4156e86306770d84f4782f3371b9e578b04361"
+        },
+        {
+          "path": "native/src/ui/dialogs.rs",
+          "sha256": "6d058386537bb71d31eafea8c09348ae3667f43686d88daf5bc566a6442bbb25"
+        },
+        {
+          "path": "native/src/ui/experiment.rs",
+          "sha256": "6ce84130fc8184963be149a254b6d229ebefd2bafba08d5ca042bb318de010f5"
+        },
+        {
+          "path": "native/src/ui/experiment/frame.rs",
+          "sha256": "c221ad969cf1188a2d1319ea6712796c0e847f129030f8336d41fda77190a5c8"
+        },
+        {
+          "path": "native/src/ui/experiment/tests.rs",
+          "sha256": "d53b77ac289b6c660c448576d11660dea9acfce9e507017b0e9937f2c796279d"
+        },
+        {
+          "path": "native/src/ui/input_tests.rs",
+          "sha256": "d21075e2d786b2f1a0c426b2a24c63afddc7429be2c0519262c9f49e0c97b99e"
+        },
+        {
+          "path": "native/src/ui/inputs.rs",
+          "sha256": "9029075aa6409a711424d944469c9a12f471a854ede4882685076c21efb68a7c"
+        },
+        {
+          "path": "native/src/ui/menus.rs",
+          "sha256": "9e3c7915210e686259ab0879f60c6bc183bdbc2ccd9c4be90be04dd9169a81cb"
+        },
+        {
+          "path": "native/src/ui/menus_tests.rs",
+          "sha256": "556fdabc8742246d8ee835dc11978ebf6b81c8c7317ade3f695c9d7a672609cc"
+        },
+        {
+          "path": "native/src/ui/radio_tests.rs",
+          "sha256": "dde70d5bcf14c497a6ba7e3b31b280ddf43daedba75ebae8c98face03b616592"
+        },
+        {
+          "path": "native/src/ui/row_menus.rs",
+          "sha256": "09329196b4ef58bab3a76cd115a1d8ffcb96da8b25d6bd1e44d37da4466b95c7"
+        },
+        {
+          "path": "native/src/ui/row_menus/tests.rs",
+          "sha256": "26f6f525184d46814e6de4e8880d2fef2bef92f7b2f0f3c4fa29900a547d4cae"
+        },
+        {
+          "path": "native/src/ui/semantics.rs",
+          "sha256": "05425d6fbd0d6d04a6509036745f5f48ffcf1bf3f95d1276cdcb7887a7603ae9"
+        },
+        {
+          "path": "native/src/ui/semantics_tests.rs",
+          "sha256": "c375235246e0ed59265231b82488e18bfe162313771c8ab30d3f19c736e547ac"
+        },
+        {
+          "path": "native/src/ui/slider.rs",
+          "sha256": "eeaccadbdcfa834d44044450b4899ca674864ea49290b839ff229584a15f03d7"
+        },
+        {
+          "path": "native/src/ui/tabs_tests.rs",
+          "sha256": "14952d7312273e75513b27d6cdf34053e902714528fe149b37c581e94ebab1f4"
+        },
+        {
+          "path": "native/src/ui/tests.rs",
+          "sha256": "4a26f4430d03f69eee0ec07d2fa8867504b198e4a51a8d61c443ab3e48c8404b"
+        },
+        {
+          "path": "native/src/ui/theming.rs",
+          "sha256": "10451cf273f464372a76393ddebf6f9fa31d7dffd78b6008dfe46a1827b9cbe0"
+        },
+        {
+          "path": "native/src/ui/tooltip_tests.rs",
+          "sha256": "5df0329822a4e28a74ab3aafd550cb13e1a45e66d1812d7b6d0a714edcf94cb5"
+        },
+        {
+          "path": "native/vendor/GPUI-NOTICE",
+          "sha256": "e01d43c7cbc0d916485e63d0dbdee41dff93c22118a939135742dca1447f9314"
+        },
+        {
+          "path": "native/vendor/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "native/vendor/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "native/vendor/NOTICE",
+          "sha256": "e7c4131d16224a6d73c66b3f7d5b8ada3ec5b0768f8017767f3bb6f9d70a3087"
+        },
+        {
+          "path": "native/vendor/README.md",
+          "sha256": "ac29f54a072f18d5b8900a5e13b740891f6b27947c7e4d0c11e5d692c3c1ec57"
+        },
+        {
+          "path": "native/vendor/accessibility.patch",
+          "sha256": "91a22b75840c77b122dd15c9d18ced26c2e2a89c3d88d66a2c81af93e7ecc866"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/.cargo_vcs_info.json",
+          "sha256": "225ec7ff1c9138aa45f17e63a699e3dda1e348e769b61aec0448cdbabc07700f"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/Cargo.toml",
+          "sha256": "9eadb3f1642e8136d507b13c910276debd203929d3acdcfe1370df4c79466e27"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/README.md",
+          "sha256": "d85aba43de55ad4e6d9654bdf9899f1447aa8f791dd4c2789e95ae4b461aa59f"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/UPSTREAM.json",
+          "sha256": "3869101aaafcf246b39c16d13973a6e02a9ab0db7b081746d4ab056a67906605"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/action.rs",
+          "sha256": "36d0787759c74a16a0718a81bd9b10d73d03c1114610c7c7d529ef8f2bd8efb5"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/adapter.rs",
+          "sha256": "a0824815eedf7d03632c43ed75cb40486254edd01406be313029daf62d83b9c2"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/callback.rs",
+          "sha256": "5a4c799c0209340518170f3e9714f5f0e159b7a46ecff8c61596d05b3da3b4bd"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/context.rs",
+          "sha256": "096ad72a261a919876c158f78e2b606d7a5813973ba6e5cca685c486cb516eed"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/error.rs",
+          "sha256": "9905c653b2b86274331ba783f6ed3f37acf9bd3f450e59811bdc6b7522c51ff7"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/events.rs",
+          "sha256": "831458d5ab667d38a507f9be28419632704894a20dbbb66cf4deb81c04502ab0"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/filters.rs",
+          "sha256": "cfe74d16da43ccfda209f11107faf78442c6830fa126cf2d48ffdcdf14c65288"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/lib.rs",
+          "sha256": "d352e70c251f821b5a08d6fb05645faf64462bcede1f1582b9909354d61fccb4"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/node.rs",
+          "sha256": "8db3adfa613d74857b9fb0bef9b7e2ba8f8e97e5a6115122aed4bf82aef7152c"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/rect.rs",
+          "sha256": "b24337632621ee6bfa6397525bbd864b08b94e23c9201ebefd0fd73d1aa112e2"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/simplified.rs",
+          "sha256": "95dd4aafbd9bede9d2e8d5f614bc691fef50386e92da9d036d76883573eb497d"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/text_attributes.rs",
+          "sha256": "bd20841018e863c108d9a25ef6c5324951f4fba02c582e19943bdccdd052a744"
+        },
+        {
+          "path": "native/vendor/accesskit_atspi_common-0.19.1/src/util.rs",
+          "sha256": "e831407f6e9b05e403fb4256f037e040d813168716bb1ae3d56f8f0441b58a52"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/.cargo_vcs_info.json",
+          "sha256": "3272bb704f4ccc9eda927d7b19878684fee12ada387116f5331d1c2e6e95e892"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/Cargo.toml",
+          "sha256": "f75c77dc052103040d9ff95469fe50f94cd327b147fec851a8cb709c8a379774"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/README.md",
+          "sha256": "28c871133e9adeb24b4140a520614cee08713c35e2e2688f4a2fed7d4e62b472"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/UPSTREAM.json",
+          "sha256": "041d7ad389f472ce10619f0957033dba746747ec45af9887436b9cb61617fb21"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/src/filters.rs",
+          "sha256": "7ed1578cac719bfaf02c96aa3fd9adc070b487eef9126d8da2b5bc611b66c6f4"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/src/iterators.rs",
+          "sha256": "241345c892b481f075826cebc9ce9a0d68ee3b88bfa49668ed99388e61031f38"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/src/lib.rs",
+          "sha256": "11bf579ec7ff5251ff8646b2008d327db47fad4cfd586c7745076c5710e0fc7c"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/src/node.rs",
+          "sha256": "79eae090be57e25d7944d36c673e0b511d882ecae464ae3093d5a2bcc4121cab"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/src/text.rs",
+          "sha256": "aec62207031f24728fd8621159ba4b93f98dfa287a6e6ee36d5f370857ac9ae3"
+        },
+        {
+          "path": "native/vendor/accesskit_consumer-0.38.0/src/tree.rs",
+          "sha256": "11bd99118f37469144807416d4430893de938b1533f36d067c04e36235367f9a"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/.cargo_vcs_info.json",
+          "sha256": "4f1ed69660019a050c71392dc51047dbf96bad01ae556444277dda796848d477"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/Cargo.toml",
+          "sha256": "2f1bb12679396e02bed65a1e51bba2375f639cdbceb3773b5226f7dc8f3b9818"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/README.md",
+          "sha256": "843382343abfe5052b670db006fa0fde3f8bf577ef9be8d200392d9b7c0a13cd"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/UPSTREAM.json",
+          "sha256": "7e7a2a6b89231385b33551ed29eb7af23b692bbf0946c1aa739cb2eb9b4349d0"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/adapter.rs",
+          "sha256": "ec4be14db24c8164d9fb367c99b132702a24f10172688d36f11457d4b95b91d6"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/bus.rs",
+          "sha256": "266d1c5fbd10aa97b4375997d6bd02170dafbcd4e16bec387a3196ab7cf5adf2"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/accessible.rs",
+          "sha256": "b60a1c989be3edf03e9661df8663cdd1b3930ac40db40058cafabb322ce38626"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/action.rs",
+          "sha256": "7ffa334b1cace21aa567a074d0c1ba59dd2229449af02ffc329bfd4671940903"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/application.rs",
+          "sha256": "530316441ee42b415605f6f50526ac776d8ab038aff24dfa02d4352dedcf2db0"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/cache.rs",
+          "sha256": "30c19dde323e4e9c03c6d204b0185b70ce953ae1f6bfe47ad5f78ca0b85156d2"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/component.rs",
+          "sha256": "bb95115fe289aa2b92b6fce76a7a60df9a93a06a32281192aa4fdd6e75373fc3"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/hyperlink.rs",
+          "sha256": "9a53b1d164208963ed047326f12ab380700807a3338b8c76f4edd8a492cd35d8"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/mod.rs",
+          "sha256": "8c3351b0bc27e42dcb5436cb919530b6e14a67d9c5914665accdda3e2479b122"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/selection.rs",
+          "sha256": "980d556b2620de481146580744d80f3bde0631b148d1330aed268a0a5a6b7905"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/text.rs",
+          "sha256": "3e36eb6bdd8dcdb7d9831474aec4d0cc86ba281d65addbbb52e72aa165b64ed9"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/interfaces/value.rs",
+          "sha256": "829dfa73ab581da1be9210c1a6a0361bbb8563fb8d49c7057557cc1ddefafbab"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/mod.rs",
+          "sha256": "2ea8e56ae5d3fde6a380582890597d49a0390a86dfddcb275df5281ad46cd90e"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/object_address.rs",
+          "sha256": "71f293f5de1c46e5e2a2503053baa3c1fe7c62c13cc7c957dbf2843dfa531e79"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/atspi/object_id.rs",
+          "sha256": "0a0d87d35d858ebcc3dad9695556385aee61509009db3de236840b65bc940c0e"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/context.rs",
+          "sha256": "8a5c0881ea79e46ec0acc0864a526b87f2012284d1a7f3edade1b4ea21a7d0d0"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/executor.rs",
+          "sha256": "38e4a47fc2afd555d91d8e74156165d7da632c381e488a1c7693ed140ff278fa"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/lib.rs",
+          "sha256": "4416ce59366d321c3dbd29a1054c3ad6c426168c97f7b237ff3e818de6c3168c"
+        },
+        {
+          "path": "native/vendor/accesskit_unix-0.22.1/src/util.rs",
+          "sha256": "2a043a60ea1d76c5603d65d5a9844586f00d1d310902032214a10c70b80750c5"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/.cargo_vcs_info.json",
+          "sha256": "7b556e30d8d54e863f20727b9547512b6955849fc5d6c1819b01301c8a0bd764"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/Cargo.toml",
+          "sha256": "baad411ffb33b69d13765a538db985128def773bc93e6722183c34efcd5289b2"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/README.md",
+          "sha256": "622db8e92d711b64279a91e25ae9345959c82bb4d47157dbf5c3a6a53f80f6d6"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/UPSTREAM.json",
+          "sha256": "fa4fbe2a644e1e88c8ea3e6aa00d9dba14e0a43029a33c4699baf996dfa9b6bc"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/adapter.rs",
+          "sha256": "6519a7e59a380c8afadca814fd998d0697e91ad8be94da8e11ac8e5580d47edf"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/context.rs",
+          "sha256": "d67198d243aafe1e8940a6642765d66ce17fbb13e23f98d9e09d99d9400c09ae"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/filters.rs",
+          "sha256": "744374b547065b153123c80028f129f5c6bb53052660205e1a2f231c3e169f64"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/lib.rs",
+          "sha256": "8a6f20ed5354c9834d88a59091c764f65aa31359f81c57386fe06e9d806e9396"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/node.rs",
+          "sha256": "8d66311f950f16b6e247f64893dc258ac6b3a84495e62d28046901416c3b9785"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/subclass.rs",
+          "sha256": "69bb742d5451f2cff1c2110e77782948cb751aaad3302c5b1453ebf8b3d20a9e"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/tests/mod.rs",
+          "sha256": "5ea818811560d2af26cade33f7ec162c5f718ee62b2c9b3dd3dc822677d30409"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/tests/simple.rs",
+          "sha256": "8bd3eb20e258f2a9d5379671f5c3b4121623a66a95f6acfa9f70412323c87691"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/tests/subclassed.rs",
+          "sha256": "0987f1d442d1b57657f17fac6a9623ae012603531f47afcb31ff6ca73cb8e932"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/text.rs",
+          "sha256": "a8cee4eae55985cf68e1ade06a80101f65812ea7c1b4e8f2d5ac58b0efbbd1e1"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/util.rs",
+          "sha256": "dab7b1ffeccd6124cfc0dea6ff237e3ac9ba3661c0e23e04a1e433a596490656"
+        },
+        {
+          "path": "native/vendor/accesskit_windows-0.34.0/src/window_handle.rs",
+          "sha256": "dec1d78c81784a18c50f066e89d57d0fe02a7c9199a11e47a0833f8b9113d8c2"
+        },
+        {
+          "path": "native/vendor/cache-signals.patch",
+          "sha256": "215a5b40e47415e6c66309d689068afbd1bde849e6e3a4dd4abb8118e159afcc"
+        },
+        {
+          "path": "native/vendor/focus.patch",
+          "sha256": "e98a0a6e149325f5a7336f276e6b24324883320da5fad74c076850616804b4df"
+        },
+        {
+          "path": "native/vendor/font-collection.patch",
+          "sha256": "35fb2ba4b9f866163bd37e9a658b90e8fedd6dba5cb6fff09cc2dedb4926f026"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/Cargo.toml",
+          "sha256": "8b287f24d859e25379185c007a1f7068792ddf98b43a02c1905ca22b3cd559bc"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/LICENSE-APACHE",
+          "sha256": "752daf2fb234ca4a1fa372c073fe127f44b7b90fd2529ae44273a64f9d53da7a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/README.md",
+          "sha256": "989b10e5914dcc8a1f2568303849aeab2d6aa26f2c5dfead96de0491330ada79"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/UPSTREAM.json",
+          "sha256": "03ef7470f2114e0b438797a0ce4f7ad557cbefad4f8500a8f57e1172ca6090df"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/build.rs",
+          "sha256": "4c8ee205251fb2d5b66446a7d7385a908ecf5bbd1cae31eb4a72bf0b02b7ffb7"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/docs/contexts.md",
+          "sha256": "2688efb86472685cf2ea1af254c7c4bc70d53dd369c3d30118bf5e356fe86574"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/docs/key_dispatch.md",
+          "sha256": "56189467c43ca57c7cfa507f6ed7cdc31516144cbe648ef1f5fd97696862fe1a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/resources/windows/gpui.manifest.xml",
+          "sha256": "00bce21693c57d15d1a15f1d8814206d9dd80389bbf63ce5a8f3b364891232b6"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/resources/windows/gpui.rc",
+          "sha256": "eb3efc3b6af498552a0dd67f69d58e1a53e49155dfe90e4649478ec64dbd6af6"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/_accessibility.rs",
+          "sha256": "bcdeb209fa6309f5c507d9e8918235e75c18751c1985d0ebed632de643d7ea2e"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/_ownership_and_data_flow.rs",
+          "sha256": "4edbde237dc322ceac8969028811fd30d87a8bd108475a642c4fb961b2770258"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/action.rs",
+          "sha256": "35ff9f0af723f42d296ac1fc6fc220abc7c864367f97d257bbfad707e98d39be"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app.rs",
+          "sha256": "075e8977cd92dc5937ed638522eda17507da39d2a0bf9602fad1fc46df0f941f"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/async_context.rs",
+          "sha256": "9ce9c6f7fa3621679d4785d74686e81300cdc765b500245d8a92a8d33aed3094"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/bench_context.rs",
+          "sha256": "a159d1faa29eccba61db38d3a48f1e83ae8ed8b5501dbf7940991d381f93fea6"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/context.rs",
+          "sha256": "af9c74ba63623cf4f107861e041cddb72cca5b5c65695ab6531bb44fbf7b3573"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/entity_map.rs",
+          "sha256": "f770a17e04bfb1305577ca423a926fa967eeb3f392aeba10811d2ef7ccd2562d"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/headless_app_context.rs",
+          "sha256": "b8f42a8e9e99f74611984fcf301f5f998377e7ea2eacd20a3a9c45873143a248"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/test_app.rs",
+          "sha256": "ea41a502634c8eb8011a0f499b8a3900939228e6f6260bf8857766c799633316"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/test_context.rs",
+          "sha256": "b57dd9f67b1b6a344c9859bb5adf9b4405bcf7e21cf0a0bece3fda93b8afda56"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/app/visual_test_context.rs",
+          "sha256": "b6e0399349417b70cf067a90cf46a385a0b2efc999e30fd4a037d0ecdd87ff1c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/arena.rs",
+          "sha256": "262e6403f8fa505592dddb674028f43c0e41beb1f51aa97e37c917215052580b"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/asset_cache.rs",
+          "sha256": "cc1eb306523094d2d9a0e15538ce9a4fe29408288bd73e27781ea9a92c1b059e"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/assets.rs",
+          "sha256": "44e116678b8b351ecb7fb45a3163b58288d551fbc72049ddc7a8d255d589bcff"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/bounds_tree.rs",
+          "sha256": "c3da5abcd110191eea8b7b73a88bb8d1fd89251549e889c9cd42d1a7857a1b4c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/color.rs",
+          "sha256": "4292aa1a2bbc56b653aaef0702726325f8efb93f16226320519e257c3ba8a839"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/colors.rs",
+          "sha256": "bd7d022046e8ff2303761168f70a473738abbe200f3b40b7f216d16ca05d187b"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/debug_overlay.rs",
+          "sha256": "c5bdef757b2ce28d4b1e584ba2dbaf988df106057bedab23c185b61451425cf4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/element.rs",
+          "sha256": "1eea2303609c4aca23e44e623a9d44eded93ad8b70f86e3e4c7446b3e0238b4c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/anchored.rs",
+          "sha256": "1c649ab428e36a9502dca7d9b5c530acccd70f5a8500588c2e400e85d2a15f52"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/animation.rs",
+          "sha256": "117a4b1a580382b21accce30308f0480853c1e9372220566748dcb5f74d5793e"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/canvas.rs",
+          "sha256": "3e09646e725d31c10a88be290c146d6a6e829e0be173e6bc82c138461668e646"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/container_query.rs",
+          "sha256": "7e72aab18967e7e16ebbe38c535caf2ac6f881a62cf9f6045922fbeb8a06df07"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/deferred.rs",
+          "sha256": "0501cd9c0f041b849e51ea78a69abeb24781e5b5488311c0b87f4cf1ed01f451"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/div.rs",
+          "sha256": "10f334243fae305666e48d4939ed63495ce01b13534db22a751062a6f76fa59b"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/image_cache.rs",
+          "sha256": "e4540d7e92bc63bbaaf703df42338bbfabca764e34b7244880460d38962e14c4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/img.rs",
+          "sha256": "c196cb1ed3db30ab3141b036c84288a22e04de2b53b687e1d86fe732420374e3"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/list.rs",
+          "sha256": "42704328bf8f1f5c75b0129dfaf4052e475f2de1bcfec3a2c6f92f518c6cb573"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/mod.rs",
+          "sha256": "447ab5d960591744b9f193bbf9af562b5fbf9d8fd156e179584031e6f464d632"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/surface.rs",
+          "sha256": "b72696ba0a043fdcddcad5536c7cde2e1703a4fc185f6a5449b86b62cee20819"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/svg.rs",
+          "sha256": "ab5412945c36fd0087e95a1544d610cf9308e906b3059835b4c49f98f4b9279e"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/text.rs",
+          "sha256": "3ffcc422356924ae4d6eef864421f56588be65cd931c8fe35d7e5e6438c23346"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/elements/uniform_list.rs",
+          "sha256": "04221d6daf31f1bd994fb4649a19df3184b56de293301c0306183bd642e09e03"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/executor.rs",
+          "sha256": "6047eea975fb8d0b3cfd170a07a73d72a27b80b91830c272e8c84ec49ffde52c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/geometry.rs",
+          "sha256": "900fc506a964cda44ed0cf1f97c01ff28d7268c87c9eeadbf7a4f1bb50e33edd"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/gestures.rs",
+          "sha256": "0a1db91af00d98d35799bd2c82f65ec8d39e026dc58c66b78623368b367dbb7e"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/global.rs",
+          "sha256": "c52ddc647f712282a3a1f3629f864d0868966169fee7aff5f1f8d27e67f3f077"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/gpui.rs",
+          "sha256": "667571c3c84b8db714961171b4bdc5c82fe85b0dfcbd630e89e5b4f73fe71299"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/input.rs",
+          "sha256": "212ab29d9ac70756d2e480a246b56c5028257746cd5f1b49a3a59a12b7a19db9"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/inspector.rs",
+          "sha256": "39a2790b992b2c354eccb4d60a7070e41628a86c5463d339f9c7b8fa250c1ede"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/interactive.rs",
+          "sha256": "443b41c4f7d6d31ba288a49a151dc2280ec1e1e20df2f558551dc07009672087"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/key_dispatch.rs",
+          "sha256": "2fe88ee61eb3a1dbec40e10e6d56e5eb92862a28116f29f3d035e12eae6e6974"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/keymap.rs",
+          "sha256": "7b007c96f748b0593ce56f9ea1520422b3b9401919cc442f2ef4a2b374e203be"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/keymap/binding.rs",
+          "sha256": "7306cd42de8bd0dbbf111c7b1c9d30b2a814251ad0f00b7f7cb3bf042925f895"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/keymap/context.rs",
+          "sha256": "dd3cf2e883caed26e201a8aed39fbc51de782e7f806ecc22fde617929ca223cf"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/path_builder.rs",
+          "sha256": "07fa0b21e5493cf46ce54976d77ffea3a430ddbbc369c4d4e247a3bc68854e35"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform.rs",
+          "sha256": "9de7e0b0f29c51b149263b9bc9b4061bfbe41849e296b75df9cf259d9bbbdc4c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/app_menu.rs",
+          "sha256": "c751e70bf50cf2366dad9d6b2a66fc3a8e9cd1547128173dbfc59520feb454cc"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/keyboard.rs",
+          "sha256": "8de8d585f4238204fd14113abded703afa6bb0a532dacabdf400df8249390376"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/keystroke.rs",
+          "sha256": "35515a9d079060667e99851f09227d0ff2204b2d0d951bd96d8297f3bc3f9115"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/layer_shell.rs",
+          "sha256": "cdb4822c6589461045f09829640da3961e957d782c8e4763050b65701c90d305"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/popup.rs",
+          "sha256": "18a8aa2aaf3739c71d34233e7b2dabb4e902e5e27f9e1dcb362acd110478bb1a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/scap_screen_capture.rs",
+          "sha256": "b6492678395e5a9a3335fd6babaa60192dc5b971efd32f896e33fb8fbbd7e484"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/test.rs",
+          "sha256": "52861874bfdd1433728d61bd7be3a40b1f8c27aae4e4cc9d31b311ef13bda994"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/dispatcher.rs",
+          "sha256": "dea03a78a0c64d486f2c5b7bc669ba281638a0f8ee53316a52993a0e5b5cabd0"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/display.rs",
+          "sha256": "1cbb36acb34c98fefdebf9c3676ff6b2dad93ef9e51ed7729ccdfa34f8b6ceb4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/platform.rs",
+          "sha256": "3a95163b4974fa09a6ee6b4c3f9dd579698e642afb80a8529d4e17989b23ce22"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/test/window.rs",
+          "sha256": "e31520f95c8910c6e378a39a4fc59312ed02f157aa7f2aaf2ab59d04a29553b9"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/threaded_dispatcher.rs",
+          "sha256": "aff57da6e74ddb0dbdb57f2c58b08236c1b78a4971e0c6d2f095f0746096f09c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform/visual_test.rs",
+          "sha256": "71265c50863bfb9eb0dd5e103d1bbbb5d612e73cee1614662c26ac538db28124"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/platform_scheduler.rs",
+          "sha256": "db193099a1b790d8658e1f056b393bb03df5b97f2c89f60c0ebca7186bdc0a51"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/prelude.rs",
+          "sha256": "cbbef2e02b205044bb46dbe0e5353af35dfa466bcecb45078947994958ef133d"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/profiler.rs",
+          "sha256": "2ead5740bf573293e4866ae40ea06d82721a87d31c0310415c3c0e2f2866508a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/profiler/actions.rs",
+          "sha256": "1907458a07d8370f19652fb60bb0bf1ef8ee8baf3e5fe4d04fc54f380e586d8f"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/profiler/hang.rs",
+          "sha256": "2e410c91cec8f874471d7463194b8a7ccf2deeeefca80b3da4e93e7c335d5acb"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/profiler/journal.rs",
+          "sha256": "f4a12172d034ad393899c4f820ad9488533a1517c87e01716759305b120286da"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/queue.rs",
+          "sha256": "3eb36c766b3ae5c78b7373a6fa92a3115e498769c99485d78ad8e910fde19305"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/scene.rs",
+          "sha256": "2162c7da284ca995e5a84a3c9b66fbd65abb63d96858c0cc76c25efd4ba1d66e"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/shared_uri.rs",
+          "sha256": "7a0a4feb3e290bb3f2c15fd4c8ee4c8ca3a9a5974e04ec084c4f8f0f3fc89248"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/spring.rs",
+          "sha256": "1cdc32dc3fd2d2b8cbdc7809e51c276ced938592dd08083fe7cc063a02086663"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/style.rs",
+          "sha256": "b4a0e838fc7050cef25f71aae623cf86010c2ec361600479d24ce1aaff91bdc1"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/styled.rs",
+          "sha256": "c6e62fe136bedf887ee755c886df5466d5fe0b398a004b35d1a3530fef809c8d"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/subscription.rs",
+          "sha256": "cca3b5138cb23084932772c8e009cce8a08562c2c00b69f3e0d4b1676b88087a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/svg_renderer.rs",
+          "sha256": "fb12dae87c0cd4c5f5a1fbbd2f9548d52fde9440c21e3d576dfeb0233eda88a6"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/tab_stop.rs",
+          "sha256": "7f742d6d6b7e5cd6fc634f2764fc3937e1cdebcf086d4b7c166379724edd1881"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/taffy.rs",
+          "sha256": "dd561fcc6b693cfcd15b343b5e2935b9cff2ee8fb373d5e7166ca71ff1f74880"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/test.rs",
+          "sha256": "3898a57d360edf65a9388ee005837f3d3b84102911cf79590352d12542f69a9c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/text_system.rs",
+          "sha256": "b39e05a8a8f7b36e13ffe1211d2c2993f68f2ce4cada87ad3414492a42e927b4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/text_system/font_fallbacks.rs",
+          "sha256": "8451a6f069fe78c76da11377ee17b01aabd3c35aaa494fb329f2ae5a5bf9736f"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/text_system/font_features.rs",
+          "sha256": "85f901df313e3b8379e65b70a0e69e5dfc7d8280a761e568d1f4293edc4c4834"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/text_system/line.rs",
+          "sha256": "25bbf6a409ce8e70d1265a858f2d2abdbbc2c110d515abd31bb0a379cdce54e3"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/text_system/line_layout.rs",
+          "sha256": "a78d230d050bbf17bd968612da1d84f4c8aaefc39f82100e11b2b3a6990d45e4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/text_system/line_wrapper.rs",
+          "sha256": "bb3ab3fa326466850816452fcf0ec82e3939a4dde5cb5f0515d771df922501e7"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/util.rs",
+          "sha256": "04397f667bf5d890cce690b96441cd5b8f5eb0a5dd2942ce27b0314be38fa636"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/view.rs",
+          "sha256": "11eeda4ac05a0b03b22df9ffd58fc08ce1f6b0ef57af6cd8e7679d06f4601d94"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/window.rs",
+          "sha256": "b91a966cbcd1fc74f3d2bfd4f29330954d622697852582f435a51c60ba81d78d"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/window/a11y.rs",
+          "sha256": "1579b5772038313635feda4ad5c32a46f5bd843396268c8b573d68e7c57488b5"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/window/a11y/debug.rs",
+          "sha256": "2055ed9e63900a601a973191ff82ebbd91557178036826a4d2c04b09f5cf4dc2"
+        },
+        {
+          "path": "native/vendor/gpui-pre-0.3.7/src/window/prompts.rs",
+          "sha256": "0d58ec14e8139af53b50f4ad67690f01959ed59ffafc4adb2cf522f3f6197164"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/Cargo.toml",
+          "sha256": "a18a7efb4b25e2409ca9c47e2bc67f6229ef7b8e5646e145b1e90753ae9faa84"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/LICENSE-APACHE",
+          "sha256": "752daf2fb234ca4a1fa372c073fe127f44b7b90fd2529ae44273a64f9d53da7a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/UPSTREAM.json",
+          "sha256": "19e57d939408b4fb9e9bb6c09e929037127c76c621e8f0e79b6d27fc7a5b58b3"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/build.rs",
+          "sha256": "3192734d0448f3ec44525e3b55c025d30d9926edce6b24e5575ac27a1ab3ad06"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/alpha_correction.hlsl",
+          "sha256": "d37b106f1266b40a0e17478455dfaac1205214f597e23fbd0a26455c49806bf4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/clipboard.rs",
+          "sha256": "513125f0afe8c9393f02121310cd250784de0910adff7d77b31363992281fd4c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/color_text_raster.hlsl",
+          "sha256": "53bb7f737dcf5b7c7a2c474cf6e7f649cc4e7d49b5526c2ac5f75f75086ce2b8"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/destination_list.rs",
+          "sha256": "2f9bfdb5e7fdfdb2f72e4e150683677538b38dc4087390e916df765fab46a6e4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/dialog.rs",
+          "sha256": "94f35e514b4f42ef96aa0a66934193a33534bd1536cc526e2be3547c745adb41"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/direct_manipulation.rs",
+          "sha256": "da83877b3e6c2d3f7d391eb151cc4cc56c70dbc95b261f5bda2e3e861d8aca1d"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/direct_write.rs",
+          "sha256": "e3722ede834f91e3b88a4225bc55c43e6f91c69aeef4f13f0e1239fd7c56a8c0"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/directx_atlas.rs",
+          "sha256": "eff897707e3b8b4e549cd247725a6cee9c14b6a8188e32d32ad6360d693ce455"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/directx_devices.rs",
+          "sha256": "83372170f6225db45033473d118fc43708942ec9687467de09e2b5215c835cf1"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/directx_renderer.rs",
+          "sha256": "76c73b8f718640e3766db3197d149228cf4fda7936afc2a122237aa80f6a920c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/dispatcher.rs",
+          "sha256": "a24daa0105ceadc2a4d50f0d1afab5a4af441a6a1254412d9811a04095f8cdd4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/display.rs",
+          "sha256": "763040fe7a9c29d78c46e42dd8c4ffaa8eb703d7cdba0748b709a8e76787f614"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/events.rs",
+          "sha256": "7458a01f0b2c6569a251441054a8375cf3910e1d7399b3edad2ca80bc43b0f8c"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/gpui_windows.rs",
+          "sha256": "75343c98433a942fa1f4a700592e11361edb9a236a5523fd9a6327523b0c9b6a"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/keyboard.rs",
+          "sha256": "4e373ce1a3f23b6527b1abb3051b59c96d5cc2b0f777d4d4097dd27dd1673516"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/platform.rs",
+          "sha256": "5f9da137f264b8e0ffadbbe6eb8edd83dcf38718f14e13eac52bfaad8b291fb4"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/shaders.hlsl",
+          "sha256": "16a7d6ba1e2095bf1aa53c4d91a3ba54282851c4c097dbaf3d688d6f6983c4fc"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/system_notifications.rs",
+          "sha256": "d0159dbf6fd10622a5b106806ea2f57b3fe983eb6e2fc8635ab38bdf6529879d"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/system_settings.rs",
+          "sha256": "a9d22571c2405f610d44b85d86fbcf0356f7cc6aeeffad269a534b42eeffbdd9"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/util.rs",
+          "sha256": "e9bdd79c80149f7d60d2a35f4e86398343762a6c2549fd67de1de4de9ab65147"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/vsync.rs",
+          "sha256": "2223e21da45cbefb3d427e5a804ac7367815db41e56d1d47f315ab0ad9efb675"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/window.rs",
+          "sha256": "35ca36a271ca0f3be6b8bcd9619d16763704abeab10d825c85a234c2cb208058"
+        },
+        {
+          "path": "native/vendor/gpui-pre-windows-0.3.7/src/wrapper.rs",
+          "sha256": "a17bfb94697904d650a0db4007880262256d06bf96cb00af387e73fde7536c8b"
+        },
+        {
+          "path": "native/vendor/menu-invoke.patch",
+          "sha256": "34850b1c1f62a7d0ddb46248bf7f1c6525f7d99056662516ba2c717f8c507d5a"
+        },
+        {
+          "path": "native/vendor/present-feedback.patch",
+          "sha256": "32a03c9295baa6c18af29fb74fbc650484318deb882428633e4adbef99ca1d29"
+        },
+        {
+          "path": "native/vendor/window-bounds.patch",
+          "sha256": "82db82dc6dc984d3adfaa3bea857bc0b5b7818144c469275064854caf36a22ed"
+        },
+        {
+          "path": "pubspec.lock",
+          "sha256": "297050a0bb0c6823e51a53a3643cc0568b261311b2cc7d41a6c88c41ce95e5cb"
+        },
+        {
+          "path": "pubspec.yaml",
+          "sha256": "5371469bb2b5d1aa295b1543c7565593fa0ac7a7788f4a58ba0d0c7abc157e10"
+        },
+        {
+          "path": "rust-toolchain.toml",
+          "sha256": "d7c30241dcc347f1ea6f7f509f19891b16be5443c8d97d0d4cc5480aa645df26"
+        },
+        {
+          "path": "tool/accessibility/cache_events.dart",
+          "sha256": "2d99f034fd9398bc63a1fe592e0efbd6b25230d5527c2efa7175e61ad60bf6fa"
+        },
+        {
+          "path": "tool/accessibility/client.dart",
+          "sha256": "1666d37cff8a945d69769949357a6b2b7437377844500ebcb1b4c4d1a7dc5d08"
+        },
+        {
+          "path": "tool/accessibility/controls.dart",
+          "sha256": "7c65475e40a5833ff67f7e51bcac6d0e64887265ac43b483daa962f76bced532"
+        },
+        {
+          "path": "tool/accessibility/disabled.dart",
+          "sha256": "ffc3d6ab2b5a7d4c8e876e1fe515e79d7e209691b0d2f27a754621c5227ab86d"
+        },
+        {
+          "path": "tool/accessibility/probe.dart",
+          "sha256": "aa190e8cac2d1600ae82b888ea1215fca8dd604275bb90b5d31791e754204ab6"
+        },
+        {
+          "path": "tool/accessibility/settings_track.dart",
+          "sha256": "d613c8d15b308f91a6c382a5bf0180bc15b67039b3db11e22a97009988d99d12"
+        },
+        {
+          "path": "tool/accessibility/terminal_track.dart",
+          "sha256": "964c37db66dc36765f268071d74b759bcc8aad4d993952740429115b2170ccef"
+        },
+        {
+          "path": "tool/accessibility/verify_vendor.dart",
+          "sha256": "73afac70c83c91ac81453e0ec2ccc7816d4c82aa8c8ac481256a302ae82ce54a"
+        },
+        {
+          "path": "tool/accessibility/watchlist.dart",
+          "sha256": "c7d0c2e7902ea8562514f9cf951f9dc5c9fd8000d8bbf0957b92a40c810e8256"
+        },
+        {
+          "path": "tool/build.dart",
+          "sha256": "35f697e339ce26d210f372d3c5f73e51780edab3dd56cb49bb17246cd8511e80"
+        },
+        {
+          "path": "tool/build_cli.dart",
+          "sha256": "2a9fad7bb563b6732bf4dee981bea194f743346107c8d2d67bda2aee89222a06"
+        },
+        {
+          "path": "tool/build_test_fixtures.dart",
+          "sha256": "417dee84b34e43624cf04feae23125ca26c1c1dce73cf0f0af27db5f491430d6"
+        },
+        {
+          "path": "tool/capture_host_baseline.dart",
+          "sha256": "1848e2d9c9db94d8da03ce00e7a24006cdb82720f300f6e3baf04eb0bd718e14"
+        },
+        {
+          "path": "tool/capture_publication_trace.dart",
+          "sha256": "a7a7ac69bc94bb88b82bbfd8fa873fb953e7bd84f476dca2d337fa1f7d2958bd"
+        },
+        {
+          "path": "tool/check.dart",
+          "sha256": "2ba89ce06734da69698eef12ac14a49ce462386c05132975fedca76e989c7ded"
+        },
+        {
+          "path": "tool/dev.dart",
+          "sha256": "cccb7c3a2d1ca8b26f41f8163e872efc10705361204ed3c78e5b55c5d4fca036"
+        },
+        {
+          "path": "tool/docs_check.dart",
+          "sha256": "49298f18d1ff4eb8943db1240cf02cc03944df1b17a8a0fcbb02230d64966fc4"
+        },
+        {
+          "path": "tool/doctor.dart",
+          "sha256": "83ff87cf819d275ba9437737592bca3989f00eb3ef9267380e89d31d1f393053"
+        },
+        {
+          "path": "tool/env.dart",
+          "sha256": "557d22c4fb515b43962c474d80b06682c3d781e633538e7b871853f75dbea9a1"
+        },
+        {
+          "path": "tool/measure_data.dart",
+          "sha256": "33ec8955f1838878df04973381e3f1ff61a425ee85aef57d8aca210b8f6f647c"
+        },
+        {
+          "path": "tool/native_probe/Cargo.lock",
+          "sha256": "d18393b920d9149779037a4b0fae21661b60bd3e6f4d6cae801c9b9f1ce8931b"
+        },
+        {
+          "path": "tool/native_probe/Cargo.toml",
+          "sha256": "aa6fb9575e10279c8d75e868a3140e2f0bd6e2c10269668bff7dd3daa376e1e0"
+        },
+        {
+          "path": "tool/native_probe/README.md",
+          "sha256": "30a83e06fb068872a903e79ac6885b463ddd2ab679cc6d10f20ab038eb51e64e"
+        },
+        {
+          "path": "tool/native_probe/build.dart",
+          "sha256": "8128e1a201b1b0fc5d1e8cb3d049babc337af92113974ef4c839a1b4a9ccda93"
+        },
+        {
+          "path": "tool/native_probe/client.dart",
+          "sha256": "a41b9ed7a7c09a7426bf43787e696f6e966ae54b237113cc160f9268f83ce2fa"
+        },
+        {
+          "path": "tool/native_probe/src/linux.rs",
+          "sha256": "200911ddb6465e1e6e1bb7b4d5505bdd931dfe6e7ee65327168d1e68c7945fee"
+        },
+        {
+          "path": "tool/native_probe/src/linux/cache.rs",
+          "sha256": "c515fb3d2f5bb18bf1020289dcf65070960d1510d113a90d192ac7c3c2152fd8"
+        },
+        {
+          "path": "tool/native_probe/src/macos.rs",
+          "sha256": "1aafc9c68f96caece71199225ea1bf369b1e3f690015b825ff9848c893d0529f"
+        },
+        {
+          "path": "tool/native_probe/src/main.rs",
+          "sha256": "a8b649afa1c56d2d7a55dae35522f4e280cbed4f3a7b3936193c58e7732a3fdb"
+        },
+        {
+          "path": "tool/native_probe/src/windows.rs",
+          "sha256": "c35054d8df8c07c02ff5cad529df45d0ff21a2fe9ec3d30cb4440a162a6517e9"
+        },
+        {
+          "path": "tool/package.dart",
+          "sha256": "1724859a8122b5b40f0aefbc86d0a70aabea73c4783ed6f7d88393a0055556b9"
+        },
+        {
+          "path": "tool/performance/README.md",
+          "sha256": "b6e36476adf89b05d0fe03449c07df67d0f97eae912175ae273456bf284c62fd"
+        },
+        {
+          "path": "tool/performance/bench_diff.dart",
+          "sha256": "e91ddcf50bc91760335ec105920f3d5378c9d6115445c3e958885a488a98f894"
+        },
+        {
+          "path": "tool/performance/bench_frames_live.dart",
+          "sha256": "28d5ec1c75bcac3ff00d89e9de30d28d840564363b1d498dbf92799d271142b7"
+        },
+        {
+          "path": "tool/performance/bench_memo.dart",
+          "sha256": "f6ecd9794c2842eb999f4cea0fb8ddb150c9b0610d15b1a36c4e97146d2d3a4a"
+        },
+        {
+          "path": "tool/performance/bench_patch_live.dart",
+          "sha256": "5af8eab9ec7d9d6aeed64af354efbbfe5c8585fe7c394b304a12f7a3c24e8f77"
+        },
+        {
+          "path": "tool/performance/capture_baseline.dart",
+          "sha256": "ae2ab92a8c33e195b04cc5b8ca6b1347e9a4649026985c9a40dde854f286a17f"
+        },
+        {
+          "path": "tool/performance/capture_encoding.dart",
+          "sha256": "97e38ba80801369a4b8206be02defa3193cefa2d4b8b4e43c65a9b3b4d644220"
+        },
+        {
+          "path": "tool/performance/capture_snapshot_gate.dart",
+          "sha256": "ff1f934eac7752cfef006c8cf95a4f729d4d0db7a69d7a08d1e8ed2fd63b16ba"
+        },
+        {
+          "path": "tool/performance/capture_strategy.dart",
+          "sha256": "21e9b13c0254df434adcc792ddba05e80d214e90c1ab0dc44d6be09ab6f28d1e"
+        },
+        {
+          "path": "tool/performance/compare_frames.dart",
+          "sha256": "1afd8d4c90cfc9933daa6a1506f8b272def675ab08063b48e1b7e50da19abba4"
+        },
+        {
+          "path": "tool/performance/compare_update_gate.dart",
+          "sha256": "58069024d41cb599aa14115783d4e3e36b23ff3b731d1e34beb1c887823a828f"
+        },
+        {
+          "path": "tool/performance/experiment_diff.dart",
+          "sha256": "36408b36a72b089cf85ad5634e5663caeb04c183578ff16f3ac995fba61b0e48"
+        },
+        {
+          "path": "tool/performance/experiment_transport.dart",
+          "sha256": "51c389c84ee3219d778c4fe2bf482a20551ffec176c18a468261e9229d13516b"
+        },
+        {
+          "path": "tool/performance/measure_floor.dart",
+          "sha256": "fc1a382f2d2f4e5d0a5ab0bd37a3a491a510e7e5a31fa2550c4edafa35dcb612"
+        },
+        {
+          "path": "tool/performance/measure_large_dataset.dart",
+          "sha256": "fe5949079a7167146540026a920888bca4303e51d7800c8332f82bd4322e6046"
+        },
+        {
+          "path": "tool/performance/run_baselines.dart",
+          "sha256": "b2b4591ab89bd3675c9d0223736cb9b4e4c8f65d323bdbed4dddc253ffd2fa6b"
+        },
+        {
+          "path": "tool/performance/run_encoding.dart",
+          "sha256": "8e1e3ff39e783e054fecb0288e91e98bad9c67df7b85a07ab1c64ad500592944"
+        },
+        {
+          "path": "tool/performance/run_logged.dart",
+          "sha256": "7a01625bc70b3b3cec4eb7c628e00b7383aa084d9cfaa727897ebe027d9b0806"
+        },
+        {
+          "path": "tool/performance/run_snapshot_gate.dart",
+          "sha256": "7b75e56a9d73a5869ac5143fea43cad47f7dad786c59ff0a602d23e342ee3c2e"
+        },
+        {
+          "path": "tool/performance/run_strategies.dart",
+          "sha256": "d127996a03d5c4c7d6e5e902e52e59ef5d36fec988d356309c8d724b622d8960"
+        },
+        {
+          "path": "tool/performance/run_update_gate.dart",
+          "sha256": "298cdae3e461d4cc073327e55bf4759fa7b09d4b13c91681fc45502a4420238e"
+        },
+        {
+          "path": "tool/performance/snapshot_fixture.dart",
+          "sha256": "59b391c742bf081339fa21de9e91f29606c9e5b328d0e43b28c7bd7f634db7df"
+        },
+        {
+          "path": "tool/performance/summarize_baselines.dart",
+          "sha256": "3ba718bddb6f3e9f3b4cfc2ae61779dc2a1a6101651be24b55ae7de4c419d1c0"
+        },
+        {
+          "path": "tool/performance/summarize_encoding.dart",
+          "sha256": "9848ebfe58b4432c21fbee4414b514e9a2ee1f7f63a040c0e72736ca5098bbde"
+        },
+        {
+          "path": "tool/performance/summarize_snapshot_gate.dart",
+          "sha256": "a56420e380dc4af6696ce90dd3de7eec657a926eb9fd874df2c335eacc29a20e"
+        },
+        {
+          "path": "tool/performance/summarize_strategies.dart",
+          "sha256": "1bd24f2af5e42f4b2ea21728b389db24f8371db8b1ea2c93ff832e98dc58da79"
+        },
+        {
+          "path": "tool/platform_probe/README.md",
+          "sha256": "c1e89804c307ea5bc7ac67925949eb10c528e050312e0cb19fc8152395b56934"
+        },
+        {
+          "path": "tool/platform_probe/companion.dart",
+          "sha256": "077136e4414ec3adbf7e03294e4b69e180798f1d18e1cdb09514ad45fb5ab772"
+        },
+        {
+          "path": "tool/platform_probe/native/Cargo.toml",
+          "sha256": "65670763ea6cf4ac55969dc7d819b6fd38c2f5a64563651694e92721b301122f"
+        },
+        {
+          "path": "tool/platform_probe/native/build.rs",
+          "sha256": "1bdee8eb8b342ccf6fa9e589052275a1bb1292a7752ec85e27a9e1b622a408bd"
+        },
+        {
+          "path": "tool/platform_probe/native/src/lib.rs",
+          "sha256": "2ef3f5a3eceb906609ff21adccbffd1e5a66e60ab2b58d549d8a8e9cb07b80af"
+        },
+        {
+          "path": "tool/platform_probe/native/src/main.rs",
+          "sha256": "93c898ebcc4491c6a3c08ea7c08b7b36c5c4246f3e90c9b64d488e1cc7e150d4"
+        },
+        {
+          "path": "tool/platform_probe/probe.dart",
+          "sha256": "ceaf9032d41767081a7d511304ddce86da3b902cd71d610f9d62d9dbdb78fc73"
+        },
+        {
+          "path": "tool/platform_probe/reload.dart",
+          "sha256": "f1b2a793e021d859cdefd8b7601197b5729dc93dac873f7a1ec4d8a43bd33fae"
+        },
+        {
+          "path": "tool/platform_probe/reload_ffi.dart",
+          "sha256": "1b8e9d3fff9ac719189f82c2d2b1becfd360eb5d6d2fa65c4080655f5e985f4e"
+        },
+        {
+          "path": "tool/platform_probe/run.dart",
+          "sha256": "e9eaaa4fe74a96ef3a3fb58ab6dd3273b55fd42593e23bfcf6ad64512c843e54"
+        },
+        {
+          "path": "tool/prepare_windows_release_checks.dart",
+          "sha256": "f85b6f4fa03bc680f9bb89357bb9405aee3aa0a49ab99c2935f99ca27a52bcee"
+        },
+        {
+          "path": "tool/record_platform_environment.dart",
+          "sha256": "43371096931cbaedc1c6bd4ea2b917727e6cc8865d3aa148fb2c12f2dfabc330"
+        },
+        {
+          "path": "tool/run_host_baselines.dart",
+          "sha256": "e62821b077dd572b6f86de3d8e01ee4bee5ee4e27d5e1bfbc84f7891b4740692"
+        },
+        {
+          "path": "tool/source_inventory.dart",
+          "sha256": "f69c829c9ef51397caf8d44ae723132cdb0c872fd39365ed573119c146c5784d"
+        },
+        {
+          "path": "tool/src/archives.dart",
+          "sha256": "cd07e84b5c846a34f9ac4b5ed10d335ac405fa9d8a14e1a31231582e2c99d130"
+        },
+        {
+          "path": "tool/src/commands.dart",
+          "sha256": "591e6834604add32e4f47f004dca12b5d38c755e86ab7d09621e7c359e5e4e16"
+        },
+        {
+          "path": "tool/src/dart_sdk.dart",
+          "sha256": "264f726e78548679ad07a4e8f1444aac9283b7ea7816782449ae2e80263149ea"
+        },
+        {
+          "path": "tool/src/dev_session.dart",
+          "sha256": "a0492a57e19931cec2301aa82b1f41893c02abba7ce500a8bfadbea538d586ae"
+        },
+        {
+          "path": "tool/src/owned_process.dart",
+          "sha256": "0859c57f4dfe85bda929af84b2c3f831229b561c56c94295b8854ddf97f437fd"
+        },
+        {
+          "path": "tool/src/package_manifest.dart",
+          "sha256": "c34ea5054fe81d1f20664484997694a5305e736b907e660eb9812b0295a8b8c0"
+        },
+        {
+          "path": "tool/src/toolchain.dart",
+          "sha256": "78ba888f81ec19d18ac906b46d551301bb2fe2d9f65ef3784ec62b76751fb3d0"
+        },
+        {
+          "path": "tool/src/windows_package.dart",
+          "sha256": "dc9a31f24f4018884a8195984ae214cca527d1b0391c08b95a769711446c1f31"
+        },
+        {
+          "path": "tool/src/windows_tool.dart",
+          "sha256": "d1b61d8c06a9dced47a863a9efbcf3710da4604af224e7a2e5293e8892adcdc0"
+        },
+        {
+          "path": "tool/summarize.dart",
+          "sha256": "08a4705e47ef7a771566d034260c744b48b213f17b1faa412d181c2ca1849507"
+        },
+        {
+          "path": "tool/unix/Dockerfile.runtime",
+          "sha256": "ccb51ee2d56931a8230844d71a8346689cf89cbe90eb8acf7ef57f6ba8c72288"
+        },
+        {
+          "path": "tool/unix/verify.dart",
+          "sha256": "71c8200fb707cc7322066b2429aa44abbf2691343d586e31d0dad4adb4eeb5e9"
+        },
+        {
+          "path": "tool/verify_dev_failures.dart",
+          "sha256": "9717119bef1e1afa1507e9daa78e627979c6f3551cf3c993855550fd01bd29c2"
+        },
+        {
+          "path": "tool/verify_dev_launcher.dart",
+          "sha256": "224db9ff5bf79ce26d2b3e4ff71f2a12fa567b84fd5934851841605fff9b634e"
+        },
+        {
+          "path": "tool/verify_mvp.dart",
+          "sha256": "7e62d70ff849e0fac6a5bb4ad41fe9c6f752f10892a4c78883536a2eba98d9f3"
+        },
+        {
+          "path": "tool/verify_package.dart",
+          "sha256": "2b9942aaf5820c61ab510fea6441fac19742725d7dbb7d645e5aaf488dd8f5a6"
+        },
+        {
+          "path": "tool/verify_package_failures.dart",
+          "sha256": "67c749a0eea200dab0e90f9999a5defb1943d8ba06aa0a7dbdf7298ddce4c2c3"
+        },
+        {
+          "path": "tool/verify_reload.dart",
+          "sha256": "95758bfb7cb767cf7ba7585db3342f91d39e03da510075699a9a3d76e161f2f5"
+        },
+        {
+          "path": "tool/verify_settings.dart",
+          "sha256": "b86363d54e79099afbc5eb43df6bffed374987a3a0425027618b86f16ba476e5"
+        },
+        {
+          "path": "tool/verify_terminal.dart",
+          "sha256": "4199a78e1f285c645a26a70de3db20300cc17e02a763dac3f8e5d2183b3b9393"
+        },
+        {
+          "path": "tool/verify_terminal_reload.dart",
+          "sha256": "6ca53865c67ff23c34b2c90ac6eacf3caf589cd420a8c252f33c85b34c32ff7e"
+        },
+        {
+          "path": "tool/verify_watchlist_reload.dart",
+          "sha256": "e8d8ac142c1aa33abb00b89a7c03f5a968b5f25628005c2e5547bb8ae11b8e6d"
+        },
+        {
+          "path": "tool/verify_watchlist_stability.dart",
+          "sha256": "8df9e7998fdf97ce1cb31db63fa9874da9734e190e5850aac335e71785be05a8"
+        },
+        {
+          "path": "tool/verify_watchlist_ui.dart",
+          "sha256": "6ec527e792f405d0994b160267e646dbd94c9c6c3983afbd59f2e501e7308da9"
+        },
+        {
+          "path": "tool/verify_windows_prerequisites.dart",
+          "sha256": "52983a430be25b3cbca51fc1ba11462abbe6bcac525335302867b5f61e30798a"
+        },
+        {
+          "path": "tool/verify_x11_display.dart",
+          "sha256": "dae3227ac7e771c340788294e6d2f4cdaed8f11d4cba5495c1dd176827af8052"
+        },
+        {
+          "path": "tool/windows/app.manifest",
+          "sha256": "bc8919877937cdde35c14cd117876cb9de3f1be4dc74c2b07306973962cc58ea"
+        },
+        {
+          "path": "tool/windows/capability_state.dart",
+          "sha256": "28d4d375f1a74f09f8c81bc9d505cf90442174b2c2a09e05f3d7c4b7df61ccbf"
+        },
+        {
+          "path": "tool/windows/common.dart",
+          "sha256": "2e804caadd18cd562ad5192e18c6f70104199fe0b4de02d0a74f7096f0213308"
+        },
+        {
+          "path": "tool/windows/enable_release_checks.dart",
+          "sha256": "af6c1004edc7b86630c64faf6e50783e05142c8dbdb3e98de003a159f1233cd9"
+        },
+        {
+          "path": "tool/windows/ime-results.md",
+          "sha256": "62a0265974444a52e94f21a9690feb9df385c616e0fd75f112555597b5900b56"
+        },
+        {
+          "path": "tool/windows/native/Cargo.lock",
+          "sha256": "7fc0111321965672438d3ec9af4a235e97824181e8904a39b473f0c66f744242"
+        },
+        {
+          "path": "tool/windows/native/Cargo.toml",
+          "sha256": "e874cb33e4b55e8a8e11a100d74fe4335fff4d2411e58333659465427b2d8821"
+        },
+        {
+          "path": "tool/windows/native/src/main.rs",
+          "sha256": "2a3dd5574de66c2eed1d31f7a6cfe5506653dbe4cb2fbeba229e45364f7c2287"
+        },
+        {
+          "path": "tool/windows/native/src/platform.rs",
+          "sha256": "5775e46090b56d2bee0b0cb10d72cfb19bc06109ccabcc1a32525daef4e0bed2"
+        },
+        {
+          "path": "tool/windows/sandbox_release_check.dart",
+          "sha256": "8dcd34f924edbe199d29a8ed6eda0de697ecbbd8c3f9835399ed343266430ca8"
+        },
+        {
+          "path": "tool/windows/verify.dart",
+          "sha256": "c676352cbaaf162fe2e1912eeefe6c77565fbd2554b5c579e129bb62a398f517"
+        }
+      ],
+      "source_sha256": "0603d42fbc57accfe0e57acd5e388715b1961a1dda305eb49d36d266e0891066",
+      "application_entry": {
+        "path": "example/watchlist/main.dart",
+        "tracked_in_sdk_repository": true,
+        "sha256": "5ea00a3583f2bb4ea14a5a212bd3a2f3ce1cbbbae324d19ee96971b30f2854da"
+      },
+      "dart": "Dart SDK version: 3.13.4 (stable) (Tue Sep 15 01:01:15 2026 -0700) on \"linux_x64\"",
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+      "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+      "built_at_utc": "2026-09-30T00:54:32.976685Z"
+    },
+    "files": [
+      {
+        "name": "AccessKit-LICENSE-APACHE.txt",
+        "bytes": 9723,
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+      },
+      {
+        "name": "AccessKit-LICENSE-MIT.txt",
+        "bytes": 1023,
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      },
+      {
+        "name": "AccessKit-NOTICE.txt",
+        "bytes": 685,
+        "sha256": "e7c4131d16224a6d73c66b3f7d5b8ada3ec5b0768f8017767f3bb6f9d70a3087"
+      },
+      {
+        "name": "Dart-LICENSE.txt",
+        "bytes": 1502,
+        "sha256": "2cfa3ee8e7512e6d44c854b986510810fadc815f93f890373b3a81c1b6ccd256"
+      },
+      {
+        "name": "GPUI-Kit-LICENSE.txt",
+        "bytes": 10305,
+        "sha256": "d1b0449e5478c574ba4f686c2656df7fe77d66821a61f8b6ed3378a58ed9a811"
+      },
+      {
+        "name": "GPUI-LICENSE-APACHE.txt",
+        "bytes": 10768,
+        "sha256": "752daf2fb234ca4a1fa372c073fe127f44b7b90fd2529ae44273a64f9d53da7a"
+      },
+      {
+        "name": "GPUI-NOTICE.txt",
+        "bytes": 150,
+        "sha256": "e01d43c7cbc0d916485e63d0dbdee41dff93c22118a939135742dca1447f9314"
+      },
+      {
+        "name": "LICENSE",
+        "bytes": 1071,
+        "sha256": "09a57f07cfced3b344cbef7a277da22eb3f0bddfeae5c742d989e9c0827d98a2"
+      },
+      {
+        "name": "README.txt",
+        "bytes": 808,
+        "sha256": "fe3fa8aceed87d10473d43fcea849b34fbcf2e0dccb0060fa4318abea9c6b0b1"
+      },
+      {
+        "name": "RELEASE-CHECKS.md",
+        "bytes": 8288,
+        "sha256": "e3914ac68e70f31c177f30a3668a1ce3c130b5d27296083da8638db771fb74ed"
+      },
+      {
+        "name": "THIRD-PARTY.json",
+        "bytes": 73936,
+        "sha256": "590c165e172aa77e9d163152e79d4b106aaeb8fb7594994c1aa1c43bfb1df720"
+      },
+      {
+        "name": "Watchlist",
+        "bytes": 7332064,
+        "sha256": "b1199fdf5605e26a4af07b3904d541365f5dc541a16d32939bb5131125109d88"
+      },
+      {
+        "name": "gpuidart-launcher",
+        "bytes": 426360,
+        "sha256": "54a8861548aa3a113b43415e440cd41a6f715fce8af578eefe15625ce026cf4a"
+      },
+      {
+        "name": "libgpuidart.so",
+        "bytes": 49424736,
+        "sha256": "80b7bdd730117c246929b3c31678e5d622e3b1472d906d7457a72423c854ce6e"
+      },
+      {
+        "name": "verify",
+        "bytes": 6926896,
+        "sha256": "5e6489bdf2ed426263f8f1081c7f36ec5793df0c2887c56a96641dfa8825dcb2"
+      }
+    ]
+  },
+  "installed_payload_bytes": 64300042,
+  "installed_size_scope": "Extracted payload including verifier, manifest and documentation; excludes system runtime prerequisites",
+  "dependency_inspection": {
+    "/evaluation/extracted/Watchlist": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f1771294000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f1770d13000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f1770d0e000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f1770c25000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f1770a12000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f1771296000)\n",
+      "stderr": ""
+    },
+    "/evaluation/extracted/libgpuidart.so": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fd584bcb000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fd582600000)\n\tlibxkbcommon.so.0 => /lib/x86_64-linux-gnu/libxkbcommon.so.0 (0x00007fd5825b7000)\n\tlibxkbcommon-x11.so.0 => /lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 (0x00007fd5825ad000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd58257f000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fd582496000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd582281000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fd584bcd000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007fd58227b000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fd582273000)\n\tlibxcb-xkb.so.1 => /lib/x86_64-linux-gnu/libxcb-xkb.so.1 (0x00007fd582255000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007fd58223f000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007fd58222e000)\n",
+      "stderr": ""
+    },
+    "/evaluation/extracted/gpuidart-launcher": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f5a3390f000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f5a3387e000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5a3366b000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f5a33911000)\n",
+      "stderr": ""
+    },
+    "/evaluation/extracted/verify": {
+      "status": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f9eb6cc0000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f9eb673f000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f9eb673a000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f9eb6651000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9eb643e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f9eb6cc2000)\n",
+      "stderr": ""
+    }
+  },
+  "working_directory": "/tmp/gpuidart-package-run-VLWCZP",
+  "environment": {
+    "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+    "HOME": "/tmp/gpuidart-package-run-VLWCZP/home",
+    "TMPDIR": "/tmp/gpuidart-package-run-VLWCZP",
+    "DISPLAY": ":99",
+    "XAUTHORITY": "/tmp/xvfb-run.m6KvWE/Xauthority",
+    "LIBGL_ALWAYS_SOFTWARE": "1"
+  },
+  "application_exit_code": 0,
+  "stderr": "",
+  "stdout": "{\"application\":\"watchlist\",\"mode\":\"aot\",\"passed\":true,\"rows\":1000,\"native\":{\"charts\":{},\"theme\":{\"descriptor\":{\"mode\":\"light\"},\"resolved\":{\"background\":\"#FFFFFF\",\"foreground\":\"#0A0A0A\",\"primary\":\"#171717\",\"primary_foreground\":\"#FAFAFA\",\"secondary\":\"#E5E5E5\",\"secondary_foreground\":\"#171717\",\"muted\":\"#F5F5F5\",\"muted_foreground\":\"#737373\",\"accent\":\"#F5F5F5\",\"accent_foreground\":\"#171717\",\"danger\":\"#EF4444\",\"danger_foreground\":\"#FAFAFA\",\"border\":\"#E5E5E5\",\"success\":\"#22C55E\",\"warning\":\"#EAB308\",\"info\":\"#06B6D4\"}},\"revision\":8,\"native_process_id\":60,\"inputs\":{\"search\":{\"entity\":4294967298,\"text\":\"\",\"selection\":{\"start\":0,\"end\":0},\"focused\":false}},\"tables\":{\"watchlist\":{\"entity\":4294967300,\"visible_rows\":{\"start\":0,\"end\":8},\"row_count\":1000,\"dataset\":\"instruments\",\"dataset_revision\":4,\"scroll_y\":0.0,\"view\":{\"source_rows\":1000,\"view_rows\":1000,\"groups\":0,\"spec_hash\":6086514543335466803,\"pending\":false},\"selection\":{\"row\":null,\"record\":null},\"focused\":false}},\"lists\":{},\"subtrees\":{},\"labels\":{\"title\":\"Market watch\",\"source\":\"Sample instruments and prices. No live market feed.\",\"summary\":\"1000 instruments shown · 0 saved\",\"selection\":\"ALP0000 · Alpine Research · 100.07\",\"status\":\"ALP0000 removed from shortlist.\"},\"scrolls\":{},\"panes\":{},\"trees\":{},\"active_sheet\":null,\"controls\":{},\"focus_handle\":null,\"window\":{\"width\":960.0,\"height\":720.0,\"scale_factor\":1.0,\"scroll_y\":0.0},\"native\":{\"materializations\":3,\"rows_constructed\":32,\"cells_constructed\":120,\"data_records_checked\":3,\"data_cells_written\":3,\"view_recomputes\":5,\"view_jobs\":0,\"dataset_copies\":0},\"frame_gaps\":{\"frames\":3,\"longest_gap_us\":751958,\"since_mark_us\":786518},\"draw\":{\"samples\":3,\"p50_us\":2652.159,\"p95_us\":11190.271,\"p99_us\":11190.271},\"dirty_to_present_submit\":{\"samples\":1,\"p50_us\":19218.431,\"p95_us\":19218.431,\"p99_us\":19218.431},\"present_interval\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0},\"input_to_frame\":{\"samples\":0,\"p50_us\":0.0,\"p95_us\":0.0,\"p99_us\":0.0}},\"runtime\":{\"application\":{\"pid\":60,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":456691,\"cpu_system_us\":64814,\"memory_peak_bytes\":{\"rss\":185335808},\"memory_peak_source\":\"getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes\",\"loaded_images\":[\"/evaluation/extracted/Watchlist\",\"/evaluation/extracted/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":185921536,\"Pss\":182110208,\"Pss_Dirty\":71520256,\"Pss_Anon\":59707392,\"Pss_File\":110594048,\"Pss_Shmem\":11808768,\"Shared_Clean\":5873664,\"Shared_Dirty\":0,\"Private_Clean\":108527616,\"Private_Dirty\":71520256,\"Referenced\":185921536,\"Anonymous\":59707392,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false},\"ui\":{\"pid\":60,\"os\":\"linux\",\"arch\":\"x86_64\",\"cpu_user_us\":456691,\"cpu_system_us\":65939,\"memory_peak_bytes\":{\"rss\":185335808},\"memory_peak_source\":\"getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes\",\"loaded_images\":[\"/evaluation/extracted/Watchlist\",\"/evaluation/extracted/libgpuidart.so\",\"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\",\"/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1\",\"/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so\",\"/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0\",\"/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1\",\"/usr/lib/x86_64-linux-gnu/libc.so.6\",\"/usr/lib/x86_64-linux-gnu/libdl.so.2\",\"/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0\",\"/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0\",\"/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72\",\"/usr/lib/x86_64-linux-gnu/libelf-0.190.so\",\"/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1\",\"/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4\",\"/usr/lib/x86_64-linux-gnu/libgcc_s.so.1\",\"/usr/lib/x86_64-linux-gnu/libicudata.so.74.2\",\"/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2\",\"/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5\",\"/usr/lib/x86_64-linux-gnu/libm.so.6\",\"/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libpthread.so.0\",\"/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33\",\"/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4\",\"/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275\",\"/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so\",\"/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so\",\"/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0\",\"/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14\",\"/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0\",\"/usr/lib/x86_64-linux-gnu/libz.so.1.3\",\"/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5\"],\"loaded_images_source\":\"/proc/self/maps executable file mappings\",\"memory_bytes\":{\"Rss\":185946112,\"Pss\":182134784,\"Pss_Dirty\":71544832,\"Pss_Anon\":59731968,\"Pss_File\":110594048,\"Pss_Shmem\":11808768,\"Shared_Clean\":5873664,\"Shared_Dirty\":0,\"Private_Clean\":108527616,\"Private_Dirty\":71544832,\"Referenced\":185946112,\"Anonymous\":59731968,\"KSM\":0,\"LazyFree\":0,\"AnonHugePages\":6291456,\"ShmemPmdMapped\":0,\"FilePmdMapped\":0,\"Shared_Hugetlb\":0,\"Private_Hugetlb\":0,\"Swap\":0,\"SwapPss\":0,\"Locked\":0},\"memory_source\":\"/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them\",\"main_thread\":false}},\"metrics\":{\"description_builds\":8,\"encoded_snapshots\":7,\"operation_publications\":7,\"resubmitted_publications\":0,\"patches\":0,\"encoded_bytes\":3891,\"ffi_callbacks\":26,\"ui_callbacks\":0,\"diagnostic_callbacks\":9,\"description_build\":{\"samples\":8,\"p50_us\":44,\"p95_us\":57,\"p99_us\":57},\"encode\":{\"samples\":7,\"p50_us\":11,\"p95_us\":19,\"p99_us\":19},\"publish_to_applied\":{\"samples\":7,\"p50_us\":239,\"p95_us\":19412,\"p99_us\":19412},\"initial\":{\"bytes\":63171,\"encode_us\":785},\"data_messages\":3,\"data_bytes\":439,\"data_records_checked\":3,\"data_cells_written\":3,\"data_encode\":{\"samples\":3,\"p50_us\":3,\"p95_us\":16,\"p99_us\":16},\"data_pack\":{\"samples\":0,\"p50_us\":0,\"p95_us\":0,\"p99_us\":0},\"data_publish_to_applied\":{\"samples\":3,\"p50_us\":108,\"p95_us\":439,\"p99_us\":439},\"native_data_parse\":{\"samples\":3,\"p50_us\":7,\"p95_us\":10,\"p99_us\":10},\"native_data_apply\":{\"samples\":3,\"p50_us\":15,\"p95_us\":173,\"p99_us\":173},\"native_snapshot_apply\":{\"samples\":7,\"p50_us\":42,\"p95_us\":185,\"p99_us\":185}}}\n",
+  "application": {
+    "application": "watchlist",
+    "mode": "aot",
+    "passed": true,
+    "rows": 1000,
+    "native": {
+      "charts": {},
+      "theme": {
+        "descriptor": {
+          "mode": "light"
+        },
+        "resolved": {
+          "background": "#FFFFFF",
+          "foreground": "#0A0A0A",
+          "primary": "#171717",
+          "primary_foreground": "#FAFAFA",
+          "secondary": "#E5E5E5",
+          "secondary_foreground": "#171717",
+          "muted": "#F5F5F5",
+          "muted_foreground": "#737373",
+          "accent": "#F5F5F5",
+          "accent_foreground": "#171717",
+          "danger": "#EF4444",
+          "danger_foreground": "#FAFAFA",
+          "border": "#E5E5E5",
+          "success": "#22C55E",
+          "warning": "#EAB308",
+          "info": "#06B6D4"
+        }
+      },
+      "revision": 8,
+      "native_process_id": 60,
+      "inputs": {
+        "search": {
+          "entity": 4294967298,
+          "text": "",
+          "selection": {
+            "start": 0,
+            "end": 0
+          },
+          "focused": false
+        }
+      },
+      "tables": {
+        "watchlist": {
+          "entity": 4294967300,
+          "visible_rows": {
+            "start": 0,
+            "end": 8
+          },
+          "row_count": 1000,
+          "dataset": "instruments",
+          "dataset_revision": 4,
+          "scroll_y": 0.0,
+          "view": {
+            "source_rows": 1000,
+            "view_rows": 1000,
+            "groups": 0,
+            "spec_hash": 6086514543335466803,
+            "pending": false
+          },
+          "selection": {
+            "row": null,
+            "record": null
+          },
+          "focused": false
+        }
+      },
+      "lists": {},
+      "subtrees": {},
+      "labels": {
+        "title": "Market watch",
+        "source": "Sample instruments and prices. No live market feed.",
+        "summary": "1000 instruments shown · 0 saved",
+        "selection": "ALP0000 · Alpine Research · 100.07",
+        "status": "ALP0000 removed from shortlist."
+      },
+      "scrolls": {},
+      "panes": {},
+      "trees": {},
+      "active_sheet": null,
+      "controls": {},
+      "focus_handle": null,
+      "window": {
+        "width": 960.0,
+        "height": 720.0,
+        "scale_factor": 1.0,
+        "scroll_y": 0.0
+      },
+      "native": {
+        "materializations": 3,
+        "rows_constructed": 32,
+        "cells_constructed": 120,
+        "data_records_checked": 3,
+        "data_cells_written": 3,
+        "view_recomputes": 5,
+        "view_jobs": 0,
+        "dataset_copies": 0
+      },
+      "frame_gaps": {
+        "frames": 3,
+        "longest_gap_us": 751958,
+        "since_mark_us": 786518
+      },
+      "draw": {
+        "samples": 3,
+        "p50_us": 2652.159,
+        "p95_us": 11190.271,
+        "p99_us": 11190.271
+      },
+      "dirty_to_present_submit": {
+        "samples": 1,
+        "p50_us": 19218.431,
+        "p95_us": 19218.431,
+        "p99_us": 19218.431
+      },
+      "present_interval": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      },
+      "input_to_frame": {
+        "samples": 0,
+        "p50_us": 0.0,
+        "p95_us": 0.0,
+        "p99_us": 0.0
+      }
+    },
+    "runtime": {
+      "application": {
+        "pid": 60,
+        "os": "linux",
+        "arch": "x86_64",
+        "cpu_user_us": 456691,
+        "cpu_system_us": 64814,
+        "memory_peak_bytes": {
+          "rss": 185335808
+        },
+        "memory_peak_source": "getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes",
+        "loaded_images": [
+          "/evaluation/extracted/Watchlist",
+          "/evaluation/extracted/libgpuidart.so",
+          "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1",
+          "/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so",
+          "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1",
+          "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+          "/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0",
+          "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0",
+          "/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72",
+          "/usr/lib/x86_64-linux-gnu/libelf-0.190.so",
+          "/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1",
+          "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+          "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "/usr/lib/x86_64-linux-gnu/libicudata.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5",
+          "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+          "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+          "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4",
+          "/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so",
+          "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14",
+          "/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+          "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5"
+        ],
+        "loaded_images_source": "/proc/self/maps executable file mappings",
+        "memory_bytes": {
+          "Rss": 185921536,
+          "Pss": 182110208,
+          "Pss_Dirty": 71520256,
+          "Pss_Anon": 59707392,
+          "Pss_File": 110594048,
+          "Pss_Shmem": 11808768,
+          "Shared_Clean": 5873664,
+          "Shared_Dirty": 0,
+          "Private_Clean": 108527616,
+          "Private_Dirty": 71520256,
+          "Referenced": 185921536,
+          "Anonymous": 59707392,
+          "KSM": 0,
+          "LazyFree": 0,
+          "AnonHugePages": 6291456,
+          "ShmemPmdMapped": 0,
+          "FilePmdMapped": 0,
+          "Shared_Hugetlb": 0,
+          "Private_Hugetlb": 0,
+          "Swap": 0,
+          "SwapPss": 0,
+          "Locked": 0
+        },
+        "memory_source": "/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them",
+        "main_thread": false
+      },
+      "ui": {
+        "pid": 60,
+        "os": "linux",
+        "arch": "x86_64",
+        "cpu_user_us": 456691,
+        "cpu_system_us": 65939,
+        "memory_peak_bytes": {
+          "rss": 185335808
+        },
+        "memory_peak_source": "getrusage RUSAGE_SELF ru_maxrss; lifetime high-water RSS, KiB converted to bytes",
+        "loaded_images": [
+          "/evaluation/extracted/Watchlist",
+          "/evaluation/extracted/libgpuidart.so",
+          "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1",
+          "/usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so",
+          "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0",
+          "/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1",
+          "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+          "/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0",
+          "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0",
+          "/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72",
+          "/usr/lib/x86_64-linux-gnu/libelf-0.190.so",
+          "/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1",
+          "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+          "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "/usr/lib/x86_64-linux-gnu/libicudata.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2",
+          "/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5",
+          "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+          "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+          "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4",
+          "/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_asahi.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_gfxstream.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_lvp.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+          "/usr/lib/x86_64-linux-gnu/libvulkan_virtio.so",
+          "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb-xkb.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0",
+          "/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14",
+          "/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0",
+          "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+          "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5"
+        ],
+        "loaded_images_source": "/proc/self/maps executable file mappings",
+        "memory_bytes": {
+          "Rss": 185946112,
+          "Pss": 182134784,
+          "Pss_Dirty": 71544832,
+          "Pss_Anon": 59731968,
+          "Pss_File": 110594048,
+          "Pss_Shmem": 11808768,
+          "Shared_Clean": 5873664,
+          "Shared_Dirty": 0,
+          "Private_Clean": 108527616,
+          "Private_Dirty": 71544832,
+          "Referenced": 185946112,
+          "Anonymous": 59731968,
+          "KSM": 0,
+          "LazyFree": 0,
+          "AnonHugePages": 6291456,
+          "ShmemPmdMapped": 0,
+          "FilePmdMapped": 0,
+          "Shared_Hugetlb": 0,
+          "Private_Hugetlb": 0,
+          "Swap": 0,
+          "SwapPss": 0,
+          "Locked": 0
+        },
+        "memory_source": "/proc/self/smaps_rollup; RSS includes shared pages; PSS apportions them",
+        "main_thread": false
+      }
+    },
+    "metrics": {
+      "description_builds": 8,
+      "encoded_snapshots": 7,
+      "operation_publications": 7,
+      "resubmitted_publications": 0,
+      "patches": 0,
+      "encoded_bytes": 3891,
+      "ffi_callbacks": 26,
+      "ui_callbacks": 0,
+      "diagnostic_callbacks": 9,
+      "description_build": {
+        "samples": 8,
+        "p50_us": 44,
+        "p95_us": 57,
+        "p99_us": 57
+      },
+      "encode": {
+        "samples": 7,
+        "p50_us": 11,
+        "p95_us": 19,
+        "p99_us": 19
+      },
+      "publish_to_applied": {
+        "samples": 7,
+        "p50_us": 239,
+        "p95_us": 19412,
+        "p99_us": 19412
+      },
+      "initial": {
+        "bytes": 63171,
+        "encode_us": 785
+      },
+      "data_messages": 3,
+      "data_bytes": 439,
+      "data_records_checked": 3,
+      "data_cells_written": 3,
+      "data_encode": {
+        "samples": 3,
+        "p50_us": 3,
+        "p95_us": 16,
+        "p99_us": 16
+      },
+      "data_pack": {
+        "samples": 0,
+        "p50_us": 0,
+        "p95_us": 0,
+        "p99_us": 0
+      },
+      "data_publish_to_applied": {
+        "samples": 3,
+        "p50_us": 108,
+        "p95_us": 439,
+        "p99_us": 439
+      },
+      "native_data_parse": {
+        "samples": 3,
+        "p50_us": 7,
+        "p95_us": 10,
+        "p99_us": 10
+      },
+      "native_data_apply": {
+        "samples": 3,
+        "p50_us": 15,
+        "p95_us": 173,
+        "p99_us": 173
+      },
+      "native_snapshot_apply": {
+        "samples": 7,
+        "p50_us": 42,
+        "p95_us": 185,
+        "p99_us": 185
+      }
+    }
+  },
+  "limitation": "Hash, extracted launch, dependency and native-window checks only. Environment cleanliness is an operator declaration. Human IME, Retina/fractional scaling and physical presentation remain separate checks."
+}
