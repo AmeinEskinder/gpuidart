@@ -381,8 +381,10 @@ impl WindowsPlatform {
             .name("VSyncProvider".to_owned())
             .spawn(move || {
                 let vsync_provider = VSyncProvider::new();
+                let pacer = FramePacer::new();
                 loop {
                     vsync_provider.wait_for_vsync();
+                    pacer.wait();
                     if check_device_lost(&directx_device.device)
                         || invalidate_devices.fetch_and(false, Ordering::Acquire)
                     {

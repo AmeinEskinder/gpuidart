@@ -1361,10 +1361,17 @@ impl WindowsWindowInner {
             // will rebuild the scene with fresh atlas textures.
             self.state.renderer.borrow_mut().mark_drawable();
         }
+        let draw_started = std::time::Instant::now();
         request_frame(RequestFrameOptions {
             require_presentation: false,
             force_render,
         });
+        // A draw that presented is a sample for the frame pacer, and a
+        // present nothing followed gets its statistics read once more.
+        if last_presents(handle.0 as isize)[0].is_some_and(|at| at >= draw_started) {
+            record_draw(draw_started.elapsed());
+        }
+        self.state.renderer.borrow_mut().settle_present_feedback();
 
         self.state.callbacks.request_frame.set(Some(request_frame));
         self.update_ime_enabled(handle);

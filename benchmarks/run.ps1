@@ -11,6 +11,7 @@ param(
     [switch]$ReleaseRecords,
     [switch]$FlutterIsolate,
     [ValidateSet(30, 60)][int]$ScrollRate = 60,
+    [ValidateRange(0.0, 100.0)][double]$InputJitterMs = (1000.0 / 60),
     [ValidateRange(0,1000000)][int]$Rows = 100000
 )
 $ErrorActionPreference = 'Stop'
@@ -135,7 +136,27 @@ try {
     $period = switch ($Workload) { idle { [double]::PositiveInfinity } scroll { 1000.0 / $ScrollRate } cell { 200.0 } burst { 1000.0 / 30 } view { 1000.0 } }
     $plannedInputs = $Seconds * $(switch ($Workload) { idle { 0 } scroll { $ScrollRate } cell { 5 } burst { 30 } view { 1 } })
     $wheelDelta = switch ($Implementation) { solid { -156 } flutter { -117 } default { -120 } }
-    $nextInput = 0.0
+    # Inputs at 60, 30 or 5 a second against a 59.96 Hz panel stay almost
+    # locked to the refresh, so within a run they sample a fraction of the
+    # interval and the run's median depends on where it started. Every
+    # input is offset by a seeded uniform draw over one refresh interval,
+    # capped just under the input period so the order and the count hold.
+    # The seed is the workload and the attempt's ordinal in its series, so
+    # both fixtures' n-th attempts get the same offsets.
+    $seriesPrefix = $RunId -replace '-\d+$', ''
+    $attemptOrdinal = @(Get-ChildItem -Directory -Path (Join-Path $root 'reports/comparison') -Filter "$seriesPrefix-*" | Where-Object { $_.Name -ne $RunId -and (Test-Path (Join-Path $_.FullName "$Implementation-$Workload")) }).Count
+    $jitterSeed = 7919 * (1 + $attemptOrdinal) + @{ idle = 0; scroll = 1; cell = 2; burst = 3; view = 4 }[$Workload]
+    $jitterSpan = if ($plannedInputs -gt 0) { [math]::Min($InputJitterMs, $period * 0.999) } else { 0.0 }
+    $jitterRandom = New-Object System.Random($jitterSeed)
+    $jitter = New-Object 'double[]' ([math]::Max(1, $plannedInputs))
+    for ($j = 0; $j -lt $plannedInputs; $j++) { $jitter[$j] = $jitterRandom.NextDouble() * $jitterSpan }
+    # The last input keeps clear of the end of the window, or a draw that
+    # puts it in the final millisecond is never sent.
+    if ($plannedInputs -gt 0) {
+        $latest = $Seconds * 1000.0 - 2.0 - ($plannedInputs - 1) * $period
+        if ($jitter[$plannedInputs - 1] -gt $latest) { $jitter[$plannedInputs - 1] = [math]::Max(0.0, $latest) }
+    }
+    $nextInput = $jitter[0]
     $nextSlot = 0
     $nextSample = 0.0
     $missedInputDeadlines = 0
@@ -164,7 +185,7 @@ try {
                     $skipped = [math]::Floor($late / $period)
                     $missedInputDeadlines += $skipped
                     $nextSlot += $skipped
-                    $nextInput = $nextSlot * $period
+                    $nextInput = $nextSlot * $period + $jitter[[math]::Min($nextSlot, $jitter.Length - 1)]
                 }
                 $qpc = [Diagnostics.Stopwatch]::GetTimestamp()
                 $sequence = $inputTimes.Count + 1
@@ -177,7 +198,7 @@ try {
                 }
                 $inputTimes.Add(@{ sequence = $sequence; qpc = $qpc; injection_completed_qpc = [Diagnostics.Stopwatch]::GetTimestamp(); packets_accepted = $sentPackets; scheduled_ms = $nextInput; sent_ms = $elapsed })
                 $nextSlot++
-                $nextInput = $nextSlot * $period
+                $nextInput = $nextSlot * $period + $jitter[[math]::Min($nextSlot, $jitter.Length - 1)]
             }
             if ($hovering -and $elapsed -ge $nextHover) {
                 $hoverStep++
@@ -198,7 +219,7 @@ try {
         }
         if (-not $measuring) {
             $inputTimes.Clear(); $samples.Clear()
-            $nextInput = 0.0; $nextSlot = 0; $nextSample = 0.0; $missedInputDeadlines = 0
+            $nextInput = $jitter[0]; $nextSlot = 0; $nextSample = 0.0; $missedInputDeadlines = 0
             $nextHover = 0.0; $hoverStep = 0; $hoverMoves = 0
             $app.Refresh()
             $cpuStart = $app.TotalProcessorTime.TotalMilliseconds
@@ -278,7 +299,7 @@ try {
         driver_warmup = -not [bool]$BackgroundSmoke
         input_count = $inputTimes.Count; input_deadlines_missed = $missedInputDeadlines
         hover_moves = $hoverMoves
-        planned_inputs = $plannedInputs; scroll_rate = $(if ($Workload -eq 'scroll') { $ScrollRate } else { $null })
+        planned_inputs = $plannedInputs; scroll_rate = $(if ($Workload -eq 'scroll') { $ScrollRate } else { $null }); input_jitter_ms = $jitterSpan; input_jitter_seed = $jitterSeed; attempt_ordinal = $attemptOrdinal
         correctness = @{
             passed = $verificationIssues.Count -eq 0; issues = @($verificationIssues.ToArray())
             expected_updates = $expectedUpdates; observed_updates = $verification.updates

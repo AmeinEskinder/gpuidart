@@ -120,8 +120,38 @@ update reads it to tell a window that is painting at every tick, where an
 extra frame would be rendered for nothing, from one that has been idle; the
 clock is per window so that one window's presents never mark another busy.
 
+The feedback reads the statistics once more 60 ms after a present that
+nothing followed (`settle`, called from the paint handler), since the swap
+chain names a present as shown only in a later reading and a window that
+stops painting would otherwise leave its last present unconfirmed.
+
 The benchmark runner sets the variable for the GPUI fixtures when it captures
 or traces. The reason is in the capture report of 2026-09-29: PresentMon, with
 or without elevation, follows almost none of a composed flip-model swap
 chain's presents to the display on this system and drops part of them from
 its record, while the swap chain reports both.
+
+## Windows frame pacing
+
+[frame-pacing.patch](frame-pacing.patch) changes when the vsync tick of the
+Windows platform invalidates its windows. Upstream invalidates right after
+`DwmFlush` returns, which is just after the compositor's pass: a frame is
+then drawn and presented early in the refresh interval and waits the rest
+of it for the next pass (the comparison fixture presented 3.8 to 5.1 ms
+after the vertical blank and reached the display 28 to 29 ms after the
+present, against 7.2 to 7.6 and 26 ms for a Flutter window on the same
+panel). The patched tick waits, on a high-resolution waitable timer, until
+the next vertical blank less a margin the compositor needs less the recent
+99th percentile of the draw time (sampled in the paint handler from the
+draws that presented), so the present lands late in the interval and the
+frame carries input up to that later moment; when draws are long the wait
+is zero and the tick is upstream's. `GPUI_FRAME_PACING=0` turns it off and
+`GPUI_FRAME_PACING_MARGIN_US` replaces the margin, which was found by
+sweeping it on the comparison fixture: with margins of 1, 2 and
+3 ms, 11.0, 2.8 and 1.1 percent of frames were shown a refresh late; at 4 ms
+none were, but 15 of 598 presents were never shown; 5 ms is the smallest
+margin with at least 99 percent of frames at the second blank and under 2
+percent unshown, and is the default. Over six runs a side the paced tick
+presents 9.0 ms after the blank on the burst workload and 10.1 on scroll
+instead of 4.9 and 5.1, and present to display falls from 28.4 ms to 24.4
+and 23.3.

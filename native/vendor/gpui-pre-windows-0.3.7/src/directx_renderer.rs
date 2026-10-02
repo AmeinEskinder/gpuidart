@@ -53,6 +53,8 @@ struct PresentFeedback {
     lines: Vec<String>,
     written: bool,
     last_flush: std::time::Instant,
+    unsettled: bool,
+    last_present: std::time::Instant,
 }
 
 impl PresentFeedback {
@@ -63,6 +65,8 @@ impl PresentFeedback {
             lines: Vec::new(),
             written: false,
             last_flush: std::time::Instant::now(),
+            unsettled: false,
+            last_present: std::time::Instant::now(),
         })
     }
 
@@ -74,7 +78,23 @@ impl PresentFeedback {
         value
     }
 
+    /// One more reading for a present nothing followed. The swap chain
+    /// names a present as shown only in a later reading, so a window that
+    /// stops painting would leave its last present unconfirmed; by 60 ms it
+    /// has reached the display.
+    fn settle(&mut self, swap_chain: &IDXGISwapChain1) {
+        if self.unsettled && self.last_present.elapsed() >= std::time::Duration::from_millis(60) {
+            self.unsettled = false;
+            self.record(swap_chain, 0);
+            self.flush();
+        }
+    }
+
     fn record(&mut self, swap_chain: &IDXGISwapChain1, start: i64) {
+        if start != 0 {
+            self.unsettled = true;
+            self.last_present = std::time::Instant::now();
+        }
         let end = Self::qpc();
         let count = unsafe { swap_chain.GetLastPresentCount() }.unwrap_or(0);
         let mut statistics = DXGI_FRAME_STATISTICS::default();
@@ -364,6 +384,12 @@ impl DirectXRenderer {
             feedback.record(swap_chain, start);
         }
         result.ok().context("Presenting swap chain failed")
+    }
+
+    pub(crate) fn settle_present_feedback(&mut self) {
+        if let (Some(feedback), Some(resources)) = (&mut self.present_feedback, &self.resources) {
+            feedback.settle(&resources.swap_chain);
+        }
     }
 
     pub(crate) fn handle_device_lost(&mut self, directx_devices: &DirectXDevices) -> Result<()> {

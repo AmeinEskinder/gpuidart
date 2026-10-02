@@ -168,6 +168,19 @@ and 11 ms sooner at the 95th percentile (37.6 against 48.2), with one
 present per click; on the burst the window made 598 presents in ten
 seconds against 597 with the repaint off.
 
+The vsync tick itself is paced on Windows (a patch to the vendored
+platform, [frame-pacing.patch](../native/vendor/frame-pacing.patch)): the
+tick waits until the next vertical blank less a margin for the compositor
+less the recent 99th percentile of the draw time before it invalidates the
+window, so a frame drawn at the tick is presented late in the refresh
+interval, carries input up to that later moment, and reaches the display
+at the same blank it would have. Unpaced, the window presented 4 to 5 ms
+after the blank and waited 28 to 29 ms for the display; paced with the default 5 ms
+margin it presents 9 to 10 ms after the blank and waits 23 to 24, and input
+reaches the display 5 to 6 ms sooner at the median on the burst and scroll
+workloads (six runs a side).
+`GPUI_FRAME_PACING=0` turns the pacing off.
+
 `GPUIDART_DRAW_ON_UPDATE=0` in the process environment turns the repaint
 off, which is the behavior on macOS and Linux; `GPUIDART_DRAW_ON_UPDATE=always`
 fires it after every update regardless of idleness, for measurement. The
