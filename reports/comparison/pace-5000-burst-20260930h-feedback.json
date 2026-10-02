@@ -1,0 +1,48 @@
+{
+  "scope": "from the moment the injection completed to the first Present call after it, and to the vertical blank the swap chain reports the first present at or after that one was shown at (a first present the display never took is superseded by the next, which carries the change too)",
+  "runs": [
+    {
+      "run": "pace-5000-burst-20260930h-0",
+      "implementation": "dart",
+      "workload": "burst",
+      "eligible": true,
+      "inputs": 300,
+      "deadlines_missed": 0,
+      "presents_in_window": 598,
+      "presents_shown_in_window": 594,
+      "input_to_present_ms": {
+        "n": 300,
+        "p50": 11.182,
+        "p95": 18.548,
+        "p99": 19.729,
+        "max": 20.689
+      },
+      "input_to_display_ms": {
+        "n": 300,
+        "p50": 35.075,
+        "p95": 43.006,
+        "p99": 45.653,
+        "max": 52.7
+      },
+      "inputs_without_a_later_present": 0,
+      "inputs_whose_present_was_not_seen_displayed": 0,
+      "inputs_whose_first_present_was_superseded": 4,
+      "presents_never_displayed_in_window": 4,
+      "between_presents_ms": {
+        "n": 597,
+        "p50": 16.552,
+        "p95": 21.543,
+        "p99": 22.246,
+        "max": 34.126
+      },
+      "present_to_display_ms": {
+        "n": 594,
+        "p50": 24.856,
+        "p95": 29.706,
+        "p99": 29.989,
+        "max": 30.281
+      },
+      "source": "swap chain feedback (GPUI_PRESENT_FEEDBACK)"
+    }
+  ]
+}
